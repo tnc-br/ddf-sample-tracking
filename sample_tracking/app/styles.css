@@ -1,0 +1,22 @@
+.nav-link {
+    color: black;
+    display: flex;
+    flex-direction: row;
+}
+
+.nav-link span {
+    padding-right: 10px;
+}
+
+.nav-wrapper {
+    position: absolute;
+    width: 256px;
+    top: 67px;
+    margin: 20px;
+}
+
+.add-sample-button {
+    border-radius: 30px;
+    box-shadow: 2px 2px 5px;
+    margin-bottom: 20px;
+}

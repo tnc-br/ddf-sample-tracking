@@ -1,0 +1,69 @@
+.title {
+    font-family: Google Sans;
+    font-size: 28px;
+    font-weight: 400;
+    line-height: 36px;
+    letter-spacing: 0px;
+    text-align: left;
+
+}
+
+.add-sample-page-wrapper {
+    margin: 30px;
+}
+
+.subtitle {
+    width: Fixed (930px);
+    height: Hug (24px);
+    gap: 32px;
+}
+
+.qrcode-text {
+    width: 457px;
+    height: 20px;
+}
+
+
+.print-button {
+    background-color:lightblue;
+    width: 86px;
+    padding: 5px;
+    margin-top: 30px;
+    margin-bottom: 30px;
+    border-radius: 3px;
+}
+
+.submit-buttons {
+    float: right;
+}
+
+.sample-details-form {
+    width: 542px;
+}
+
+.form-group {
+    margin-bottom: 1rem;
+  }
+  
+  .form-inline .form-control {
+    display: inline-block;
+    width: auto;
+    vertical-align: middle;
+  }
+  
+  .form-row {
+    display: flex;
+    justify-content: space-between;
+  }
+  
+  label {
+    margin-bottom: 0.5rem;
+  }
+
+  .latlon-input {
+    width: 48%;
+  }
+
+  .btn-primary {
+    margin-left: 15px;
+  }
