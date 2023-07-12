@@ -1,0 +1,13 @@
+.admin-wrapper {
+    position: absolute;
+    left: 304px;
+    width: 1088px;
+}
+
+.btn {
+    margin: 10px;
+}
+
+.header {
+    font-size: 1.4em;
+}

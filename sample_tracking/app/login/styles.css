@@ -1,0 +1,38 @@
+
+
+svg {
+    margin: 10px;
+}
+
+.bg-grey {
+    background-color: lightgray;
+}
+
+.sign-up-progress-wrapper {
+    display: flex;
+    justify-content: space-between;
+    width: 250px;
+    margin-bottom: 20px;
+    margin-top: 20px;
+}
+
+.sign-up-progress {
+    margin-right: 10px;
+}
+
+.container {
+    width: 424px !important;
+}
+
+.btn-primary {
+    margin-top: 20px;
+}
+
+.back-arrow {
+    margin-right: 15px;
+    cursor: pointer;
+}
+
+.text-blue {
+    color: blue;
+}
