@@ -8,9 +8,8 @@ import { initializeApp } from "firebase/app";
 import { getAuth, signInWithEmailAndPassword, signInWithPopup, createUserWithEmailAndPassword, onAuthStateChanged, GoogleAuthProvider, FacebookAuthProvider, updateProfile } from "firebase/auth";
 import { useRouter } from 'next/navigation'
 import { firebaseConfig } from '../firebase_config';
-import { doc, setDoc, getFirestore } from "firebase/firestore";
+import { doc, setDoc, getDocs, collection, getFirestore, updateDoc, arrayUnion, addDoc } from "firebase/firestore";
 import './styles.css';
-
 
 export default function LogInSignUpPage() {
 
@@ -211,34 +210,40 @@ export function SignUp({
   router,
 }) {
 
-  const roles = {
-    'Guest': 'guest',
-    'Admin': 'admin',
-    'Lab technician': 'lab_tech',
-    'Law enforcement': 'law_enforcement',
-  }
-
   const [signUpTab, setSignUpTab] = useState(0);
   const [signUpData, setSignUpData] = useState({});
+  const [availableOrgs, setAvailableOrgs] = useState({});
 
   function updateSignUpData(signUpData) {
     setSignUpData(signUpData);
   }
 
   const auth = getAuth();
+  const db = getFirestore();
+
+  if (Object.keys(availableOrgs).length < 1) {
+    const orgs = {};
+    getDocs(collection(db, "organizations")).then((querySnapshot) => {
+      console.log('made request to organizations');
+      querySnapshot.forEach((doc) => {
+        const docData = doc.data();
+        orgs[docData['org_name']] = doc.id;
+      });
+      setAvailableOrgs(orgs);
+    });
+  }
 
   function finishYourDetailsTab() {
     console.log('here');
     const firstName = document.getElementById('firstName')!.value;
     const lastName = document.getElementById('lastName')!.value;
-    const role = document.getElementById('roleSelect')!.value;
     const lab = document.getElementById('labSelect')!.value;
-    if (firstName.length > 0 && lastName.length > 0 && role.length > 0 && lab.length > 0) {
+    const labValue = lab === 'Create new organization' ? "NEW" : availableOrgs[lab];
+    if (firstName.length > 0 && lastName.length > 0 && lab.length > 0) {
       updateSignUpData({
         firstName: firstName,
         lastName: lastName,
-        role: role,
-        lab: lab,
+        lab: labValue,
       })
       setSignUpTab(1);
     }
@@ -249,22 +254,58 @@ export function SignUp({
     const password = document.getElementById('password')!.value;
     const reEnterPassword = document.getElementById('reEnterPassword')!.value;
     const name = `${signUpData.firstName} ${signUpData.lastName}`;
+    const newOrgName = document.getElementById('newOrgName') ? document.getElementById('newOrgName')!.value : '';
     if (password !== reEnterPassword) {
       console.log('Passwords dont match');
       return;
-    } 
+    }
     await createUserWithEmailAndPassword(auth, email, password);
     await updateProfile(auth.currentUser, {
       displayName: name,
     });
-    const db = getFirestore();
-    const docRef = doc(db, "users", auth.currentUser!.uid);
-    setDoc(docRef, {
-      lab: signUpData.lab,
-      name: name,
-      role: roles[signUpData.role],
-      role_approval_status: "needs_approval",
-    });
+
+    // const docRef = doc(db, "users", auth.currentUser!.uid);
+    // setDoc(docRef, {
+    //   lab: signUpData.lab,
+    //   name: name,
+    //   role_approval_status: "needs_approval",
+    // });
+
+    const date = new Date();
+    const dateString = `${date.getMonth() + 1} ${date.getDate()} ${date.getFullYear()}`;
+    if (signUpData.lab === 'NEW') {
+      const newOrgDoc = doc(db, "new_users", "new_orgs");
+      let newObj = {};
+      newObj[newOrgName] = {
+        admin_id: auth.currentUser!.uid,
+        admin_name: name,
+        email: email,
+        date_requested: dateString,
+      }
+      updateDoc(newOrgDoc, newObj);
+    } else {
+      // const newUserDocRef = doc(db, "new_users", signUpData.lab);
+      // let newObj = {};
+      // newObj[auth.currentUser!.uid] = {
+      //   name: name,
+      //   email: email,
+      //   date_requested: dateString,
+      //   org: signUpData.lab,
+      // }
+      addDoc(collection(db, "new_users"), {
+        name: name,
+        email: email,
+        date_requested: dateString,
+        org: signUpData.lab,
+        uid: auth.currentUser!.uid,
+      })
+      // updateDoc(newUserDocRef, {
+      //   prospective_members: arrayUnion(auth.currentUser!.uid),
+
+      // });
+    }
+
+
 
 
     router.push('/tasks');
@@ -274,7 +315,7 @@ export function SignUp({
   function yourDetailsTab() {
     return (<div className='your-details-tab'>
       <div className="form-outline mb-4">
-        <input type="text" name="name" placeholder='First name'  id="firstName" className="form-control form-control-lg" />
+        <input type="text" name="name" placeholder='First name' id="firstName" className="form-control form-control-lg" />
       </div>
 
       <div className="form-outline mb-4">
@@ -282,19 +323,16 @@ export function SignUp({
       </div>
 
       <div className="form-group">
-        <label htmlFor="roleSelect">Role</label>
-        <select className="form-control" id="roleSelect">
-          <option>Guest</option>
-          <option>Admin</option>
-          <option>Lab technician</option>
-          <option>Law enforcement</option>
-        </select>
-      </div>
-
-      <div className="form-group">
-        <label htmlFor="labSelect">Lab</label>
+        <label htmlFor="labSelect">Organization</label>
         <select className="form-control" id="labSelect">
-          <option>Test lab</option>
+          <option key="newOrgOption" id="newOrgOption">Create new organization</option>
+          {
+            Object.keys(availableOrgs).map((key, i) => {
+              return (
+                <option key={key} id={key}>{key}</option>
+              )
+            })
+          }
         </select>
       </div>
       <button type="button" onClick={finishYourDetailsTab} className="btn btn-primary">Next</button>
@@ -304,8 +342,12 @@ export function SignUp({
   function accountInfo() {
     return (
       <div className='account-info-tab'>
+        {signUpData['lab'] === "NEW" && <div className="form-outline mb-4">
+          <input type="text" name="newOrgName" autoComplete="off" placeholder='New organization name' id="newOrgName" className="form-control form-control-lg" />
+        </div>}
+
         <div className="form-outline mb-4">
-          <input type="email" name="email" placeholder='Email address'  id="email" className="form-control form-control-lg" />
+          <input type="email" name="email" autoComplete="off" placeholder='Email address' id="email" className="form-control form-control-lg" />
         </div>
 
         <div className="form-outline mb-4">
@@ -313,7 +355,7 @@ export function SignUp({
         </div>
 
         <div className="form-outline mb-4">
-          <input type="password" name="passwordConfirmed" placeholder='Re-enter password'  id="reEnterPassword" className="form-control form-control-lg" />
+          <input type="password" name="passwordConfirmed" placeholder='Re-enter password' id="reEnterPassword" className="form-control form-control-lg" />
         </div>
 
         <div className="d-flex justify-content-center">

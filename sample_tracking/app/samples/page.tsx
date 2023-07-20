@@ -2,7 +2,7 @@
 import 'bootstrap/dist/css/bootstrap.css';
 import { initializeApp } from "firebase/app";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
-import { getFirestore, getDocs, collection, getDocFromCache, doc, setDoc } from "firebase/firestore";
+import { getFirestore, getDocs, collection, query, or, and, where, getDoc, doc } from "firebase/firestore";
 import { useState } from 'react';
 import './styles.css';
 import { useRouter } from 'next/navigation'
@@ -15,6 +15,7 @@ export default function Samples() {
 
     const [data, setData] = useState({});
     const [selectedSample, setSelectedSample] = useState('');
+    const [userData, setUserData] = useState({ org: '', role: '' });
 
     function updateData(data: {}) {
         setData(data);
@@ -28,32 +29,172 @@ export default function Samples() {
     const router = useRouter();
 
     const auth = getAuth();
-    onAuthStateChanged(auth, (user) => {
-        if (!user) {
-            router.push('/login');
-        }
-    });
-
-    console.log('In login signup');
-    const db = getFirestore();
-
-    if (Object.keys(data).length === 0) {
-        const samples = {};
-        console.log('got here');
-        getDocs(collection(db, "verified_samples")).then((querySnapshot) => {
-            console.log('made request');
-            querySnapshot.forEach((doc) => {
-                const docData = doc.data();
-                samples[doc.id] = doc.data();
-
-            });
-            updateData(samples);
-
+    if (userData.role.length < 1) {
+        onAuthStateChanged(auth, (user) => {
+            if (!user) {
+                router.push('/login');
+            } else {
+                const userDocRef = doc(db, "users", user.uid);
+                getDoc(userDocRef).then((docRef) => {
+                    if (docRef.exists()) {
+                        const docData = docRef.data();
+                        if (!docData.role) {
+                            router.push('/tasks');
+                        } else {
+                            setUserData(docData);
+                        }
+                    }
+                })
+            }
         });
     }
 
+    console.log('In login signup');
+    const db = getFirestore();
+    if (Object.keys(data).length < 1 && userData.role.length > 0) {
+        addSamplesToDataList();
+    }
+    
+
+
+    // const user = auth.currentUser;
+    // if (!user) return;
+    // const samples = {};
+    // console.log('got here');
+    // const verifiedSamplesRef = collection(db, "trusted_samples");
+    // let samplesQuery;
+    // if (userData.role == "site_admin") {
+    //     getDocs(collection(db, "trusted_samples")).then((querySnapshot) => {
+    //         console.log('made request');
+    //         querySnapshot.forEach((doc) => {
+    //             const docData = doc.data();
+    //             samples[doc.id] = doc.data();
+
+    //         });
+    //         updateData(samples);
+
+    //     });
+    // } else if (userData.role == "admin") {
+    //     // samplesQuery = query(verifiedSamplesRef, where("visibility", "==", "public"));
+    //     samplesQuery = query(verifiedSamplesRef, 
+    //         or(
+    //             where("visibility", "==", "public"),
+    //             where("visibility", "==", "logged_in"),
+    //             where("org", "==", userData.org)
+    //     ));
+    // } else if (userData.role == "member") {
+    //     samplesQuery = query(verifiedSamplesRef,
+    //         or(
+    //             where("created_by", "==", user.uid),
+    //             where("visibility", "==", "public"),
+    //             where("visibility", "==", "logged_in"),
+    //             // and(
+    //             //     where("visibility", "==", "organization"),
+    //             //     where("org", "==", userData.org)),
+    //         ))
+    // }
+
+
+
+    
+
+    async function getSamplesFromCollection(collectionName: string): Promise<Map<string, Map<string, string>>> {
+        const user = auth.currentUser;
+        const samples = {};
+        if (!user) return samples;
+        console.log('got here');
+        const verifiedSamplesRef = collection(db, collectionName);
+        let samplesQuery;
+        if (userData.role == "site_admin") {
+            const querySnapshot = await getDocs(collection(db, collectionName)).catch((error) => {
+                console.log("Unable to fetch samples: " + error);
+            });
+            if (querySnapshot) {
+                querySnapshot.forEach((doc) => {
+                    const docData = doc.data();
+                    samples[doc.id] = doc.data();
+    
+                });
+            }
+            
+            return samples;
+        } else if (userData.role == "admin") {
+            samplesQuery = query(verifiedSamplesRef, where("visibility", "==", "public"));
+            samplesQuery = query(verifiedSamplesRef,
+                or(
+                    where("visibility", "==", "public"),
+                    where("visibility", "==", "logged_in"),
+                    where("org", "==", userData.org)
+                ));
+            // samplesQuery = query(verifiedSamplesRef,
+            //     or(
+            //         where("created_by", "==", user.uid),
+            //         where("visibility", "==", "public"),
+            //         where("visibility", "==", "logged_in"),
+            //         and(
+            //             where("visibility", "==", "organization"),
+            //             where("org", "==", userData.org)),
+            //     ))
+        } else {
+            samplesQuery = query(verifiedSamplesRef, 
+                or(
+                    where("created_by", "==", user.uid),
+                    where("visibility", "==", "public"),
+                    where("visibility", "==", "logged_in"),
+                    and(
+                        where("visibility", "==", "organization"),
+                        where("org", "==", userData.org)),
+                ))
+        }
+
+        const querySnapshot = await getDocs(samplesQuery).catch((error) => {
+            console.log("Unable to fetch samples: " + error);
+        });
+        if (querySnapshot) {
+            querySnapshot.forEach((doc) => {
+                const docData = doc.data();
+                samples[doc.id] = doc.data();
+    
+            });
+
+        }
+        
+        return samples;
+
+
+    }
+
+    async function addSamplesToDataList() {
+        if (Object.keys(data).length === 0 && userData.role.length > 0) {
+            let allSamples: Map<string, Map<string, string>> = {};
+            const trustedSamples = await getSamplesFromCollection('trusted_samples');
+            const untrustedSamples = await getSamplesFromCollection('untrusted_samples');
+            const unknownSamples = await getSamplesFromCollection('unkown_samples');
+            Object.keys(trustedSamples).forEach((trustedSampleId: string) => {
+                allSamples[trustedSampleId] = trustedSamples[trustedSampleId];
+            });
+            Object.keys(untrustedSamples).forEach((untrustedSampleId: string) => {
+                allSamples[untrustedSampleId] = untrustedSamples[untrustedSampleId];
+            });
+            Object.keys(unknownSamples).forEach((unknownSampleId: string) => {
+                allSamples[unknownSampleId] = unknownSamples[unknownSampleId];
+            });
+            // const allSamples: Map<string, Map<string, string>> =
+            //     new Map([
+            //         ...Array.from(trustedSamples),
+            //         ...Array.from(untrustedSamples),
+            //         ...Array.from(untrustedSamples)]);
+            if (Object.keys(allSamples).length > 0) {
+                updateData(allSamples);
+            }
+            
+        }
+
+    }
+
     function onSampleClick(evt) {
-        const url = `./sample-details?id=${evt.target.parentElement.id}`;
+        const trustedStatus = data[evt.target.parentElement.id].trusted
+        const url = `./sample-details?trusted=${trustedStatus}&id=${evt.target.parentElement.id}`;
         router.push(url)
     }
 
@@ -70,7 +211,7 @@ export default function Samples() {
         let isFirst = true;
         selectedSamples.forEach((sample) => {
             headers.forEach((header) => {
-                csv += (isFirst ? data[sample][header].toString() : ',' + data[sample][header].toString()); 
+                csv += (isFirst ? data[sample][header].toString() : ',' + data[sample][header].toString());
                 isFirst = false;
             });
             csv += '\n';
@@ -116,9 +257,10 @@ export default function Samples() {
                                         <td>{key}</td>
                                         <td onClick={onSampleClick} className="sample-link">Sample {i}</td>
                                         <td>{data[key].status === 'in_progress' ? <span>In progress</span> : <span className="badge bg-success">Completed</span>}</td>
-                                        <td> <span className="badge bg-success"><span className="material-symbols-outlined">
+                                        {data[key].trusted === 'trusted' ? <td> <span className="badge bg-success"><span className="material-symbols-outlined">
                                             done
-                                        </span>Trusted</span></td>
+                                        </span>Trusted</span></td> : <td>-</td>}
+                                        
                                         <td>{data[key].current_step ? <span>{data[key].current_step}</span> : <span>-</span>}</td>
                                         <td>{data[key].created_by ? <span>{data[key].created_by}</span> : <span>-</span>}</td>
                                     </tr>
