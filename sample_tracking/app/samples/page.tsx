@@ -7,7 +7,10 @@ import { useState } from 'react';
 import './styles.css';
 import { useRouter } from 'next/navigation'
 import Nav from '../nav';
-import * as csv from 'jquery-csv';
+
+// import ReactTable from "react-table";  
+// import ReactTable from "react-table";
+// import "react-table/react-table.css";  
 
 import { firebaseConfig } from '../firebase_config';
 
@@ -211,7 +214,7 @@ export default function Samples() {
         let isFirst = true;
         selectedSamples.forEach((sample) => {
             headers.forEach((header) => {
-                csv += (isFirst ? data[sample][header].toString() : ',' + data[sample][header].toString());
+                csv += (isFirst ? data[sample][header] : ',' + data[sample][header]);
                 isFirst = false;
             });
             csv += '\n';
@@ -233,18 +236,49 @@ export default function Samples() {
             <div>
                 <Nav />
             </div>
+            {/* <ReactTable
+    // PaginationComponent={Pagination}
+    // data={makeData()}
+    columns={[
+      {
+        Header: "First Name",
+        accessor: "firstName",
+        minWidth: 300
+      },
+      {
+        Header: "Last Name",
+        accessor: "lastName",
+        minWidth: 300
+      },
+      {
+        Header: "Age",
+        accessor: "age",
+        minWidth: 300
+      },
+      {
+        Header: "Status",
+        accessor: "status",
+        minWidth: 300
+      },
+      {
+        Header: "Visits",
+        accessor: "visits",
+        minWidth: 300
+      }
+    ]}
+  /> */}
             <div id="samplesTable" className='samples-wrapper'>
                 <p className='header'>All samples</p>
                 <button type="button" onClick={onDowloadClick} className="btn btn-primary">Download</button>
-                <table className="table table-hover">
+                <table className="table table-hover" data-page-length="25">
                     <thead>
                         <tr id="table-header">
                             <th className="w-5"><input type="checkbox" id="allSamples" name="allSamples" /></th>
                             <th className="w-20">Internal code</th>
                             <th className="w-30">Name</th>
-                            <th className="w-10">Status</th>
-                            <th className="w-10">Trusted</th>
-                            <th className="w-10">Current step</th>
+                            <th className="w-15">Status</th>
+                            <th className="w-15">Trusted</th>
+                            <th className="w-15">Current step</th>
                             <th className="w-20">Created by</th>
                         </tr>
                     </thead>
@@ -255,7 +289,7 @@ export default function Samples() {
                                     <tr key={i} id={key}>
                                         <td><input type="checkbox" id={i.toString()} className="select-sample-checkbox" name="selectSample" /></td>
                                         <td>{key}</td>
-                                        <td onClick={onSampleClick} className="sample-link">Sample {i}</td>
+                                        <td onClick={onSampleClick} className="sample-link">{data[key].sample_name}</td>
                                         <td>{data[key].status === 'in_progress' ? <span>In progress</span> : <span className="badge bg-success">Completed</span>}</td>
                                         {data[key].trusted === 'trusted' ? <td> <span className="badge bg-success"><span className="material-symbols-outlined">
                                             done
