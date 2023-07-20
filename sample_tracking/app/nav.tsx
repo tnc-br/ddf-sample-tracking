@@ -43,7 +43,7 @@ export default function Nav() {
     //         })
     //     }
     // });
-    
+
 
     function onLogOutClick() {
         signOut(auth).then(() => {
@@ -64,13 +64,8 @@ export default function Nav() {
     return (
         <div className='nav-wrapper'>
             <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@48,400,0,0" />
-            <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@48,400,0,0" />
-            <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@48,400,0,0" />
-            <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@48,400,0,0" />
-            <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@48,400,0,0" />
-            <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@48,400,0,0" />
             <ul className="nav flex-column">
-                {canAddSample() &&  <li className="nav-item">
+                {canAddSample() && <li className="nav-item">
                     <a className="nav-link add-sample-button" href="./add-sample"><span className="material-symbols-outlined">
                         add
                     </span> Add sample</a>
@@ -82,19 +77,28 @@ export default function Nav() {
                 </li>}
                 {canAddSample() && <li className="nav-item">
                     <a className="nav-link" href="./my-samples"> <span className="material-symbols-outlined">
-                        science
+                        labs
                     </span>My samples</a>
                 </li>}
                 <li className="nav-item">
                     <a className="nav-link" href="./samples"> <span className="material-symbols-outlined">
-                        category
+                        lab_panel
                     </span> All samples</a>
                 </li>
-                {isAdmin() && <li className="nav-item">
-                    <a className="nav-link" href="./admin"><span className="material-symbols-outlined">
-                        admin_panel_settings
-                    </span> Manage users</a>
-                </li>}
+                <div className="admin-options">
+                    {isAdmin() && <li className="nav-item">
+                        <a className="nav-link" href="./sign-up-requests"><span className="material-symbols-outlined">
+                            person_add
+                        </span> Sign up requests</a>
+                    </li>}
+                    {isAdmin() && <li className="nav-item">
+                        <a className="nav-link" href="./all-users"><span className="material-symbols-outlined">
+                            groups
+                        </span> {role === 'site_admin' ? 'All users' : 'My organization'}</a>
+                    </li>}
+
+                </div>
+
                 <li className="nav-item">
                     <button className="nav-link" onClick={onLogOutClick}> <span className="material-symbols-outlined">
                         logout
