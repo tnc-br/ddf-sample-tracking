@@ -18,7 +18,7 @@ export default function SampleDetails() {
     const [selectedDoc, setDoc] = useState({});
     const [hasStartedRequest, setHasStartedRequest] = useState(false);
     const [tabShown, setTabShown] = useState(0);
-    const [userData, setUserData] = useState({role: '', org: ''});
+    const [userData, setUserData] = useState({ role: '', org: '' });
 
     function updateStateDoc(data: {}) {
         setDoc(data);
@@ -70,7 +70,7 @@ export default function SampleDetails() {
     }
 
 
-    let  docRef;
+    let docRef;
     if (trusted === 'trusted') {
         docRef = doc(db, "trusted_samples", sampleId!)
     } else if (trusted === 'untrusted') {
@@ -78,11 +78,11 @@ export default function SampleDetails() {
     } else if (trusted === 'unknown') {
         docRef = doc(db, "unknown_samples", sampleId!);
     }
-    
+
 
 
     if (Object.keys(selectedDoc).length < 1 && !hasStartedRequest && userData.role.length > 0 && docRef) {
-        
+
         // setHasStartedRequestTrue();
         getDoc(docRef).then((docRef) => {
             if (docRef.exists()) {
@@ -133,25 +133,25 @@ export default function SampleDetails() {
         const fullHeadingId = 'panelsStayOpen' + headingId;
         const fullCollapseId = 'panelsStayOpen' + collapseId;
         const dataBsTarget = '#' + fullCollapseId;
-        
+
         return <div className="accordion-item">
-                    <h2 className="accordion-header" id={fullHeadingId}>
-                        <button className={buttonClassName} type="button" data-bs-toggle="collapse" data-bs-target={dataBsTarget} aria-expanded="false" aria-controls={fullCollapseId}>
-                            {selectedDoc.current_step && processSteps.indexOf(selectedDoc.current_step) > stepNumber ? <span className='process-number completed'><span className="material-symbols-outlined">
-                                done
-                            </span></span> : <span className='process-number incomplete'>{stepNumber + 1}</span>}
-                            {title}
-                        </button>
-                    </h2>
-                    <div id={fullCollapseId} className={detailsPanelClassName} aria-labelledby={fullCollapseId}>
-                        <div className="accordion-body">
-                            Placeholder
-                            <div>
-                                <button type="button" className={processCompletedButtonClassName} onClick={processCompletedButtonPressed}>Mark as completed</button>
-                            </div>
-                        </div>
+            <h2 className="accordion-header" id={fullHeadingId}>
+                <button className={buttonClassName} type="button" data-bs-toggle="collapse" data-bs-target={dataBsTarget} aria-expanded="false" aria-controls={fullCollapseId}>
+                    {selectedDoc.current_step && processSteps.indexOf(selectedDoc.current_step) > stepNumber ? <span className='process-number completed'><span className="material-symbols-outlined">
+                        done
+                    </span></span> : <span className='process-number incomplete'>{stepNumber + 1}</span>}
+                    {title}
+                </button>
+            </h2>
+            <div id={fullCollapseId} className={detailsPanelClassName} aria-labelledby={fullCollapseId}>
+                <div className="accordion-body">
+                    Placeholder
+                    <div>
+                        <button type="button" className={processCompletedButtonClassName} onClick={processCompletedButtonPressed}>Mark as completed</button>
                     </div>
                 </div>
+            </div>
+        </div>
     }
 
     function ProcessTab() {
@@ -181,43 +181,35 @@ export default function SampleDetails() {
             <table className="table table-borderless">
                 <tbody>
                     <tr>
-                        <td className='value-title'>Internal code</td>
-                        <td>{selectedDoc['code lab']}</td>
+                        <td className='value-title'>Last updated by</td>
+                        <td>{selectedDoc['last_updated_by']}</td>
                         <td className='value-title'>Collection site</td>
-                        <td>{selectedDoc['Site']}</td>
+                        <td>{selectedDoc['site']}</td>
                     </tr>
                     <tr>
                         <td className='value-title'>Scientific name</td>
-                        <td>{selectedDoc['Species']}</td>
+                        <td>{selectedDoc['species']}</td>
                         <td className='value-title'>City</td>
-                        <td>{selectedDoc['State']}</td>
+                        <td>{selectedDoc['state']}</td>
                     </tr>
                     <tr>
-                        <td className='value-title'>Popular name</td>
-                        <td>NA</td>
+                        <td className='value-title'>Date created</td>
+                        <td>{selectedDoc['created_on']}</td>
                         <td className='value-title'>Latitude</td>
                         <td>{selectedDoc['lat']}</td>
                     </tr>
                     <tr>
-                        <td className='value-title'>Company of origin</td>
-                        <td>NA</td>
+                        <td className='value-title'>Organization</td>
+                        <td>{selectedDoc['org']}</td>
                         <td className='value-title'>Longitude</td>
                         <td>{selectedDoc['lon']}</td>
                     </tr>
                     <tr>
                         <td className='value-title'>Created by</td>
                         <td>{selectedDoc['created_by']}</td>
-                        <td className='value-title'>Date created</td>
-                        <td>{selectedDoc['created_on']}</td>
-                    </tr>
-                    <tr>
-                        <td className='value-title'>Reviewer</td>
-                        <td>NA</td>
                         <td className='value-title'>Date completed</td>
-                        <td>NA</td>
+                        <td>{selectedDoc['date_completed'] ? selectedDoc['date_completed'] : '-'}</td>
                     </tr>
-
-
                 </tbody>
 
             </table>
