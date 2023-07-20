@@ -11,7 +11,7 @@ import './styles.css';
 import { useRouter } from 'next/navigation'
 import 'bootstrap/dist/css/bootstrap.css';
 import { getFirestore, getDocs, collection, updateDoc, doc, setDoc, addDoc, getDoc, arrayUnion, arrayRemove, deleteField, query, where, deleteDoc } from "firebase/firestore";
-import {getRanHex} from '../utils';
+import { getRanHex } from '../utils';
 
 
 export default function SignUpRequests() {
@@ -95,7 +95,7 @@ export default function SignUpRequests() {
         const dateString = `${date.getMonth() + 1} ${date.getDate()} ${date.getFullYear()}`;
 
         // const adminName =         
-        addDoc(collection(db, "organizations"), {org_name: orgName});
+        addDoc(collection(db, "organizations"), { org_name: orgName });
         const orgId = getRanHex(20);
         const newUserDocRef = doc(db, "users", prospectiveOrgs[orgName].admin_id);
         setDoc(newUserDocRef, {
@@ -141,7 +141,7 @@ export default function SignUpRequests() {
         });
         // const deleteDocRef = doc(db, "new_users", memberId);
         deleteMemberFromNewMemberList(memberId);
-        
+
     }
 
     function handleRejectMemberClick() {
@@ -171,11 +171,12 @@ export default function SignUpRequests() {
     return (<div><div>
         <Nav />
     </div>
-        <div className='admin-wrapper'>
-            <h3>Admin page</h3>
+        <div className="admin-wrapper">
+            <h3 className='page-title'>Sign up requests ({Object.keys(prospectiveUsers).length + Object.keys(prospectiveOrgs).length})</h3>
             <div>
-                <div id="pendingApprovalsTable" className='samples-wrapper'>
-                    <p className='header'>Individuals</p>
+                <div id="pendingApprovalsTable" className="user-table">
+                    <p className="section-header">Individuals ({Object.keys(prospectiveUsers).length})</p>
+                    <p className="sub-section-header">Join requests from individual users</p>
                     <table className="table">
                         <thead>
                             <tr id="table-header">
@@ -184,7 +185,7 @@ export default function SignUpRequests() {
                                 <th>Email</th>
                                 <th>Date requested</th>
                                 {/* <th>Role</th> */}
-                                <th>Approve/reject</th>
+                                {/* <th>Approve/reject</th> */}
                             </tr>
                         </thead>
                         <tbody id="samples-data">
@@ -197,8 +198,9 @@ export default function SignUpRequests() {
                                             <td>{prospectiveUsers[key].email}</td>
                                             <td>{prospectiveUsers[key].date_requested}</td>
                                             {/* <td>{pendingApprovals[key].role}</td> */}
-                                            <td><button onClick={handleApproveMemberClick} type="button" className="btn btn-outline-primary">Approve</button>
-                                                <button onClick={handleRejectMemberClick} type="button" className="btn btn-outline-danger">Reject</button></td>
+                                            <td className="approve-reject-wrapper"><button onClick={handleRejectMemberClick} type="button" className="btn btn-outline-danger reject-button">Decline</button>
+                                                <button onClick={handleApproveMemberClick} type="button" className="btn btn-outline-primary approve-button">Approve</button>
+                                            </td>
                                         </tr>
                                     )
 
@@ -208,7 +210,8 @@ export default function SignUpRequests() {
                     </table>
                 </div>
                 {userData.role === "site_admin" && <div id="usersTable" className='samples-wrapper'>
-                    <p className='header'>Organizations</p>
+                    <p className="section-header">Organizations ({Object.keys(prospectiveOrgs).length})</p>
+                    <p className="sub-section-header">Join requests from organizations</p>
                     <table className="table">
                         <thead>
                             <tr id="table-header">
@@ -216,7 +219,7 @@ export default function SignUpRequests() {
                                 <th>Org Admin</th>
                                 <th>Admin email</th>
                                 <th>Date requested</th>
-                                <th>Approve/reject</th>
+                                {/* <th>Approve/reject</th> */}
                                 {/* <th>Admin email</th> */}
                                 {/* <th>Control access</th> */}
                             </tr>
@@ -230,9 +233,9 @@ export default function SignUpRequests() {
                                             <td>{prospectiveOrgs[key].admin_name}</td>
                                             <td>{prospectiveOrgs[key].email}</td>
                                             <td>{prospectiveOrgs[key].date_requested}</td>
-                                            <td><button onClick={handleApproveOrgClick} type="button" className="btn btn-outline-primary">Approve</button>
-                                                <button onClick={handleRejectOrgClick} type="button" className="btn btn-outline-danger">Reject</button></td>
-                                
+                                            <td className="approve-reject-wrapper"><button onClick={handleRejectOrgClick} type="button" className="btn btn-outline-danger reject-button">Decline</button>
+                                                <button onClick={handleApproveOrgClick} type="button" className="btn btn-outline-primary approve-button">Approve</button></td>
+
 
                                         </tr>
                                     )
