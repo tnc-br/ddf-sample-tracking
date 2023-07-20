@@ -10,12 +10,14 @@ import { initializeApp } from "firebase/app";
 import { firebaseConfig } from '../firebase_config';
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { useState } from 'react';
+import {speciesList} from '../species_list';
 
 export default function AddSample() {
     const [user, setUser] = useState({});
     const [sampleTrust, setSampletrust] = useState('untrusted');
     // const [isMember, setIsMember] = useState(false);
     const [userData, setUserdata] = useState({});
+    const [speciesNames, setSpeciesNames] = useState(['']);
 
     const router = useRouter();
     const app = initializeApp(firebaseConfig);
@@ -43,6 +45,11 @@ export default function AddSample() {
             }
         });
     }
+
+    if (speciesNames.length < 2) {
+        setSpeciesNames(getSpeciesNames());
+    }
+    
 
 
     function onCancleClick() {
@@ -99,7 +106,7 @@ export default function AddSample() {
             isValid = false;
         }
         if (sampleTrustValue === "trusted") {
-            const sampleLat =  document.getElementById('inputLat');
+            const sampleLat = document.getElementById('inputLat');
             if (sampleLat.value.length < 1) {
                 sampleLat!.classList.add('invalid');
                 isValid = false;
@@ -109,7 +116,7 @@ export default function AddSample() {
                 inputLonEl!.classList.add('invalid');
                 isValid = false;
             }
-            const dateOfHarvestEl =  document.getElementById('dateOfHarvest');
+            const dateOfHarvestEl = document.getElementById('dateOfHarvest');
             if (dateOfHarvestEl!.value.length < 1) {
                 dateOfHarvestEl?.classList.add('invalid');
                 isValid = false;
@@ -168,12 +175,18 @@ export default function AddSample() {
     function getRanHex(size: number): string {
         let result = [];
         let hexRef = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'];
-      
+
         for (let n = 0; n < size; n++) {
-          result.push(hexRef[Math.floor(Math.random() * 16)]);
+            result.push(hexRef[Math.floor(Math.random() * 16)]);
         }
         return result.join('');
-      }
+    }
+
+    function getSpeciesNames(): string[] {
+        const species = speciesList.split('\n')
+        return species;
+
+    }
 
 
     return (
@@ -209,8 +222,13 @@ export default function AddSample() {
                         <input type="text" className="form-control" id="internalCode" />
                     </div> */}
                     <div className="form-group">
+                        <datalist id="suggestions">
+                            {speciesNames.map((speciesName: string) => {
+                                return (<option>{speciesName}</option>)
+                            })}
+                        </datalist>
                         <label htmlFor="treeSpecies">Tree species</label>
-                        <input type="text" className="form-control" id="treeSpecies" />
+                        <input type="text" autoComplete="on" list="suggestions" className="form-control" id="treeSpecies" />
                     </div>
                     {sampleTrust !== "unknown" && <div>
                         <div className="form-group">
