@@ -1,7 +1,19 @@
 .nav-link {
-    color: black;
     display: flex;
     flex-direction: row;
+
+    color: var(--grey-800, #3C4043);
+
+    color: var(--m-3-sys-light-on-surface, #1D1B20);
+
+    /* M3/label/large */
+    font-family: Roboto;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 500;
+    line-height: 20px;
+    /* 142.857% */
+    letter-spacing: 0.1px;
 }
 
 .nav-link span {
@@ -19,4 +31,24 @@
     border-radius: 30px;
     box-shadow: 2px 2px 5px;
     margin-bottom: 20px;
+
+    display: flex;
+    width: 150px;
+    height: 48px;
+    justify-content: center;
+    align-items: center;
+    flex-shrink: 0;
+
+    border-radius: 16px;
+    background: var(--m-3-sys-light-surface-container-high, #ECE6F0);
+
+    /* M3/Elevation Light/3 */
+    box-shadow: 0px 1px 3px 0px rgba(0, 0, 0, 0.30), 0px 4px 8px 3px rgba(0, 0, 0, 0.15);
 }
+
+.admin-options {
+    border-top: 1px solid lightgray;
+    border-bottom: 1px solid lightgray;
+    max-width: 200px;
+}
+
