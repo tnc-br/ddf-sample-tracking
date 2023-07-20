@@ -43,7 +43,7 @@ export default function Admin() {
             router.push('/login');
         } else {
             user.getIdTokenResult(true).then((token) => {
-                if (token.claims.role !== 'admin') {
+                if (token.claims.role !== 'admin' && token.claims.role !== 'site_admin') {
                     router.push('/tasks');
                 }
             });

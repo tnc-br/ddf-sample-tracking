@@ -6,6 +6,7 @@ import { doc, getDoc, getFirestore, updateDoc } from "firebase/firestore";
 import { initializeApp } from "firebase/app";
 import { firebaseConfig } from '../firebase_config';
 import { useSearchParams, usePathname } from 'next/navigation'
+import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { useState } from 'react';
 import 'jquery';
 import 'popper.js';
@@ -16,7 +17,8 @@ export default function SampleDetails() {
 
     const [selectedDoc, setDoc] = useState({});
     const [hasStartedRequest, setHasStartedRequest] = useState(false);
-    const [tabShown, setTabShown] = useState(0)
+    const [tabShown, setTabShown] = useState(0);
+    const [userData, setUserData] = useState({role: '', org: ''});
 
     function updateStateDoc(data: {}) {
         setDoc(data);
@@ -39,16 +41,49 @@ export default function SampleDetails() {
 
     const searchParams = useSearchParams();
     const sampleId = searchParams.get('id');
+    const trusted = searchParams.get('trusted');
     console.log("sampleId: " + sampleId);
 
     const app = initializeApp(firebaseConfig);
     const db = getFirestore();
-    const docRef = doc(db, "verified_samples", sampleId!);
 
 
-    if (Object.keys(selectedDoc).length < 1 && !hasStartedRequest) {
+    const auth = getAuth();
+    if (userData.role.length < 1) {
+        onAuthStateChanged(auth, (user) => {
+            if (!user) {
+                router.push('/login');
+            } else {
+                const userDocRef = doc(db, "users", user.uid);
+                getDoc(userDocRef).then((docRef) => {
+                    if (docRef.exists()) {
+                        const docData = docRef.data();
+                        if (!docData.role) {
+                            router.push('/tasks');
+                        } else {
+                            setUserData(docData);
+                        }
+                    }
+                })
+            }
+        });
+    }
+
+
+    let  docRef;
+    if (trusted === 'trusted') {
+        docRef = doc(db, "trusted_samples", sampleId!)
+    } else if (trusted === 'untrusted') {
+        docRef = doc(db, "untrusted_samples", sampleId!);
+    } else if (trusted === 'unknown') {
+        docRef = doc(db, "unknown_samples", sampleId!);
+    }
+    
+
+
+    if (Object.keys(selectedDoc).length < 1 && !hasStartedRequest && userData.role.length > 0 && docRef) {
         
-        setHasStartedRequestTrue();
+        // setHasStartedRequestTrue();
         getDoc(docRef).then((docRef) => {
             if (docRef.exists()) {
                 console.log('updated data');
@@ -167,13 +202,13 @@ export default function SampleDetails() {
                         <td className='value-title'>Company of origin</td>
                         <td>NA</td>
                         <td className='value-title'>Longitude</td>
-                        <td>{selectedDoc['long']}</td>
+                        <td>{selectedDoc['lon']}</td>
                     </tr>
                     <tr>
                         <td className='value-title'>Created by</td>
                         <td>{selectedDoc['created_by']}</td>
                         <td className='value-title'>Date created</td>
-                        <td>{selectedDoc['date_created']}</td>
+                        <td>{selectedDoc['created_on']}</td>
                     </tr>
                     <tr>
                         <td className='value-title'>Reviewer</td>

@@ -8,24 +8,41 @@ import { initializeApp } from "firebase/app";
 import './styles.css';
 import { useState } from 'react';
 import { firebaseConfig } from './firebase_config';
+import { getFirestore, getDoc, doc } from "firebase/firestore";
 
 export default function Nav() {
-    const [isAdmin, setIsAdmin] = useState(false);
     const [role, setRole] = useState('');
+    // const [userData, setUserData] = useState({});
 
 
     const app = initializeApp(firebaseConfig);
     const router = useRouter();
     const auth = getAuth();
+    const db = getFirestore();
 
-    onAuthStateChanged(auth, (user) => {
-        if (user) {
-            user.getIdTokenResult(true).then((token) => {
-                // setIsAdmin(token.claims.role === 'admin');
-                setRole(token.claims.role);
-            })
-        }
-    });
+    if (role.length < 1) {
+        onAuthStateChanged(auth, (user) => {
+            if (!user) {
+                router.push('/login');
+            } else {
+                const userDocRef = doc(db, "users", user.uid);
+                getDoc(userDocRef).then((docRef) => {
+                    if (docRef.exists()) {
+                        setRole(docRef.data().role);
+                    }
+                })
+            }
+        });
+    }
+
+    // onAuthStateChanged(auth, (user) => {
+    //     if (user) {
+    //         user.getIdTokenResult(true).then((token) => {
+    //             // setIsAdmin(token.claims.role === 'admin');
+    //             setRole(token.claims.role);
+    //         })
+    //     }
+    // });
     
 
     function onLogOutClick() {
@@ -37,7 +54,11 @@ export default function Nav() {
     }
 
     function canAddSample() {
-        return role === 'admin' || role === 'lab_tech';
+        return role === 'admin' || role === 'member' || role === 'site_admin';
+    }
+
+    function isAdmin() {
+        return role === 'admin' || role === 'site_admin';
     }
 
     return (
@@ -69,7 +90,7 @@ export default function Nav() {
                         category
                     </span> All samples</a>
                 </li>
-                {role === 'admin' && <li className="nav-item">
+                {isAdmin() && <li className="nav-item">
                     <a className="nav-link" href="./admin"><span className="material-symbols-outlined">
                         admin_panel_settings
                     </span> Manage users</a>
