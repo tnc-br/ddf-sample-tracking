@@ -11,8 +11,6 @@ import './styles.css';
 import { useRouter } from 'next/navigation'
 import 'bootstrap/dist/css/bootstrap.css';
 import { getFirestore, getDocs, collection, updateDoc, doc, setDoc, addDoc, getDoc, arrayUnion, arrayRemove, deleteField, query, where, deleteDoc } from "firebase/firestore";
-import { getRanHex } from '../utils';
-
 
 export default function SignUpRequests() {
     const [pendingApprovals, setPendingApprovals] = useState({});
@@ -95,8 +93,12 @@ export default function SignUpRequests() {
         const dateString = `${date.getMonth() + 1} ${date.getDate()} ${date.getFullYear()}`;
 
         // const adminName =         
-        addDoc(collection(db, "organizations"), { org_name: orgName });
+        // addDoc(collection(db, "organizations"), { org_name: orgName });
         const orgId = getRanHex(20);
+        const newOrgRef = doc(db, "organizations", orgId);
+        setDoc(newOrgRef, {
+            org_name: orgName,
+        });
         const newUserDocRef = doc(db, "users", prospectiveOrgs[orgName].admin_id);
         setDoc(newUserDocRef, {
             org: orgId,
@@ -158,6 +160,16 @@ export default function SignUpRequests() {
         setProspectiveUsers(newProspectiveUsersList);
 
     }
+
+    function getRanHex(size: number): string {
+        let result = [];
+        let hexRef = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'];
+      
+        for (let n = 0; n < size; n++) {
+          result.push(hexRef[Math.floor(Math.random() * 16)]);
+        }
+        return result.join('');
+      }
 
 
 
