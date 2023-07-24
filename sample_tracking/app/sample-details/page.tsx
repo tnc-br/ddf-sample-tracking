@@ -13,14 +13,31 @@ import 'popper.js';
 import 'bootstrap/dist/js/bootstrap.bundle.min';
 import { useRouter } from 'next/navigation'
 
+type Sample = {
+    last_updated_by: string,
+    site: string,
+    state: string, 
+    org_name: string, 
+    lon: string,
+    lat: string,
+    species: string,
+    created_by: string,
+    date_completed: string,
+    created_by_name: string,
+    current_step: string,
+    created_on: string,
+    org: string,
+
+}
+
 export default function SampleDetails() {
 
-    const [selectedDoc, setDoc] = useState({});
+    const [selectedDoc, setDoc] = useState({} as Sample);
     const [hasStartedRequest, setHasStartedRequest] = useState(false);
     const [tabShown, setTabShown] = useState(0);
     const [userData, setUserData] = useState({ role: '', org: '' });
 
-    function updateStateDoc(data: {}) {
+    function updateStateDoc(data: Sample) {
         setDoc(data);
     }
     function setHasStartedRequestTrue() {
@@ -200,13 +217,13 @@ export default function SampleDetails() {
                     </tr>
                     <tr>
                         <td className='value-title'>Organization</td>
-                        <td>{selectedDoc['org']}</td>
+                        <td>{selectedDoc['org_name'] ? selectedDoc['org_name'] : selectedDoc['org']}</td>
                         <td className='value-title'>Longitude</td>
                         <td>{selectedDoc['lon']}</td>
                     </tr>
                     <tr>
                         <td className='value-title'>Created by</td>
-                        <td>{selectedDoc['created_by']}</td>
+                        <td>{selectedDoc['created_by_name'] ? selectedDoc['created_by_name'] : selectedDoc['created_by']}</td>
                         <td className='value-title'>Date completed</td>
                         <td>{selectedDoc['date_completed'] ? selectedDoc['date_completed'] : '-'}</td>
                     </tr>

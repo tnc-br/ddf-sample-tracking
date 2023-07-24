@@ -12,18 +12,25 @@ import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { useState } from 'react';
 import {speciesList} from '../species_list';
 
+type UserData = {
+    name: string,
+    org: string,
+    org_name: string,
+    role: string,
+  }
+
 export default function AddSample() {
     const [user, setUser] = useState({});
     const [sampleTrust, setSampletrust] = useState('untrusted');
     // const [isMember, setIsMember] = useState(false);
-    const [userData, setUserdata] = useState({});
+    const [userData, setUserdata] = useState({} as UserData);
     const [speciesNames, setSpeciesNames] = useState(['']);
 
     const router = useRouter();
     const app = initializeApp(firebaseConfig);
     const auth = getAuth();
     const db = getFirestore();
-    if (Object.keys(userData).length < 1) {
+    if (!userData.role) {
         onAuthStateChanged(auth, (user) => {
             if (user) {
                 console.log(user);
@@ -35,7 +42,7 @@ export default function AddSample() {
                         if (!docData.role) {
                             router.push('/tasks');
                         } else {
-                            setUserdata(docData);
+                            setUserdata(docData as UserData);
                         }
                     }
                 })
@@ -49,16 +56,15 @@ export default function AddSample() {
     if (speciesNames.length < 2) {
         setSpeciesNames(getSpeciesNames());
     }
-    
-
 
     function onCancleClick() {
         router.push('/samples');
     }
+
     function onCreateSampleClick() {
         if (!formIsValid()) return;
         const internalCode = getRanHex(20);
-        const sampleTrustValue = document.getElementById('sampleTrustSelected')!.value;
+        const sampleTrustValue = (document.getElementById('sampleTrustSelected')! as HTMLInputElement).value;
         let docRef;
         if (sampleTrustValue === "trusted") {
             docRef = doc(db, "trusted_samples", internalCode);
@@ -73,14 +79,14 @@ export default function AddSample() {
         if (!user) return;
         setDoc(docRef, {
             'code_lab': internalCode,
-            'visibility': document.getElementById('sampleVisibility')!.value,
-            'sample_name': document.getElementById('sampleName')!.value,
-            'species': document.getElementById('treeSpecies')!.value,
-            'site': document.getElementById('collectionSite')!.value,
-            'state': document.getElementById('inputState')!.value,
-            'lat': document.getElementById('inputLat')!.value,
-            'lon': document.getElementById('inputLon')!.value,
-            'date_of_harvest': document.getElementById('dateOfHarvest')!.value,
+            'visibility': (document.getElementById('sampleVisibility')! as HTMLInputElement).value,
+            'sample_name': (document.getElementById('sampleName')! as HTMLInputElement).value,
+            'species': (document.getElementById('treeSpecies')! as HTMLInputElement).value,
+            'site': (document.getElementById('collectionSite') as HTMLInputElement) ? (document.getElementById('collectionSite')! as HTMLInputElement).value : '-',
+            'state': (document.getElementById('inputState') as HTMLInputElement) ? (document.getElementById('inputState')! as HTMLInputElement).value : '-',
+            'lat': (document.getElementById('inputLat')! as HTMLInputElement) ? (document.getElementById('inputLat')! as HTMLInputElement).value : '-',
+            'lon': (document.getElementById('inputLon')! as HTMLInputElement) ? (document.getElementById('inputLon')! as HTMLInputElement).value : '-',
+            'date_of_harvest': (document.getElementById('dateOfHarvest')! as HTMLInputElement) ? (document.getElementById('dateOfHarvest')! as HTMLInputElement).value : '-',
             'created_by': user.uid,
             'current_step': '1. Drying process',
             'status': 'in_progress',
@@ -88,6 +94,8 @@ export default function AddSample() {
             'created_on': currentDateString,
             'last_updated_by': userData.name,
             'org': userData.org,
+            'org_name': userData.org_name ? userData.org_name : '-',
+            'created_by_name': userData.name,
 
         }).then(() => {
             const url = `./sample-details?trusted=${sampleTrustValue}&id=${internalCode}`;
@@ -98,36 +106,36 @@ export default function AddSample() {
 
     function formIsValid(): boolean {
         let isValid = true;
-        const sampleTrustValue = document.getElementById('sampleTrustSelected')!.value;
-        const sampleName = document.getElementById('sampleName')!.value;
+        const sampleTrustValue = (document.getElementById('sampleTrustSelected')! as HTMLInputElement).value;
+        const sampleName = (document.getElementById('sampleName')! as HTMLInputElement).value;
         let docRef;
         if (sampleName.length < 1 || sampleName.length > 100) {
             document.getElementById('sampleName')!.classList.add('invalid');
             isValid = false;
         }
         if (sampleTrustValue === "trusted") {
-            const sampleLat = document.getElementById('inputLat');
-            if (sampleLat.value.length < 1) {
+            const sampleLat = document.getElementById('inputLat') as HTMLInputElement;
+            if (sampleLat!.value.length < 1) {
                 sampleLat!.classList.add('invalid');
                 isValid = false;
             }
-            const inputLonEl = document.getElementById('inputLon');
+            const inputLonEl = document.getElementById('inputLon') as HTMLInputElement;
             if (inputLonEl!.value.length < 1) {
                 inputLonEl!.classList.add('invalid');
                 isValid = false;
             }
-            const dateOfHarvestEl = document.getElementById('dateOfHarvest');
+            const dateOfHarvestEl = document.getElementById('dateOfHarvest') as HTMLInputElement;
             if (dateOfHarvestEl!.value.length < 1) {
                 dateOfHarvestEl?.classList.add('invalid');
                 isValid = false;
             }
-            const collectionSiteEl = document.getElementById('collectionSite');
-            if (collectionSiteEl.value.length < 1) {
+            const collectionSiteEl = document.getElementById('collectionSite') as HTMLInputElement;
+            if (collectionSiteEl!.value.length < 1) {
                 collectionSiteEl?.classList.add('invalid');
                 isValid = false;
             }
-            const collectionStateEl = document.getElementById('inputState');
-            if (collectionStateEl.value.length < 1) {
+            const collectionStateEl = document.getElementById('inputState') as HTMLInputElement;
+            if (collectionStateEl!.value.length < 1) {
                 collectionStateEl?.classList.add('invalid');
                 isValid = false;
             }
@@ -135,38 +143,11 @@ export default function AddSample() {
         return isValid;
     }
 
-    function onUploadSamplesClick() {
-
-    }
-
-    function onFileChanged(evt) {
-        console.log(evt);
-        const target = evt.target;
-        if (target && target.files.length > 0) {
-            uploadSamples(target.files[0]);
-        }
-    }
-
-    function uploadSamples(file: File) {
-        const reader = new FileReader();
-        reader.readAsText(file as File);
-        reader.onload = function (event) {
-            if (!event || !event.target) {
-                return;
-            }
-            var csvdata = event.target.result;
-            if (!csvdata) return;
-            var rowData = (csvdata as string).split('\n');
-            console.log(rowData);
-            const titles = rowData[0].split(',');
-        }
-    }
-
-    function onSampleTrustChange(evt) {
+    function onSampleTrustChange(evt: any) {
         setSampletrust(evt.target.value);
     }
 
-    function onRequiredFieldChange(evt) {
+    function onRequiredFieldChange(evt: any) {
         if (evt.target.classList.contains('invalid')) {
             evt.target.classList.remove('invalid');
         }
@@ -187,7 +168,6 @@ export default function AddSample() {
         return species;
 
     }
-
 
     return (
         <div className="add-sample-page-wrapper">

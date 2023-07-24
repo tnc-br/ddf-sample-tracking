@@ -8,8 +8,15 @@ import { initializeApp } from "firebase/app";
 import { getAuth, signInWithEmailAndPassword, signInWithPopup, createUserWithEmailAndPassword, onAuthStateChanged, GoogleAuthProvider, FacebookAuthProvider, updateProfile } from "firebase/auth";
 import { useRouter } from 'next/navigation'
 import { firebaseConfig } from '../firebase_config';
-import { doc, setDoc, getDocs, collection, getFirestore, updateDoc, arrayUnion, addDoc } from "firebase/firestore";
+import { doc, setDoc, getDocs, collection, getFirestore, updateDoc, arrayUnion, addDoc, getDoc } from "firebase/firestore";
 import './styles.css';
+
+type SignUpData = {
+  firstName: string,
+  lastName: string,
+  lab: string,
+  labName: string,
+}
 
 export default function LogInSignUpPage() {
 
@@ -93,6 +100,7 @@ export function Login({
 
   function signInWithGoogle() {
     const auth = getAuth();
+    const db = getFirestore();
     const provider = new GoogleAuthProvider();
     provider.setCustomParameters({
       'display': 'popup',
@@ -105,6 +113,20 @@ export function Login({
         const token = credential.accessToken;
         // The signed-in user info.
         const user = result.user;
+        const userDocRef = doc(db, "users", user.uid);
+        getDoc(userDocRef).then((docRef) => {
+          if (docRef.exists()) {
+            const docData = docRef.data();
+            if (docData.role) {
+              router.push('/tasks');
+            } else {
+              setUserData(docData);
+            }
+          } else {
+            // This is a new user. 
+
+          }
+        })
         // IdP data available using getAdditionalUserInfo(result)
         // ...
       }).catch((error) => {
@@ -181,15 +203,9 @@ export function Login({
               <button type="button" onClick={attemptSignIn} className="btn btn-primary">Sign in</button>
               <p className="small"><a className="" href="#!">Forgot password</a></p>
 
-              <p className="small">Or log in with</p>
-              <div className="d-flex justify-content-center text-center mt-4 pt-1">
-                <button onClick={signInWithFacebook} className="text-white"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-facebook" viewBox="0 0 16 16">
-                  <path d="M16 8.049c0-4.446-3.582-8.05-8-8.05C3.58 0-.002 3.603-.002 8.05c0 4.017 2.926 7.347 6.75 7.951v-5.625h-2.03V8.05H6.75V6.275c0-2.017 1.195-3.131 3.022-3.131.876 0 1.791.157 1.791.157v1.98h-1.009c-.993 0-1.303.621-1.303 1.258v1.51h2.218l-.354 2.326H9.25V16c3.824-.604 6.75-3.934 6.75-7.951z" />
-                </svg></button>
-                <button onClick={signInWithGoogle} className="text-white"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-google" viewBox="0 0 16 16">
-                  <path d="M15.545 6.558a9.42 9.42 0 0 1 .139 1.626c0 2.434-.87 4.492-2.384 5.885h.002C11.978 15.292 10.158 16 8 16A8 8 0 1 1 8 0a7.689 7.689 0 0 1 5.352 2.082l-2.284 2.284A4.347 4.347 0 0 0 8 3.166c-2.087 0-3.86 1.408-4.492 3.304a4.792 4.792 0 0 0 0 3.063h.003c.635 1.893 2.405 3.301 4.492 3.301 1.078 0 2.004-.276 2.722-.764h-.003a3.702 3.702 0 0 0 1.599-2.431H8v-3.08h7.545z" />
-                </svg></button>
-              </div>
+              <p className="small">Or log in with <button onClick={signInWithGoogle}><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-google" viewBox="0 0 16 16">
+                <path d="M15.545 6.558a9.42 9.42 0 0 1 .139 1.626c0 2.434-.87 4.492-2.384 5.885h.002C11.978 15.292 10.158 16 8 16A8 8 0 1 1 8 0a7.689 7.689 0 0 1 5.352 2.082l-2.284 2.284A4.347 4.347 0 0 0 8 3.166c-2.087 0-3.86 1.408-4.492 3.304a4.792 4.792 0 0 0 0 3.063h.003c.635 1.893 2.405 3.301 4.492 3.301 1.078 0 2.004-.276 2.722-.764h-.003a3.702 3.702 0 0 0 1.599-2.431H8v-3.08h7.545z" />
+              </svg></button></p>
 
             </div>
 
@@ -211,10 +227,15 @@ export function SignUp({
 }) {
 
   const [signUpTab, setSignUpTab] = useState(0);
-  const [signUpData, setSignUpData] = useState({});
+  const [signUpData, setSignUpData] = useState({
+    firstName: '',
+    lastName: '',
+    lab: '',
+    labName: ''
+  });
   const [availableOrgs, setAvailableOrgs] = useState({});
 
-  function updateSignUpData(signUpData) {
+  function updateSignUpData(signUpData: SignUpData) {
     setSignUpData(signUpData);
   }
 
@@ -237,13 +258,14 @@ export function SignUp({
     console.log('here');
     const firstName = document.getElementById('firstName')!.value;
     const lastName = document.getElementById('lastName')!.value;
-    const lab = document.getElementById('labSelect')!.value;
-    const labValue = lab === 'Create new organization' ? "NEW" : availableOrgs[lab];
-    if (firstName.length > 0 && lastName.length > 0 && lab.length > 0) {
+    const labName = document.getElementById('labSelect')!.value;
+    const labValue = labName === 'Create new organization' ? "NEW" : availableOrgs[labName];
+    if (firstName.length > 0 && lastName.length > 0 && labName.length > 0) {
       updateSignUpData({
         firstName: firstName,
         lastName: lastName,
         lab: labValue,
+        labName: labName,
       })
       setSignUpTab(1);
     }
@@ -298,6 +320,7 @@ export function SignUp({
         date_requested: dateString,
         org: signUpData.lab,
         uid: auth.currentUser!.uid,
+        org_name: signUpData.labName,
       })
       // updateDoc(newUserDocRef, {
       //   prospective_members: arrayUnion(auth.currentUser!.uid),
