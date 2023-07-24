@@ -78,7 +78,10 @@ export default function Users() {
                 querySnapshot.forEach((doc) => {
                     const docData = doc.data();
                     console.log(docData);
-                    usersList[doc.id] = docData;
+                    if (docData.org) {
+                        usersList[doc.id] = docData;
+                    }
+                    
                 });
                 if (Object.keys(usersList).length > 0) {
                     setUsers(usersList);
