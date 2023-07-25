@@ -30,6 +30,7 @@ type Sample = {
     created_on: string,
     last_updated_by: string,
     org: string,
+    validity: number,
 }
 
 export default function SamplesTable({samplesData}) {
@@ -67,6 +68,11 @@ export default function SamplesTable({samplesData}) {
             {
                 accessorKey: 'trusted',
                 header: 'Trusted',
+                size: 150,
+            },
+            {
+                accessorKey: 'validity',
+                header: 'Validity',
                 size: 150,
             },
             {
