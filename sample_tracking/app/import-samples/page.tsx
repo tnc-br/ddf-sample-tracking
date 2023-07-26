@@ -18,9 +18,9 @@ type UserData = {
     role: string,
 }
 
-export default function AddSample() {
+export default function ImportCsv() {
     const [user, setUser] = useState({});
-    const [sampleTrust, setSampletrust] = useState('untrusted');
+    const [sampleTrust, setSampleTrust] = useState('untrusted');
     const [userData, setUserdata] = useState({} as UserData);
 
     const router = useRouter();
@@ -83,6 +83,10 @@ export default function AddSample() {
         return result.join('');
     }
 
+    function onSampleTrustChange(evt: any) {
+        setSampleTrust(evt.target.value);
+    }
+
     function onUploadSamplesClick() {
         if (document.getElementById("formFile")!.value == "") {
             console.log("No file to upload");
@@ -126,6 +130,9 @@ export default function AddSample() {
         // Create the batch write.
         const db = getFirestore();
         const batch = writeBatch(db);
+        const user = auth.currentUser;
+        if (!user) return;
+        const sampleVisibility = (document.getElementById('sampleVisibility')! as HTMLInputElement).value;
         for (var rowIndex in csvValues) {
             console.log('adding doc');
             // TODO - check if the checkbox is selected for the row.
@@ -136,10 +143,11 @@ export default function AddSample() {
             //        https://firebase.google.com/docs/firestore/manage-data/transactions#batched-writes
             var row = csvValues[rowIndex];
             const internalCode = getRanHex(20);
-            const docRef = doc(db, "trusted_samples", internalCode);
+            const docRef = doc(db, sampleTrust + "_samples", internalCode);
             console.log()
             batch.set(docRef, {
                 'code_lab': row[selectedColumnCounts['code_lab'].index],
+                'visibility': sampleVisibility,
                 'species': row[selectedColumnCounts['Species'].index],
                 'site': row[selectedColumnCounts['Site'].index],
                 'state': row[selectedColumnCounts['State'].index],
@@ -156,9 +164,11 @@ export default function AddSample() {
             });
         }
 
-        batch.commit();
-
         // TODO - handle errors.
+        batch.commit().then(() => {
+            const url = `./my-samples`;
+            router.push(url)
+        })
     }
 
     function onFileChanged(event) {
@@ -207,6 +217,19 @@ export default function AddSample() {
                 <Nav />
             </div>
             <div className="import-form-wrapper">
+                <label htmlFor="sampleTrustSelected" defaultValue={sampleTrust}>Is this sample trusted?</label>
+                <select onChange={onSampleTrustChange} className="form-select" id="sampleTrustSelected" aria-label="Select sample trusted status">
+                    <option value="untrusted">No</option>
+                    <option value="trusted">Yes</option>
+                    <option value="unknown">Unkown</option>
+                </select>
+                <label htmlFor="sampleVisibility">Sample visibility</label>
+                    <select className="form-select" id="sampleVisibility" aria-label="Select sample trusted status">
+                        <option value="public">Publicly available</option>
+                        <option value="logged_in">Available to any logged-in user</option>
+                        <option value="organization">Available to my organization only</option>
+                        <option value="private">Private to me and admins only</option>
+                    </select>
                 <label htmlFor="formFile" className="form-label">Upload CSV file</label>
                 <input capture onChange={onFileChanged} accept=".csv" className="form-control" type="file" id="formFile" />
                 {/* TODO - add a selector for the type of sample, untrusted, trusted, unknown */}
