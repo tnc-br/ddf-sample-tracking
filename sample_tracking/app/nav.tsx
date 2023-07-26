@@ -71,6 +71,11 @@ export default function Nav() {
                     </span> Add sample</a>
                 </li>}
                 {canAddSample() && <li className="nav-item">
+                    <a className="nav-link" href="./import-samples">
+                        <span className="material-symbols-outlined">cloud_upload</span>
+                        Import samples</a>
+                </li>}
+                {canAddSample() && <li className="nav-item">
                     <a className="nav-link" href="./tasks"><span className="material-symbols-outlined">
                         list_alt
                     </span> My tasks</a>
