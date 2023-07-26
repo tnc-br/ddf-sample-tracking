@@ -224,7 +224,7 @@ export default function ImportCsv() {
                     <option value="unknown">Unkown</option>
                 </select>
                 <label htmlFor="sampleVisibility">Sample visibility</label>
-                    <select className="form-select" id="sampleVisibility" aria-label="Select sample trusted status">
+                    <select className="form-select" id="sampleVisibility" aria-label="Select sample visibility">
                         <option value="public">Publicly available</option>
                         <option value="logged_in">Available to any logged-in user</option>
                         <option value="organization">Available to my organization only</option>
