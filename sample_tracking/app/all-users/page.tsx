@@ -12,7 +12,14 @@ import { useRouter } from 'next/navigation'
 import 'bootstrap/dist/css/bootstrap.css';
 import { getFirestore, getDocs, collection, updateDoc, doc, setDoc, query, where, arrayRemove, getDoc, deleteDoc } from "firebase/firestore";
 
+interface NestedSchemas {
+    [key: string]: NestedSchemas;
+}
 
+type UserData = {
+    role: string,
+    org: string,
+}
 
 export default function Users() {
     // const [pendingApprovals, setPendingApprovals] = useState({});
@@ -21,8 +28,8 @@ export default function Users() {
     // const [updateState, setUpdateState] = useState(false);
 
     const [userDetails, setUserDetails] = useState({ role: '', org: '' });
-    const [userData, setUserData] = useState({});
-    const [users, setUsers] = useState({})
+    const [userData, setUserData] = useState({} as UserData);
+    const [users, setUsers] = useState({} as NestedSchemas)
 
     // function addPendingApproval(pendingApproval) {
     //     setPendingApprovals([...pendingApprovals, pendingApproval]);
@@ -42,24 +49,24 @@ export default function Users() {
     const auth = getAuth();
     const router = useRouter();
     const db = getFirestore();
-    if (Object.keys(userData).length < 1) {
+    if (!userData.role || userData.role.length < 1) {
         onAuthStateChanged(auth, (user) => {
             if (!user) {
-                router.push('/login');
+                router.replace('/login');
             } else {
                 const userDocRef = doc(db, "users", user.uid);
                 getDoc(userDocRef).then((docRef) => {
                     if (docRef.exists()) {
                         const docData = docRef.data();
                         if (docData.role !== 'admin' && docData.role !== 'site_admin') {
-                            router.push('/tasks');
+                            router.replace('/tasks');
                         }
-                        setUserData(docRef.data());
+                        setUserData(docRef.data() as UserData);
                     }
                 });
                 // user.getIdTokenResult(true).then((token) => {
                 //     if (token.claims.role !== 'admin' && token.claims.role !== 'site_admin') {
-                //         router.push('/tasks');
+                //         router.replace('/tasks');
                 //     } else if (userDetails.role.length < 1) {
                 //         // setUserDetails({role: token.claims.role, org: token.claims.org});
                 //         // setUserData()
@@ -73,7 +80,7 @@ export default function Users() {
         if (userData.role === 'site_admin') {
             getDocs(collection(db, "users")).then((querySnapshot) => {
                 console.log('made request to get users');
-                const usersList = {};
+                const usersList: NestedSchemas = {};
 
                 querySnapshot.forEach((doc) => {
                     const docData = doc.data();
@@ -90,7 +97,7 @@ export default function Users() {
         } else if (userData.role === 'admin') {
             const q = query(collection(db, "users"), where("org", "==", userData.org));
             const docRef = getDocs(q).then((querySnapshot) => {
-                const usersList = {};
+                const usersList: NestedSchemas = {};
                 querySnapshot.forEach((doc) => {
                     const docData = doc.data();
                     usersList[doc.id] = docData;
@@ -103,7 +110,7 @@ export default function Users() {
 
     }
 
-    function handleRemoveClick(evt) {
+    function handleRemoveClick(evt: any) {
         // const docRef = doc(db, "organizations", userDetails.org);
         const removedMemberId = evt.target.parentElement.parentElement.id;
         const userDocRef = doc(db, "users", removedMemberId);
@@ -144,10 +151,10 @@ export default function Users() {
                                 Object.keys(users).map((key, i) => {
                                     return (
                                         <tr key={i} id={key}>
-                                            <td>{users[key].name}</td>
-                                            <td>{users[key].org}</td>
-                                            <td>{users[key].email}</td>
-                                            <td>{users[key].date_added}</td>
+                                            <td>{users[key].name as unknown as string}</td>
+                                            <td>{users[key].org as unknown as string}</td>
+                                            <td>{users[key].email as unknown as string}</td>
+                                            <td>{users[key].date_added as unknown as string}</td>
                                             <td><button onClick={handleRemoveClick} type="button" className="btn btn-outline-danger">Remove</button></td>
                                             {/* <td><button onClick={handleApproveClick} type="button" className="btn btn-outline-primary">Approve</button>
                                                 <button onClick={handleRejectClick} type="button" className="btn btn-outline-danger">Reject</button></td> */}

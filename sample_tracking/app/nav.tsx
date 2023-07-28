@@ -23,7 +23,7 @@ export default function Nav() {
     if (role.length < 1) {
         onAuthStateChanged(auth, (user) => {
             if (!user) {
-                router.push('/login');
+                router.replace('/login');
             } else {
                 const userDocRef = doc(db, "users", user.uid);
                 getDoc(userDocRef).then((docRef) => {
@@ -47,7 +47,7 @@ export default function Nav() {
 
     function onLogOutClick() {
         signOut(auth).then(() => {
-            router.push('/login');
+            router.replace('/login');
         }).catch((error) => {
             console.log('Unable to log out: ' + error);
         });
@@ -77,24 +77,24 @@ export default function Nav() {
                 </li>}
                 {canAddSample() && <li className="nav-item">
                     <a className="nav-link" href="./my-samples"> <span className="material-symbols-outlined">
-labs
-</span>My samples</a>
+                        labs
+                    </span>My samples</a>
                 </li>}
                 <li className="nav-item">
                     <a className="nav-link" href="./samples"> <span className="material-symbols-outlined">
-lab_panel
-</span> All samples</a>
+                        lab_panel
+                    </span> All samples</a>
                 </li>
                 <div className="admin-options">
                     {isAdmin() && <li className="nav-item">
                         <a className="nav-link" href="./sign-up-requests"><span className="material-symbols-outlined">
-person_add
-</span> Sign up requests</a>
+                            person_add
+                        </span> Sign up requests</a>
                     </li>}
                     {isAdmin() && <li className="nav-item">
                         <a className="nav-link" href="./all-users"><span className="material-symbols-outlined">
-groups
-</span> {role === 'site_admin' ? 'All users' : 'My organization'}</a>
+                            groups
+                        </span> {role === 'site_admin' ? 'All users' : 'My organization'}</a>
                     </li>}
 
                 </div>
