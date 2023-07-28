@@ -1,9 +1,92 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    match /{document=**} {
-      allow read: if true;
-      allow write: if request.auth != null;
+
+    function canEditUserData() {
+      let documentData = request.resource.data;
+      let orgId = documentData.org;
+      let requestingUserData = get(/databases/$(database)/documents/users/$(request.auth.uid)).data;
+      let isAdmin = requestingUserData.role == "admin";
+      let isInRequestedOrg = requestingUserData.org == orgId;
+      return (isAdmin && isInRequestedOrg) || (requestingUserData.role == "site_admin");
     }
+
+    function getRequestingUserData() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data;
+    }
+    function getRequestData() {
+      return resource.data;
+    }
+    function requestingUserIsInDocumentsOrg() {
+      return getRequestingUserData().org == resource.data.org;
+    }
+    function isOrgAdmin() {
+      return (getRequestingUserData().role == "admin") && requestingUserIsInDocumentsOrg(); 
+    }
+    function visibilityFieldExists() {
+      return exists(getRequestData().visibility);
+    }
+
+    function canReadSample() {
+      return 
+	!visibilityFieldExists()
+	|| (getRequestData().visibility == "public")
+	|| (getRequestData().visibility == "logged_in" && request.auth != null)
+	|| (getRequestData().visibility == "organization" && requestingUserIsInDocumentsOrg())
+	|| isOrgAdmin()
+	|| request.auth.uid == getRequestData().created_by
+	|| (getRequestingUserData().role == "site_admin")
+	|| !getRequestData().visibility; 
+    }
+
+    function canWriteSample() {
+      return getRequestingUserData().role == "member" || getRequestingUserData().role == "admin" || getRequestingUserData().role == "site_admin";
+    } 
+
+    function canUpdateSample() {
+      return (canReadSample() && (request.resource.data.org == getRequestingUserData().org)) || getRequestingUserData().role == "site_admin";
+    }
+
+    function testCanReadSample() {
+      return getRequestData().visibility == "public";
+    }
+
+
+
+    match /roles_to_be_updated/{documentId} {
+      allow read, write: if request.auth.token.role == "site_admin" || request.auth.token.role == "admin";
+    }
+    match /trusted_samples/{documentId} {
+      allow read: if canReadSample();
+      allow write: if canWriteSample();
+      allow delete, update: if canUpdateSample();
+    }
+    match /untrusted_samples/{documentId} {
+      allow read: if canReadSample();
+      allow write: if canWriteSample();
+      allow delete, update: if canUpdateSample();
+    }
+    match /unknown_samples/{documentId} {
+      allow read: if canReadSample();
+      allow write: if canWriteSample();
+      allow delete, update: if canUpdateSample();
+    }
+    match /users/{documentId} {
+      allow read: if request.auth != null;
+      allow write, update: if canEditUserData();
+    }
+    match /site_admin/{documentId} {
+      allow read, write: if request.auth.token.role == "site_admin";
+    }
+    match /organizations/{documentId} {
+      allow read: if true;
+      allow write: if request.auth.token.role == "site_admin" || (request.auth.token.role == "admin" && documentId == request.auth.token.org); 
+    }
+    match /new_users/{documentId} {
+      allow read: if true;
+      allow write: if true;
+      allow delete: if request.auth.token.role == "site_admin" || (request.auth.token.org == documentId && request.auth.token.role == "admin");
+    }
+    
   }
 }
