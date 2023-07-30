@@ -97,7 +97,7 @@ export default function SamplesTable(props: SampleDataProps) {
 
     function onSampleClick(evt: any) {
         const url = `./sample-details?trusted=${evt.currentTarget.id}&id=${evt.target.id}`;
-        router.replace(url)
+        router.push(url)
     }
 
     function onDowloadClick(evt: any) {

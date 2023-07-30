@@ -6,9 +6,10 @@ import { getAuth, signOut, onAuthStateChanged } from "firebase/auth";
 import { useRouter } from 'next/navigation';
 import { initializeApp } from "firebase/app";
 import './styles.css';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { firebaseConfig } from './firebase_config';
 import { getFirestore, getDoc, doc } from "firebase/firestore";
+import Link from 'next/link';
 
 export default function Nav() {
     const [role, setRole] = useState('');
@@ -20,20 +21,24 @@ export default function Nav() {
     const auth = getAuth();
     const db = getFirestore();
 
-    if (role.length < 1) {
-        onAuthStateChanged(auth, (user) => {
-            if (!user) {
-                router.replace('/login');
-            } else {
-                const userDocRef = doc(db, "users", user.uid);
-                getDoc(userDocRef).then((docRef) => {
-                    if (docRef.exists()) {
-                        setRole(docRef.data().role);
-                    }
-                })
-            }
-        });
-    }
+    useEffect(() => {
+        if (role.length < 1) {
+            onAuthStateChanged(auth, (user) => {
+                if (!user) {
+                    router.push('/login');
+                } else {
+                    const userDocRef = doc(db, "users", user.uid);
+                    getDoc(userDocRef).then((docRef) => {
+                        if (docRef.exists()) {
+                            setRole(docRef.data().role);
+                        }
+                    })
+                }
+            });
+        }
+
+    })
+    
 
     // onAuthStateChanged(auth, (user) => {
     //     if (user) {
@@ -47,7 +52,7 @@ export default function Nav() {
 
     function onLogOutClick() {
         signOut(auth).then(() => {
-            router.replace('/login');
+            router.push('/login');
         }).catch((error) => {
             console.log('Unable to log out: ' + error);
         });
@@ -66,35 +71,35 @@ export default function Nav() {
             <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@48,400,0,0" />
             <ul className="nav flex-column">
                 {canAddSample() && <li className="nav-item">
-                    <a className="nav-link add-sample-button" href="./add-sample"><span className="material-symbols-outlined">
+                    <Link className="nav-link add-sample-button" href="./add-sample"><span className="material-symbols-outlined">
                         add
-                    </span> Add sample</a>
+                    </span> Add sample</Link>
                 </li>}
                 {canAddSample() && <li className="nav-item">
-                    <a className="nav-link" href="./import-samples">
+                    <Link className="nav-link" href="./import-samples">
                         <span className="material-symbols-outlined">cloud_upload</span>
-                        Import samples</a>
+                        Import samples</Link>
                 </li>}
                 {canAddSample() && <li className="nav-item">
-                    <a className="nav-link" href="./tasks"><span className="material-symbols-outlined">
+                    <Link className="nav-link" href="./tasks"><span className="material-symbols-outlined">
                         list_alt
-                    </span> My tasks</a>
+                    </span> My tasks</Link>
                 </li>}
                 {canAddSample() && <li className="nav-item">
-                    <a className="nav-link" href="./my-samples"> <span className="material-symbols-outlined">
+                    <Link className="nav-link" href="./my-samples"> <span className="material-symbols-outlined">
                         labs
-                    </span>My samples</a>
+                    </span>My samples</Link>
                 </li>}
                 <li className="nav-item">
-                    <a className="nav-link" href="./samples"> <span className="material-symbols-outlined">
+                    <Link className="nav-link" href="./samples"> <span className="material-symbols-outlined">
                         lab_panel
-                    </span> All samples</a>
+                    </span> All samples</Link>
                 </li>
                 <div className="admin-options">
                     {isAdmin() && <li className="nav-item">
-                        <a className="nav-link" href="./sign-up-requests"><span className="material-symbols-outlined">
+                        <Link className="nav-link" href="./sign-up-requests"><span className="material-symbols-outlined">
                             person_add
-                        </span> Sign up requests</a>
+                        </span> Sign up requests</Link>
                     </li>}
                     {isAdmin() && <li className="nav-item">
                         <a className="nav-link" href="./all-users"><span className="material-symbols-outlined">

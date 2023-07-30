@@ -9,7 +9,7 @@ import { doc, setDoc, getFirestore, getDoc } from "firebase/firestore";
 import { initializeApp } from "firebase/app";
 import { firebaseConfig } from '../firebase_config';
 import { getAuth, onAuthStateChanged } from "firebase/auth";
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {speciesList} from '../species_list';
 
 type UserData = {
@@ -30,35 +30,37 @@ export default function AddSample() {
     const app = initializeApp(firebaseConfig);
     const auth = getAuth();
     const db = getFirestore();
-    if (!userData.role) {
-        onAuthStateChanged(auth, (user) => {
-            if (user) {
-                console.log(user);
-                setUser(user);
-                const userDocRef = doc(db, "users", user.uid);
-                getDoc(userDocRef).then((docRef) => {
-                    if (docRef.exists()) {
-                        const docData = docRef.data();
-                        if (!docData.role) {
-                            router.replace('/tasks');
-                        } else {
-                            setUserdata(docData as UserData);
-                        }
-                    }
-                })
-            }
-            if (!user) {
-                router.replace('/login');
-            }
-        });
-    }
 
-    if (speciesNames.length < 2) {
-        setSpeciesNames(getSpeciesNames());
-    }
+    useEffect(() => {
+        if (!userData.role) {
+            onAuthStateChanged(auth, (user) => {
+                if (user) {
+                    console.log(user);
+                    setUser(user);
+                    const userDocRef = doc(db, "users", user.uid);
+                    getDoc(userDocRef).then((docRef) => {
+                        if (docRef.exists()) {
+                            const docData = docRef.data();
+                            if (!docData.role) {
+                                router.push('/tasks');
+                            } else {
+                                setUserdata(docData as UserData);
+                            }
+                        }
+                    })
+                }
+                if (!user) {
+                    router.push('/login');
+                }
+            });
+        }
+        if (speciesNames.length < 2) {
+            setSpeciesNames(getSpeciesNames());
+        }
+    });
 
     function onCancleClick() {
-        router.replace('/samples');
+        router.push('/samples');
     }
 
     function onCreateSampleClick() {
@@ -99,7 +101,7 @@ export default function AddSample() {
 
         }).then(() => {
             const url = `./sample-details?trusted=${sampleTrustValue}&id=${internalCode}`;
-            router.replace(url)
+            router.push(url)
         })
 
     }

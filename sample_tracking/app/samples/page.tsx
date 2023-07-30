@@ -3,7 +3,7 @@ import 'bootstrap/dist/css/bootstrap.css';
 import { initializeApp } from "firebase/app";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { getFirestore, getDocs, collection, query, or, and, where, getDoc, doc } from "firebase/firestore";
-import { useState, useMemo, useRef } from 'react';
+import { useState, useMemo, useRef, useEffect } from 'react';
 import './styles.css';
 import { useRouter } from 'next/navigation'
 import Nav from '../nav';
@@ -47,25 +47,29 @@ export default function Samples() {
     const router = useRouter();
 
     const auth = getAuth();
-    if (!userData.role || userData.role.length < 1) {
-        onAuthStateChanged(auth, (user) => {
-            if (!user) {
-                router.replace('/login');
-            } else {
-                const userDocRef = doc(db, "users", user.uid);
-                getDoc(userDocRef).then((docRef) => {
-                    if (docRef.exists()) {
-                        const docData = docRef.data();
-                        if (!docData.role) {
-                            router.replace('/tasks');
-                        } else {
-                            setUserData(docData as UserData);
+
+    useEffect(() => {
+        if (!userData.role || userData.role.length < 1) {
+            onAuthStateChanged(auth, (user) => {
+                if (!user) {
+                    router.push('/login');
+                } else {
+                    const userDocRef = doc(db, "users", user.uid);
+                    getDoc(userDocRef).then((docRef) => {
+                        if (docRef.exists()) {
+                            const docData = docRef.data();
+                            if (!docData.role) {
+                                router.push('/tasks');
+                            } else {
+                                setUserData(docData as UserData);
+                            }
                         }
-                    }
-                })
-            }
-        });
-    }
+                    })
+                }
+            });
+        }
+    })
+    
 
     const db = getFirestore();
     if (Object.keys(data).length < 1 && userData.role) {

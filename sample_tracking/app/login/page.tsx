@@ -42,7 +42,7 @@ export default function LogInSignUpPage() {
   const auth = getAuth();
   onAuthStateChanged(auth, (user) => {
     if (user) {
-      router.replace('/samples');
+      router.push('/samples');
     } else {
       console.log('User not logged in');
     }
@@ -87,7 +87,7 @@ function Login(props: LogInProps) {
         // Signed in 
         const user = userCredential.user;
         console.log('signed in');
-        router.replace('/tasks');
+        router.push('/samples');
       })
       .catch((error) => {
         const errorCode = error.code;
@@ -122,7 +122,7 @@ function Login(props: LogInProps) {
           if (docRef.exists()) {
             const docData = docRef.data();
             if (docData.role) {
-              router.replace('/tasks');
+              router.push('/samples');
             } 
           } else {
             // This is a new user. 
@@ -293,7 +293,7 @@ function SignUp(props: SignUpProps) {
 
       // });
     }
-    router.replace('/tasks');
+    router.push('/samples');
   }
 
 
