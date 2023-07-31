@@ -1,0 +1,17 @@
+.form-group {
+    width: 500px;
+    margin: 30px;
+}
+
+.title {
+    font-family: Google Sans;
+    font-size: 24px;
+    font-weight: 400;
+    line-height: 32px;
+    letter-spacing: 0px;
+    text-align: left;
+}
+
+.form-control {
+    margin: 10px;
+}

@@ -102,9 +102,9 @@ export default function Nav() {
                         </span> Sign up requests</Link>
                     </li>}
                     {isAdmin() && <li className="nav-item">
-                        <a className="nav-link" href="./all-users"><span className="material-symbols-outlined">
+                        <Link className="nav-link" href="./all-users"><span className="material-symbols-outlined">
                             groups
-                        </span> {role === 'site_admin' ? 'All users' : 'My organization'}</a>
+                        </span> {role === 'site_admin' ? 'All users' : 'My organization'}</Link>
                     </li>}
 
                 </div>
