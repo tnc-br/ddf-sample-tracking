@@ -66,7 +66,7 @@ export default function ImportCsv() {
         "Site",
         "State",
         "lat",
-        "long",
+        "lon",
         "created_by",
         "current_state", // TODO - should we assume completed for CSV upload?
         "date_of_harvest",
@@ -144,15 +144,14 @@ export default function ImportCsv() {
             var row = csvValues[rowIndex];
             const internalCode = getRanHex(20);
             const docRef = doc(db, sampleTrust + "_samples", internalCode);
-            console.log()
             batch.set(docRef, {
                 'code_lab': row[selectedColumnCounts['code_lab'].index],
                 'visibility': sampleVisibility,
                 'species': row[selectedColumnCounts['Species'].index],
                 'site': row[selectedColumnCounts['Site'].index],
                 'state': row[selectedColumnCounts['State'].index],
-                'lat': row[selectedColumnCounts['lat'].index],
-                'long': row[selectedColumnCounts['long'].index],
+                'lat': Number(row[selectedColumnCounts['lat'].index]),
+                'lon': Number(row[selectedColumnCounts['lon'].index]),
                 'created_by': user.uid,
                 // 'current_step': '1. Drying process',
                 'status': 'complete',
