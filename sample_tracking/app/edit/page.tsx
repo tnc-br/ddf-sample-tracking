@@ -5,7 +5,7 @@ import 'bootstrap/dist/css/bootstrap.css';
 var QRCode = require('qrcode');
 import { QRCodeSVG } from "qrcode.react";
 import { useRouter } from 'next/navigation'
-import { doc, setDoc, getFirestore, getDoc } from "firebase/firestore";
+import { doc, updateDoc, getFirestore, getDoc } from "firebase/firestore";
 import { initializeApp } from "firebase/app";
 import { firebaseConfig } from '../firebase_config';
 import { getAuth, onAuthStateChanged } from "firebase/auth";
@@ -15,6 +15,7 @@ import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
 import { statesList } from '../states_list';
 import { municipalitiesList } from '../municipalities_list';
 import SampleDataInput from '../sample_data_input';
+import { useSearchParams } from 'next/navigation'
 
 type UserData = {
     name: string,
@@ -23,17 +24,39 @@ type UserData = {
     role: string,
 }
 
-export default function AddSample() {
+type Sample = {
+    last_updated_by: string,
+    site: string,
+    state: string,
+    org_name: string,
+    lon: string,
+    lat: string,
+    species: string,
+    created_by: string,
+    date_completed: string,
+    created_by_name: string,
+    current_step: string,
+    created_on: string,
+    org: string,
+}
+
+export default function Edit() {
     const [user, setUser] = useState({});
     const [sampleTrust, setSampletrust] = useState('untrusted');
     // const [isMember, setIsMember] = useState(false);
     const [userData, setUserdata] = useState({} as UserData);
     const [currentTab, setCurrentTab] = useState(1);
+    const [selectedDoc, setDoc] = useState({} as Sample);
 
     const [formData, setFormData] = useState({
         visibility: 'public',
-        collected_by: 'supplier',
+        collected_by: 'supplier'
     });
+
+    const searchParams = useSearchParams();
+    const sampleId = searchParams.get('id');
+    const trusted = searchParams.get('trusted');
+    console.log("sampleId: " + sampleId);
 
     const router = useRouter();
     const app = initializeApp(firebaseConfig);
@@ -65,36 +88,34 @@ export default function AddSample() {
         }
     });
 
+    let docRef =  doc(db, "trusted_samples", sampleId!);	
+    if (trusted === 'untrusted') {	
+        docRef = doc(db, "untrusted_samples", sampleId!);	
+    } else if (trusted === 'unknown') {	
+        docRef = doc(db, "unknown_samples", sampleId!);	
+    }	
+    if (Object.keys(selectedDoc).length < 1 && !userData.role && docRef) {	
+        // setHasStartedRequestTrue();	
+        getDoc(docRef).then((docRef) => {	
+            if (docRef.exists()) {	
+                console.log('updated data');	
+                setFormData(docRef.data() as Sample);	
+            } else {	
+                console.log('couldnt find data');	
+            }	
+            console.log(docRef);	
+        }).catch((error) => {	
+            console.log(error);	
+        })	
+    }	
+
     function onCancleClick() {
         router.push('/samples');
     }
 
-    function sampleHasRequiredFieldsSet(): boolean {
-        return true;
-    }
-
-    function onCreateSampleClick() {
-        if (!sampleHasRequiredFieldsSet()) {
-            alert("Not all required fields are filled out to submit a sample.");
-            return;
-        }
-        const user = auth.currentUser;
-        if (!user) return;
-        const date = new Date();
-        const currentDateString = `${date.getMonth() + 1}-${date.getDate()}-${date.getFullYear()}`
-        const internalCode = getRanHex(20);
-        const sampleData = {
-            ...formData,
-            created_by: auth.currentUser!.uid,
-            created_on: currentDateString,
-            last_updated_by: userData.name,
-            org_name: userData.org_name,
-            created_by_name: userData.name,
-            code_lab: internalCode,
-        };
-        // if (!formIsValid()) return;
+    function onUpdateSampleClick() {
+        const internalCode = formData.code_lab;
         const sampleTrustValue = formData.trusted;
-        if (!sampleTrustValue) return;
         let docRef;
         if (sampleTrustValue === "trusted") {
             docRef = doc(db, "trusted_samples", internalCode);
@@ -103,7 +124,11 @@ export default function AddSample() {
         } else {
             docRef = doc(db, "unknown_samples", internalCode);
         }
-        setDoc(docRef, sampleData).then(() => {
+        const date = new Date();
+        const currentDateString = `${date.getMonth() + 1}-${date.getDate()}-${date.getFullYear()}`
+        const user = auth.currentUser;
+        if (!user) return;
+        updateDoc(docRef, formData).then(() => {
             const url = `./sample-details?trusted=${sampleTrustValue}&id=${internalCode}`;
             router.push(url)
         })
@@ -120,9 +145,9 @@ export default function AddSample() {
         return result.join('');
     }
 
-    function handleChange(formState: {}, currentTabRef: Element) {
+    function handleChange(formState: {}) {
         setFormData(formState);
-    }
+      }
 
 
     return (
@@ -131,11 +156,11 @@ export default function AddSample() {
             <p className="title">Create a new sample</p>
             <div className="sample-details-form">
                 <p>Define the details of your new sample</p>
-                <form id="sample-form">
-                    <SampleDataInput baseState={formData}
+                <form>
+                <SampleDataInput baseState={formData}
                         onStateUpdate={(state) => handleChange(state)}
-                        onActionButtonClick={(evt: any) => onCreateSampleClick()}
-                        actionButtonTitle="Create sample" />
+                        onActionButtonClick={(evt: any) => onUpdateSampleClick()}
+                        actionButtonTitle="Update sample" />
                 </form>
             </div>
         </div>
