@@ -42,14 +42,13 @@ export default function SamplesTable({samplesData}) {
     const columns = useMemo<MRT_ColumnDef<Sample>[]>(
         () => [
             {
-                accessorFn: (row) => row,
+                accessorKey: 'code_lab',
                 header: 'Internal code',
                 size: 150,
-                Cell: ({ cell }) => {                    
-                    const row = cell.getValue();
+                Cell: ({ cell, row, renderedCellValue }) => {                    
                     return (
-                        <div id={row.trusted} onClick={onSampleClick} className="sample-link">
-                      <span id={row.code_lab}>{row.code_lab}</span>
+                        <div id={row.original.trusted} onClick={onSampleClick} className="sample-link">
+                      <span id={cell.getValue()}>{renderedCellValue}</span>
                     </div>
                     )
                   },
