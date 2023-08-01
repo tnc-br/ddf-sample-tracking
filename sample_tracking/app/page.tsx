@@ -9,6 +9,8 @@ import { getAuth } from "firebase/auth";
 
 import { useRouter } from 'next/navigation'
 
+import './i18n/config';
+
 export default function Home() {
 
   const router = useRouter()

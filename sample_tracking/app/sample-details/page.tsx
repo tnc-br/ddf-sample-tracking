@@ -27,7 +27,6 @@ type Sample = {
     current_step: string,
     created_on: string,
     org: string,
-
 }
 
 type UserData = {

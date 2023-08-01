@@ -10,6 +10,8 @@ import { useState, useEffect } from 'react';
 import { firebaseConfig } from './firebase_config';
 import { getFirestore, getDoc, doc } from "firebase/firestore";
 import Link from 'next/link';
+import { useTranslation } from 'react-i18next';
+import './i18n/config';
 
 export default function Nav() {
     const [role, setRole] = useState('');
@@ -20,6 +22,7 @@ export default function Nav() {
     const router = useRouter();
     const auth = getAuth();
     const db = getFirestore();
+    const {t} = useTranslation();
 
     useEffect(() => {
         if (role.length < 1) {
@@ -73,38 +76,33 @@ export default function Nav() {
                 {canAddSample() && <li className="nav-item">
                     <Link className="nav-link add-sample-button" href="./add-sample"><span className="material-symbols-outlined">
                         add
-                    </span> Add sample</Link>
+                    </span> {t('addSample')}</Link>
                 </li>}
                 {canAddSample() && <li className="nav-item">
                     <Link className="nav-link" href="./import-samples">
                         <span className="material-symbols-outlined">cloud_upload</span>
-                        Import samples</Link>
-                </li>}
-                {canAddSample() && <li className="nav-item">
-                    <Link className="nav-link" href="./tasks"><span className="material-symbols-outlined">
-                        list_alt
-                    </span> My tasks</Link>
+                        {t('importSamples')}</Link>
                 </li>}
                 {canAddSample() && <li className="nav-item">
                     <Link className="nav-link" href="./my-samples"> <span className="material-symbols-outlined">
                         labs
-                    </span>My samples</Link>
+                    </span>{t('mySamples')}</Link>
                 </li>}
                 <li className="nav-item">
                     <Link className="nav-link" href="./samples"> <span className="material-symbols-outlined">
                         lab_panel
-                    </span> All samples</Link>
+                    </span> {t('allSamples')}</Link>
                 </li>
                 <div className="admin-options">
                     {isAdmin() && <li className="nav-item">
                         <Link className="nav-link" href="./sign-up-requests"><span className="material-symbols-outlined">
                             person_add
-                        </span> Sign up requests</Link>
+                        </span> {t('signUpRequests')}</Link>
                     </li>}
                     {isAdmin() && <li className="nav-item">
                         <Link className="nav-link" href="./all-users"><span className="material-symbols-outlined">
                             groups
-                        </span> {role === 'site_admin' ? 'All users' : 'My organization'}</Link>
+                        </span> {role === 'site_admin' ? t('allUsers') : t('myOrganization')}</Link>
                     </li>}
 
                 </div>
@@ -112,7 +110,7 @@ export default function Nav() {
                 <li className="nav-item">
                     <button className="nav-link" onClick={onLogOutClick}> <span className="material-symbols-outlined">
                         logout
-                    </span> Log out</button>
+                    </span> {t('logOut')}</button>
                 </li>
 
             </ul>
