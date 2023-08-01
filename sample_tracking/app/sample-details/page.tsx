@@ -30,12 +30,18 @@ type Sample = {
 
 }
 
+type UserData = {
+    role: string,
+    org: string,
+}
+
+
 export default function SampleDetails() {
 
     const [selectedDoc, setDoc] = useState({} as Sample);
     const [hasStartedRequest, setHasStartedRequest] = useState(false);
     const [tabShown, setTabShown] = useState(0);
-    const [userData, setUserData] = useState({ role: '', org: '' });
+    const [userData, setUserData] = useState({} as UserData);
 
     function updateStateDoc(data: Sample) {
         setDoc(data);
@@ -66,19 +72,19 @@ export default function SampleDetails() {
 
 
     const auth = getAuth();
-    if (userData.role.length < 1) {
+    if (!userData.role) {
         onAuthStateChanged(auth, (user) => {
             if (!user) {
-                router.push('/login');
+                router.replace('/login');
             } else {
                 const userDocRef = doc(db, "users", user.uid);
                 getDoc(userDocRef).then((docRef) => {
                     if (docRef.exists()) {
                         const docData = docRef.data();
                         if (!docData.role) {
-                            router.push('/tasks');
+                            router.replace('/tasks');
                         } else {
-                            setUserData(docData);
+                            setUserData(docData as UserData);
                         }
                     }
                 })
@@ -87,10 +93,8 @@ export default function SampleDetails() {
     }
 
 
-    let docRef;
-    if (trusted === 'trusted') {
-        docRef = doc(db, "trusted_samples", sampleId!)
-    } else if (trusted === 'untrusted') {
+    let docRef =  doc(db, "trusted_samples", sampleId!);
+    if (trusted === 'untrusted') {
         docRef = doc(db, "untrusted_samples", sampleId!);
     } else if (trusted === 'unknown') {
         docRef = doc(db, "unknown_samples", sampleId!);
@@ -98,13 +102,13 @@ export default function SampleDetails() {
 
 
 
-    if (Object.keys(selectedDoc).length < 1 && !hasStartedRequest && userData.role.length > 0 && docRef) {
+    if (Object.keys(selectedDoc).length < 1 && !hasStartedRequest && !userData.role && docRef) {
 
         // setHasStartedRequestTrue();
         getDoc(docRef).then((docRef) => {
             if (docRef.exists()) {
                 console.log('updated data');
-                updateStateDoc(docRef.data());
+                updateStateDoc(docRef.data() as Sample);
             } else {
                 console.log('couldnt find data');
             }

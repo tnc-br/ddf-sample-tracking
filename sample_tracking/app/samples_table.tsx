@@ -31,9 +31,14 @@ type Sample = {
     last_updated_by: string,
     org: string,
     validity: number,
+    header: string,
 }
 
-export default function SamplesTable({samplesData}) {
+interface SampleDataProps {
+    samplesData: any,
+}
+
+export default function SamplesTable(props: SampleDataProps) {
 
     const router = useRouter();
 
@@ -89,27 +94,27 @@ export default function SamplesTable({samplesData}) {
     );
 
 
-    function onSampleClick(evt) {
+    function onSampleClick(evt: any) {
         const url = `./sample-details?trusted=${evt.currentTarget.id}&id=${evt.target.id}`;
-        router.push(url)
+        router.replace(url)
     }
 
-    function onDowloadClick(evt) {
+    function onDowloadClick(evt: any) {
         if (!tableInstanceRef.current) {
             return;
         }
         const rowSelection = tableInstanceRef.current.getState().rowSelection;
         const selectedElements = document.getElementsByClassName('select-sample-checkbox');
-        const selectedSamples: typeof Samples[] = [];
+        const selectedSamples: Sample[] = [];
         Object.keys(rowSelection).forEach((index: string) => {
-            selectedSamples.push(samplesData[parseInt(index)]);
+            selectedSamples.push(props.samplesData[parseInt(index)]);
         })
         let headers = Object.keys(selectedSamples[0]);
         let csv = headers.toString() + '\n';
         let isFirst = true;
         selectedSamples.forEach((sample) => {
             headers.forEach((header) => {
-                csv += (isFirst ? sample[header] : ',' + sample[header]);
+                csv += (isFirst ? sample.header : ',' + sample.header);
                 isFirst = false;
             });
             csv += '\n';
@@ -134,11 +139,11 @@ export default function SamplesTable({samplesData}) {
                 
                 <MaterialReactTable
                     columns={columns}
-                    data={samplesData}
+                    data={props.samplesData}
                     enableRowSelection
                     tableInstanceRef={tableInstanceRef}
                     renderTopToolbarCustomActions={({ table }) => (
-                        <div sx={{ display: 'flex', gap: '1rem', p: '0.5rem', flexWrap: 'wrap' }}>
+                        <div>
                             <button
                                 disabled={!table.getIsSomeRowsSelected()}
                                 type="button" className="btn btn-primary"

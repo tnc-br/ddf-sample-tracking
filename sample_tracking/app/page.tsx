@@ -23,15 +23,14 @@ export default function Home() {
   };
 
 
-  // Initialize Firebase and declare "global" variables. all variables declared in this section are accessible to functions that follow.
   const app = initializeApp(firebaseConfig);
   const auth = getAuth();
   const user = auth.currentUser;
 
   if (user) {
-    router.push('/tasks');
+    router.replace('/tasks');
   } else {
-    router.push('/login');
+    router.replace('/login');
   }
 
 }

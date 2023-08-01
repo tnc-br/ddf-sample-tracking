@@ -40,7 +40,7 @@ export default function AddSample() {
                     if (docRef.exists()) {
                         const docData = docRef.data();
                         if (!docData.role) {
-                            router.push('/tasks');
+                            router.replace('/tasks');
                         } else {
                             setUserdata(docData as UserData);
                         }
@@ -48,7 +48,7 @@ export default function AddSample() {
                 })
             }
             if (!user) {
-                router.push('/login');
+                router.replace('/login');
             }
         });
     }
@@ -58,7 +58,7 @@ export default function AddSample() {
     }
 
     function onCancleClick() {
-        router.push('/samples');
+        router.replace('/samples');
     }
 
     function onCreateSampleClick() {
@@ -99,7 +99,7 @@ export default function AddSample() {
 
         }).then(() => {
             const url = `./sample-details?trusted=${sampleTrustValue}&id=${internalCode}`;
-            router.push(url)
+            router.replace(url)
         })
 
     }
@@ -171,7 +171,7 @@ export default function AddSample() {
 
     return (
         <div className="add-sample-page-wrapper">
-            <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@48,400,0,0" />
+            <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@48,400,0,0&display=optional" />
 
             {/* <label htmlFor="formFile" className="form-label">Upload CSV file</label>
             <input capture onChange={onFileChanged} accept=".csv" className="form-control" type="file" id="formFile" />
@@ -190,8 +190,8 @@ export default function AddSample() {
                         <option value="trusted">Yes</option>
                         <option value="unknown">Unkown</option>
                     </select>
-                    <label htmlFor="sampleVisibility" defaultValue={sampleTrust}>Sample visibility</label>
-                    <select className="form-select" id="sampleVisibility" aria-label="Select sample trusted status">
+                    <label htmlFor="sampleVisibility">Sample visibility</label>
+                    <select className="form-select" id="sampleVisibility" aria-label="Select sample visibility">
                         <option value="public">Publicly available</option>
                         <option value="logged_in">Available to any logged-in user</option>
                         <option value="organization">Available to my organization only</option>
@@ -204,7 +204,7 @@ export default function AddSample() {
                     <div className="form-group">
                         <datalist id="suggestions">
                             {speciesNames.map((speciesName: string) => {
-                                return (<option>{speciesName}</option>)
+                                return (<option key={speciesName}>{speciesName}</option>)
                             })}
                         </datalist>
                         <label htmlFor="treeSpecies">Tree species</label>

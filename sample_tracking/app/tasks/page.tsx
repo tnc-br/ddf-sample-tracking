@@ -18,7 +18,7 @@ export default function Tasks() {
   // onAuthStateChanged(auth, (user) => {
   //   if (!user) {
   //     console.log('User not logged in');
-  //     router.push('/login');
+  //     router.replace('/login');
   //   }
   // });
   return (
