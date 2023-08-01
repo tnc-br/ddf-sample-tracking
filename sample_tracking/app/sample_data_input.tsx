@@ -324,7 +324,6 @@ export default function SampleDataInput(props: any) {
     return (
         <div className="add-sample-page-wrapper">
             <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@48,400,0,0&display=optional" />
-            <p className="title">Create a new sample</p>
             <div className="sample-details-form">
                 <p>Define the details of your new sample</p>
                 <form id='sample-form'>

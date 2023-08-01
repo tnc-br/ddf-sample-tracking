@@ -72,7 +72,7 @@ export default function Samples() {
     
 
     const db = getFirestore();
-    if (Object.keys(data).length < 1 && userData.role) {
+    if (Object.keys(data).length < 1) {
         addSamplesToDataList();
     }
 
@@ -105,7 +105,7 @@ export default function Samples() {
                     where("visibility", "==", "logged_in"),
                     where("org", "==", userData.org)
                 ));
-        } else {
+        } else if (userData.org != null) {
             samplesQuery = query(verifiedSamplesRef,
                 or(
                     where("created_by", "==", user.uid),
@@ -115,6 +115,8 @@ export default function Samples() {
                         where("visibility", "==", "organization"),
                         where("org", "==", userData.org)),
                 ))
+        } else {
+            samplesQuery = query(verifiedSamplesRef, where("visibility", "==", "public"));
         }
 
         const querySnapshot = await getDocs(samplesQuery).catch((error) => {
@@ -133,7 +135,7 @@ export default function Samples() {
     }
 
     async function addSamplesToDataList() {
-        if (Object.keys(samplesState[0]).length < 1 && userData.role.length > 0) {
+        if (Object.keys(samplesState[0]).length < 1) {
             let allSamples: any = [{}];
             const trustedSamples = await getSamplesFromCollection('trusted_samples');
             const untrustedSamples = await getSamplesFromCollection('untrusted_samples');

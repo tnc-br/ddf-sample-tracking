@@ -88,7 +88,7 @@ export default function AddSample() {
             created_by: auth.currentUser!.uid,
             created_on: currentDateString,
             last_updated_by: userData.name,
-            org_name: userData.org_name,
+            org_name: userData.org,
             created_by_name: userData.name,
             code_lab: internalCode,
         };
