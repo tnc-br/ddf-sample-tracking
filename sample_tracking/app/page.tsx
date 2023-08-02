@@ -29,6 +29,7 @@ export default function Home() {
   const auth = getAuth();
   const user = auth.currentUser;
 
+<<<<<<< HEAD
   useEffect(() => {
     if (user) {
       router.push('/samples');
@@ -37,5 +38,12 @@ export default function Home() {
     }
   });
 
+=======
+  if (user) {
+    router.replace('/tasks');
+  } else {
+    router.replace('/login');
+  }
+>>>>>>> main
 
 }

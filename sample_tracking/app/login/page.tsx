@@ -51,7 +51,7 @@ export default function LogInSignUpPage() {
   const auth = getAuth();
   onAuthStateChanged(auth, (user) => {
     if (user) {
-      router.push('/samples');
+      router.replace('/samples');
     } else {
       console.log('User not logged in');
     }

@@ -47,14 +47,13 @@ export default function SamplesTable(props: SampleDataProps) {
     const columns = useMemo<MRT_ColumnDef<Sample>[]>(
         () => [
             {
-                accessorFn: (row) => row,
+                accessorKey: 'code_lab',
                 header: 'Internal code',
                 size: 150,
-                Cell: ({ cell }) => {                    
-                    const row = cell.getValue();
+                Cell: ({ cell, row, renderedCellValue }) => {                    
                     return (
-                        <div id={(row as Sample).trusted} onClick={onSampleClick} className="sample-link">
-                      <span id={(row as Sample).code_lab}>{(row as Sample).code_lab}</span>
+                        <div id={row.original.trusted} onClick={onSampleClick} className="sample-link">
+                      <span id={cell.getValue()}>{renderedCellValue}</span>
                     </div>
                     )
                   },
@@ -106,7 +105,7 @@ export default function SamplesTable(props: SampleDataProps) {
 
     function onSampleClick(evt: any) {
         const url = `./sample-details?trusted=${evt.currentTarget.id}&id=${evt.target.id}`;
-        router.push(url)
+        router.replace(url)
     }
 
     function onEditSampleClick(evt: any) {

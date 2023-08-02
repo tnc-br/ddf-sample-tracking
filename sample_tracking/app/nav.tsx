@@ -55,7 +55,7 @@ export default function Nav() {
 
     function onLogOutClick() {
         signOut(auth).then(() => {
-            router.push('/login');
+            router.replace('/login');
         }).catch((error) => {
             console.log('Unable to log out: ' + error);
         });
