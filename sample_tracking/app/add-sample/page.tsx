@@ -39,31 +39,6 @@ export default function AddSample() {
     const app = initializeApp(firebaseConfig);
     const auth = getAuth();
     const db = getFirestore();
-<<<<<<< HEAD
-=======
-    if (!userData.role) {
-        onAuthStateChanged(auth, (user) => {
-            if (user) {
-                console.log(user);
-                setUser(user);
-                const userDocRef = doc(db, "users", user.uid);
-                getDoc(userDocRef).then((docRef) => {
-                    if (docRef.exists()) {
-                        const docData = docRef.data();
-                        if (!docData.role) {
-                            router.replace('/tasks');
-                        } else {
-                            setUserdata(docData as UserData);
-                        }
-                    }
-                })
-            }
-            if (!user) {
-                router.replace('/login');
-            }
-        });
-    }
->>>>>>> main
 
     useEffect(() => {
         if (!userData.role) {
@@ -153,7 +128,6 @@ export default function AddSample() {
     return (
         <div className="add-sample-page-wrapper">
             <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@48,400,0,0&display=optional" />
-<<<<<<< HEAD
             <p className="title">Create a new sample</p>
             <div className="sample-details-form">
                 <p>Define the details of your new sample</p>
@@ -162,89 +136,6 @@ export default function AddSample() {
                         onStateUpdate={(state) => handleChange(state)}
                         onActionButtonClick={(evt: any) => onCreateSampleClick()}
                         actionButtonTitle="Create sample" />
-=======
-
-            {/* <label htmlFor="formFile" className="form-label">Upload CSV file</label>
-            <input capture onChange={onFileChanged} accept=".csv" className="form-control" type="file" id="formFile" />
-            <button type="button" className="btn btn-primary">Upload samples</button> */}
-            <p className="title">Create a new sample</p>
-            <div className="sample-details-form">
-                <p>Define the details of your new sample</p>
-                <form>
-                    <div className="form-group">
-                        <label htmlFor="sampleName">Sample name</label>
-                        <input type="text" className="form-control" onChange={onRequiredFieldChange} id="sampleName" />
-                    </div>
-                    <label htmlFor="sampleTrustSelected" defaultValue={sampleTrust}>Is this sample trusted?</label>
-                    <select onChange={onSampleTrustChange} className="form-select" id="sampleTrustSelected" aria-label="Select sample trusted status">
-                        <option value="untrusted">No</option>
-                        <option value="trusted">Yes</option>
-                        <option value="unknown">Unkown</option>
-                    </select>
-                    <label htmlFor="sampleVisibility">Sample visibility</label>
-                    <select className="form-select" id="sampleVisibility" aria-label="Select sample visibility">
-                        <option value="public">Publicly available</option>
-                        <option value="logged_in">Available to any logged-in user</option>
-                        <option value="organization">Available to my organization only</option>
-                        <option value="private">Private to me and admins only</option>
-                    </select>
-                    {/* <div className="form-group">
-                        <label htmlFor="internalCode">Internal code</label>
-                        <input type="text" className="form-control" id="internalCode" />
-                    </div> */}
-                    <div className="form-group">
-                        <datalist id="suggestions">
-                            {speciesNames.map((speciesName: string) => {
-                                return (<option key={speciesName}>{speciesName}</option>)
-                            })}
-                        </datalist>
-                        <label htmlFor="treeSpecies">Tree species</label>
-                        <input type="text" autoComplete="on" list="suggestions" className="form-control" id="treeSpecies" />
-                    </div>
-                    {sampleTrust !== "unknown" && <div>
-                        <div className="form-group">
-                            <label htmlFor="collectionSite">Collection site</label>
-                            <input type="text" className="form-control" onChange={onRequiredFieldChange} id="collectionSite" />
-                        </div>
-                        <div className="form-group">
-                            <label htmlFor="inputState">State</label>
-                            <input type="text" className="form-control" onChange={onRequiredFieldChange} id="inputState" />
-                        </div>
-                        <div className="form-group">
-                            <label htmlFor="dateOfHarvest">Date of harvest</label>
-                            <input type="text" className="form-control" onChange={onRequiredFieldChange} id="dateOfHarvest" />
-                        </div>
-                        <div className="form-row">
-
-                            <div className="form-group latlon-input" id="inputLatFormGroup">
-                                <label htmlFor="inputLat">Latitude</label>
-                                <input type="text" className="form-control" onChange={onRequiredFieldChange} id="inputLat" />
-                                <div className="invalid-feedback">
-                                    Please provide a latitude.
-                                </div>
-                            </div>
-                            <div className="form-group latlon-input">
-                                <label htmlFor="inputLon">Longitude</label>
-                                <input type="text" className="form-control" onChange={onRequiredFieldChange} id="inputLon" />
-                                <div className="invalid-feedback">
-                                    Please provide a longitude.
-                                </div>
-                            </div>
-                        </div>
-                    </div>}
-
-                    <p className='subtitle'>Assign a QR code</p>
-                    <p className='qrcode-text'>Print and paste this QR code on the sample to be analyzed</p>
-                    <QRCodeSVG value="http://timberid.org" />
-                    <div className='print-button'><span className="material-symbols-outlined">
-                        print
-                    </span> Print</div>
-                    <div className='submit-buttons'>
-                        <button type="button" onClick={onCancleClick} className="btn btn-outline-primary">Cancel</button>
-                        <button type="button" onClick={onCreateSampleClick} className="btn btn-primary">Create sample</button>
-                    </div>
-
->>>>>>> main
                 </form>
             </div>
         </div>
