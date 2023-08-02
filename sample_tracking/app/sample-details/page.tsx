@@ -2,22 +2,22 @@
 import Nav from '../nav';
 import './styles.css';
 import 'bootstrap/dist/css/bootstrap.css';
-import { doc, getDoc, getFirestore, updateDoc } from "firebase/firestore";
+import { doc, getDoc, getFirestore, updateDoc, DocumentReference } from "firebase/firestore";
 import { initializeApp } from "firebase/app";
 import { firebaseConfig } from '../firebase_config';
 import { useSearchParams, usePathname } from 'next/navigation'
 import { getAuth, onAuthStateChanged } from "firebase/auth";
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import 'jquery';
 import 'popper.js';
-import 'bootstrap/dist/js/bootstrap.bundle.min';
+// import 'bootstrap/dist/js/bootstrap.bundle.min';
 import { useRouter } from 'next/navigation'
 
 type Sample = {
     last_updated_by: string,
     site: string,
-    state: string, 
-    org_name: string, 
+    state: string,
+    org_name: string,
     lon: string,
     lat: string,
     species: string,
@@ -27,7 +27,6 @@ type Sample = {
     current_step: string,
     created_on: string,
     org: string,
-
 }
 
 type UserData = {
@@ -72,50 +71,56 @@ export default function SampleDetails() {
 
 
     const auth = getAuth();
-    if (!userData.role) {
-        onAuthStateChanged(auth, (user) => {
-            if (!user) {
-                router.replace('/login');
-            } else {
-                const userDocRef = doc(db, "users", user.uid);
-                getDoc(userDocRef).then((docRef) => {
-                    if (docRef.exists()) {
-                        const docData = docRef.data();
-                        if (!docData.role) {
-                            router.replace('/tasks');
-                        } else {
-                            setUserData(docData as UserData);
+
+
+    useEffect(() => {
+        if (!userData.role) {
+            onAuthStateChanged(auth, (user) => {
+                if (!user) {
+                    router.push('/login');
+                } else {
+                    const userDocRef = doc(db, "users", user.uid);
+                    getDoc(userDocRef).then((user) => {
+                        if (user.exists()) {
+                            const docData = user.data();
+                            if (!docData.role) {
+                                router.push('/tasks');
+                            } else {
+                                setUserData(docData as UserData);
+                            }
                         }
-                    }
-                })
-            }
-        });
-    }
+                    })
+                }
+            });
+        }
+    });
 
-
-    let docRef =  doc(db, "trusted_samples", sampleId!);
-    if (trusted === 'untrusted') {
-        docRef = doc(db, "untrusted_samples", sampleId!);
-    } else if (trusted === 'unknown') {
-        docRef = doc(db, "unknown_samples", sampleId!);
-    }
-
-
-
-    if (Object.keys(selectedDoc).length < 1 && !hasStartedRequest && !userData.role && docRef) {
-
-        // setHasStartedRequestTrue();
-        getDoc(docRef).then((docRef) => {
-            if (docRef.exists()) {
-                console.log('updated data');
-                updateStateDoc(docRef.data() as Sample);
-            } else {
-                console.log('couldnt find data');
-            }
-            console.log(docRef);
-        }).catch((error) => {
-            console.log(error);
-        })
+    let docRef =  doc(db, "trusted_samples", sampleId!);	
+    if (trusted === 'untrusted') {	
+        docRef = doc(db, "untrusted_samples", sampleId!);	
+    } else if (trusted === 'unknown') {	
+        docRef = doc(db, "unknown_samples", sampleId!);	
+    }	
+    if (Object.keys(selectedDoc).length < 1 && !hasStartedRequest && !userData.role && docRef) {	
+        // setHasStartedRequestTrue();	
+        getDoc(docRef).then((docRef) => {	
+            if (docRef.exists()) {	
+                console.log('updated data');	
+                updateStateDoc(docRef.data() as Sample);	
+            } else {	
+                console.log('couldnt find data');	
+            }	
+            console.log(docRef);	
+        }).catch((error) => {	
+            console.log(error);	
+        })	
+    }	
+    function processCompletedButtonPressed() {	
+        const nextStep = processSteps[processSteps.indexOf(selectedDoc.current_step) + 1];	
+        updateDoc(docRef, {	
+            'current_step': nextStep,	
+        });	
+        updateCurrentStep(nextStep);	
     }
 
     function showDetails() {
@@ -128,14 +133,6 @@ export default function SampleDetails() {
 
     function showResults() {
         updateTabShown(2);
-    }
-
-    function processCompletedButtonPressed() {
-        const nextStep = processSteps[processSteps.indexOf(selectedDoc.current_step) + 1];
-        updateDoc(docRef, {
-            'current_step': nextStep,
-        });
-        updateCurrentStep(nextStep);
     }
 
     function processStep(title: string, stepNumber: number, headingId: string, collapseId: string) {

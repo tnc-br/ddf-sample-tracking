@@ -3,7 +3,7 @@ import 'bootstrap/dist/css/bootstrap.css';
 import { initializeApp } from "firebase/app";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { getFirestore, getDocs, collection, query, or, and, where, getDoc, doc } from "firebase/firestore";
-import { useState, useMemo, useRef } from 'react';
+import { useState, useMemo, useRef, useEffect } from 'react';
 import './styles.css';
 import { useRouter } from 'next/navigation'
 import Nav from '../nav';
@@ -42,19 +42,22 @@ export default function MySamples() {
     const [samplesState, setSamplesState] = useState([{}]);
     const [userId, setUserId] = useState('');
 
-    const app = initializeApp(firebaseConfig);
     const router = useRouter();
+    const app = initializeApp(firebaseConfig);
 
     const auth = getAuth();
-    if (userId.length < 1) {
-        onAuthStateChanged(auth, (user) => {
-            if (!user) {
-                router.replace('/login');
-            } else {
-                setUserId(user.uid)
-            }
-        });
-    }
+    useEffect(() => {
+        if (userId.length < 1) {
+            onAuthStateChanged(auth, (user) => {
+                if (!user) {
+                    router.push('/login');
+                } else {
+                    setUserId(user.uid)
+                }
+            });
+        }
+    });
+    
 
     const db = getFirestore();
     if (Object.keys(data).length < 1 && userId.length > 0) {

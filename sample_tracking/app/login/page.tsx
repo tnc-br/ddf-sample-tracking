@@ -20,7 +20,7 @@ type SignUpData = {
 
 interface LogInProps {
   onSignUpClick: any,
-} 
+}
 
 interface SignUpProps {
   onLogInClick: any,
@@ -32,6 +32,15 @@ interface NestedSchemas {
 
 interface OrgsSchemas {
   [key: string]: string;
+}
+
+type NewUser = {
+  name: string,
+  email: string,
+  date_requested: string,
+  org: string,
+  uid: string,
+  org_name: string
 }
 
 export default function LogInSignUpPage() {
@@ -87,7 +96,7 @@ function Login(props: LogInProps) {
         // Signed in 
         const user = userCredential.user;
         console.log('signed in');
-        router.replace('/tasks');
+        router.push('/samples');
       })
       .catch((error) => {
         const errorCode = error.code;
@@ -121,15 +130,24 @@ function Login(props: LogInProps) {
         getDoc(userDocRef).then((docRef) => {
           if (docRef.exists()) {
             const docData = docRef.data();
-            if (docData.role) {
-              router.replace('/tasks');
-            } 
+            if (docData.role && docData.org) {
+              router.push('/samples');
+            } else {
+              router.push('/select-org');
+            }
           } else {
+            const date = new Date();
+            const dateString = `${date.getMonth() + 1} ${date.getDate()} ${date.getFullYear()}`;
             // This is a new user. 
+            addDoc(collection(db, "new_users"), {
+              name: user.displayName,
+              email: user.email,
+              date_requested: dateString,
+              uid: user.uid,
+            })
+            router.push('/select-org');
           }
-        })
-        // IdP data available using getAdditionalUserInfo(result)
-        // ...
+        });
       }).catch((error) => {
         // Handle Errors here.
         const errorCode = error.code;
@@ -272,14 +290,7 @@ function SignUp(props: SignUpProps) {
       }
       updateDoc(newOrgDoc, newObj);
     } else {
-      // const newUserDocRef = doc(db, "new_users", signUpData.lab);
-      // let newObj = {};
-      // newObj[auth.currentUser!.uid] = {
-      //   name: name,
-      //   email: email,
-      //   date_requested: dateString,
-      //   org: signUpData.lab,
-      // }
+
       addDoc(collection(db, "new_users"), {
         name: name,
         email: email,
@@ -287,13 +298,38 @@ function SignUp(props: SignUpProps) {
         org: signUpData.lab,
         uid: auth.currentUser!.uid,
         org_name: signUpData.labName,
-      })
+      });
+
+      const newUser = {
+        name: name,
+        email: email,
+        date_requested: dateString,
+        org: signUpData.lab,
+        uid: auth.currentUser!.uid,
+        org_name: signUpData.labName,
+      }
+
+      // addUserToNewUsersCollection(newUser)
       // updateDoc(newUserDocRef, {
       //   prospective_members: arrayUnion(auth.currentUser!.uid),
 
       // });
     }
-    router.replace('/tasks');
+    router.push('/samples');
+  }
+
+
+
+  function addUserToNewUsersCollection(newUserData: NewUser) {
+    addDoc(collection(db, "new_users"), {
+      name: newUserData.name,
+      email: newUserData.email,
+      date_requested: newUserData.date_requested,
+      org: newUserData.org ? newUserData.org : "",
+      uid: newUserData.uid,
+      org_name: newUserData.org_name ? newUserData.org_name : "",
+    });
+
   }
 
 

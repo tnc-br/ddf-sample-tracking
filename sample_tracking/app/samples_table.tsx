@@ -79,16 +79,25 @@ export default function SamplesTable(props: SampleDataProps) {
                 header: 'Validity',
                 size: 150,
             },
+
             {
-                accessorKey: 'current_step',
-                header: 'Current step',
+                accessorKey: 'last_updated_by',
+                header: 'Last updated by',
                 size: 150,
             },
             {
-                accessorKey: 'site',
-                header: 'Collection site',
+                accessorFn: (row) => row,
+                header: 'Actions',
                 size: 150,
-            },
+                Cell: ({ cell }) => {        
+                    const row = cell.getValue();            
+                    return (
+                        <div id={(row as Sample).trusted} onClick={onEditSampleClick} className="sample-link">
+                      <span id={(row as Sample).code_lab}>Edit</span>
+                    </div>
+                    )
+                  },
+            }
         ],
         [],
     );
@@ -97,6 +106,11 @@ export default function SamplesTable(props: SampleDataProps) {
     function onSampleClick(evt: any) {
         const url = `./sample-details?trusted=${evt.currentTarget.id}&id=${evt.target.id}`;
         router.replace(url)
+    }
+
+    function onEditSampleClick(evt: any) {
+        const url = `./edit?trusted=${evt.currentTarget.id}&id=${evt.target.id}`;
+        router.push(url)
     }
 
     function onDowloadClick(evt: any) {

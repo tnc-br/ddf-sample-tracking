@@ -5,7 +5,7 @@ import { initializeApp as initializeAdminApp } from 'firebase-admin/app';
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { firebaseConfig } from '../firebase_config';
 import { initializeApp } from "firebase/app";
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Nav from '../nav';
 import './styles.css';
 import { useRouter } from 'next/navigation'
@@ -33,24 +33,28 @@ export default function SignUpRequests() {
     const auth = getAuth();
     const router = useRouter();
     const db = getFirestore();
-    if (Object.keys(userData).length < 1) {
-        onAuthStateChanged(auth, (user) => {
-            if (!user) {
-                router.replace('/login');
-            } else {
-                const userDocRef = doc(db, "users", user.uid);
-                getDoc(userDocRef).then((docRef) => {
-                    if (docRef.exists()) {
-                        const docData = docRef.data();
-                        if (docData.role !== 'admin' && docData.role !== 'site_admin') {
-                            router.replace('/tasks');
+
+    useEffect(() => {
+        if (Object.keys(userData).length < 1) {
+            onAuthStateChanged(auth, (user) => {
+                if (!user) {
+                    router.push('/login');
+                } else {
+                    const userDocRef = doc(db, "users", user.uid);
+                    getDoc(userDocRef).then((docRef) => {
+                        if (docRef.exists()) {
+                            const docData = docRef.data();
+                            if (docData.role !== 'admin' && docData.role !== 'site_admin') {
+                                router.push('/tasks');
+                            }
+                            setUserData(docRef.data() as UserData);
                         }
-                        setUserData(docRef.data() as UserData);
-                    }
-                })
-            }
-        });
-    }
+                    })
+                }
+            });
+        }
+    })
+    
 
     if (Object.keys(pendingApprovals).length < 1 && Object.keys(currentUsers).length < 1) {
         const pendingUsers: NestedSchemas = {};

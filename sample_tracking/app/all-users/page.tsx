@@ -5,7 +5,7 @@ import { initializeApp as initializeAdminApp } from 'firebase-admin/app';
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { firebaseConfig } from '../firebase_config';
 import { initializeApp } from "firebase/app";
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Nav from '../nav';
 import './styles.css';
 import { useRouter } from 'next/navigation'
@@ -49,32 +49,28 @@ export default function Users() {
     const auth = getAuth();
     const router = useRouter();
     const db = getFirestore();
-    if (!userData.role || userData.role.length < 1) {
-        onAuthStateChanged(auth, (user) => {
-            if (!user) {
-                router.replace('/login');
-            } else {
-                const userDocRef = doc(db, "users", user.uid);
-                getDoc(userDocRef).then((docRef) => {
-                    if (docRef.exists()) {
-                        const docData = docRef.data();
-                        if (docData.role !== 'admin' && docData.role !== 'site_admin') {
-                            router.replace('/tasks');
+
+    useEffect(() => {
+        if (!userData.role || userData.role.length < 1) {
+            onAuthStateChanged(auth, (user) => {
+                if (!user) {
+                    router.push('/login');
+                } else {
+                    const userDocRef = doc(db, "users", user.uid);
+                    getDoc(userDocRef).then((docRef) => {
+                        if (docRef.exists()) {
+                            const docData = docRef.data();
+                            if (docData.role !== 'admin' && docData.role !== 'site_admin') {
+                                router.push('/tasks');
+                            }
+                            setUserData(docRef.data() as UserData);
                         }
-                        setUserData(docRef.data() as UserData);
-                    }
-                });
-                // user.getIdTokenResult(true).then((token) => {
-                //     if (token.claims.role !== 'admin' && token.claims.role !== 'site_admin') {
-                //         router.replace('/tasks');
-                //     } else if (userDetails.role.length < 1) {
-                //         // setUserDetails({role: token.claims.role, org: token.claims.org});
-                //         // setUserData()
-                //     }
-                // });
-            }
-        });
-    }
+                    });
+                }
+            });
+        }
+    })
+    
 
     if (Object.keys(users).length < 1) {
         if (userData.role === 'site_admin') {
