@@ -39,13 +39,13 @@ export default function SampleDataInput(props: any) {
 
     const [formData, setFormData] = useState(props.baseState);
 
+    const router = useRouter();
+
     if (!props || !props.onStateUpdate || !props.onActionButtonClick || !props.baseState || !props.actionButtonTitle) return;
 
     if (Object.keys(props.baseState).length > Object.keys(formData).length) {
         setFormData(props.baseState);
     }
-
-    const router = useRouter();
 
     function attemptToUpdateCurrentTab(newTab: number) {
         const currentTabRef = getCurrentTabFormRef();
@@ -238,7 +238,7 @@ export default function SampleDataInput(props: any) {
                         <select onChange={handleChange} value={formData.state} name='state' className="form-select" aria-label="Default select example" id="state">
                             {getStatesList().map((state: string) => {
                                 return (
-                                    <option value={state}>{state}</option>
+                                    <option key={state} value={state}>{state}</option>
                                 )
                             })}
                         </select>
@@ -326,7 +326,7 @@ export default function SampleDataInput(props: any) {
             <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@48,400,0,0&display=optional" />
             <div className="sample-details-form">
                 <p>Define the details of your new sample</p>
-                <form id='sample-form'>
+                <div id='sample-form'>
                     <div className="tabs">
                         <div onClick={() => attemptToUpdateCurrentTab(1)} className={currentTab === 1 ? "current_tab" : "unselected_tab"}>Basic info</div>
                         <div onClick={() => attemptToUpdateCurrentTab(2)} className={currentTab === 2 ? "current_tab" : "unselected_tab"}>Sample origin</div>
@@ -337,7 +337,7 @@ export default function SampleDataInput(props: any) {
                         {currentTab === 2 && sampleOriginTab()}
                         {currentTab === 3 && sampleMeasurementsTab()}
                     </div>
-                </form>
+                </div>
                 <div className='submit-buttons'>
                     <button type="button" onClick={onCancleClick} className="btn btn-outline-primary">Cancel</button>
                     <button type="button" onClick={onActionButtonClick} className="btn btn-primary">{props.actionButtonTitle}</button>

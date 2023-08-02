@@ -6,7 +6,7 @@ var QRCode = require('qrcode');
 import { QRCodeSVG } from "qrcode.react";
 import { useRouter } from 'next/navigation'
 import { doc, setDoc, getFirestore, getDoc } from "firebase/firestore";
-import { initializeApp } from "firebase/app";
+import { initializeApp, getApp } from "firebase/app";
 import { firebaseConfig } from '../firebase_config';
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { useState, useEffect } from 'react';
@@ -15,6 +15,7 @@ import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
 import { statesList } from '../states_list';
 import { municipalitiesList } from '../municipalities_list';
 import SampleDataInput from '../sample_data_input';
+import {initializeAppIfNecessary} from '../utils';
 
 type UserData = {
     name: string,
@@ -36,7 +37,7 @@ export default function AddSample() {
     });
 
     const router = useRouter();
-    const app = initializeApp(firebaseConfig);
+    const app = initializeAppIfNecessary();
     const auth = getAuth();
     const db = getFirestore();
 

@@ -53,10 +53,17 @@ export default function Edit() {
         collected_by: 'supplier'
     });
 
+    let sampleId = '12345';
+    let trusted = 'trusted';
+
     const searchParams = useSearchParams();
-    const sampleId = searchParams.get('id');
-    const trusted = searchParams.get('trusted');
-    console.log("sampleId: " + sampleId);
+    if (typeof window !== "undefined") {
+        const queryString = window.location.search;
+        console.log("Querystring: " + queryString);
+        const urlParams = new URLSearchParams(queryString);
+        sampleId = urlParams.get('id') ? urlParams.get('id') : searchParams.get('id');
+        trusted = urlParams.get('trusted') ? urlParams.get('trusted') : searchParams.get('trusted'); 
+    }
 
     const router = useRouter();
     const app = initializeApp(firebaseConfig);
@@ -152,16 +159,15 @@ export default function Edit() {
 
     return (
         <div className="add-sample-page-wrapper">
-            <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@48,400,0,0&display=optional" />
             <p className="title">Edit sample</p>
             <div className="sample-details-form">
                 <p>Define the details of your new sample</p>
-                <form>
+                <div>
                 <SampleDataInput baseState={formData}
                         onStateUpdate={(state) => handleChange(state)}
                         onActionButtonClick={(evt: any) => onUpdateSampleClick()}
                         actionButtonTitle="Update sample" />
-                </form>
+                </div>
             </div>
         </div>
     )

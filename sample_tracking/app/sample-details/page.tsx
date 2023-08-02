@@ -60,11 +60,18 @@ export default function SampleDetails() {
 
     const router = useRouter();
 
+    let sampleId = '12345';
+    let trusted = 'trusted';
 
     const searchParams = useSearchParams();
-    const sampleId = searchParams.get('id');
-    const trusted = searchParams.get('trusted');
-    console.log("sampleId: " + sampleId);
+    if (typeof window !== "undefined") {
+        const queryString = window.location.search;
+        console.log("Querystring: " + queryString);
+        const urlParams = new URLSearchParams(queryString);
+        sampleId = urlParams.get('id') ? urlParams.get('id') : searchParams.get('id');
+        trusted = urlParams.get('trusted') ? urlParams.get('trusted') : searchParams.get('trusted'); 
+    }
+
 
     const app = initializeApp(firebaseConfig);
     const db = getFirestore();
@@ -172,22 +179,6 @@ export default function SampleDetails() {
         </div>
     }
 
-    function ProcessTab() {
-        return (<div>
-            <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@48,400,0,0" />
-            <div className="accordion" id="accordionPanelsStayOpenExample">
-                {processStep('Drying process', 0, 'headingOne', 'collapseOne')}
-                {processStep('Lamination', 1, 'headingTwo', 'collapseTwo')}
-                {processStep('Chopping & homogenization', 2, 'headingThree', 'collapseThree')}
-                {processStep('Chemical preparation', 3, 'headingFour', 'collapseFour')}
-                {processStep('Weighing', 4, 'headingFive', 'collapseFive')}
-                {processStep('Encapsulation', 5, 'headingSix', 'collapseSix')}
-                {processStep('Mass spectrometer & data return', 6, 'headingSeven', 'collapseSeven')}
-            </div>
-        </div>)
-
-    }
-
     function ResultsTab() {
         return (<div>Results</div>)
 
@@ -249,20 +240,15 @@ export default function SampleDetails() {
                             <a className={tabShown === 0 ? 'nav-link active' : 'nav-link'} onClick={showDetails} id="details-tab" data-toggle="tab" href="#details" role="tab" aria-controls="details" aria-selected="true">Details</a>
                         </li>
                         <li className="nav-item">
-                            <a className={tabShown === 1 ? 'nav-link active' : 'nav-link'} onClick={showProcess} id="process-tab" data-toggle="tab" href="#process" role="tab" aria-controls="process" aria-selected="false">Process</a>
-                        </li>
-                        <li className="nav-item">
                             <a className={tabShown === 2 ? 'nav-link active' : 'nav-link'} onClick={showResults} id="results-tab" data-toggle="tab" href="#results" role="tab" aria-controls="results" aria-selected="false">Results</a>
                         </li>
                     </ul>
                     <div className="tab-content" id="myTabContent">
                         <div className={tabShown === 0 ? 'tab-pane fade show active' : 'tab-pane fade'} id="details" role="tabpanel" aria-labelledby="details-tab"><DetailsTab /></div>
-                        <div className={tabShown === 1 ? 'tab-pane fade show active' : 'tab-pane fade'} id="process" role="tabpanel" aria-labelledby="process-tab"><ProcessTab /></div>
                         <div className={tabShown === 2 ? 'tab-pane fade show active' : 'tab-pane fade'} id="results" role="tabpanel" aria-labelledby="results-tab"><ResultsTab /></div>
                     </div>
                 </div>
 
             </div>
-
         </div>)
 }

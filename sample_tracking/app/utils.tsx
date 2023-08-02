@@ -1,3 +1,5 @@
+import { initializeApp, getApp } from "firebase/app";
+import { firebaseConfig } from './firebase_config';
 
 export default function getRanHex(size: number): string {
     let result = [];
@@ -8,3 +10,12 @@ export default function getRanHex(size: number): string {
     }
     return result.join('');
   }
+
+
+export function initializeAppIfNecessary() {
+    try {
+        return getApp();
+    } catch (any) {
+        return initializeApp(firebaseConfig);
+    }
+}

@@ -1,6 +1,5 @@
 "use client";
 import 'bootstrap/dist/css/bootstrap.css';
-import { initializeApp } from "firebase/app";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { getFirestore, getDocs, collection, query, or, and, where, getDoc, doc } from "firebase/firestore";
 import { useState, useMemo, useRef, useEffect } from 'react';
@@ -8,6 +7,7 @@ import './styles.css';
 import { useRouter } from 'next/navigation'
 import Nav from '../nav';
 import SamplesTable from '../samples_table';
+import {initializeAppIfNecessary} from '../utils';
 
 import { firebaseConfig } from '../firebase_config';
 
@@ -43,7 +43,7 @@ export default function Samples() {
     const [userData, setUserData] = useState({} as UserData);
     const [samplesState, setSamplesState] = useState([{}]);
 
-    const app = initializeApp(firebaseConfig);
+    const app = initializeAppIfNecessary();
     const router = useRouter();
 
     const auth = getAuth();
@@ -76,7 +76,7 @@ export default function Samples() {
         addSamplesToDataList();
     }
 
-    async function getSamplesFromCollection(collectionName: string): Promise<[Map<string, Map<string, string>>]> {
+    async function getSamplesFromCollection(collectionName: string): Promise<Map<string, Map<string, string>>[]> {
         const user = auth.currentUser;
         const samples: any = {};
         const samplesStateArray: any = [];
@@ -136,11 +136,18 @@ export default function Samples() {
 
     async function addSamplesToDataList() {
         if (Object.keys(samplesState[0]).length < 1) {
-            let allSamples: any = [{}];
+            // let allSamples: any = [{}];
             const trustedSamples = await getSamplesFromCollection('trusted_samples');
+            let allSamples = await getSamplesFromCollection('trusted_samples');
             const untrustedSamples = await getSamplesFromCollection('untrusted_samples');
+            if (untrustedSamples.length > 0) {
+                allSamples = allSamples.concat(untrustedSamples);
+            }
             const unknownSamples = await getSamplesFromCollection('unknown_samples');
-            allSamples = [...trustedSamples, ...untrustedSamples, ...unknownSamples];
+            if (unknownSamples.length > 0) {
+                allSamples = allSamples.concat(unknownSamples);
+            }
+            // allSamples = [trustedSamples.length ? ...trustedSamples : [], ...untrustedSamples, ...unknownSamples];
             if (allSamples.length > 0) {
                 setSamplesState(allSamples);
             }

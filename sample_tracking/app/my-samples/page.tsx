@@ -1,6 +1,5 @@
 "use client";
 import 'bootstrap/dist/css/bootstrap.css';
-import { initializeApp } from "firebase/app";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { getFirestore, getDocs, collection, query, or, and, where, getDoc, doc } from "firebase/firestore";
 import { useState, useMemo, useRef, useEffect } from 'react';
@@ -8,6 +7,7 @@ import './styles.css';
 import { useRouter } from 'next/navigation'
 import Nav from '../nav';
 import SamplesTable from '../samples_table';
+import {initializeAppIfNecessary} from '../utils';
 
 import { firebaseConfig } from '../firebase_config';
 
@@ -43,7 +43,7 @@ export default function MySamples() {
     const [userId, setUserId] = useState('');
 
     const router = useRouter();
-    const app = initializeApp(firebaseConfig);
+    const app = initializeAppIfNecessary()
 
     const auth = getAuth();
     useEffect(() => {

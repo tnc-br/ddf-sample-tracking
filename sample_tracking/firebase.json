@@ -24,6 +24,40 @@
       "firebase.json",
       "**/.*",
       "**/node_modules/**"
+    ],
+    "rewrites": [
+      {
+        "source": "/my-samples",
+        "destination": "/my-samples.html"
+      },
+      {
+        "source": "/import-samples",
+        "destination": "/import-samples.html"
+      },
+      {
+        "source": "/sign-up-requests",
+        "destination": "/sign-up-requests.html"
+      },
+      {
+        "source": "/all-users",
+        "destination": "/all-users.html"
+      },
+      {
+        "source": "/add-sample",
+        "destination": "/add-sample.html"
+      },
+      {
+        "source": "/sample-details",
+        "destination": "/sample-details.html"
+      },
+      {
+        "source": "/edit",
+        "destination": "/edit.html"
+      },
+      {
+        "source": "**",
+        "destination": "/index.html"
+      }
     ]
   }
 }

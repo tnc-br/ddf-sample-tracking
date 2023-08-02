@@ -4,12 +4,12 @@ import Image from 'next/image'
 import 'bootstrap/dist/css/bootstrap.css';
 import { useState } from 'react';
 
-import { initializeApp } from "firebase/app";
 import { getAuth, signInWithEmailAndPassword, signInWithPopup, createUserWithEmailAndPassword, onAuthStateChanged, GoogleAuthProvider, FacebookAuthProvider, updateProfile } from "firebase/auth";
 import { useRouter } from 'next/navigation'
 import { firebaseConfig } from '../firebase_config';
 import { doc, setDoc, getDocs, collection, getFirestore, updateDoc, arrayUnion, addDoc, getDoc } from "firebase/firestore";
 import './styles.css';
+import {initializeAppIfNecessary} from '../utils';
 
 type SignUpData = {
   firstName: string,
@@ -47,7 +47,7 @@ export default function LogInSignUpPage() {
 
   const router = useRouter()
 
-  const app = initializeApp(firebaseConfig);
+  const app = initializeAppIfNecessary();
   const auth = getAuth();
   onAuthStateChanged(auth, (user) => {
     if (user) {
