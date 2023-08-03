@@ -81,7 +81,10 @@ export default function MySamples() {
             querySnapshot.forEach((doc) => {
                 const docData = doc.data();
                 samples[doc.id] = doc.data();
-                samplesStateArray.push(docData as Sample);
+                samplesStateArray.push({
+                    ...docData,
+                    doc_id: doc.id,
+                 } as Sample);
             });
         }
 
@@ -110,7 +113,7 @@ export default function MySamples() {
             </div>
             <div id="samplesTable" className='samples-wrapper'>
                 <p className='header'>My samples</p>
-                <SamplesTable samplesData={samplesState} />
+                <SamplesTable samplesData={samplesState} canDeleteSamples={true} />
             </div>
         </div>
     )

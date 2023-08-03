@@ -65,7 +65,7 @@
     cursor: default;
 }
 
-.sample-link {
+.actions-button {
     color: blue !important;
     text-decoration: underline;
     cursor: pointer;

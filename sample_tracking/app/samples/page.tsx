@@ -92,7 +92,10 @@ export default function Samples() {
                 querySnapshot.forEach((doc) => {
                     const docData = doc.data();
                     samples[doc.id as unknown as number] = doc.data();
-                    samplesStateArray.push(docData);
+                    samplesStateArray.push({
+                        ...docData,
+                        doc_id: doc.id,
+                    });
                 });
             }
 
@@ -126,7 +129,10 @@ export default function Samples() {
             querySnapshot.forEach((doc) => {
                 const docData = doc.data();
                 samples[doc.id] = doc.data();
-                samplesStateArray.push(docData);
+                samplesStateArray.push({
+                    ...docData,
+                    doc_id: doc.id,
+                });
             });
 
         }
@@ -136,22 +142,53 @@ export default function Samples() {
 
     async function addSamplesToDataList() {
         if (Object.keys(samplesState[0]).length < 1) {
-            // let allSamples: any = [{}];
+            let allSamples: any = [{}];
             const trustedSamples = await getSamplesFromCollection('trusted_samples');
-            let allSamples = await getSamplesFromCollection('trusted_samples');
             const untrustedSamples = await getSamplesFromCollection('untrusted_samples');
-            if (untrustedSamples.length > 0) {
-                allSamples = allSamples.concat(untrustedSamples);
-            }
             const unknownSamples = await getSamplesFromCollection('unknown_samples');
+
+            if (trustedSamples.length + untrustedSamples.length + unknownSamples.length < 1) {
+                return;
+            }
+            if (trustedSamples.length > 0) {
+                allSamples  = (trustedSamples as Array).map((sample: Sample) => {
+                    return {
+                        ...sample,
+                        trusted: 'trusted',
+                    };
+                });
+            }
+            
+            // let allSamples = await getSamplesFromCollection('trusted_samples');
+            
+            if (untrustedSamples.length > 0) {
+                const updatedSamples = untrustedSamples.map((sample: Sample) => {
+                    return {
+                        ...sample,
+                        trusted: 'untrusted',
+                    };
+                });
+                allSamples = allSamples.concat(updatedSamples);
+            }
+            
             if (unknownSamples.length > 0) {
-                allSamples = allSamples.concat(unknownSamples);
+                const updatedSamples = unknownSamples.map((sample: Sample) => {
+                    return {
+                        ...sample,
+                        trusted: 'unknown',
+                    };
+                });
+                allSamples = allSamples.concat(updatedSamples);
             }
             // allSamples = [trustedSamples.length ? ...trustedSamples : [], ...untrustedSamples, ...unknownSamples];
             if (allSamples.length > 0) {
                 setSamplesState(allSamples);
             }
         }
+    }
+
+    function isAdmin(): boolean {
+        return userData.role === 'admin' || userData.role === 'site_admin';
     }
 
     return (
@@ -161,10 +198,10 @@ export default function Samples() {
             <div>
                 <Nav />
             </div>
-            <div id="samplesTable" className='samples-wrapper'>
+            {userData.org && <div id="samplesTable" className='samples-wrapper'>
                 <p className='header'>All samples</p>
-                <SamplesTable samplesData={samplesState as Sample[]} />
-            </div>
+                <SamplesTable samplesData={samplesState as Sample[]} canDeleteSamples={isAdmin()}/>
+            </div>}
         </div>
     )
 }

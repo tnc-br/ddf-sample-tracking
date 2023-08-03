@@ -52,12 +52,10 @@
     max-width: 200px;
 }
 
-
-
-
-
-
-
+.action-buttons-wrapper {
+    display: flex;
+    justify-content: space-between;
+}
 
 
 

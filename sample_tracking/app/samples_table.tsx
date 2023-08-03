@@ -2,12 +2,13 @@
 import 'bootstrap/dist/css/bootstrap.css';
 import { initializeApp } from "firebase/app";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
-import { getFirestore, getDocs, collection, query, or, and, where, getDoc, doc } from "firebase/firestore";
+import { getFirestore, deleteDoc, doc, collection } from "firebase/firestore";
 import { useState, useMemo, useRef } from 'react';
 import './styles.css';
 import { useRouter } from 'next/navigation'
 // import Nav from '../nav';
 import { MaterialReactTable, type MRT_ColumnDef, type MRT_TableInstance, type MRT_SortingState, type MRT_PaginationState } from 'material-react-table';
+import { initializeAppIfNecessary } from './utils';
 
 import { firebaseConfig } from './firebase_config';
 
@@ -32,17 +33,33 @@ type Sample = {
     org: string,
     validity: number,
     header: string,
+    doc_id: string,
+    updated_state: boolean,
 }
 
 interface SampleDataProps {
     samplesData: any,
+    canDeleteSamples: boolean,
 }
 
 export default function SamplesTable(props: SampleDataProps) {
 
+    const [sampleData, setSampleData] = useState(props.samplesData as Sample[]);
+    // const [hasDeletedSample, setHasDeletedSample] = useState(false);
+
     const router = useRouter();
+    const app = initializeAppIfNecessary();
+    const db = getFirestore();
 
     const tableInstanceRef = useRef<MRT_TableInstance<Sample>>(null);
+
+    if (!sampleHasBeenDeletedFromList() && sampleData.length !== props.samplesData.length) {
+        setSampleData(props.samplesData);
+    }
+
+    function updateSampleData(newSampleData: Sample[]) {
+        setSampleData(newSampleData);
+    }
 
     const columns = useMemo<MRT_ColumnDef<Sample>[]>(
         () => [
@@ -50,19 +67,19 @@ export default function SamplesTable(props: SampleDataProps) {
                 accessorKey: 'code_lab',
                 header: 'Internal code',
                 size: 150,
-                Cell: ({ cell, row, renderedCellValue }) => {                    
+                Cell: ({ cell, row, renderedCellValue }) => {
                     return (
-                        <div id={row.original.trusted} onClick={onSampleClick} className="sample-link">
-                      <span id={cell.getValue()}>{renderedCellValue}</span>
-                    </div>
+                        <div id={row.original.trusted} onClick={onSampleClick} className="actions-button sample-link">
+                            <span id={cell.getValue()}>{renderedCellValue}</span>
+                        </div>
                     )
-                  },
+                },
             },
             {
                 accessorKey: 'sample_name',
                 header: 'Name',
                 size: 150,
-                
+
             },
             {
                 accessorKey: 'status',
@@ -88,19 +105,62 @@ export default function SamplesTable(props: SampleDataProps) {
             {
                 accessorFn: (row) => row,
                 header: 'Actions',
-                size: 150,
-                Cell: ({ cell }) => {        
-                    const row = cell.getValue();            
+                size: 100,
+                Cell: ({ cell }) => {
+                    const row = cell.getValue();
                     return (
-                        <div id={(row as Sample).trusted} onClick={onEditSampleClick} className="sample-link">
-                      <span id={(row as Sample).code_lab}>Edit</span>
-                    </div>
+                        <div className="action-buttons-wrapper">
+                            <div id={(row as Sample).trusted} onClick={onEditSampleClick} className="actions-button">
+                                <span id={(row as Sample).doc_id}>Edit</span>
+                            </div>
+                            {props.canDeleteSamples && <div id={(row as Sample).trusted} onClick={onDeleteSampleClick} className="actions-button">
+                                <span id={(row as Sample).doc_id}>Delete</span>
+                            </div>}
+                        </div>
+
                     )
-                  },
+                },
             }
         ],
-        [],
+        [sampleData],
     );
+
+    function onDeleteSampleClick(evt: any) {
+        const sampleId = evt.target.id;
+        const trustedValue = evt.currentTarget.id;
+        let confirmText = `Are you sure you want to delete sample ${sampleId}?`
+        if (confirm(confirmText) === true) {
+            let collectionName = `${trustedValue}_samples`;
+            const deletedDocRef = doc(db, collectionName, sampleId);
+            deleteDoc(deletedDocRef);
+        }
+        deleteSampleFromSampleState({
+            trusted: trustedValue,
+            doc_id: sampleId,
+        } as Sample);
+    }
+
+    function deleteSampleFromSampleState(sample: Sample) {
+        let sampleIndex = -1;
+        for(let i = 0; i < sampleData.length; i ++) {
+            if (sampleData[i].trusted === sample.trusted && sampleData[i].doc_id === sample.doc_id) {
+                sampleIndex = i;
+                break;
+            }
+        }
+        let newSamplesState = [...sampleData];
+        newSamplesState.splice(sampleIndex, 1);
+        if (!sampleHasBeenDeletedFromList()) {
+            newSamplesState.push({
+                updated_state: true,
+            } as Sample);
+        }
+        updateSampleData(newSamplesState);
+    }
+
+    function sampleHasBeenDeletedFromList(): boolean {
+        return sampleData[sampleData.length-1].updated_state;   
+    }
 
 
     function onSampleClick(evt: any) {
@@ -150,10 +210,10 @@ export default function SamplesTable(props: SampleDataProps) {
                 <Nav />
             </div> */}
             <div >
-                
+
                 <MaterialReactTable
                     columns={columns}
-                    data={props.samplesData}
+                    data={sampleData}
                     enableRowSelection
                     tableInstanceRef={tableInstanceRef}
                     renderTopToolbarCustomActions={({ table }) => (

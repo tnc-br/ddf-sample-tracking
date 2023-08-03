@@ -106,7 +106,10 @@ export default function Edit() {
         getDoc(docRef).then((docRef) => {	
             if (docRef.exists()) {	
                 console.log('updated data');	
-                setFormData(docRef.data() as Sample);	
+                setFormData({
+                    ...docRef.data(),
+                    trusted: trusted, 
+                }as Sample);	
             } else {	
                 console.log('couldnt find data');	
             }	
@@ -121,8 +124,8 @@ export default function Edit() {
     }
 
     function onUpdateSampleClick() {
-        const internalCode = formData.code_lab;
-        const sampleTrustValue = formData.trusted;
+        const internalCode = sampleId;
+        const sampleTrustValue = trusted;
         let docRef;
         if (sampleTrustValue === "trusted") {
             docRef = doc(db, "trusted_samples", internalCode);
