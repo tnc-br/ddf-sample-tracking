@@ -109,17 +109,55 @@ export default function Users() {
     function handleRemoveClick(evt: any) {
         // const docRef = doc(db, "organizations", userDetails.org);
         const removedMemberId = evt.target.parentElement.parentElement.id;
-        const userDocRef = doc(db, "users", removedMemberId);
-        updateDoc(userDocRef, {
-            org: "",
-        })
-        // deleteDoc(doc(db, "users", removedMemberId));
-        
+        const confirmString = `Are you sure you want to remove ${users[removedMemberId].name}?`
+        if (!confirm(confirmString)) return;
+        deleteDoc(doc(db, "users", removedMemberId));
         delete users[removedMemberId];
-        // updateDoc(docRef, {
-        //     members: arrayRemove(removedMemberId),
-        // });
+    }
+
+    function handleMakeOrgAdminClick(evt: any) {
         
+        const newOrgAdminId = evt.target.parentElement.parentElement.id;
+        const confirmString = `Are you sure you want to make ${users[newOrgAdminId].name} an org admin?`
+        if (!confirm(confirmString)) return;
+        if (users[newOrgAdminId].role as unknown as string === 'site_admin') {
+            // Cannot demote site_admin to org_admin
+            return;
+        }
+        const userDocRef = doc(db, "users", newOrgAdminId);
+        updateDoc(userDocRef, {
+            role: "admin",
+        });
+    }
+
+    function handleMakeSiteAdminClick(evt: any) {
+        const newSiteAdminId = evt.target.parentElement.parentElement.id;
+        const confirmString = `Are you sure you want to make ${users[newSiteAdminId].name} a site admin?`
+        if (!confirm(confirmString)) return;
+        const userDocRef = doc(db, "users", newSiteAdminId);
+        updateDoc(userDocRef, {
+            role: "site_admin",
+        });
+    }
+
+    function showMakeOrgAdminButton(id: string): boolean {
+        const userRole = users[id].role as unknown as string;
+        return (userRole !== 'admin' && userRole !== 'site_admin');
+    }
+
+    function showMakeSiteAdminButton(id: string): boolean {
+        const userRole = users[id].role as unknown as string;
+        return userRole !== 'site_admin' && userData.role === 'site_admin';
+    }
+
+    function showRemoveUserButton(id: string): boolean {
+        const userRole = users[id].role as unknown as string;
+        return userRole !== 'site_admin';
+    }
+
+    function isSiteAdmin(id: string): boolean {
+        const userRole = users[id].role as unknown as string;
+        return userRole === 'site_admin';
     }
 
 
@@ -151,7 +189,12 @@ export default function Users() {
                                             <td>{users[key].org as unknown as string}</td>
                                             <td>{users[key].email as unknown as string}</td>
                                             <td>{users[key].date_added as unknown as string}</td>
-                                            <td><button onClick={handleRemoveClick} type="button" className="btn btn-outline-danger">Remove</button></td>
+                                            <td>
+                                                {!isSiteAdmin(key) && <button onClick={handleRemoveClick} type="button" className="btn btn-sm btn-outline-danger">Remove</button>}
+                                                {showMakeOrgAdminButton(key) && <button onClick={handleMakeOrgAdminClick} type="button" className="btn btn-sm btn-primary">Make org admin</button>}
+                                                {showMakeSiteAdminButton(key) ? <button onClick={handleMakeSiteAdminClick} type="button" className="btn btn-sm btn-primary">Make site admin</button>
+                                                : isSiteAdmin(key) ? <span>User is site admin</span> : <span>User is org admin</span>}
+                                                </td>
                                             {/* <td><button onClick={handleApproveClick} type="button" className="btn btn-outline-primary">Approve</button>
                                                 <button onClick={handleRejectClick} type="button" className="btn btn-outline-danger">Reject</button></td> */}
                                         </tr>
