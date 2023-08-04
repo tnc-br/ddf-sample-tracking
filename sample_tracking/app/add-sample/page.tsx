@@ -30,6 +30,7 @@ export default function AddSample() {
     // const [isMember, setIsMember] = useState(false);
     const [userData, setUserdata] = useState({} as UserData);
     const [currentTab, setCurrentTab] = useState(1);
+    const [pageTitle, setPageTitle] = useState("Create a new sample");
 
     const [formData, setFormData] = useState({
         visibility: 'public',
@@ -74,7 +75,10 @@ export default function AddSample() {
         return true;
     }
 
-    function onCreateSampleClick() {
+    function onCreateSampleClick(sampleId: string) {
+        if (!sampleId) {
+            console.log("Error: SampleId not provided when trying to create sample");
+        }
         if (!sampleHasRequiredFieldsSet()) {
             alert("Not all required fields are filled out to submit a sample.");
             return;
@@ -83,7 +87,7 @@ export default function AddSample() {
         if (!user) return;
         const date = new Date();
         const currentDateString = `${date.getMonth() + 1}-${date.getDate()}-${date.getFullYear()}`
-        const internalCode = getRanHex(20);
+        const internalCode = sampleId;
         const sampleData = {
             ...formData,
             created_by: auth.currentUser!.uid,
@@ -104,10 +108,8 @@ export default function AddSample() {
         } else {
             docRef = doc(db, "unknown_samples", internalCode);
         }
-        setDoc(docRef, sampleData).then(() => {
-            const url = `./sample-details?trusted=${sampleTrustValue}&id=${internalCode}`;
-            router.replace(url)
-        })
+        setDoc(docRef, sampleData);
+        setPageTitle("Sample created!")
 
     }
 
@@ -129,15 +131,17 @@ export default function AddSample() {
     return (
         <div className="add-sample-page-wrapper">
             <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@48,400,0,0&display=optional" />
-            <p className="title">Create a new sample</p>
+            <p className="title">{pageTitle}</p>
             <div className="sample-details-form">
-                <p>Define the details of your new sample</p>
-                <form id="sample-form">
+                {pageTitle === "Create a new sample" && <p>Define the details of your new sample</p>}
+                {userData && <form id="sample-form">
                     <SampleDataInput baseState={formData}
                         onStateUpdate={(state) => handleChange(state)}
-                        onActionButtonClick={(evt: any) => onCreateSampleClick()}
-                        actionButtonTitle="Create sample" />
-                </form>
+                        onActionButtonClick={(id: string) => onCreateSampleClick(id)}
+                        actionButtonTitle="Create sample"
+                        createQrCode={true}
+                        userData={userData} />
+                </form>}
             </div>
         </div>
     )

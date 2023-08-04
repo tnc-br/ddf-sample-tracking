@@ -10,5 +10,6 @@
     "status": "Status",
     "trusted": "Trusted",
     "validity": "Validity",
-    "lastUpdatedBy": "Last updated by"
+    "lastUpdatedBy": "Last updated by",
+    "addSample":" Add sample"
   }

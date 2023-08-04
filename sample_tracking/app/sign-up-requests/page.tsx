@@ -263,8 +263,6 @@ export default function SignUpRequests() {
                                             <td>{prospectiveOrgs[key].date_requested as unknown as string}</td>
                                             <td className="approve-reject-wrapper"><button onClick={handleRejectOrgClick} type="button" className="btn btn-outline-danger reject-button">Decline</button>
                                                 <button onClick={handleApproveOrgClick} type="button" className="btn btn-outline-primary approve-button">Approve</button></td>
-
-
                                         </tr>
                                     )
 

@@ -14,6 +14,7 @@ import { speciesList } from './species_list';
 import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
 import { statesList } from './states_list';
 import { municipalitiesList } from './municipalities_list';
+import getRanHex from './utils';
 
 
 type UserData = {
@@ -28,13 +29,15 @@ type SampleDataInputProps = {
     onActionButtonClick: any,
     baseState: {},
     actionButtonTitle: string,
+    createQrCode: boolean,
+    userData: UserData,
 }
 
-export default function SampleDataInput(props: any) {
+export default function SampleDataInput(props: SampleDataInputProps) {
     const [user, setUser] = useState({});
     const [sampleTrust, setSampletrust] = useState('untrusted');
     // const [isMember, setIsMember] = useState(false);
-    const [userData, setUserdata] = useState({} as UserData);
+    const [userData, setUserdata] = useState(props.userData);
     const [currentTab, setCurrentTab] = useState(1);
 
     const [formData, setFormData] = useState(props.baseState);
@@ -115,8 +118,6 @@ export default function SampleDataInput(props: any) {
         let currentTabRef;
         if (currentTab === 1) {
             currentTabRef = document.getElementById('info-tab');
-        } else if (currentTab === 2) {
-            currentTabRef = document.getElementById('sample-origin-tab');
         } else {
             currentTabRef = document.getElementById('sample-measurements');
         }
@@ -129,16 +130,17 @@ export default function SampleDataInput(props: any) {
 
     function onActionButtonClick() {
         const currentTabRef = getCurrentTabFormRef();
-        if (checkCurrentTabFormValidity()) {
+        if (!checkCurrentTabFormValidity()) return;
+        if (!props.createQrCode) {
             props.onActionButtonClick();
+        } else {
+            attemptToUpdateCurrentTab(3);
         }
     }
 
     function getCurrentTabFormRef(): Element {
         if (currentTab === 1) {
             return document.getElementById('info-tab');
-        } else if (currentTab === 2) {
-            return document.getElementById('sample-origin-tab');
         } else {
             return document.getElementById('sample-measurements');
         }
@@ -148,19 +150,29 @@ export default function SampleDataInput(props: any) {
         const currentTabRef = getCurrentTabFormRef();
         if (currentTabRef.checkValidity()) {
             // Form is valid, forward to calling component handling.
-            return true;
+            if (currentTab === 1 && !formData.trusted) {
+                alert("Please select an origin value");
+            } else {
+                return true;
+            }
+            
         } else {
             currentTabRef.reportValidity();
             return false;
         }
     }
-  
+
+    function originIsKnownOrUncertain(): boolean {
+        return formData.trusted === 'trusted' || formData.trusted === 'unknown';
+    }
+
 
 
     function basicInfoTab() {
         return (
             <form id='info-tab' className='grid-columns'>
                 <div className='column-one'>
+                    <p>Visibility</p>
                     <div className="visibility_buttons">
                         <div onClick={handleSelectPublicVisibility}
                             className={formData.visibility === 'public' ? "button_select public_button selected" : "button_select public_button"}>Public</div>
@@ -173,8 +185,8 @@ export default function SampleDataInput(props: any) {
                     </div>
                     <div>
                         <label htmlFor="sampleTrustSelected" defaultValue={sampleTrust}>Status</label>
-                        <select onChange={handleChange} value={formData.trusted} name='trusted' className="form-select" aria-label="Default select example" id="sampleTrustSelected">
-                            <option selected>Open this select menu</option>
+                        <select onChange={handleChange} value={formData.status} name='status' className="form-select" aria-label="Default select example" id="sampleTrustSelected">
+                            <option value="unselected">-- Select option --</option>
                             <option value="not_started">Not started</option>
                             <option value="in_progress">In progress</option>
                             <option value="concluded">Concluded</option>
@@ -189,61 +201,50 @@ export default function SampleDataInput(props: any) {
                         <label htmlFor="treeSpecies">Tree species</label>
                         <input onChange={handleChange} value={formData.species} name='species' type="text" autoComplete="on" list="suggestions" className="form-control" id="treeSpecies" />
                     </div>
-                </div>
-            </form>
 
-
-        )
-    }
-
-
-    function sampleOriginTab() {
-        return (
-            <form id='sample-origin-tab' className='grid-columns'>
-                <div className='column-one'>
                     <div>
                         <label htmlFor="origin" defaultValue={sampleTrust}>Origin</label>
-                        <select onChange={handleChange} value={formData.trusted} name='trusted' className="form-select" aria-label="Default select example" id="origin">
-                            <option selected>Open this select menu</option>
-                            <option value="trusted">Known</option>
+                        <select onChange={handleChange} value={formData.trusted} name='trusted' required className="form-select" aria-label="Default select example" id="origin">
+                        <option value="unselected">-- Select option -- </option>
                             <option value="untrusted">Unkown</option>
+                            <option value="trusted">Known</option>
                             <option value="unknown">Uncertain</option>
                         </select>
                     </div>
-                    <div>
+                    {originIsKnownOrUncertain() && <div>
                         <div className="form-group">
                             <label htmlFor="collectionSite">Collection site</label>
-                            <input onChange={handleChange} value={formData.site} name='site' type="text" className="form-control" id="collectionSite" />
+                            <input onChange={handleChange} value={formData.site} required name='site' type="text" className="form-control" id="collectionSite" />
                         </div>
-                    </div>
-                    <div className="form-row">
+                    </div>}
+                    {originIsKnownOrUncertain() && <div className="form-row">
                         <div className="form-group latlon-input" id="inputLatFormGroup">
                             <label htmlFor="inputLat">Latitude</label>
-                            <input onChange={handleChange} value={formData.lat} name='lat' type="text" className="form-control" id="inputLat" />
+                            <input onChange={handleChange} value={formData.lat} required name='lat' type="text" className="form-control" id="inputLat" />
                             <div className="invalid-feedback">
                                 Please provide a latitude.
                             </div>
                         </div>
                         <div className="form-group latlon-input">
                             <label htmlFor="inputLon">Longitude</label>
-                            <input onChange={handleChange} value={formData.lon} name='lon' type="text" className="form-control" id="inputLon" />
+                            <input onChange={handleChange} value={formData.lon} required name='lon' type="text" className="form-control" id="inputLon" />
                             <div className="invalid-feedback">
                                 Please provide a longitude.
                             </div>
                         </div>
-                    </div>
-                    
-                    <div className="form-group">
+                    </div>}
+
+                    {originIsKnownOrUncertain() && <div className="form-group">
                         <label htmlFor="inputState">State</label>
-                        <select onChange={handleChange} value={formData.state} name='state' className="form-select" aria-label="Default select example" id="state">
+                        <select onChange={handleChange} value={formData.state} required name='state' className="form-select" aria-label="Default select example" id="state">
                             {getStatesList().map((state: string) => {
                                 return (
                                     <option key={state} value={state}>{state}</option>
                                 )
                             })}
                         </select>
-                    </div>
-                    <div className="form-group">
+                    </div>}
+                    {originIsKnownOrUncertain() && <div className="form-group">
                         <datalist id="suggestions">
                             {getMunicipalitiesList().map((municipality: string) => {
                                 return (<option key={municipality}>{municipality}</option>)
@@ -251,7 +252,7 @@ export default function SampleDataInput(props: any) {
                         </datalist>
                         <label htmlFor="municipality">Municipality</label>
                         <input onChange={handleChange} value={formData.municipality} name='municipality' type="text" autoComplete="on" list="suggestions" className="form-control" id="municipality" />
-                    </div>
+                    </div>}
                     <label htmlFor="date_collected">Date collected</label>
                     <br />
                     <input onChange={handleChange} value={formData.date_collected} name='date_collected' type="date" id="date_collected"></input>
@@ -283,9 +284,10 @@ export default function SampleDataInput(props: any) {
                     </div>
                 </div>
             </form>
+
+
         )
     }
-
 
     function sampleMeasurementsTab() {
         return (
@@ -301,7 +303,7 @@ export default function SampleDataInput(props: any) {
                     </div>
                     <div>
                         <label htmlFor="origin" defaultValue={sampleTrust}>Sample type</label>
-                        <select onChange={handleChange} name='origin' className="form-select" aria-label="Default select example" id="origin">
+                        <select onChange={handleChange} required name='origin' className="form-select" aria-label="Default select example" id="origin">
                             <option value="knonw">Disc</option>
                             <option value="unkown">Triangular</option>
                             <option value="uncertain">Chunk</option>
@@ -321,26 +323,77 @@ export default function SampleDataInput(props: any) {
         )
     }
 
+    function createSampleTab() {
+        const sampleId = getRanHex(20);
+        const today = new Date();
+        const currentDateString = today.toLocaleDateString();
+        const url = `timberid.org/sample-details?trusted=${formData.trusted}&id=${sampleId}`;
+
+        props.onActionButtonClick(sampleId);
+        return (<div>
+            <p>Summary</p>
+            <table className="table table-borderless sample-info-table">
+                <tbody>
+                    <tr>
+                        <td className="sample-info">Id</td>
+                        <td>{sampleId}</td>
+                    </tr>
+                    <tr>
+                        <td className='sample-info'>Species</td>
+                        <td>{formData.species}</td>
+                    </tr>
+                    <tr>
+                        <td className='sample-info'>Date created</td>
+                        <td>{currentDateString}</td>
+                    </tr>
+                    <tr>
+                        <td className='sample-info'>Created by</td>
+                        <td>{userData.name}</td>
+                    </tr>
+                    <tr>
+                        <td className='sample-info'>Collected in</td>
+                        <td>{formData.state}</td>
+                    </tr>
+                    <tr>
+                        <td className='sample-info'>Collected on</td>
+                        <td>{formData.date_collected}</td>
+                    </tr>
+                </tbody>
+
+            </table>
+            <div>
+                <p className='qr-title'>Sample QR code</p>
+                <p className='qr-subtitle'>Print and paste this QR code on the sample to be analayzed</p>
+                <QRCodeSVG value={url} />
+            </div>
+
+        </div>)
+    }
+
     return (
         <div className="add-sample-page-wrapper">
             <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@48,400,0,0&display=optional" />
             <div className="sample-details-form">
-                <p>Define the details of your new sample</p>
                 <div id='sample-form'>
                     <div className="tabs">
-                        <div onClick={() => attemptToUpdateCurrentTab(1)} className={currentTab === 1 ? "current_tab" : "unselected_tab"}>Basic info</div>
-                        <div onClick={() => attemptToUpdateCurrentTab(2)} className={currentTab === 2 ? "current_tab" : "unselected_tab"}>Sample origin</div>
-                        <div onClick={() => attemptToUpdateCurrentTab(3)} className={currentTab === 3 ? "current_tab" : "unselected_tab"}>Sample measurements</div>
+                        <div className={currentTab === 1 ? "current_tab" : "unselected_tab"}>Basic info</div>
+                        <div className={currentTab === 2 ? "current_tab" : "unselected_tab"}>Sample measurements</div>
+                        {props.createQrCode && <div className={currentTab === 3 ? "current_tab" : "unselected_tab"}>Create sample</div>}
                     </div>
                     <div>
                         {currentTab === 1 && basicInfoTab()}
-                        {currentTab === 2 && sampleOriginTab()}
-                        {currentTab === 3 && sampleMeasurementsTab()}
+                        {currentTab === 2 && sampleMeasurementsTab()}
+                        {currentTab === 3 && createSampleTab()}
                     </div>
                 </div>
                 <div className='submit-buttons'>
-                    <button type="button" onClick={onCancleClick} className="btn btn-outline-primary">Cancel</button>
-                    <button type="button" onClick={onActionButtonClick} className="btn btn-primary">{props.actionButtonTitle}</button>
+                    {currentTab !== 3 && <button type="button" onClick={onCancleClick} className="btn btn-outline-primary">Cancel</button>}
+                    {currentTab == 2 && <button type="button" onClick={() => attemptToUpdateCurrentTab(currentTab - 1)} className="btn btn-primary">Back</button>}
+                    {!props.createQrCode &&  <button type="button" onClick={onActionButtonClick} className="btn btn-primary">{props.actionButtonTitle}</button>}
+                    {currentTab === 3 ? <button type="button" onClick={() => router.push('/samples')} className="btn btn-primary">Return to dashboard</button>
+                        : currentTab === 1 ?
+                            <button type="button" onClick={() => attemptToUpdateCurrentTab(2)} className="btn btn-primary">Next</button> :
+                            props.createQrCode && <button type="button" onClick={onActionButtonClick} className="btn btn-primary">{props.actionButtonTitle}</button>}
                 </div>
             </div>
         </div>
