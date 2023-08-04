@@ -6,7 +6,6 @@ import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { firebaseConfig } from '../firebase_config';
 import { initializeApp } from "firebase/app";
 import { useState, useEffect } from 'react';
-import Nav from '../nav';
 import './styles.css';
 import { useRouter } from 'next/navigation'
 import 'bootstrap/dist/css/bootstrap.css';
@@ -162,9 +161,7 @@ export default function Users() {
 
 
 
-    return (<div><div>
-        <Nav />
-    </div>
+    return (<div>
         <div className='admin-wrapper'>
             <h3>{userDetails.role === 'admin' ? "My organization" : "All users"}</h3>
             <div>

@@ -50,6 +50,11 @@ export default function SampleDataInput(props: SampleDataInputProps) {
         setFormData(props.baseState);
     }
 
+    const navBar = document.getElementById('nav-wrapper');
+    if (navBar) {
+        navBar.style.display = "none";
+    }
+
     function attemptToUpdateCurrentTab(newTab: number) {
         const currentTabRef = getCurrentTabFormRef();
         if (newTab < currentTab || checkCurrentTabFormValidity()) {
@@ -136,6 +141,7 @@ export default function SampleDataInput(props: SampleDataInputProps) {
     }
 
     function onCancleClick() {
+        handleExitSampleDataInputPage();
         router.push('samples');
     }
 
@@ -182,7 +188,7 @@ export default function SampleDataInput(props: SampleDataInputProps) {
     function validateSampleResultsTab(): boolean {
         if (!currentTab === 3 || !props.createQrCode) {
             return true;
-        } 
+        }
         const formData = document.getElementById('results-tab');
     }
 
@@ -419,7 +425,7 @@ export default function SampleDataInput(props: SampleDataInputProps) {
                     <div className='column-one'>
                         <div className="form-group">
                             <label htmlFor="nitrogen">d15N_wood</label>
-                            <input onChange={handleResultChange} value={formData.nitrogen ? formData.nitrogen.toString(): ''} name='nitrogen' required type="text" className="form-control" id="nitrogen" />
+                            <input onChange={handleResultChange} value={formData.nitrogen ? formData.nitrogen.toString() : ''} name='nitrogen' required type="text" className="form-control" id="nitrogen" />
                         </div>
                     </div>
                     <div className='column-one'>
@@ -437,7 +443,7 @@ export default function SampleDataInput(props: SampleDataInputProps) {
                     <div className='column-one'>
                         <div className="form-group">
                             <label htmlFor="d18O_wood">%C_wood</label>
-                            <input onChange={handleResultChange} value={formData.c_wood ? formData.c_wood.toString(): ''} name='c_wood' required type="text" className="form-control" id="c_wood" />
+                            <input onChange={handleResultChange} value={formData.c_wood ? formData.c_wood.toString() : ''} name='c_wood' required type="text" className="form-control" id="c_wood" />
                         </div>
                     </div>
                     <div className='column-one'>
@@ -467,15 +473,25 @@ export default function SampleDataInput(props: SampleDataInputProps) {
     }
 
     function shouldShowBackButton(): boolean {
-        return currentTab !== 1;
+        return currentTab !== 1 && !userIsOnLastTab();
     }
 
     function shouldShowCancelButton(): boolean {
-        return !userIsOnLastTab;
+        return !userIsOnLastTab();
     }
     function shouldShowActionItemButton(): boolean {
         const isTabBeforeCreateSample = (formData.status === 'concluded' && currentTab === 3) || (formData.status !== 'concluded' && currentTab === 2);
         return isTabBeforeCreateSample || !props.createQrCode;
+    }
+    function handleExitSampleDataInputPage() {
+        const navBar = document.getElementById('nav-wrapper');
+        if (navBar) {
+            navBar.style.display = "inline";
+        }
+    }
+    function handleReturnToDashboard() {
+        handleExitSampleDataInputPage();
+        router.push('/samples')
     }
 
 
@@ -503,7 +519,7 @@ export default function SampleDataInput(props: SampleDataInputProps) {
                     {shouldShowBackButton() && <button type="button" onClick={() => attemptToUpdateCurrentTab(currentTab - 1)} className="btn btn-primary">Back</button>}
                     {shouldShowNextButton() && <button type="button" onClick={() => attemptToUpdateCurrentTab(currentTab + 1)} className="btn btn-primary">Next</button>}
                     {shouldShowActionItemButton() && <button type="button" onClick={onActionButtonClick} className="btn btn-primary">{props.actionButtonTitle}</button>}
-                    {userIsOnLastTab() && <button type="button" onClick={() => router.push('/samples')} className="btn btn-primary">Return to dashboard</button>}
+                    {userIsOnLastTab() && <button type="button" onClick={handleReturnToDashboard} className="btn btn-primary">Return to dashboard</button>}
 
                 </div>
             </div>

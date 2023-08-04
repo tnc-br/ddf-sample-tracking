@@ -67,6 +67,11 @@ export default function AddSample() {
         }
     });
 
+    const navBar = document.getElementById('nav-wrapper');
+    if (navBar) {
+        navBar.style.display = "none";
+    }
+
     function onCancleClick() {
         router.replace('/samples');
     }

@@ -5,7 +5,6 @@ import { getFirestore, getDocs, collection, query, or, and, where, getDoc, doc }
 import { useState, useMemo, useRef, useEffect } from 'react';
 import './styles.css';
 import { useRouter } from 'next/navigation'
-import Nav from '../nav';
 import SamplesTable from '../samples_table';
 import {initializeAppIfNecessary} from '../utils';
 
@@ -194,10 +193,6 @@ export default function Samples() {
     return (
         <div className='samples-page-wrapper'>
             <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@48,400,0,0" />
-
-            <div>
-                <Nav />
-            </div>
             {userData.org && <div id="samplesTable" className='samples-wrapper'>
                 <p className='header'>All samples</p>
                 <SamplesTable samplesData={samplesState as Sample[]} canDeleteSamples={isAdmin()}/>

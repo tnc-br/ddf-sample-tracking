@@ -1,5 +1,4 @@
 "use client";
-import Nav from '../nav';
 import './styles.css';
 import 'bootstrap/dist/css/bootstrap.css';
 import { doc, getDoc, getFirestore, updateDoc, DocumentReference } from "firebase/firestore";
@@ -231,7 +230,6 @@ export default function SampleDetails() {
     return (
 
         <div>
-            <Nav />
             <div className='sample-details-wrapper'>
                 <p className='title'>Sample details</p>
                 <div>

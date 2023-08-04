@@ -108,9 +108,6 @@ export default function MySamples() {
         <div className='samples-page-wrapper'>
             <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@48,400,0,0" />
 
-            <div>
-                <Nav />
-            </div>
             <div id="samplesTable" className='samples-wrapper'>
                 <p className='header'>My samples</p>
                 <SamplesTable samplesData={samplesState} canDeleteSamples={true} />

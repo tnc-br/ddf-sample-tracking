@@ -6,7 +6,6 @@ import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { firebaseConfig } from '../firebase_config';
 import { initializeApp } from "firebase/app";
 import { useState, useEffect } from 'react';
-import Nav from '../nav';
 import './styles.css';
 import { useRouter } from 'next/navigation'
 import 'bootstrap/dist/css/bootstrap.css';
@@ -196,9 +195,7 @@ export default function SignUpRequests() {
     //         // The new custom claims will propagate to the user's ID token the
     //         // next time a new one is issued.
     //     });
-    return (<div><div>
-        <Nav />
-    </div>
+    return (<div>
         <div className="admin-wrapper">
             <h3 className='page-title'>Sign up requests ({Object.keys(prospectiveUsers).length + Object.keys(prospectiveOrgs).length})</h3>
             <div>
