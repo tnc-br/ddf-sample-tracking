@@ -87,3 +87,7 @@
   .sample-info-table {
     width: 376px;
   }
+
+  .result-input-wrapper {
+    display: flex;
+  }

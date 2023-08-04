@@ -52,7 +52,7 @@ export default function SampleDataInput(props: SampleDataInputProps) {
 
     function attemptToUpdateCurrentTab(newTab: number) {
         const currentTabRef = getCurrentTabFormRef();
-        if (checkCurrentTabFormValidity()) {
+        if (newTab < currentTab || checkCurrentTabFormValidity()) {
             setCurrentTab(newTab);
         }
     }
@@ -124,6 +124,17 @@ export default function SampleDataInput(props: SampleDataInputProps) {
         props.onStateUpdate(newFormData, currentTabRef);
     }
 
+    function handleResultChange(evt: any) {
+        const value = evt.target.value;
+        const newFormData = {
+            ...formData,
+            [evt.target.name]: value.split(','),
+        }
+        setFormData(newFormData);
+        const currentTabRef = document.getElementById('results-tab');
+        props.onStateUpdate(newFormData, currentTabRef);
+    }
+
     function onCancleClick() {
         router.push('samples');
     }
@@ -134,15 +145,17 @@ export default function SampleDataInput(props: SampleDataInputProps) {
         if (!props.createQrCode) {
             props.onActionButtonClick();
         } else {
-            attemptToUpdateCurrentTab(3);
+            attemptToUpdateCurrentTab(4);
         }
     }
 
     function getCurrentTabFormRef(): Element {
         if (currentTab === 1) {
             return document.getElementById('info-tab');
-        } else {
+        } else if (currentTab === 2) {
             return document.getElementById('sample-measurements');
+        } else {
+            return document.getElementById('results-tab');
         }
     }
 
@@ -155,7 +168,7 @@ export default function SampleDataInput(props: SampleDataInputProps) {
             } else {
                 return true;
             }
-            
+
         } else {
             currentTabRef.reportValidity();
             return false;
@@ -164,6 +177,13 @@ export default function SampleDataInput(props: SampleDataInputProps) {
 
     function originIsKnownOrUncertain(): boolean {
         return formData.trusted === 'trusted' || formData.trusted === 'unknown';
+    }
+
+    function validateSampleResultsTab(): boolean {
+        if (!currentTab === 3 || !props.createQrCode) {
+            return true;
+        } 
+        const formData = document.getElementById('results-tab');
     }
 
 
@@ -205,7 +225,7 @@ export default function SampleDataInput(props: SampleDataInputProps) {
                     <div>
                         <label htmlFor="origin" defaultValue={sampleTrust}>Origin</label>
                         <select onChange={handleChange} value={formData.trusted} name='trusted' required className="form-select" aria-label="Default select example" id="origin">
-                        <option value="unselected">-- Select option -- </option>
+                            <option value="unselected">-- Select option -- </option>
                             <option value="untrusted">Unkown</option>
                             <option value="trusted">Known</option>
                             <option value="unknown">Uncertain</option>
@@ -217,17 +237,17 @@ export default function SampleDataInput(props: SampleDataInputProps) {
                             <input onChange={handleChange} value={formData.site} required name='site' type="text" className="form-control" id="collectionSite" />
                         </div>
                     </div>}
-                    {originIsKnownOrUncertain() && <div className="form-row">
+                    {<div className="form-row">
                         <div className="form-group latlon-input" id="inputLatFormGroup">
                             <label htmlFor="inputLat">Latitude</label>
-                            <input onChange={handleChange} value={formData.lat} required name='lat' type="text" className="form-control" id="inputLat" />
+                            <input onChange={handleChange} value={formData.lat} required={originIsKnownOrUncertain()} name='lat' type="text" className="form-control" id="inputLat" />
                             <div className="invalid-feedback">
                                 Please provide a latitude.
                             </div>
                         </div>
                         <div className="form-group latlon-input">
                             <label htmlFor="inputLon">Longitude</label>
-                            <input onChange={handleChange} value={formData.lon} required name='lon' type="text" className="form-control" id="inputLon" />
+                            <input onChange={handleChange} value={formData.lon} required={originIsKnownOrUncertain()} name='lon' type="text" className="form-control" id="inputLon" />
                             <div className="invalid-feedback">
                                 Please provide a longitude.
                             </div>
@@ -295,15 +315,25 @@ export default function SampleDataInput(props: SampleDataInputProps) {
                 <div className='column-one'>
                     <div className="form-group">
                         <label htmlFor="measureing_height">Measuring height</label>
-                        <input onChange={handleChange} name='measureing_height' type="text" className="form-control" id="measureing_height" />
+                        <input onChange={handleChange} value={formData.measureing_height} name='measureing_height' type="text" className="form-control" id="measureing_height" />
                     </div>
                     <div className="form-group">
                         <label htmlFor="amount_of_measurements">Amount of measurements</label>
-                        <input onChange={handleChange} name='amount_of_measurements' type="text" className="form-control" id="amount_of_measurements" />
+                        <select onChange={handleChange} value={formData.amount_of_measurementste} required name='amount_of_measurementste' className="form-select" aria-label="Default select example" id="amount_of_measurementste">
+                            <option value="2">2</option>
+                            <option value="3">3</option>
+                            <option value="4">4</option>
+                            <option value="5">5</option>
+                            <option value="6">6</option>
+                            <option value="7">7</option>
+                            <option value="8">8</option>
+                            <option value="9">9</option>
+                            <option value="10">10</option>
+                        </select>
                     </div>
                     <div>
-                        <label htmlFor="origin" defaultValue={sampleTrust}>Sample type</label>
-                        <select onChange={handleChange} required name='origin' className="form-select" aria-label="Default select example" id="origin">
+                        <label htmlFor="sample_type" defaultValue={sampleTrust}>Sample type</label>
+                        <select onChange={handleChange} value={formData.sample_type} required name='sample_type' className="form-select" aria-label="Default select example" id="sample_type">
                             <option value="knonw">Disc</option>
                             <option value="unkown">Triangular</option>
                             <option value="uncertain">Chunk</option>
@@ -312,11 +342,11 @@ export default function SampleDataInput(props: SampleDataInputProps) {
                     </div>
                     <div className="form-group">
                         <label htmlFor="diameter">Diameter</label>
-                        <input onChange={handleChange} name='diameter' type="text" className="form-control" id="diameter" />
+                        <input onChange={handleChange} value={formData.diameter} name='diameter' type="text" className="form-control" id="diameter" />
                     </div>
                     <div className="form-group">
                         <label htmlFor="observations">Observations</label>
-                        <input onChange={handleChange} name='observations' type="text" className="form-control" id="observations" />
+                        <input onChange={handleChange} value={formData.observations} name='observations' type="text" className="form-control" id="observations" />
                     </div>
                 </div>
             </form>
@@ -370,6 +400,86 @@ export default function SampleDataInput(props: SampleDataInputProps) {
         </div>)
     }
 
+    function sampleResultsTab() {
+        return (
+            <div>
+                <form id='results-tab' className='grid-columns'>
+                    <div className='column-one'>
+                        <div className="form-group">
+                            <label htmlFor="d18O_cel">d18O_cel</label>
+                            <input onChange={handleResultChange} value={formData.d18O_cel ? formData.d18O_cel.toString() : ''} name='d18O_cel' required type="text" className="form-control" id="d18O_cel" />
+                        </div>
+                    </div>
+                    <div className='column-one'>
+                        <div className="form-group">
+                            <label htmlFor="oxygen">d18O_wood</label>
+                            <input onChange={handleResultChange} value={formData.oxygen ? formData.oxygen.toString() : ''} name='oxygen' required type="text" className="form-control" id="oxygen" />
+                        </div>
+                    </div>
+                    <div className='column-one'>
+                        <div className="form-group">
+                            <label htmlFor="nitrogen">d15N_wood</label>
+                            <input onChange={handleResultChange} value={formData.nitrogen ? formData.nitrogen.toString(): ''} name='nitrogen' required type="text" className="form-control" id="nitrogen" />
+                        </div>
+                    </div>
+                    <div className='column-one'>
+                        <div className="form-group">
+                            <label htmlFor="n_wood">N_wood</label>
+                            <input onChange={handleResultChange} value={formData.n_wood ? formData.n_wood.toString() : ''} name='n_wood' required type="text" className="form-control" id="n_wood" />
+                        </div>
+                    </div>
+                    <div className='column-one'>
+                        <div className="form-group">
+                            <label htmlFor="carbon">d13C_wood</label>
+                            <input onChange={handleResultChange} value={formData.carbon ? formData.carbon.toString() : ''} name='carbon' required type="text" className="form-control" id="carbon" />
+                        </div>
+                    </div>
+                    <div className='column-one'>
+                        <div className="form-group">
+                            <label htmlFor="d18O_wood">%C_wood</label>
+                            <input onChange={handleResultChange} value={formData.c_wood ? formData.c_wood.toString(): ''} name='c_wood' required type="text" className="form-control" id="c_wood" />
+                        </div>
+                    </div>
+                    <div className='column-one'>
+                        <div className="form-group">
+                            <label htmlFor="d13C_cel">d13C_cel</label>
+                            <input onChange={handleResultChange} value={formData.d13C_cel ? formData.d13C_cel.toString() : ''} name='d13C_cel' required type="text" className="form-control" id="d13C_cel" />
+                        </div>
+                    </div>
+                    <div className='column-one'>
+                        <div className="form-group">
+                            <label htmlFor="c_cel">%C_cel</label>
+                            <input onChange={handleResultChange} value={formData.c_cel ? formData.c_cel.toString() : ''} name='c_cel' required type="text" className="form-control" id="c_cel" />
+                        </div>
+                    </div>
+                </form>
+            </div>
+        )
+    }
+
+    function userIsOnLastTab(): boolean {
+        return ((formData.status === 'concluded' && currentTab === 4)
+            || (formData.status !== 'concluded' && currentTab === 3));
+    }
+    function shouldShowNextButton(): boolean {
+        return !userIsOnLastTab();
+
+    }
+
+    function shouldShowBackButton(): boolean {
+        return currentTab !== 1;
+    }
+
+    function shouldShowCancelButton(): boolean {
+        return !userIsOnLastTab;
+    }
+    function shouldShowActionItemButton(): boolean {
+        const isTabBeforeCreateSample = (formData.status === 'concluded' && currentTab === 3) || (formData.status !== 'concluded' && currentTab === 2);
+        return isTabBeforeCreateSample || !props.createQrCode;
+    }
+
+
+
     return (
         <div className="add-sample-page-wrapper">
             <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@48,400,0,0&display=optional" />
@@ -378,22 +488,23 @@ export default function SampleDataInput(props: SampleDataInputProps) {
                     <div className="tabs">
                         <div className={currentTab === 1 ? "current_tab" : "unselected_tab"}>Basic info</div>
                         <div className={currentTab === 2 ? "current_tab" : "unselected_tab"}>Sample measurements</div>
-                        {props.createQrCode && <div className={currentTab === 3 ? "current_tab" : "unselected_tab"}>Create sample</div>}
+                        {formData.status === 'concluded' && <div className={currentTab === 3 ? "current_tab" : "unselected_tab"}>Sample results</div>}
+                        {props.createQrCode && <div className={currentTab === 4 ? "current_tab" : "unselected_tab"}>Create sample</div>}
                     </div>
                     <div>
                         {currentTab === 1 && basicInfoTab()}
                         {currentTab === 2 && sampleMeasurementsTab()}
-                        {currentTab === 3 && createSampleTab()}
+                        {currentTab === 3 && sampleResultsTab()}
+                        {currentTab === 4 && createSampleTab()}
                     </div>
                 </div>
                 <div className='submit-buttons'>
-                    {currentTab !== 3 && <button type="button" onClick={onCancleClick} className="btn btn-outline-primary">Cancel</button>}
-                    {currentTab == 2 && <button type="button" onClick={() => attemptToUpdateCurrentTab(currentTab - 1)} className="btn btn-primary">Back</button>}
-                    {!props.createQrCode &&  <button type="button" onClick={onActionButtonClick} className="btn btn-primary">{props.actionButtonTitle}</button>}
-                    {currentTab === 3 ? <button type="button" onClick={() => router.push('/samples')} className="btn btn-primary">Return to dashboard</button>
-                        : currentTab === 1 ?
-                            <button type="button" onClick={() => attemptToUpdateCurrentTab(2)} className="btn btn-primary">Next</button> :
-                            props.createQrCode && <button type="button" onClick={onActionButtonClick} className="btn btn-primary">{props.actionButtonTitle}</button>}
+                    {shouldShowCancelButton() && <button type="button" onClick={onCancleClick} className="btn btn-outline-primary">Cancel</button>}
+                    {shouldShowBackButton() && <button type="button" onClick={() => attemptToUpdateCurrentTab(currentTab - 1)} className="btn btn-primary">Back</button>}
+                    {shouldShowNextButton() && <button type="button" onClick={() => attemptToUpdateCurrentTab(currentTab + 1)} className="btn btn-primary">Next</button>}
+                    {shouldShowActionItemButton() && <button type="button" onClick={onActionButtonClick} className="btn btn-primary">{props.actionButtonTitle}</button>}
+                    {userIsOnLastTab() && <button type="button" onClick={() => router.push('/samples')} className="btn btn-primary">Return to dashboard</button>}
+
                 </div>
             </div>
         </div>
