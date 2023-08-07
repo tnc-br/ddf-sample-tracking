@@ -8,6 +8,8 @@ import { initializeApp } from "firebase/app";
 import { firebaseConfig } from '../firebase_config';
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { useState, useEffect } from 'react';
+import Alert from "@mui/material/Alert";
+import Stack from "@mui/material/Stack";
 import Nav from '../nav';
 import Papa from 'papaparse';
 
@@ -22,6 +24,7 @@ export default function ImportCsv() {
     const [user, setUser] = useState({});
     const [sampleTrust, setSampleTrust] = useState('untrusted');
     const [userData, setUserdata] = useState({} as UserData);
+    const [errors, setErrors] = useState([] as String[]);
 
     const router = useRouter();
     const app = initializeApp(firebaseConfig);
@@ -63,18 +66,25 @@ export default function ImportCsv() {
     // State to store the values
     const [csvValues, setCsvValues] = useState([]);
 
-    const inputColumns = [
+    const requiredColumns :String[] = [
+        'lat',
+        'lon',
+        'd18O_cel',
+        'd15N_wood',
+        'd13C_wood',
+        'd13C_cel',
+    ]
+
+    const inputColumns: String[] = [
+        ...requiredColumns,
         "code_lab",
         "Species",
         "Popular name",
         "Site",
         "State",
-        "lat",
-        "lon",
         "created_by",
         "current_state", // TODO - should we assume completed for CSV upload?
         "date_of_harvest",
-        "d_18o_wood",
     ];
 
     function getRanHex(size: number): string {
@@ -91,9 +101,22 @@ export default function ImportCsv() {
         setSampleTrust(evt.target.value);
     }
 
+    function addError(error: String) {
+        setErrors(errors => [...errors, error]);
+    }
+
     function onUploadSamplesClick() {
+        setErrors([]);
         if (document.getElementById("formFile")!.value == "") {
-            console.log("No file to upload");
+            addError('No file to upload.');
+            return;
+        }
+
+        if (parsedData.length > 500) {
+            // We could support larger imports by splitting into multiple batches.
+            // https://firebase.google.com/docs/firestore/manage-data/transactions#batched-writes
+            addError('Import has a limit of 500 entries.');
+            return;
         }
 
         // build a counter of all the column types selected
@@ -109,25 +132,30 @@ export default function ImportCsv() {
             // ignored column or we will fail for dupe columns.
             selectedColumnCounts[column].index = i;
         }
-        console.log(selectedColumnCounts);
 
         var columnNames = Object.keys(selectedColumnCounts);
-        var columnsToUpload = [];
+        var columnsToUpload: String[] = [];
         for (var column in inputColumns) {
             var columnName = inputColumns[column];
             if (columnNames.indexOf(columnName) >= 0) {
                 columnsToUpload.push(columnName);
             }
         }
-        // TODO - prob just check that all the required columns are present.
-        console.log(columnsToUpload);
         if (columnsToUpload.length == 0) {
-            console.log("No columns selected");
+            addError('No columns selected');
+            return;
+        }
+
+        var missingRequiredColumns = requiredColumns.filter(col => !columnsToUpload.includes(col));
+        if (missingRequiredColumns.length > 0) {
+            addError('Missing required column[s]: ' + missingRequiredColumns.join(','));
+            return;
         }
 
         columnsToUpload.forEach(function (col) {
             if (selectedColumnCounts[col] > 1) {
-                console.log("Each column can only be selected once.")
+                addError('Each column can only be selected once.');
+                return;
             }
         });
 
@@ -138,13 +166,10 @@ export default function ImportCsv() {
         if (!user) return;
         const sampleVisibility = (document.getElementById('sampleVisibility')! as HTMLInputElement).value;
         for (var rowIndex in csvValues) {
-            console.log('adding doc');
             // TODO - check if the checkbox is selected for the row.
             // TODO - add validation for certain fields. This should be shared between different
             //        sample collection steps.
-            // TODO - handle inputs over 500 rows. That's the batch limit. We could support partial
-            //        uploads or not allow CSVs over 500 rows.
-            //        https://firebase.google.com/docs/firestore/manage-data/transactions#batched-writes
+
             var row = csvValues[rowIndex];
             const internalCode = getRanHex(20);
             const docRef = doc(db, sampleTrust + "_samples", internalCode);
@@ -156,6 +181,10 @@ export default function ImportCsv() {
                 'state': row[selectedColumnCounts['State'].index],
                 'lat': Number(row[selectedColumnCounts['lat'].index]),
                 'lon': Number(row[selectedColumnCounts['lon'].index]),
+                'd13c_cel': row[selectedColumnCounts['d13C_cel'].index],
+                'd13c_wood': row[selectedColumnCounts['d13C_wood'].index],
+                'd13o_cel': row[selectedColumnCounts['d18O_cel'].index],
+                'd15n_wood': row[selectedColumnCounts['d15N_wood'].index],
                 'created_by': user.uid,
                 // 'current_step': '1. Drying process',
                 'status': 'complete',
@@ -175,6 +204,8 @@ export default function ImportCsv() {
     }
 
     function onFileChanged(event) {
+        setErrors([]);
+
         // TODO - add a check box if there are headers present in the CSV (or assume there are always headers?)
 
         if (event.target.files.length === 0) {
@@ -220,6 +251,15 @@ export default function ImportCsv() {
                 <Nav />
             </div>
             <div className="import-form-wrapper">
+                <div className="errors-list">
+                    <Stack sx={{ width: '100%' }} spacing={2}>
+                        {errors.map((error, index) =>
+                            <Alert severity="error" key={index}>
+                                {error}
+                            </Alert>
+                        )}
+                    </Stack>
+                </div>
                 <label htmlFor="sampleTrustSelected" defaultValue={sampleTrust}>Is this sample trusted?</label>
                 <select onChange={onSampleTrustChange} className="form-select" id="sampleTrustSelected" aria-label="Select sample trusted status">
                     <option value="untrusted">No</option>
@@ -227,12 +267,12 @@ export default function ImportCsv() {
                     <option value="unknown">Unkown</option>
                 </select>
                 <label htmlFor="sampleVisibility">Sample visibility</label>
-                    <select className="form-select" id="sampleVisibility" aria-label="Select sample visibility">
-                        <option value="public">Publicly available</option>
-                        <option value="logged_in">Available to any logged-in user</option>
-                        <option value="organization">Available to my organization only</option>
-                        <option value="private">Private to me and admins only</option>
-                    </select>
+                <select className="form-select" id="sampleVisibility" aria-label="Select sample visibility">
+                    <option value="public">Publicly available</option>
+                    <option value="logged_in">Available to any logged-in user</option>
+                    <option value="organization">Available to my organization only</option>
+                    <option value="private">Private to me and admins only</option>
+                </select>
                 <label htmlFor="formFile" className="form-label">Upload CSV file</label>
                 <input capture onChange={onFileChanged} accept=".csv" className="form-control" type="file" id="formFile" />
                 {/* TODO - add a selector for the type of sample, untrusted, trusted, unknown */}
