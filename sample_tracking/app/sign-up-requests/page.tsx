@@ -5,46 +5,59 @@ import { initializeApp as initializeAdminApp } from 'firebase-admin/app';
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { firebaseConfig } from '../firebase_config';
 import { initializeApp } from "firebase/app";
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Nav from '../nav';
 import './styles.css';
 import { useRouter } from 'next/navigation'
 import 'bootstrap/dist/css/bootstrap.css';
 import { getFirestore, getDocs, collection, updateDoc, doc, setDoc, addDoc, getDoc, arrayUnion, arrayRemove, deleteField, query, where, deleteDoc } from "firebase/firestore";
 
+type UserData = {
+    role: string,
+    org: string,
+}
+
+interface NestedSchemas {
+    [key: string]: NestedSchemas;
+}
+
 export default function SignUpRequests() {
     const [pendingApprovals, setPendingApprovals] = useState({});
     const [currentUsers, setCurrentUsers] = useState({});
-    const [prospectiveUsers, setProspectiveUsers] = useState({});
-    const [prospectiveOrgs, setProspectiveOrgs] = useState({});
-    const [userData, setUserData] = useState({});
+    const [prospectiveUsers, setProspectiveUsers] = useState({} as NestedSchemas);
+    const [prospectiveOrgs, setProspectiveOrgs] = useState({} as NestedSchemas);
+    const [userData, setUserData] = useState({} as UserData);
 
     // const adminApp = initializeAdminApp();
     const app = initializeApp(firebaseConfig);
     const auth = getAuth();
     const router = useRouter();
     const db = getFirestore();
-    if (Object.keys(userData).length < 1) {
-        onAuthStateChanged(auth, (user) => {
-            if (!user) {
-                router.push('/login');
-            } else {
-                const userDocRef = doc(db, "users", user.uid);
-                getDoc(userDocRef).then((docRef) => {
-                    if (docRef.exists()) {
-                        const docData = docRef.data();
-                        if (docData.role !== 'admin' && docData.role !== 'site_admin') {
-                            router.push('/tasks');
+
+    useEffect(() => {
+        if (Object.keys(userData).length < 1) {
+            onAuthStateChanged(auth, (user) => {
+                if (!user) {
+                    router.push('/login');
+                } else {
+                    const userDocRef = doc(db, "users", user.uid);
+                    getDoc(userDocRef).then((docRef) => {
+                        if (docRef.exists()) {
+                            const docData = docRef.data();
+                            if (docData.role !== 'admin' && docData.role !== 'site_admin') {
+                                router.push('/tasks');
+                            }
+                            setUserData(docRef.data() as UserData);
                         }
-                        setUserData(docRef.data());
-                    }
-                })
-            }
-        });
-    }
+                    })
+                }
+            });
+        }
+    })
+    
 
     if (Object.keys(pendingApprovals).length < 1 && Object.keys(currentUsers).length < 1) {
-        const pendingUsers = {};
+        const pendingUsers: NestedSchemas = {};
 
         if (userData.role === 'admin' && userData.org.length > 0) {
             const q = query(collection(db, "new_users"), where("org", "==", userData.org));
@@ -57,7 +70,7 @@ export default function SignUpRequests() {
                 }
             })
         } else if (userData.role === "site_admin") {
-            const pendingOrgs = {};
+            const pendingOrgs: NestedSchemas = {};
             getDocs(collection(db, "new_users")).then((querySnapshot) => {
                 console.log('made request to get users');
                 querySnapshot.forEach((doc) => {
@@ -85,10 +98,10 @@ export default function SignUpRequests() {
         }
     }
 
-    function handleApproveOrgClick(evt) {
+    function handleApproveOrgClick(evt: any) {
         console.log(evt);
         const orgName = evt.target.parentElement.parentElement.id;
-        const adminId = prospectiveOrgs[orgName];
+        const adminId = prospectiveOrgs[orgName].admin_id as unknown as string;
         const date = new Date();
         const dateString = `${date.getMonth() + 1} ${date.getDate()} ${date.getFullYear()}`;
 
@@ -99,7 +112,7 @@ export default function SignUpRequests() {
         setDoc(newOrgRef, {
             org_name: orgName,
         });
-        const newUserDocRef = doc(db, "users", prospectiveOrgs[orgName].admin_id);
+        const newUserDocRef = doc(db, "users", adminId);
         setDoc(newUserDocRef, {
             org: orgId,
             name: prospectiveOrgs[orgName].admin_name,
@@ -110,7 +123,8 @@ export default function SignUpRequests() {
         deleteOrgFromNewOrgLists(orgName);
     }
 
-    function handleRejectOrgClick() {
+    function handleRejectOrgClick(evt: any) {
+        const orgName = evt.target.parentElement.parentElement.id;
         addDoc(collection(db, "users"), {
             name: prospectiveOrgs[orgName].admin_name,
             email: prospectiveOrgs[orgName].email,
@@ -119,7 +133,7 @@ export default function SignUpRequests() {
 
     function deleteOrgFromNewOrgLists(orgName: string) {
         const newOrgDocRef = doc(db, "new_users", "new_orgs");
-        let deletedOrgDoc = {};
+        let deletedOrgDoc: any = {};
         deletedOrgDoc[orgName] = deleteField();
         updateDoc(newOrgDocRef, deletedOrgDoc);
         const newProspectiveOrgs = prospectiveOrgs;
@@ -127,13 +141,14 @@ export default function SignUpRequests() {
         setProspectiveOrgs(newProspectiveOrgs);
     }
 
-    function handleApproveMemberClick(evt) {
+    function handleApproveMemberClick(evt: any) {
         const memberId = evt.target.parentElement.parentElement.id;
         const orgId = prospectiveUsers[memberId].org;
+        const userId = prospectiveUsers[memberId].uid
 
         const date = new Date();
         const dateString = `${date.getMonth() + 1} ${date.getDate()} ${date.getFullYear()}`;
-        const newUserDocRef = doc(db, "users", prospectiveUsers[memberId].uid);
+        const newUserDocRef = doc(db, "users", userId as unknown as string);
         setDoc(newUserDocRef, {
             name: prospectiveUsers[memberId].name,
             org: prospectiveUsers[memberId].org,
@@ -146,7 +161,8 @@ export default function SignUpRequests() {
 
     }
 
-    function handleRejectMemberClick() {
+    function handleRejectMemberClick(evt: any) {
+        const memberId = evt.target.parentElement.parentElement.id;
         addDoc(collection(db, "users"), {
             name: prospectiveUsers[memberId].name,
             email: prospectiveUsers[memberId].email,
@@ -205,10 +221,10 @@ export default function SignUpRequests() {
                                 Object.keys(prospectiveUsers).map((key, i) => {
                                     return (
                                         <tr key={i} id={key}>
-                                            <td>{prospectiveUsers[key].name}</td>
-                                            <td>{prospectiveUsers[key].org}</td>
-                                            <td>{prospectiveUsers[key].email}</td>
-                                            <td>{prospectiveUsers[key].date_requested}</td>
+                                            <td>{prospectiveUsers[key].name as unknown as string}</td>
+                                            <td>{prospectiveUsers[key].org as unknown as string}</td>
+                                            <td>{prospectiveUsers[key].email as unknown as string}</td>
+                                            <td>{prospectiveUsers[key].date_requested as unknown as string}</td>
                                             {/* <td>{pendingApprovals[key].role}</td> */}
                                             <td className="approve-reject-wrapper"><button onClick={handleRejectMemberClick} type="button" className="btn btn-outline-danger reject-button">Decline</button>
                                                 <button onClick={handleApproveMemberClick} type="button" className="btn btn-outline-primary approve-button">Approve</button>
@@ -242,9 +258,9 @@ export default function SignUpRequests() {
                                     return (
                                         <tr key={i} id={key}>
                                             <td>{key}</td>
-                                            <td>{prospectiveOrgs[key].admin_name}</td>
-                                            <td>{prospectiveOrgs[key].email}</td>
-                                            <td>{prospectiveOrgs[key].date_requested}</td>
+                                            <td>{prospectiveOrgs[key].admin_name  as unknown as string}</td>
+                                            <td>{prospectiveOrgs[key].email as unknown as string}</td>
+                                            <td>{prospectiveOrgs[key].date_requested as unknown as string}</td>
                                             <td className="approve-reject-wrapper"><button onClick={handleRejectOrgClick} type="button" className="btn btn-outline-danger reject-button">Decline</button>
                                                 <button onClick={handleApproveOrgClick} type="button" className="btn btn-outline-primary approve-button">Approve</button></td>
 

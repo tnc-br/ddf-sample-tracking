@@ -2,12 +2,14 @@
 
 import Image from 'next/image'
 import 'bootstrap/dist/css/bootstrap.css';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 import { initializeApp } from "firebase/app";
 import { getAuth } from "firebase/auth";
 
 import { useRouter } from 'next/navigation'
+
+import './i18n/config';
 
 export default function Home() {
 
@@ -23,15 +25,17 @@ export default function Home() {
   };
 
 
-  // Initialize Firebase and declare "global" variables. all variables declared in this section are accessible to functions that follow.
   const app = initializeApp(firebaseConfig);
   const auth = getAuth();
   const user = auth.currentUser;
 
-  if (user) {
-    router.push('/tasks');
-  } else {
-    router.push('/login');
-  }
+  useEffect(() => {
+    if (user) {
+      router.push('/samples');
+    } else {
+      router.push('/login');
+    }
+  });
+
 
 }

@@ -3,7 +3,7 @@ import 'bootstrap/dist/css/bootstrap.css';
 import { initializeApp } from "firebase/app";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { getFirestore, getDocs, collection, query, or, and, where, getDoc, doc } from "firebase/firestore";
-import { useState, useMemo, useRef } from 'react';
+import { useState, useMemo, useRef, useEffect } from 'react';
 import './styles.css';
 import { useRouter } from 'next/navigation'
 import Nav from '../nav';
@@ -33,45 +33,53 @@ export default function Samples() {
         org: string,
     }
 
+    type UserData = {
+        role: string,
+        org: string,
+    }
+
     const [data, setData] = useState({});
     const [selectedSample, setSelectedSample] = useState('');
-    const [userData, setUserData] = useState({ org: '', role: '' });
+    const [userData, setUserData] = useState({} as UserData);
     const [samplesState, setSamplesState] = useState([{}]);
 
     const app = initializeApp(firebaseConfig);
     const router = useRouter();
 
     const auth = getAuth();
-    if (userData.role.length < 1) {
-        onAuthStateChanged(auth, (user) => {
-            if (!user) {
-                router.push('/login');
-            } else {
-                const userDocRef = doc(db, "users", user.uid);
-                getDoc(userDocRef).then((docRef) => {
-                    if (docRef.exists()) {
-                        const docData = docRef.data();
-                        if (!docData.role) {
-                            router.push('/tasks');
-                        } else {
-                            setUserData(docData);
-                        }
-                    }
-                })
-            }
-        });
-    }
 
-    console.log('In login signup');
+    useEffect(() => {
+        if (!userData.role || userData.role.length < 1) {
+            onAuthStateChanged(auth, (user) => {
+                if (!user) {
+                    router.push('/login');
+                } else {
+                    const userDocRef = doc(db, "users", user.uid);
+                    getDoc(userDocRef).then((docRef) => {
+                        if (docRef.exists()) {
+                            const docData = docRef.data();
+                            if (!docData.role) {
+                                router.push('/tasks');
+                            } else {
+                                setUserData(docData as UserData);
+                            }
+                        }
+                    })
+                }
+            });
+        }
+    })
+    
+
     const db = getFirestore();
-    if (Object.keys(data).length < 1 && userData.role.length > 0) {
+    if (Object.keys(data).length < 1) {
         addSamplesToDataList();
     }
 
     async function getSamplesFromCollection(collectionName: string): Promise<[Map<string, Map<string, string>>]> {
         const user = auth.currentUser;
-        const samples = {};
-        const samplesStateArray = [];
+        const samples: any = {};
+        const samplesStateArray: any = [];
         if (!user) return samples;
         console.log('got here');
         const verifiedSamplesRef = collection(db, collectionName);
@@ -83,7 +91,7 @@ export default function Samples() {
             if (querySnapshot) {
                 querySnapshot.forEach((doc) => {
                     const docData = doc.data();
-                    samples[doc.id] = doc.data();
+                    samples[doc.id as unknown as number] = doc.data();
                     samplesStateArray.push(docData);
                 });
             }
@@ -97,7 +105,7 @@ export default function Samples() {
                     where("visibility", "==", "logged_in"),
                     where("org", "==", userData.org)
                 ));
-        } else {
+        } else if (userData.org != null) {
             samplesQuery = query(verifiedSamplesRef,
                 or(
                     where("created_by", "==", user.uid),
@@ -107,6 +115,8 @@ export default function Samples() {
                         where("visibility", "==", "organization"),
                         where("org", "==", userData.org)),
                 ))
+        } else {
+            samplesQuery = query(verifiedSamplesRef, where("visibility", "==", "public"));
         }
 
         const querySnapshot = await getDocs(samplesQuery).catch((error) => {
@@ -125,8 +135,8 @@ export default function Samples() {
     }
 
     async function addSamplesToDataList() {
-        if (Object.keys(samplesState[0]).length < 1 && userData.role.length > 0) {
-            let allSamples: [Map<string, Map<string, string>>] = [{}];
+        if (Object.keys(samplesState[0]).length < 1) {
+            let allSamples: any = [{}];
             const trustedSamples = await getSamplesFromCollection('trusted_samples');
             const untrustedSamples = await getSamplesFromCollection('untrusted_samples');
             const unknownSamples = await getSamplesFromCollection('unknown_samples');
@@ -146,7 +156,7 @@ export default function Samples() {
             </div>
             <div id="samplesTable" className='samples-wrapper'>
                 <p className='header'>All samples</p>
-                <SamplesTable samplesData={samplesState} />
+                <SamplesTable samplesData={samplesState as Sample[]} />
             </div>
         </div>
     )

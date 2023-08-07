@@ -18,6 +18,31 @@ type SignUpData = {
   labName: string,
 }
 
+interface LogInProps {
+  onSignUpClick: any,
+}
+
+interface SignUpProps {
+  onLogInClick: any,
+}
+
+interface NestedSchemas {
+  [key: string]: NestedSchemas | string;
+}
+
+interface OrgsSchemas {
+  [key: string]: string;
+}
+
+type NewUser = {
+  name: string,
+  email: string,
+  date_requested: string,
+  org: string,
+  uid: string,
+  org_name: string
+}
+
 export default function LogInSignUpPage() {
 
   const router = useRouter()
@@ -26,14 +51,12 @@ export default function LogInSignUpPage() {
   const auth = getAuth();
   onAuthStateChanged(auth, (user) => {
     if (user) {
-      router.push('/samples');
+      router.replace('/samples');
     } else {
       console.log('User not logged in');
     }
   });
 
-
-  console.log('In login signup');
   const [canSignIn, setCanSignIn] = useState(true);
 
 
@@ -48,43 +71,32 @@ export default function LogInSignUpPage() {
 
   return (
     <div>
-      {canSignIn ? <Login onSignUpClick={() => handleSignUpClick()} router={router} /> : <SignUp onLogInClick={() => handleSignInClick()} router={router} />}
-    </div>
-
-  )
-}
-
-export function Test() {
-  return (
-    <div>
-      TEST
+      {canSignIn ? <Login onSignUpClick={() => handleSignUpClick()} /> : <SignUp onLogInClick={() => handleSignInClick()} />}
     </div>
 
   )
 }
 
 
-export function Login({
-  onSignUpClick,
-  router,
-}) {
+function Login(props: LogInProps) {
   const [loginInfo, setLoginInfo] = useState({
     email: "",
     password: "",
   });
 
   const auth = getAuth();
+  const router = useRouter()
 
   function attemptSignIn() {
-    const email = document.getElementById('email')!.value;
-    const password = document.getElementById('password')!.value;
+    const email = (document.getElementById('email') as HTMLInputElement).value;
+    const password = (document.getElementById('password') as HTMLInputElement).value;
     console.log('username: ' + loginInfo.email + ' password: ' + loginInfo.password);
     signInWithEmailAndPassword(auth, email, password)
       .then((userCredential) => {
         // Signed in 
         const user = userCredential.user;
         console.log('signed in');
-        router.push('/tasks');
+        router.push('/samples');
       })
       .catch((error) => {
         const errorCode = error.code;
@@ -110,6 +122,7 @@ export function Login({
       .then((result) => {
         // This gives you a Google Access Token. You can use it to access the Google API.
         const credential = GoogleAuthProvider.credentialFromResult(result);
+        if (!credential) return;
         const token = credential.accessToken;
         // The signed-in user info.
         const user = result.user;
@@ -117,18 +130,24 @@ export function Login({
         getDoc(userDocRef).then((docRef) => {
           if (docRef.exists()) {
             const docData = docRef.data();
-            if (docData.role) {
-              router.push('/tasks');
+            if (docData.role && docData.org) {
+              router.push('/samples');
             } else {
-              setUserData(docData);
+              router.push('/select-org');
             }
           } else {
+            const date = new Date();
+            const dateString = `${date.getMonth() + 1} ${date.getDate()} ${date.getFullYear()}`;
             // This is a new user. 
-
+            addDoc(collection(db, "new_users"), {
+              name: user.displayName,
+              email: user.email,
+              date_requested: dateString,
+              uid: user.uid,
+            })
+            router.push('/select-org');
           }
-        })
-        // IdP data available using getAdditionalUserInfo(result)
-        // ...
+        });
       }).catch((error) => {
         // Handle Errors here.
         const errorCode = error.code;
@@ -142,42 +161,6 @@ export function Login({
 
 
   }
-
-  function signInWithFacebook() {
-
-    const auth = getAuth();
-    const provider = new FacebookAuthProvider();
-
-
-    signInWithPopup(auth, provider)
-      .then((result) => {
-        // The signed-in user info.
-        const user = result.user;
-
-        // This gives you a Facebook Access Token. You can use it to access the Facebook API.
-        const credential = FacebookAuthProvider.credentialFromResult(result);
-        const accessToken = credential.accessToken;
-
-        // IdP data available using getAdditionalUserInfo(result)
-        // ...
-      })
-      .catch((error) => {
-        // Handle Errors here.
-        const errorCode = error.code;
-        const errorMessage = error.message;
-        // The email of the user's account used.
-        const email = error.customData.email;
-        // The AuthCredential type that was used.
-        const credential = FacebookAuthProvider.credentialFromError(error);
-
-        // ...
-      });
-
-
-  }
-
-
-
 
   return (
 
@@ -210,7 +193,7 @@ export function Login({
             </div>
 
             <div>
-              <p className="mb-0">Don't have an account? <button onClick={onSignUpClick} className="text-blue">Sign Up</button>
+              <p className="mb-0">Dont have an account? <button onClick={props.onSignUpClick} className="text-blue">Sign Up</button>
               </p>
             </div>
 
@@ -221,10 +204,9 @@ export function Login({
   )
 }
 
-export function SignUp({
-  onLogInClick,
-  router,
-}) {
+function SignUp(props: SignUpProps) {
+
+  const router = useRouter()
 
   const [signUpTab, setSignUpTab] = useState(0);
   const [signUpData, setSignUpData] = useState({
@@ -233,7 +215,7 @@ export function SignUp({
     lab: '',
     labName: ''
   });
-  const [availableOrgs, setAvailableOrgs] = useState({});
+  const [availableOrgs, setAvailableOrgs] = useState({} as OrgsSchemas);
 
   function updateSignUpData(signUpData: SignUpData) {
     setSignUpData(signUpData);
@@ -243,22 +225,22 @@ export function SignUp({
   const db = getFirestore();
 
   if (Object.keys(availableOrgs).length < 1) {
-    const orgs = {};
+    const orgs: OrgsSchemas = {};
     getDocs(collection(db, "organizations")).then((querySnapshot) => {
       console.log('made request to organizations');
       querySnapshot.forEach((doc) => {
         const docData = doc.data();
         orgs[docData['org_name']] = doc.id;
       });
-      setAvailableOrgs(orgs);
+      setAvailableOrgs(orgs as OrgsSchemas);
     });
   }
 
   function finishYourDetailsTab() {
     console.log('here');
-    const firstName = document.getElementById('firstName')!.value;
-    const lastName = document.getElementById('lastName')!.value;
-    const labName = document.getElementById('labSelect')!.value;
+    const firstName = (document.getElementById('firstName') as HTMLInputElement).value;
+    const lastName = (document.getElementById('lastName') as HTMLInputElement).value;
+    const labName = (document.getElementById('labSelect') as HTMLInputElement).value;
     const labValue = labName === 'Create new organization' ? "NEW" : availableOrgs[labName];
     if (firstName.length > 0 && lastName.length > 0 && labName.length > 0) {
       updateSignUpData({
@@ -272,16 +254,18 @@ export function SignUp({
   }
 
   async function handleSignUpButtonClicked() {
-    const email = document.getElementById('email')!.value;
-    const password = document.getElementById('password')!.value;
-    const reEnterPassword = document.getElementById('reEnterPassword')!.value;
+    const email = (document.getElementById('email') as HTMLInputElement).value;
+    const password = (document.getElementById('password') as HTMLInputElement).value;
+    const reEnterPassword = (document.getElementById('reEnterPassword') as HTMLInputElement).value;
     const name = `${signUpData.firstName} ${signUpData.lastName}`;
-    const newOrgName = document.getElementById('newOrgName') ? document.getElementById('newOrgName')!.value : '';
+    const newOrgName = (document.getElementById('newOrgName') ? (document.getElementById('newOrgName') as HTMLInputElement).value : '');
     if (password !== reEnterPassword) {
       console.log('Passwords dont match');
       return;
     }
     await createUserWithEmailAndPassword(auth, email, password);
+    const user = auth.currentUser;
+    if (!user) return;
     await updateProfile(auth.currentUser, {
       displayName: name,
     });
@@ -297,7 +281,7 @@ export function SignUp({
     const dateString = `${date.getMonth() + 1} ${date.getDate()} ${date.getFullYear()}`;
     if (signUpData.lab === 'NEW') {
       const newOrgDoc = doc(db, "new_users", "new_orgs");
-      let newObj = {};
+      let newObj: NestedSchemas = {};
       newObj[newOrgName] = {
         admin_id: auth.currentUser!.uid,
         admin_name: name,
@@ -306,14 +290,7 @@ export function SignUp({
       }
       updateDoc(newOrgDoc, newObj);
     } else {
-      // const newUserDocRef = doc(db, "new_users", signUpData.lab);
-      // let newObj = {};
-      // newObj[auth.currentUser!.uid] = {
-      //   name: name,
-      //   email: email,
-      //   date_requested: dateString,
-      //   org: signUpData.lab,
-      // }
+
       addDoc(collection(db, "new_users"), {
         name: name,
         email: email,
@@ -321,17 +298,38 @@ export function SignUp({
         org: signUpData.lab,
         uid: auth.currentUser!.uid,
         org_name: signUpData.labName,
-      })
+      });
+
+      const newUser = {
+        name: name,
+        email: email,
+        date_requested: dateString,
+        org: signUpData.lab,
+        uid: auth.currentUser!.uid,
+        org_name: signUpData.labName,
+      }
+
+      // addUserToNewUsersCollection(newUser)
       // updateDoc(newUserDocRef, {
       //   prospective_members: arrayUnion(auth.currentUser!.uid),
 
       // });
     }
+    router.push('/samples');
+  }
 
 
 
+  function addUserToNewUsersCollection(newUserData: NewUser) {
+    addDoc(collection(db, "new_users"), {
+      name: newUserData.name,
+      email: newUserData.email,
+      date_requested: newUserData.date_requested,
+      org: newUserData.org ? newUserData.org : "",
+      uid: newUserData.uid,
+      org_name: newUserData.org_name ? newUserData.org_name : "",
+    });
 
-    router.push('/tasks');
   }
 
 
@@ -398,7 +396,7 @@ export function SignUp({
 
         <div className="card">
           <div className="card-body p-5">
-            <h3><span onClick={onLogInClick} className="material-symbols-outlined back-arrow">
+            <h3><span onClick={props.onLogInClick} className="material-symbols-outlined back-arrow">
               arrow_back
             </span>Sign up</h3>
 

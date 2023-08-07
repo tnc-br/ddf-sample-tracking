@@ -7,7 +7,7 @@ import { doc, setDoc, getFirestore, getDoc, serverTimestamp, writeBatch } from "
 import { initializeApp } from "firebase/app";
 import { firebaseConfig } from '../firebase_config';
 import { getAuth, onAuthStateChanged } from "firebase/auth";
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Alert from "@mui/material/Alert";
 import Stack from "@mui/material/Stack";
 import Nav from '../nav';
@@ -30,27 +30,32 @@ export default function ImportCsv() {
     const app = initializeApp(firebaseConfig);
     const auth = getAuth();
     const db = getFirestore();
-    if (!userData.role) {
-        onAuthStateChanged(auth, (user) => {
-            if (user) {
-                setUser(user);
-                const userDocRef = doc(db, "users", user.uid);
-                getDoc(userDocRef).then((docRef) => {
-                    if (docRef.exists()) {
-                        const docData = docRef.data();
-                        if (!docData.role) {
-                            router.push('/tasks');
-                        } else {
-                            setUserdata(docData as UserData);
+    useEffect(() => {
+        if (!userData.role) {
+            onAuthStateChanged(auth, (user) => {
+                if (user) {
+                    console.log(user);
+                    setUser(user);
+                    const userDocRef = doc(db, "users", user.uid);
+                    getDoc(userDocRef).then((docRef) => {
+                        if (docRef.exists()) {
+                            const docData = docRef.data();
+                            if (!docData.role) {
+                                router.push('/tasks');
+                            } else {
+                                setUserdata(docData as UserData);
+                            }
                         }
-                    }
-                })
-            }
-            if (!user) {
-                router.push('/login');
-            }
-        });
-    }
+                    })
+                }
+                if (!user) {
+                    router.push('/login');
+                }
+            });
+        }
+
+    })
+    
 
     // State to store parsed data
     const [parsedData, setParsedData] = useState([]);
