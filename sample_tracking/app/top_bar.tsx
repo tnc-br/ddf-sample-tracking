@@ -6,7 +6,7 @@ import { getAuth, signOut, onAuthStateChanged } from "firebase/auth";
 import { useRouter } from 'next/navigation';
 import { initializeApp } from "firebase/app";
 import './styles.css';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { firebaseConfig } from './firebase_config';
 import { getFirestore, getDoc, doc } from "firebase/firestore";
 import Link from 'next/link';
@@ -22,9 +22,11 @@ export default function TopBar() {
     const router = useRouter();
     const auth = getAuth();
     const db = getFirestore();
-    const { t } = useTranslation();
+    const { t, i18n } = useTranslation();
+    const ref = useRef(null);
 
     useEffect(() => {
+        // if (Object.keys(userData).length < 1) {
         if (Object.keys(userData).length < 1) {
             onAuthStateChanged(auth, (user) => {
                 if (!user) {
@@ -43,21 +45,16 @@ export default function TopBar() {
             });
         }
 
+        if (!showMenu) {
+            window.addEventListener('click', ((evt) => {
+                if (!evt.target.classList.contains('profile-photo') && !evt.target.classList.contains('profile-menu') && !evt.target.classList.contains('nav-link')) {
+                    setShowMenu(false)
+                }
+            }));
+        }
+
     })
 
-    if (!showMenu) {
-        document.body.addEventListener('click', () => setShowMenu(false)); 
-    }
-
-
-    // onAuthStateChanged(auth, (user) => {
-    //     if (user) {
-    //         user.getIdTokenResult(true).then((token) => {
-    //             // setIsAdmin(token.claims.role === 'admin');
-    //             setRole(token.claims.role);
-    //         })
-    //     }
-    // });
 
 
     function onLogOutClick() {
@@ -72,15 +69,28 @@ export default function TopBar() {
         setShowMenu(!showMenu);
     }
 
+    function handlePortugalesChange() {
+        if (document.getElementById('portugales')!.checked) {
+            i18n.changeLanguage('pt');
+        } else {
+            i18n.changeLanguage('en');
+        }
+
+    }
+
     return (
-        <div className='top-bar-wrapper'>
+        <div id="top-bar" className='top-bar-wrapper'>
             <div className="page-title">Timber ID</div>
             {userData.photoUrl && <img onClick={handleProfileClick} className="profile-photo" src={userData.photoUrl} alt="Trulli" width="32" height="32" />}
             {!userData.photoUrl && <div onClick={handleProfileClick} className="letter-profile profile-photo">{userData.name ? userData.name.charAt(0) : ''}</div>}
             {showMenu && <div className='profile-menu'>
-                <div>
-                    <span className="language-label">Portugales</span>
-                    <input type="checkbox" id="portugales" name="portugales" value="portugales"></input>
+                <div className="language-selector">
+                    <span className="language-label nav-link">
+                        <span className="material-symbols-outlined">
+                            language
+                        </span>
+                        Portugales</span>
+                    <input onChange={handlePortugalesChange} className='nav-link' type="checkbox" id="portugales" name="portugales" value="portugales"></input>
                 </div>
                 <div className="nav-item">
                     <button className="nav-link" onClick={onLogOutClick}> <span className="material-symbols-outlined">

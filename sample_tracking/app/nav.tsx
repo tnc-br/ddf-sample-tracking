@@ -107,11 +107,11 @@ export default function Nav() {
 
                 </div>
 
-                <li className="nav-item">
+                {/* <li className="nav-item">
                     <button className="nav-link" onClick={onLogOutClick}> <span className="material-symbols-outlined">
                         logout
                     </span> {t('logOut')}</button>
-                </li>
+                </li> */}
 
             </ul>
             {/* <nav className="navbar navbar-expand-lg navbar-light bg-light">

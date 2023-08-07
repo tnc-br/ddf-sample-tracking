@@ -7,6 +7,7 @@ import { firebaseConfig } from '../firebase_config';
 import { useSearchParams, usePathname } from 'next/navigation'
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { useState, useEffect } from 'react';
+import { showNavBar, showTopBar } from '../utils';
 import 'jquery';
 import 'popper.js';
 // import 'bootstrap/dist/js/bootstrap.bundle.min';
@@ -55,6 +56,7 @@ export default function SampleDetails() {
 
     }
 
+    
     const processSteps = ['1. Drying process', '2. Lamination', '3. Chopping & homogenization', '4. Chemical preparation', '5. Weighing', '6. Encapsulation', '7. Mass spectrometer & data return'];
 
     const router = useRouter();
@@ -80,6 +82,9 @@ export default function SampleDetails() {
 
 
     useEffect(() => {
+        showNavBar();
+    showTopBar();
+
         if (!userData.role) {
             onAuthStateChanged(auth, (user) => {
                 if (!user) {

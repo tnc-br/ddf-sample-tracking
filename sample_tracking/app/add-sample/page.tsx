@@ -15,7 +15,10 @@ import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
 import { statesList } from '../states_list';
 import { municipalitiesList } from '../municipalities_list';
 import SampleDataInput from '../sample_data_input';
-import {initializeAppIfNecessary} from '../utils';
+import {initializeAppIfNecessary, getRanHex} from '../utils';
+import { useTranslation } from 'react-i18next';
+import '../i18n/config';
+
 
 type UserData = {
     name: string,
@@ -41,6 +44,7 @@ export default function AddSample() {
     const app = initializeAppIfNecessary();
     const auth = getAuth();
     const db = getFirestore();
+    const {t} = useTranslation();
 
     useEffect(() => {
         if (!userData.role) {
@@ -66,11 +70,6 @@ export default function AddSample() {
             });
         }
     });
-
-    const navBar = document.getElementById('nav-wrapper');
-    if (navBar) {
-        navBar.style.display = "none";
-    }
 
     function onCancleClick() {
         router.replace('/samples');
@@ -116,16 +115,6 @@ export default function AddSample() {
         setDoc(docRef, sampleData);
         setPageTitle("Sample created!")
 
-    }
-
-    function getRanHex(size: number): string {
-        let result = [];
-        let hexRef = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'];
-
-        for (let n = 0; n < size; n++) {
-            result.push(hexRef[Math.floor(Math.random() * 16)]);
-        }
-        return result.join('');
     }
 
     function handleChange(formState: {}, currentTabRef: Element) {

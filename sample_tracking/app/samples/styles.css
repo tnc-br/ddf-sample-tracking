@@ -26,7 +26,7 @@
     position: absolute;
     left: 304px;
     width: 1088px;
-    /* top: 67px; */
+    top: 67px;
 }
 
 .header {
@@ -60,6 +60,15 @@
     align-items: center;
     position: absolute;
     pointer-events: none;
+    margin-left: 19px;
+    margin-top: 19px;
+    font-family: Roboto;
+    font-size: 12px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 16px;
+    letter-spacing: 0.3px;
+    border-radius: 2px;
 }
 
 .table-hover {
@@ -70,4 +79,41 @@
     color: blue !important;
     text-decoration: underline;
     cursor: pointer;
+}
+
+.sample-table {
+    margin-top: 50px;
+}
+
+.summary-box {
+    border: 1px solid var(--grey-300, #DADCE0);
+    width: 536px;
+    height: 132px;
+    border-radius: 8px;
+    margin: 8px;
+}
+
+.samples-summary {
+    display: flex;
+}
+
+.samples-size-label {
+    font-family: Roboto;
+    font-size: 36px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 44px;
+    padding-top: 24px;
+    padding-left: 19px;
+}
+
+.in-progress {
+    background: #E8F0FE !important;
+    color: #185ABC;
+
+}
+
+.completed {
+    background: #E6F4EA;
+    color:  #137333;
 }

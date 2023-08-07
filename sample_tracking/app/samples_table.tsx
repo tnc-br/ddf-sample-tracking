@@ -13,6 +13,8 @@ import { initializeAppIfNecessary } from './utils';
 import { firebaseConfig } from './firebase_config';
 
 import { useReactTable } from '@tanstack/react-table'
+import { useTranslation } from 'react-i18next';
+import './i18n/config';
 
 type Sample = {
     code_lab: string,
@@ -50,10 +52,12 @@ export default function SamplesTable(props: SampleDataProps) {
     const router = useRouter();
     const app = initializeAppIfNecessary();
     const db = getFirestore();
+    const {t} = useTranslation();
 
+    
     const tableInstanceRef = useRef<MRT_TableInstance<Sample>>(null);
 
-    if (!sampleHasBeenDeletedFromList() && sampleData.length !== props.samplesData.length) {
+    if (!sampleHasBeenDeletedFromList() && (sampleData && sampleData.length !== props.samplesData.length)) {
         setSampleData(props.samplesData);
     }
 
@@ -65,7 +69,7 @@ export default function SamplesTable(props: SampleDataProps) {
         () => [
             {
                 accessorKey: 'code_lab',
-                header: 'Internal code',
+                header: t('internalCode'),
                 size: 150,
                 Cell: ({ cell, row, renderedCellValue }) => {
                     return (
@@ -77,34 +81,24 @@ export default function SamplesTable(props: SampleDataProps) {
             },
             {
                 accessorKey: 'sample_name',
-                header: 'Name',
+                header: t('header'),
                 size: 150,
 
             },
             {
                 accessorKey: 'status',
-                header: 'Status',
+                header: t('status'),
                 size: 200,
-            },
-            {
-                accessorKey: 'trusted',
-                header: 'Trusted',
-                size: 150,
-            },
-            {
-                accessorKey: 'validity',
-                header: 'Validity',
-                size: 150,
             },
 
             {
                 accessorKey: 'last_updated_by',
-                header: 'Last updated by',
+                header: t('lastUpdatedBy'),
                 size: 150,
             },
             {
                 accessorFn: (row) => row,
-                header: 'Actions',
+                header: t('actions'),
                 size: 100,
                 Cell: ({ cell }) => {
                     const row = cell.getValue();
@@ -159,6 +153,7 @@ export default function SamplesTable(props: SampleDataProps) {
     }
 
     function sampleHasBeenDeletedFromList(): boolean {
+        if (!sampleData) return false;
         return sampleData[sampleData.length-1].updated_state;   
     }
 
@@ -209,13 +204,16 @@ export default function SamplesTable(props: SampleDataProps) {
             {/* <div>
                 <Nav />
             </div> */}
-            <div >
+            <div>
 
                 <MaterialReactTable
                     columns={columns}
                     data={sampleData}
                     enableRowSelection
                     tableInstanceRef={tableInstanceRef}
+                    muiTablePaginationProps={{
+                        rowsPerPageOptions: [5, 10],
+                    }}
                     renderTopToolbarCustomActions={({ table }) => (
                         <div>
                             <button

@@ -2,14 +2,14 @@
 
 import Image from 'next/image'
 import 'bootstrap/dist/css/bootstrap.css';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 import { getAuth, signInWithEmailAndPassword, signInWithPopup, createUserWithEmailAndPassword, onAuthStateChanged, GoogleAuthProvider, FacebookAuthProvider, updateProfile } from "firebase/auth";
 import { useRouter } from 'next/navigation'
 import { firebaseConfig } from '../firebase_config';
 import { doc, setDoc, getDocs, collection, getFirestore, updateDoc, arrayUnion, addDoc, getDoc } from "firebase/firestore";
 import './styles.css';
-import { initializeAppIfNecessary } from '../utils';
+import { initializeAppIfNecessary, hideNavBar, hideTopBar } from '../utils';
 
 type SignUpData = {
   firstName: string,
@@ -58,6 +58,15 @@ export default function LogInSignUpPage() {
   });
 
   const [canSignIn, setCanSignIn] = useState(true);
+
+
+  useEffect(() => {
+    hideNavBar();
+    hideTopBar();
+  })
+
+
+
 
 
   function handleSignUpClick() {
@@ -131,6 +140,7 @@ function Login(props: LogInProps) {
           if (docRef.exists()) {
             const docData = docRef.data();
             if (docData.role && docData.org) {
+
               router.push('/samples');
             } else {
               router.push('/select-org');

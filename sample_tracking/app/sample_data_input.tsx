@@ -14,8 +14,9 @@ import { speciesList } from './species_list';
 import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
 import { statesList } from './states_list';
 import { municipalitiesList } from './municipalities_list';
-import getRanHex from './utils';
-
+import {getRanHex, hideNavBar} from './utils';
+import { useTranslation } from 'react-i18next';
+import './i18n/config';
 
 type UserData = {
     name: string,
@@ -43,17 +44,19 @@ export default function SampleDataInput(props: SampleDataInputProps) {
     const [formData, setFormData] = useState(props.baseState);
 
     const router = useRouter();
+    const {t} = useTranslation();
+
+
+    useEffect(() => {
+        hideNavBar();
+    })
 
     if (!props || !props.onStateUpdate || !props.onActionButtonClick || !props.baseState || !props.actionButtonTitle) return;
 
     if (Object.keys(props.baseState).length > Object.keys(formData).length) {
         setFormData(props.baseState);
     }
-
-    const navBar = document.getElementById('nav-wrapper');
-    if (navBar) {
-        navBar.style.display = "none";
-    }
+    
 
     function attemptToUpdateCurrentTab(newTab: number) {
         const currentTabRef = getCurrentTabFormRef();
@@ -141,7 +144,6 @@ export default function SampleDataInput(props: SampleDataInputProps) {
     }
 
     function onCancleClick() {
-        handleExitSampleDataInputPage();
         router.push('samples');
     }
 
@@ -198,24 +200,24 @@ export default function SampleDataInput(props: SampleDataInputProps) {
         return (
             <form id='info-tab' className='grid-columns'>
                 <div className='column-one'>
-                    <p>Visibility</p>
+                    <p>{t('visibility')}</p>
                     <div className="visibility_buttons">
                         <div onClick={handleSelectPublicVisibility}
-                            className={formData.visibility === 'public' ? "button_select public_button selected" : "button_select public_button"}>Public</div>
+                            className={formData.visibility === 'public' ? "button_select public_button selected" : "button_select public_button"}>{t('public')}</div>
                         <div onClick={handleSelectPrivateVisibility}
-                            className={formData.visibility === 'private' ? "button_select private_button selected" : "button_select private_button"}>Private</div>
+                            className={formData.visibility === 'private' ? "button_select private_button selected" : "button_select private_button"}>{t('private')}</div>
                     </div>
                     <div className="form-group">
-                        <label htmlFor="sampleName">Sample name</label>
+                        <label htmlFor="sampleName">{t('sampleName')}</label>
                         <input onChange={handleChange} value={formData.sample_name} name='sample_name' required type="text" className="form-control" id="sampleName" />
                     </div>
                     <div>
-                        <label htmlFor="sampleTrustSelected" defaultValue={sampleTrust}>Status</label>
-                        <select onChange={handleChange} value={formData.status} name='status' className="form-select" aria-label="Default select example" id="sampleTrustSelected">
+                        <label htmlFor="sampleTrustSelected" defaultValue={sampleTrust}>{t('status')}</label>
+                        <select onChange={handleChange} value={formData.status} required name='status' className="form-select" aria-label="Default select example" id="sampleTrustSelected">
                             <option value="unselected">-- Select option --</option>
-                            <option value="not_started">Not started</option>
-                            <option value="in_progress">In progress</option>
-                            <option value="concluded">Concluded</option>
+                            <option value="not_started">{t('notStarted')}</option>
+                            <option value="in_progress">{t('inProgress')}</option>
+                            <option value="concluded">{t('concluded')}</option>
                         </select>
                     </div>
                     <div className="form-group">
@@ -224,35 +226,35 @@ export default function SampleDataInput(props: SampleDataInputProps) {
                                 return (<option key={speciesName}>{speciesName}</option>)
                             })}
                         </datalist>
-                        <label htmlFor="treeSpecies">Tree species</label>
+                        <label htmlFor="treeSpecies">{t('treeSpecies')}</label>
                         <input onChange={handleChange} value={formData.species} name='species' type="text" autoComplete="on" list="suggestions" className="form-control" id="treeSpecies" />
                     </div>
 
                     <div>
-                        <label htmlFor="origin" defaultValue={sampleTrust}>Origin</label>
+                        <label htmlFor="origin" defaultValue={sampleTrust}>{t('origin')}</label>
                         <select onChange={handleChange} value={formData.trusted} name='trusted' required className="form-select" aria-label="Default select example" id="origin">
                             <option value="unselected">-- Select option -- </option>
-                            <option value="untrusted">Unkown</option>
-                            <option value="trusted">Known</option>
-                            <option value="unknown">Uncertain</option>
+                            <option value="untrusted">{t('unknown')}</option>
+                            <option value="trusted">{t('known')}</option>
+                            <option value="unknown">{t('uncertain')}</option>
                         </select>
                     </div>
                     {originIsKnownOrUncertain() && <div>
                         <div className="form-group">
-                            <label htmlFor="collectionSite">Collection site</label>
+                            <label htmlFor="collectionSite">{t('collectionSite')}</label>
                             <input onChange={handleChange} value={formData.site} required name='site' type="text" className="form-control" id="collectionSite" />
                         </div>
                     </div>}
                     {<div className="form-row">
                         <div className="form-group latlon-input" id="inputLatFormGroup">
-                            <label htmlFor="inputLat">Latitude</label>
+                            <label htmlFor="inputLat">{t('latitude')}</label>
                             <input onChange={handleChange} value={formData.lat} required={originIsKnownOrUncertain()} name='lat' type="text" className="form-control" id="inputLat" />
                             <div className="invalid-feedback">
                                 Please provide a latitude.
                             </div>
                         </div>
                         <div className="form-group latlon-input">
-                            <label htmlFor="inputLon">Longitude</label>
+                            <label htmlFor="inputLon">{t('longitude')}</label>
                             <input onChange={handleChange} value={formData.lon} required={originIsKnownOrUncertain()} name='lon' type="text" className="form-control" id="inputLon" />
                             <div className="invalid-feedback">
                                 Please provide a longitude.
@@ -276,36 +278,36 @@ export default function SampleDataInput(props: SampleDataInputProps) {
                                 return (<option key={municipality}>{municipality}</option>)
                             })}
                         </datalist>
-                        <label htmlFor="municipality">Municipality</label>
+                        <label htmlFor="municipality">{t('municipality')}</label>
                         <input onChange={handleChange} value={formData.municipality} name='municipality' type="text" autoComplete="on" list="suggestions" className="form-control" id="municipality" />
                     </div>}
-                    <label htmlFor="date_collected">Date collected</label>
+                    <label htmlFor="date_collected">{t('dateCollected')}</label>
                     <br />
                     <input onChange={handleChange} value={formData.date_collected} name='date_collected' type="date" id="date_collected"></input>
                 </div>
                 <div className='column_two'>
 
                     <div>
-                        <p>Collected by</p>
+                        <p>{t('collectedBy')}</p>
                         <div className="visibility_buttons">
                             <div onClick={handleSelectSupplier}
-                                className={formData.collected_by === 'supplier' ? "button_select public_button selected" : "button_select public_button"}>Supplier</div>
+                                className={formData.collected_by === 'supplier' ? "button_select public_button selected" : "button_select public_button"}>{t('supplier')}</div>
                             <div onClick={handleSelectMyOrg}
-                                className={formData.collected_by === 'my_org' ? "button_select private_button selected" : "button_select private_button"}>My org</div>
+                                className={formData.collected_by === 'my_org' ? "button_select private_button selected" : "button_select private_button"}>{t('myOrg')}</div>
                         </div>
                     </div>
                     <div>
                         {formData.collected_by === "supplier" && <div className="form-group">
-                            <label htmlFor="supplier">Supplier</label>
+                            <label htmlFor="supplier">{t('supplier')}</label>
                             <input onChange={handleChange} value={formData.supplier} name='supplier' type="text" className="form-control" id="supplier" />
                         </div>}
                     </div>
                     <div className="form-group">
-                        <label htmlFor="city">City</label>
+                        <label htmlFor="city">{t('city')}</label>
                         <input onChange={handleChange} value={formData.city} name='city' type="text" className="form-control" id="city" />
                     </div>
                     <div className="form-group">
-                        <label htmlFor="collectionSite">Collection site</label>
+                        <label htmlFor="collectionSite">{t('collectionSite')}</label>
                         <input onChange={handleChange} value={formData.site} name='site' type="text" className="form-control" id="collectionSite" />
                     </div>
                 </div>
@@ -320,11 +322,11 @@ export default function SampleDataInput(props: SampleDataInputProps) {
             <form id='sample-measurements' className='grid-columns'>
                 <div className='column-one'>
                     <div className="form-group">
-                        <label htmlFor="measureing_height">Measuring height</label>
+                        <label htmlFor="measureing_height">{t('measuringHeight')}</label>
                         <input onChange={handleChange} value={formData.measureing_height} name='measureing_height' type="text" className="form-control" id="measureing_height" />
                     </div>
                     <div className="form-group">
-                        <label htmlFor="amount_of_measurements">Amount of measurements</label>
+                        <label htmlFor="amount_of_measurements">{t('amountOfMeasurements')}</label>
                         <select onChange={handleChange} value={formData.amount_of_measurementste} required name='amount_of_measurementste' className="form-select" aria-label="Default select example" id="amount_of_measurementste">
                             <option value="2">2</option>
                             <option value="3">3</option>
@@ -338,7 +340,7 @@ export default function SampleDataInput(props: SampleDataInputProps) {
                         </select>
                     </div>
                     <div>
-                        <label htmlFor="sample_type" defaultValue={sampleTrust}>Sample type</label>
+                        <label htmlFor="sample_type" defaultValue={sampleTrust}>{t('sampleType')}</label>
                         <select onChange={handleChange} value={formData.sample_type} required name='sample_type' className="form-select" aria-label="Default select example" id="sample_type">
                             <option value="knonw">Disc</option>
                             <option value="unkown">Triangular</option>
@@ -347,11 +349,11 @@ export default function SampleDataInput(props: SampleDataInputProps) {
                         </select>
                     </div>
                     <div className="form-group">
-                        <label htmlFor="diameter">Diameter</label>
+                        <label htmlFor="diameter">{t('diameter')}</label>
                         <input onChange={handleChange} value={formData.diameter} name='diameter' type="text" className="form-control" id="diameter" />
                     </div>
                     <div className="form-group">
-                        <label htmlFor="observations">Observations</label>
+                        <label htmlFor="observations">{t('observations')}</label>
                         <input onChange={handleChange} value={formData.observations} name='observations' type="text" className="form-control" id="observations" />
                     </div>
                 </div>
@@ -375,23 +377,23 @@ export default function SampleDataInput(props: SampleDataInputProps) {
                         <td>{sampleId}</td>
                     </tr>
                     <tr>
-                        <td className='sample-info'>Species</td>
+                        <td className='sample-info'>{t('species')}</td>
                         <td>{formData.species}</td>
                     </tr>
                     <tr>
-                        <td className='sample-info'>Date created</td>
+                        <td className='sample-info'>{t('dateCreated')}</td>
                         <td>{currentDateString}</td>
                     </tr>
                     <tr>
-                        <td className='sample-info'>Created by</td>
+                        <td className='sample-info'>{t('createdBy')}</td>
                         <td>{userData.name}</td>
                     </tr>
                     <tr>
-                        <td className='sample-info'>Collected in</td>
+                        <td className='sample-info'>{t('collectedIn')}</td>
                         <td>{formData.state}</td>
                     </tr>
                     <tr>
-                        <td className='sample-info'>Collected on</td>
+                        <td className='sample-info'>{t('collectedOn')}</td>
                         <td>{formData.date_collected}</td>
                     </tr>
                 </tbody>
@@ -483,14 +485,7 @@ export default function SampleDataInput(props: SampleDataInputProps) {
         const isTabBeforeCreateSample = (formData.status === 'concluded' && currentTab === 3) || (formData.status !== 'concluded' && currentTab === 2);
         return isTabBeforeCreateSample || !props.createQrCode;
     }
-    function handleExitSampleDataInputPage() {
-        const navBar = document.getElementById('nav-wrapper');
-        if (navBar) {
-            navBar.style.display = "inline";
-        }
-    }
     function handleReturnToDashboard() {
-        handleExitSampleDataInputPage();
         router.push('/samples')
     }
 
@@ -502,10 +497,10 @@ export default function SampleDataInput(props: SampleDataInputProps) {
             <div className="sample-details-form">
                 <div id='sample-form'>
                     <div className="tabs">
-                        <div className={currentTab === 1 ? "current_tab" : "unselected_tab"}>Basic info</div>
-                        <div className={currentTab === 2 ? "current_tab" : "unselected_tab"}>Sample measurements</div>
-                        {formData.status === 'concluded' && <div className={currentTab === 3 ? "current_tab" : "unselected_tab"}>Sample results</div>}
-                        {props.createQrCode && <div className={currentTab === 4 ? "current_tab" : "unselected_tab"}>Create sample</div>}
+                        <div className={currentTab === 1 ? "current_tab" : "unselected_tab"}>{t('basicInfo')}</div>
+                        <div className={currentTab === 2 ? "current_tab" : "unselected_tab"}>{t('sampleMeasurements')}</div>
+                        {formData.status === 'concluded' && <div className={currentTab === 3 ? "current_tab" : "unselected_tab"}>{t('sampleResults')}</div>}
+                        {props.createQrCode && <div className={currentTab === 4 ? "current_tab" : "unselected_tab"}>{t('createSample')}</div>}
                     </div>
                     <div>
                         {currentTab === 1 && basicInfoTab()}
@@ -517,7 +512,7 @@ export default function SampleDataInput(props: SampleDataInputProps) {
                 <div className='submit-buttons'>
                     {shouldShowCancelButton() && <button type="button" onClick={onCancleClick} className="btn btn-outline-primary">Cancel</button>}
                     {shouldShowBackButton() && <button type="button" onClick={() => attemptToUpdateCurrentTab(currentTab - 1)} className="btn btn-primary">Back</button>}
-                    {shouldShowNextButton() && <button type="button" onClick={() => attemptToUpdateCurrentTab(currentTab + 1)} className="btn btn-primary">Next</button>}
+                    {shouldShowNextButton() && <button type="button" onClick={() => attemptToUpdateCurrentTab(currentTab + 1)} className="btn btn-primary next-button">Next</button>}
                     {shouldShowActionItemButton() && <button type="button" onClick={onActionButtonClick} className="btn btn-primary">{props.actionButtonTitle}</button>}
                     {userIsOnLastTab() && <button type="button" onClick={handleReturnToDashboard} className="btn btn-primary">Return to dashboard</button>}
 
