@@ -86,7 +86,6 @@ export default function SamplesTable(props: SampleDataProps) {
                 accessorFn: (row) => (row as Sample).sample_name ?? '',
                 header: t('name'),
                 size: 150,
-
             },
             {
                 accessorFn: (row) => (row as Sample).status ?? '',
@@ -212,6 +211,7 @@ export default function SamplesTable(props: SampleDataProps) {
                     enableFacetedValues
                     enableRowSelection
                     tableInstanceRef={tableInstanceRef}
+                    globalFilterFn="contains"
                     muiTablePaginationProps={{
                         rowsPerPageOptions: [5, 10],
                     }}
