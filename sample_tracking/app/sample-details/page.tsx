@@ -194,87 +194,126 @@ export default function SampleDetails() {
 
         const url = `timberid.org/sample-details?trusted=${trusted}&id=${sampleId}`;
 
-        return (<div>
-            <div className="table table-borderless">
-                <div className="sample-details">
-                    <tr>
-                        <td className='value-title'>Visibility</td>
-                        <td>{selectedDoc['visibility']}</td>
-                        <td className='value-title'>Collection site</td>
-                        <td>{selectedDoc['site']}</td>
-                        <td className='value-title'>Supplier name</td>
-                        <td>{selectedDoc['supplier']}</td>
-                    </tr>
-                    <tr>
-                        <td className='value-title'>Sample name</td>
-                        <td>{selectedDoc['sample_name']}</td>
-                        <td className='value-title'>Latitude</td>
-                        <td>{selectedDoc['lat']}</td>
-                        <td className='value-title'>City</td>
-                        <td>{selectedDoc['city']}</td>
-                    </tr>
-                    <tr>
-                        <td className='value-title'>Tree species</td>
-                        <td>{selectedDoc['species']}</td>
-                        <td className='value-title'>Longitude</td>
-                        <td>{selectedDoc['lon']}</td>
-                        <td className='value-title'>Collection site</td>
-                        <td>{selectedDoc['site']}</td>
-                    </tr>
-                    <tr>
-                        <td className='value-title'>Origin</td>
-                        <td>{selectedDoc['trusted']}</td>
-                        <td className='value-title'>Last updated by</td>
-                        <td>{selectedDoc['last_updated_by']}</td>
-                        <td className='value-title'>Date of harvest</td>
-                        <td>{selectedDoc['date_of_harvest']}</td>
-                    </tr>
-                    <tr>
-                        <td className='value-title'>Created by</td>
-                        <td>{selectedDoc['created_by_name'] ? selectedDoc['created_by_name'] : selectedDoc['created_by']}</td>
-                        <td className='value-title'>Date completed</td>
-                        <td>{selectedDoc['date_completed']}</td>
-                    </tr>
+        return (
+            <div>
+                <div className="details">
+                    <div className='section-title'>
+                        Details
+                    </div>
+                    <div className="detail-row">
+                        <div className='detail'>
+                            <span className="detail-name">Sample name</span>
+                            <span className='detail-value'>{selectedDoc['visibility'] || "unknown"}</span>
+                        </div>
+                        <div className='detail'>
+                            <span className="detail-name">Collection site</span>
+                            <span className='detail-value'>{selectedDoc['site'] || "unknown"}</span>
+                        </div>
+                        <div className='detail'>
+                            <span className="detail-name">Supplier name</span>
+                            <span className='detail-value'>{selectedDoc['supplier'] || "unknown"}</span>
+                        </div>
+                    </div>
+
+                    <div className="detail-row">
+                        <div className='detail'>
+                            <span className="detail-name">Sample name</span>
+                            <span className='detail-value'>{selectedDoc['sample_name'] || "unknown"}</span>
+                        </div>
+                        <div className='detail'>
+                            <span className="detail-name">Latitude</span>
+                            <span className='detail-value'>{selectedDoc['lat'] || "unknown"}</span>
+                        </div>
+                        <div className='detail'>
+                            <span className="detail-name">City</span>
+                            <span className='detail-value'>{selectedDoc['city'] || "unknown"}</span>
+                        </div>
+                    </div>
+
+                    <div className="detail-row">
+                        <div className='detail'>
+                            <span className="detail-name">Tree species</span>
+                            <span className='detail-value'>{selectedDoc['species'] || "unknown"}</span>
+                        </div>
+                        <div className='detail'>
+                            <span className="detail-name">Longitude</span>
+                            <span className='detail-value'>{selectedDoc['lon'] || "unknown"}</span>
+                        </div>
+                        <div className='detail'>
+                            <span className="detail-name">Collection site</span>
+                            <span className='detail-value'>{selectedDoc['site'] || "unknown"}</span>
+                        </div>
+                    </div>
+
+                    <div className="detail-row">
+                        <div className='detail'>
+                            <span className="detail-name">Origin</span>
+                            <span className='detail-value'>{selectedDoc['d18O_cel']}</span>
+                        </div>
+                        <div className='detail'>
+                            <span className="detail-name">Collected by</span>
+                            <span className='detail-value'>{selectedDoc['collected_by']}</span>
+                        </div>
+                    </div>
                 </div>
+
+
+                <div className='details'>
+                <div className='section-title'>
+                        Result values
+                    </div>
+                    <div className="detail-row">
+                        <div className='detail'>
+                            <span className="detail-name">d18O_cel</span>
+                            <span className='detail-value'>{selectedDoc['d18O_cel'] ? selectedDoc['d18O_cel'].toString() : "unknown"}</span>
+                        </div>
+                        <div className='detail'>
+                            <span className="detail-name">d18O_wood</span>
+                            <span className='detail-value'>{selectedDoc['oxygen'] ? selectedDoc['oxygen'].toString() : "unknown"}</span>
+                        </div>
+                        <div className='detail'>
+                            <span className="detail-name">d15N_wood</span>
+                            <span className='detail-value'>{selectedDoc['nitrogen'] ? selectedDoc['nitrogen'].toString() : "unknown"}</span>
+                        </div>
+                    </div>
+
+                    <div className="detail-row">
+                        <div className='detail'>
+                            <span className="detail-name">%N_wood</span>
+                            <span className='detail-value'>{selectedDoc['n_wood'] ? selectedDoc['n_wood'].toString() : "unknown"}</span>
+                        </div>
+                        <div className='detail'>
+                            <span className="detail-name">d13C_wood</span>
+                            <span className='detail-value'>{selectedDoc['carbon'] ? selectedDoc['carbon'].toString() : "unknown"}</span>
+                        </div>
+                        <div className='detail'>
+                            <span className="detail-name">%C_wood</span>
+                            <span className='detail-value'>{selectedDoc['c_wood'] ? selectedDoc['c_wood'].toString() : "unknown"}</span>
+                        </div>
+                    </div>
+
+                    <div className="detail-row">
+                        <div className='detail'>
+                            <span className="detail-name">d13C_cel</span>
+                            <span className='detail-value'>{selectedDoc['d13C_cel'] ? selectedDoc['d13C_cel'].toString() : "unknown"}</span>
+                        </div>
+                        <div className='detail'>
+                            <span className="detail-name">%C_cel</span>
+                            <span className='detail-value'>{selectedDoc['c_cel'] ? selectedDoc['c_cel'].toString() : "unknown"}</span>
+                        </div>
+                    </div>
+
+                </div>
+
+                <div id='qr-code'>
+                    <div className="section-title">
+                        Sample QR code
+                    </div>
+                    <QRCodeSVG value={url} />
+                </div>
+
             </div>
-
-
-            <div className="table table-borderless">
-                <p>Sample measurements</p>
-                <div className="sample-details">
-                    <tr>
-                        <td className='value-title'>d18O_cel</td>
-                        <td>{selectedDoc['d18O_cel']}</td>
-                        <td className='value-title'>d18O_wood</td>
-                        <td>{selectedDoc['oxygyen']}</td>
-                    </tr>
-                    <tr>
-                        <td className='value-title'>d15N_wood</td>
-                        <td>{selectedDoc['nitrogen']}</td>
-                        <td className='value-title'>N_wood</td>
-                        <td>{selectedDoc['n_wood']}</td>
-
-                    </tr>
-                    <tr>
-                        <td className='value-title'>d13C_wood</td>
-                        <td>{selectedDoc['carbon']}</td>
-                        <td className='value-title'>%C_wood</td>
-                        <td>{selectedDoc['c_wood']}</td>
-                    </tr>
-                    <tr>
-                        <td className='value-title'>d13C_cel</td>
-                        <td>{selectedDoc['d13C_cel']}</td>
-                        <td className='value-title'>%C_cel</td>
-                        <td>{selectedDoc['c_cel']}</td>
-                    </tr>
-                </div>
-            </div>
-
-            <div id='qr-code'>
-                 <QRCodeSVG value={url} />
-                </div>
-
-        </div>)
+        )
     }
 
 
@@ -283,7 +322,7 @@ export default function SampleDetails() {
 
         <div>
             <div className='sample-details-wrapper'>
-                <p className='title'>Sample details</p>
+                <p className='title'>{selectedDoc['sample_name'] || "Sample details"}</p>
                 <div>
                     {/* <ul className="nav nav-tabs" id="myTab" role="tablist">
                         <li className="nav-item">
@@ -294,8 +333,8 @@ export default function SampleDetails() {
                         </li>
                     </ul> */}
                     <div className="tab-content" id="myTabContent">
-                        <div className={tabShown === 0 ? 'tab-pane fade show active' : 'tab-pane fade'} id="details" role="tabpanel" aria-labelledby="details-tab"><DetailsTab /></div>
-                        <div className={tabShown === 2 ? 'tab-pane fade show active' : 'tab-pane fade'} id="results" role="tabpanel" aria-labelledby="results-tab"><ResultsTab /></div>
+                        <DetailsTab />
+                        {/* <div className={tabShown === 2 ? 'tab-pane fade show active' : 'tab-pane fade'} id="results" role="tabpanel" aria-labelledby="results-tab"><ResultsTab /></div> */}
                     </div>
                 </div>
 
