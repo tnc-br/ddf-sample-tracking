@@ -1,6 +1,5 @@
 "use client";
 import 'bootstrap/dist/css/bootstrap.css';
-import { initializeApp } from "firebase/app";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { getFirestore, getDocs, collection, query, or, and, where, getDoc, doc } from "firebase/firestore";
 import { useState, useMemo, useRef, useEffect } from 'react';
@@ -8,6 +7,7 @@ import './styles.css';
 import { useRouter } from 'next/navigation'
 import Nav from '../nav';
 import SamplesTable from '../samples_table';
+import {initializeAppIfNecessary} from '../utils';
 
 import { firebaseConfig } from '../firebase_config';
 
@@ -43,7 +43,7 @@ export default function MySamples() {
     const [userId, setUserId] = useState('');
 
     const router = useRouter();
-    const app = initializeApp(firebaseConfig);
+    const app = initializeAppIfNecessary()
 
     const auth = getAuth();
     useEffect(() => {
@@ -81,7 +81,10 @@ export default function MySamples() {
             querySnapshot.forEach((doc) => {
                 const docData = doc.data();
                 samples[doc.id] = doc.data();
-                samplesStateArray.push(docData as Sample);
+                samplesStateArray.push({
+                    ...docData,
+                    doc_id: doc.id,
+                 } as Sample);
             });
         }
 
@@ -105,12 +108,9 @@ export default function MySamples() {
         <div className='samples-page-wrapper'>
             <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@48,400,0,0" />
 
-            <div>
-                <Nav />
-            </div>
             <div id="samplesTable" className='samples-wrapper'>
                 <p className='header'>My samples</p>
-                <SamplesTable samplesData={samplesState} />
+                <SamplesTable samplesData={samplesState} canDeleteSamples={true} />
             </div>
         </div>
     )

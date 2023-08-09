@@ -1,13 +1,14 @@
 "use client";
 import 'bootstrap/dist/css/bootstrap.css';
-import { initializeApp } from "firebase/app";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { getFirestore, getDocs, collection, query, or, and, where, getDoc, doc } from "firebase/firestore";
 import { useState, useMemo, useRef, useEffect } from 'react';
 import './styles.css';
 import { useRouter } from 'next/navigation'
-import Nav from '../nav';
 import SamplesTable from '../samples_table';
+import { initializeAppIfNecessary, showNavBar, showTopBar } from '../utils';
+import { useTranslation } from 'react-i18next';
+import '../i18n/config';
 
 import { firebaseConfig } from '../firebase_config';
 
@@ -42,13 +43,17 @@ export default function Samples() {
     const [selectedSample, setSelectedSample] = useState('');
     const [userData, setUserData] = useState({} as UserData);
     const [samplesState, setSamplesState] = useState([{}]);
+    const [inProgressSamples, setInProgressSamples] = useState([{}]);
+    const [allSamples, setAllSamples] = useState({});
 
-    const app = initializeApp(firebaseConfig);
+    const app = initializeAppIfNecessary();
     const router = useRouter();
-
     const auth = getAuth();
+    const { t } = useTranslation();
 
     useEffect(() => {
+        showNavBar();
+        showTopBar();
         if (!userData.role || userData.role.length < 1) {
             onAuthStateChanged(auth, (user) => {
                 if (!user) {
@@ -64,23 +69,25 @@ export default function Samples() {
                                 setUserData(docData as UserData);
                             }
                         }
-                    })
+                    });
                 }
-            });
+            })
         }
     })
-    
+
+
+
 
     const db = getFirestore();
-    if (Object.keys(data).length < 1) {
+    if (!allSamples.inProgress && !allSamples.completed) {
         addSamplesToDataList();
     }
 
-    async function getSamplesFromCollection(collectionName: string): Promise<[Map<string, Map<string, string>>]> {
+    async function getSamplesFromCollection(collectionName: string): Promise<Map<string, Map<string, string>>[]> {
         const user = auth.currentUser;
         const samples: any = {};
         const samplesStateArray: any = [];
-        if (!user) return samples;
+        // if (!user) return samples;
         console.log('got here');
         const verifiedSamplesRef = collection(db, collectionName);
         let samplesQuery;
@@ -92,7 +99,10 @@ export default function Samples() {
                 querySnapshot.forEach((doc) => {
                     const docData = doc.data();
                     samples[doc.id as unknown as number] = doc.data();
-                    samplesStateArray.push(docData);
+                    samplesStateArray.push({
+                        ...docData,
+                        code_lab: doc.id,
+                    });
                 });
             }
 
@@ -126,7 +136,10 @@ export default function Samples() {
             querySnapshot.forEach((doc) => {
                 const docData = doc.data();
                 samples[doc.id] = doc.data();
-                samplesStateArray.push(docData);
+                samplesStateArray.push({
+                    ...docData,
+                    code_lab: doc.id,
+                });
             });
 
         }
@@ -140,26 +153,138 @@ export default function Samples() {
             const trustedSamples = await getSamplesFromCollection('trusted_samples');
             const untrustedSamples = await getSamplesFromCollection('untrusted_samples');
             const unknownSamples = await getSamplesFromCollection('unknown_samples');
-            allSamples = [...trustedSamples, ...untrustedSamples, ...unknownSamples];
-            if (allSamples.length > 0) {
-                setSamplesState(allSamples);
+            if (!trustedSamples.length || trustedSamples.length + untrustedSamples.length + unknownSamples.length < 1) {
+                return;
+            }
+
+            let inProgressSamples: any = [];
+            let completedSamples: any = [];
+            trustedSamples.forEach((sample: Sample) => {
+                if (sample.status === 'concluded') {
+                    completedSamples.push({
+                        ...sample,
+                        trusted: 'trusted',
+                    })
+                } else {
+                    inProgressSamples.push({
+                        ...sample,
+                        trusted: 'trusted',
+                    })
+                }
+            });
+
+            untrustedSamples.forEach((sample: Sample) => {
+                if (sample.status === 'concluded') {
+                    completedSamples.push({
+                        ...sample,
+                        trusted: 'untrusted',
+                    })
+                } else {
+                    inProgressSamples.push({
+                        ...sample,
+                        trusted: 'untrusted',
+                    })
+                }
+            });
+
+            unknownSamples.forEach((sample: Sample) => {
+                if (sample.status === 'concluded') {
+                    completedSamples.push({
+                        ...sample,
+                        trusted: 'unknown',
+                    })
+                } else {
+                    inProgressSamples.push({
+                        ...sample,
+                        trusted: 'unknown',
+                    })
+                }
+            });
+
+
+
+
+
+
+
+            // if (trustedSamples.length > 0) {
+            //     allSamples  = (trustedSamples as Array).map((sample: Sample) => {
+            //         return {
+            //             ...sample,
+            //             trusted: 'trusted',
+            //         };
+            //     });
+            // }
+
+            // // let allSamples = await getSamplesFromCollection('trusted_samples');
+
+            // if (untrustedSamples.length > 0) {
+            //     const updatedSamples = untrustedSamples.map((sample: Sample) => {
+            //         return {
+            //             ...sample,
+            //             trusted: 'untrusted',
+            //         };
+            //     });
+            //     allSamples = allSamples.concat(updatedSamples);
+            // }
+
+            // if (unknownSamples.length > 0) {
+            //     const updatedSamples = unknownSamples.map((sample: Sample) => {
+            //         return {
+            //             ...sample,
+            //             trusted: 'unknown',
+            //         };
+            //     });
+            //     allSamples = allSamples.concat(updatedSamples);
+            // }
+
+            // allSamples = [trustedSamples.length ? ...trustedSamples : [], ...untrustedSamples, ...unknownSamples];
+            if (inProgressSamples.length > 0 || completedSamples.length > 0) {
+                setAllSamples({
+                    inProgress: inProgressSamples,
+                    completed: completedSamples,
+                })
+                // setSamplesState(allSamples);
             }
         }
+    }
+
+    function isAdmin(): boolean {
+        return userData.role === 'admin' || userData.role === 'site_admin';
     }
 
     return (
         <div className='samples-page-wrapper'>
             <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@48,400,0,0" />
+            {<div id="samplesTable" className='samples-wrapper'>
+                <div className='samples-summary'>
+                    {allSamples.inProgress && <div className='summary-box'>
+                        <div className='samples-size-label'>{allSamples.inProgress.length}</div>
+                        <span className="badge in-progress">{t('inProgress')}</span>
+                        {/* <div>In progress</div> */}
+                    </div>}
 
-            <div>
-                <Nav />
-            </div>
-            <div id="samplesTable" className='samples-wrapper'>
-                <p className='header'>All samples</p>
-                <SamplesTable samplesData={samplesState as Sample[]} />
-            </div>
+                    {allSamples.completed && <div className='summary-box'>
+                        <div className='samples-size-label'>{allSamples.completed.length}</div>
+                        <span className="badge completed">{t('completed')}</span>
+                    </div>}
+                </div>
+
+                <div className="sample-table">
+                    <p className='header'>{t('inProgress')}</p>
+                    {allSamples.inProgress && <SamplesTable samplesData={allSamples.inProgress as Sample[]} canDeleteSamples={isAdmin()} />}
+                </div>
+
+                <div className="sample-table">
+                    <p className='header'>{t('completed')}</p>
+                    {allSamples.completed && <SamplesTable samplesData={allSamples.completed as Sample[]} canDeleteSamples={isAdmin()} />}
+                </div>
+                {!allSamples.inProgress && !allSamples.completed && <div>No samples to show. Wait to be accepted to an organization to view samples.</div>}
+
+            </div>}
         </div>
     )
 }
+
 
 

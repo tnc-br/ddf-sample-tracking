@@ -10,6 +10,11 @@
 
 .add-sample-page-wrapper {
   margin: 30px;
+  background-color: white;
+  margin-top: 75px;
+  width: 950px;
+  left: 50px;
+  position: absolute;
 }
 
 .subtitle {
@@ -106,7 +111,7 @@ label {
   letter-spacing: 0.1px;
   padding: 12px;
   cursor: pointer;
-  
+
 }
 
 .public_button {
@@ -135,7 +140,8 @@ label {
 .unselected_tab {
   border-bottom: .5px solid #49454F;
 }
-.tabs > div {
+
+.tabs>div {
   height: 48px;
   flex-direction: column;
   justify-content: flex-end;

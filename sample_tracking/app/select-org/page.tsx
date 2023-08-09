@@ -11,7 +11,7 @@ import { firebaseConfig } from '../firebase_config';
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { useState, useEffect } from 'react';
 import { speciesList } from '../species_list';
-
+import { hideNavBar, hideTopBar } from '../utils';
 
 type UserData = {
     name: string,
@@ -37,6 +37,8 @@ export default function SelectOrg() {
     const db = getFirestore();
 
     useEffect(() => {
+        hideNavBar();
+        hideTopBar();
         if (userDocId.length < 1) {
             onAuthStateChanged(auth, (user) => {
                 if (user) {
@@ -62,11 +64,11 @@ export default function SelectOrg() {
                         querySnapshot.forEach((docRef) => {
                             const data = docRef.data();
                             // if (data.exists()) {
-                                if (data.org) {
-                                    console.log("Error: this new user already has a pending org request. Forwarding to samples.");
-                                    router.push('/samples');
-                                }
-                                setNewUserDocId(docRef.id);
+                            if (data.org) {
+                                console.log("Error: this new user already has a pending org request. Forwarding to samples.");
+                                router.push('/samples');
+                            }
+                            setNewUserDocId(docRef.id);
                             // }
                         });
 
@@ -77,6 +79,8 @@ export default function SelectOrg() {
             });
         }
     });
+
+
 
     if (Object.keys(availableOrgs).length < 1) {
         const orgs: OrgsSchemas = {};

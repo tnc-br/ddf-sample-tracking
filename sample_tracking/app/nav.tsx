@@ -15,6 +15,7 @@ import './i18n/config';
 
 export default function Nav() {
     const [role, setRole] = useState('');
+    const [showAddSampleMenu, setShowAddSampleMenu] = useState(false);
     // const [userData, setUserData] = useState({});
 
 
@@ -22,7 +23,7 @@ export default function Nav() {
     const router = useRouter();
     const auth = getAuth();
     const db = getFirestore();
-    const {t} = useTranslation();
+    const { t } = useTranslation();
 
     useEffect(() => {
         if (role.length < 1) {
@@ -41,7 +42,7 @@ export default function Nav() {
         }
 
     })
-    
+
 
     // onAuthStateChanged(auth, (user) => {
     //     if (user) {
@@ -70,7 +71,7 @@ export default function Nav() {
     }
 
     return (
-        <div className='nav-wrapper'>
+        <div id="nav-wrapper" className='nav-wrapper'>
             <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@48,400,0,0" />
             <ul className="nav flex-column">
                 {canAddSample() && <li className="nav-item">
@@ -83,11 +84,11 @@ export default function Nav() {
                         <span className="material-symbols-outlined">cloud_upload</span>
                         {t('importSamples')}</Link>
                 </li>}
-                {canAddSample() && <li className="nav-item">
+                {/* {canAddSample() && <li className="nav-item">
                     <Link className="nav-link" href="./my-samples"> <span className="material-symbols-outlined">
                         labs
                     </span>{t('mySamples')}</Link>
-                </li>}
+                </li>} */}
                 <li className="nav-item">
                     <Link className="nav-link" href="./samples"> <span className="material-symbols-outlined">
                         lab_panel
@@ -107,11 +108,11 @@ export default function Nav() {
 
                 </div>
 
-                <li className="nav-item">
+                {/* <li className="nav-item">
                     <button className="nav-link" onClick={onLogOutClick}> <span className="material-symbols-outlined">
                         logout
                     </span> {t('logOut')}</button>
-                </li>
+                </li> */}
 
             </ul>
             {/* <nav className="navbar navbar-expand-lg navbar-light bg-light">
@@ -126,6 +127,10 @@ export default function Nav() {
                 </ul>
                 <button className="my-2 my-lg-0 btn btn-outline-primary my-2 my-sm-0" type="submit" onClick={onLogOutClick}>Log out</button>
             </nav> */}
+            {/* {showAddSampleMenu && <div className="add-sample-options-wrapper">
+                <div><Link href="./add-sample?status=complete" className='add-sample-option'>Completed sample</Link></div>
+                <div><Link href="./add-sample?status=incomplete" className='add-sample-option'>Uncompleted sample</Link></div>
+            </div>} */}
         </div>
 
     )

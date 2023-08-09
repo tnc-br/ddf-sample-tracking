@@ -26,6 +26,7 @@
     position: absolute;
     left: 304px;
     width: 1088px;
+    top: 67px;
 }
 
 .header {
@@ -65,7 +66,7 @@
     cursor: default;
 }
 
-.sample-link {
+.actions-button {
     color: blue !important;
     text-decoration: underline;
     cursor: pointer;

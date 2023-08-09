@@ -12,6 +12,7 @@ import Alert from "@mui/material/Alert";
 import Stack from "@mui/material/Stack";
 import Nav from '../nav';
 import Papa from 'papaparse';
+import {getRanHex} from '../utils';
 
 type UserData = {
     name: string,
@@ -86,16 +87,6 @@ export default function ImportCsv() {
         "current_state", // TODO - should we assume completed for CSV upload?
         "date_of_harvest",
     ];
-
-    function getRanHex(size: number): string {
-        let result = [];
-        let hexRef = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'];
-
-        for (let n = 0; n < size; n++) {
-            result.push(hexRef[Math.floor(Math.random() * 16)]);
-        }
-        return result.join('');
-    }
 
     function onSampleTrustChange(evt: any) {
         setSampleTrust(evt.target.value);

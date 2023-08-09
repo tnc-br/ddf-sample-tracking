@@ -6,11 +6,11 @@ import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { firebaseConfig } from '../firebase_config';
 import { initializeApp } from "firebase/app";
 import { useState, useEffect } from 'react';
-import Nav from '../nav';
 import './styles.css';
 import { useRouter } from 'next/navigation'
 import 'bootstrap/dist/css/bootstrap.css';
 import { getFirestore, getDocs, collection, updateDoc, doc, setDoc, addDoc, getDoc, arrayUnion, arrayRemove, deleteField, query, where, deleteDoc } from "firebase/firestore";
+import { showNavBar, showTopBar, getRanHex } from '../utils';
 
 type UserData = {
     role: string,
@@ -35,6 +35,8 @@ export default function SignUpRequests() {
     const db = getFirestore();
 
     useEffect(() => {
+        showNavBar();
+        showTopBar();
         if (Object.keys(userData).length < 1) {
             onAuthStateChanged(auth, (user) => {
                 if (!user) {
@@ -54,7 +56,7 @@ export default function SignUpRequests() {
             });
         }
     })
-    
+
 
     if (Object.keys(pendingApprovals).length < 1 && Object.keys(currentUsers).length < 1) {
         const pendingUsers: NestedSchemas = {};
@@ -167,6 +169,7 @@ export default function SignUpRequests() {
             name: prospectiveUsers[memberId].name,
             email: prospectiveUsers[memberId].email,
         });
+        deleteMemberFromNewMemberList(memberId);
     }
 
     function deleteMemberFromNewMemberList(memberId: string) {
@@ -177,28 +180,13 @@ export default function SignUpRequests() {
 
     }
 
-    function getRanHex(size: number): string {
-        let result = [];
-        let hexRef = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'];
-      
-        for (let n = 0; n < size; n++) {
-          result.push(hexRef[Math.floor(Math.random() * 16)]);
-        }
-        return result.join('');
-      }
-
-
-
-
     // getAdminAuth()
     //     .setCustomUserClaims(uid, { admin: true })
     //     .then(() => {
     //         // The new custom claims will propagate to the user's ID token the
     //         // next time a new one is issued.
     //     });
-    return (<div><div>
-        <Nav />
-    </div>
+    return (<div>
         <div className="admin-wrapper">
             <h3 className='page-title'>Sign up requests ({Object.keys(prospectiveUsers).length + Object.keys(prospectiveOrgs).length})</h3>
             <div>
@@ -247,9 +235,6 @@ export default function SignUpRequests() {
                                 <th>Org Admin</th>
                                 <th>Admin email</th>
                                 <th>Date requested</th>
-                                {/* <th>Approve/reject</th> */}
-                                {/* <th>Admin email</th> */}
-                                {/* <th>Control access</th> */}
                             </tr>
                         </thead>
                         <tbody id="samples-data">
@@ -258,13 +243,11 @@ export default function SignUpRequests() {
                                     return (
                                         <tr key={i} id={key}>
                                             <td>{key}</td>
-                                            <td>{prospectiveOrgs[key].admin_name  as unknown as string}</td>
+                                            <td>{prospectiveOrgs[key].admin_name as unknown as string}</td>
                                             <td>{prospectiveOrgs[key].email as unknown as string}</td>
                                             <td>{prospectiveOrgs[key].date_requested as unknown as string}</td>
                                             <td className="approve-reject-wrapper"><button onClick={handleRejectOrgClick} type="button" className="btn btn-outline-danger reject-button">Decline</button>
                                                 <button onClick={handleApproveOrgClick} type="button" className="btn btn-outline-primary approve-button">Approve</button></td>
-
-
                                         </tr>
                                     )
 

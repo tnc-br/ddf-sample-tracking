@@ -2,14 +2,14 @@
 
 import Image from 'next/image'
 import 'bootstrap/dist/css/bootstrap.css';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
-import { initializeApp } from "firebase/app";
 import { getAuth, signInWithEmailAndPassword, signInWithPopup, createUserWithEmailAndPassword, onAuthStateChanged, GoogleAuthProvider, FacebookAuthProvider, updateProfile } from "firebase/auth";
 import { useRouter } from 'next/navigation'
 import { firebaseConfig } from '../firebase_config';
 import { doc, setDoc, getDocs, collection, getFirestore, updateDoc, arrayUnion, addDoc, getDoc } from "firebase/firestore";
 import './styles.css';
+import { initializeAppIfNecessary, hideNavBar, hideTopBar } from '../utils';
 
 type SignUpData = {
   firstName: string,
@@ -47,7 +47,7 @@ export default function LogInSignUpPage() {
 
   const router = useRouter()
 
-  const app = initializeApp(firebaseConfig);
+  const app = initializeAppIfNecessary();
   const auth = getAuth();
   onAuthStateChanged(auth, (user) => {
     if (user) {
@@ -58,6 +58,15 @@ export default function LogInSignUpPage() {
   });
 
   const [canSignIn, setCanSignIn] = useState(true);
+
+
+  useEffect(() => {
+    hideNavBar();
+    hideTopBar();
+  })
+
+
+
 
 
   function handleSignUpClick() {
@@ -131,6 +140,7 @@ function Login(props: LogInProps) {
           if (docRef.exists()) {
             const docData = docRef.data();
             if (docData.role && docData.org) {
+
               router.push('/samples');
             } else {
               router.push('/select-org');
@@ -186,14 +196,15 @@ function Login(props: LogInProps) {
               <button type="button" onClick={attemptSignIn} className="btn btn-primary">Sign in</button>
               <p className="small"><a className="" href="#!">Forgot password</a></p>
 
-              <p className="small">Or log in with <button onClick={signInWithGoogle}><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-google" viewBox="0 0 16 16">
+              <p className="small">Or log in with <button className="btn btn-primary" onClick={signInWithGoogle}><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-google" viewBox="0 0 16 16">
                 <path d="M15.545 6.558a9.42 9.42 0 0 1 .139 1.626c0 2.434-.87 4.492-2.384 5.885h.002C11.978 15.292 10.158 16 8 16A8 8 0 1 1 8 0a7.689 7.689 0 0 1 5.352 2.082l-2.284 2.284A4.347 4.347 0 0 0 8 3.166c-2.087 0-3.86 1.408-4.492 3.304a4.792 4.792 0 0 0 0 3.063h.003c.635 1.893 2.405 3.301 4.492 3.301 1.078 0 2.004-.276 2.722-.764h-.003a3.702 3.702 0 0 0 1.599-2.431H8v-3.08h7.545z" />
               </svg></button></p>
 
             </div>
 
             <div>
-              <p className="mb-0">Dont have an account? <button onClick={props.onSignUpClick} className="text-blue">Sign Up</button>
+              <p className="mb-0">Dont have an account? 
+              <button onClick={props.onSignUpClick} type="button" className="btn btn-info">Sign up</button>
               </p>
             </div>
 
@@ -242,7 +253,12 @@ function SignUp(props: SignUpProps) {
     const lastName = (document.getElementById('lastName') as HTMLInputElement).value;
     const labName = (document.getElementById('labSelect') as HTMLInputElement).value;
     const labValue = labName === 'Create new organization' ? "NEW" : availableOrgs[labName];
-    if (firstName.length > 0 && lastName.length > 0 && labName.length > 0) {
+    const form = document.getElementById('your-details-tab');
+    if (!form) return;
+    if (!form.checkValidity()) {
+      form.reportValidity();
+      return true;
+    } else {
       updateSignUpData({
         firstName: firstName,
         lastName: lastName,
@@ -261,6 +277,7 @@ function SignUp(props: SignUpProps) {
     const newOrgName = (document.getElementById('newOrgName') ? (document.getElementById('newOrgName') as HTMLInputElement).value : '');
     if (password !== reEnterPassword) {
       console.log('Passwords dont match');
+      alert("The passwords you entered don't match.");
       return;
     }
     await createUserWithEmailAndPassword(auth, email, password);
@@ -334,18 +351,18 @@ function SignUp(props: SignUpProps) {
 
 
   function yourDetailsTab() {
-    return (<div className='your-details-tab'>
+    return (<form id="your-details-tab" className='your-details-tab'>
       <div className="form-outline mb-4">
-        <input type="text" name="name" placeholder='First name' id="firstName" className="form-control form-control-lg" />
+        <input required type="text" name="name" placeholder='First name' id="firstName" className="form-control form-control-lg" />
       </div>
 
       <div className="form-outline mb-4">
-        <input type="text" name="name" placeholder='Last name' id="lastName" className="form-control form-control-lg" />
+        <input required type="text" name="name" placeholder='Last name' id="lastName" className="form-control form-control-lg" />
       </div>
 
       <div className="form-group">
         <label htmlFor="labSelect">Organization</label>
-        <select className="form-control" id="labSelect">
+        <select required className="form-control" id="labSelect">
           <option key="newOrgOption" id="newOrgOption">Create new organization</option>
           {
             Object.keys(availableOrgs).map((key, i) => {
@@ -357,26 +374,26 @@ function SignUp(props: SignUpProps) {
         </select>
       </div>
       <button type="button" onClick={finishYourDetailsTab} className="btn btn-primary">Next</button>
-    </div>)
+    </form>)
   }
 
   function accountInfo() {
     return (
       <div className='account-info-tab'>
         {signUpData['lab'] === "NEW" && <div className="form-outline mb-4">
-          <input type="text" name="newOrgName" autoComplete="off" placeholder='New organization name' id="newOrgName" className="form-control form-control-lg" />
+          <input required type="text" name="newOrgName" autoComplete="off" placeholder='New organization name' id="newOrgName" className="form-control form-control-lg" />
         </div>}
 
         <div className="form-outline mb-4">
-          <input type="email" name="email" autoComplete="off" placeholder='Email address' id="email" className="form-control form-control-lg" />
+          <input required type="email" name="email" autoComplete="off" placeholder='Email address' id="email" className="form-control form-control-lg" />
         </div>
 
         <div className="form-outline mb-4">
-          <input type="password" name="password" placeholder='Password' id="password" className="form-control form-control-lg" />
+          <input required type="password" name="password" placeholder='Password' id="password" className="form-control form-control-lg" />
         </div>
 
         <div className="form-outline mb-4">
-          <input type="password" name="passwordConfirmed" placeholder='Re-enter password' id="reEnterPassword" className="form-control form-control-lg" />
+          <input required type="password" name="passwordConfirmed" placeholder='Re-enter password' id="reEnterPassword" className="form-control form-control-lg" />
         </div>
 
         <div className="d-flex justify-content-center">
