@@ -77,31 +77,35 @@ export default function SamplesTable(props: SampleDataProps) {
                 Cell: ({ cell, row, renderedCellValue }) => {
                     return (
                         <div id={row.original.trusted} onClick={onSampleClick} className="actions-button sample-link">
-                            <span id={row.original.code_lab}>{renderedCellValue}</span>
+                            <span id={row.original.code_lab + "-details"}>{renderedCellValue}</span>
                         </div>
                     )
                 },
             },
             {
-                accessorKey: 'sample_name',
-                header: t('header'),
+                accessorFn: (row) => (row as Sample).sample_name ?? '',
+                header: t('name'),
                 size: 150,
 
             },
             {
-                accessorKey: 'status',
+                accessorFn: (row) => (row as Sample).status ?? '',
                 header: t('status'),
                 size: 200,
+                filterVariant: 'select',
+
             },
             {
                 accessorKey: 'validity',
                 header: t('validity'),
                 size: 100,
+                enableColumnFilter: false, // Consider a range filter if we have ~complete data.
             },
             {
-                accessorKey: 'last_updated_by',
+                accessorFn: (row) => (row as Sample).last_updated_by ?? '',
                 header: t('lastUpdatedBy'),
                 size: 150,
+                filterVariant: 'select',
             },
             {
                 accessorFn: (row) => row,
@@ -112,10 +116,10 @@ export default function SamplesTable(props: SampleDataProps) {
                     return (
                         <div className="action-buttons-wrapper">
                             <div id={(row as Sample).trusted} onClick={onEditSampleClick} className="actions-button">
-                                <span id={(row as Sample).code_lab}>Edit</span>
+                                <span id={(row as Sample).code_lab + "-edit"}>Edit</span>
                             </div>
                             {props.canDeleteSamples && <div id={(row as Sample).trusted} onClick={onDeleteSampleClick} className="actions-button">
-                                <span id={(row as Sample).code_lab}>Delete</span>
+                                <span id={(row as Sample).code_lab + "-delete"}>Delete</span>
                             </div>}
                         </div>
 
@@ -205,6 +209,7 @@ export default function SamplesTable(props: SampleDataProps) {
                 <MaterialReactTable
                     columns={columns}
                     data={sampleData}
+                    enableFacetedValues
                     enableRowSelection
                     tableInstanceRef={tableInstanceRef}
                     muiTablePaginationProps={{
