@@ -12,6 +12,9 @@
   margin: 30px;
   background-color: white;
   margin-top: 75px;
+  width: 950px;
+  left: 50px;
+  position: absolute;
 }
 
 .subtitle {

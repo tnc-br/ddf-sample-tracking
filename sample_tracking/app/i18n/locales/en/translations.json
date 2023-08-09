@@ -46,5 +46,7 @@
     "notStarted": "Not started",
     "concluded": "Concluded",
     "actions": "Actions",
-    "header": "Header"
+    "header": "Header",
+    "createdBy": "Created by",
+    "collectedOn": "Collected on"
   }

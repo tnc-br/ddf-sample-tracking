@@ -16,8 +16,8 @@ import { statesList } from '../states_list';
 import { municipalitiesList } from '../municipalities_list';
 import SampleDataInput from '../sample_data_input';
 import {initializeAppIfNecessary, getRanHex} from '../utils';
-import { useTranslation } from 'react-i18next';
-import '../i18n/config';
+import { useSearchParams } from 'next/navigation'
+
 
 
 type UserData = {
@@ -34,6 +34,7 @@ export default function AddSample() {
     const [userData, setUserdata] = useState({} as UserData);
     const [currentTab, setCurrentTab] = useState(1);
     const [pageTitle, setPageTitle] = useState("Create a new sample");
+    const [sampleId, setSampleID] = useState('');
 
     const [formData, setFormData] = useState({
         visibility: 'public',
@@ -44,7 +45,19 @@ export default function AddSample() {
     const app = initializeAppIfNecessary();
     const auth = getAuth();
     const db = getFirestore();
-    const {t} = useTranslation();
+
+    let status = "completed";
+    const searchParams = useSearchParams();
+    if (typeof window !== "undefined") {
+        const queryString = window.location.search;
+        console.log("Querystring: " + queryString);
+        const urlParams = new URLSearchParams(queryString);
+        status = urlParams.get('status') ? urlParams.get('status') : searchParams.get('status');
+    }
+
+    if (sampleId.length < 1) {
+        setSampleID(getRanHex(20));
+    }
 
     useEffect(() => {
         if (!userData.role) {
@@ -91,7 +104,6 @@ export default function AddSample() {
         if (!user) return;
         const date = new Date();
         const currentDateString = `${date.getMonth() + 1}-${date.getDate()}-${date.getFullYear()}`
-        const internalCode = sampleId;
         const sampleData = {
             ...formData,
             created_by: auth.currentUser!.uid,
@@ -99,18 +111,27 @@ export default function AddSample() {
             last_updated_by: userData.name,
             org_name: userData.org,
             created_by_name: userData.name,
-            code_lab: internalCode,
+            code_lab: sampleId,
+            oxygen: formData.oxygen ? formData.oxygen.map((value: string) => parseFloat(value)) : [],
+            nitrogen: formData.nitrogen ? formData.nitrogen.map((value: string) => parseFloat(value)) : [],
+            n_wood: formData.n_wood ? formData.n_wood.map((value: string) => parseFloat(value)) : [],
+            carbon: formData.carbon ? formData.carbon.map((value: string) => parseFloat(value)) : [],
+            c_wood: formData.c_wood ? formData.c_wood.map((value: string) => parseFloat(value)) : [],
+            c_cel: formData.c_cel ? formData.c_cel.map((value: string) => parseFloat(value)) : [],
+            d13C_cel: formData.d13C_cel ? formData.d13C_cel.map((value: string) => parseFloat(value)) : [],
+            lat: formData.lat ? parseFloat(formData.lat) : '',
+            lon: formData.lon ? parseFloat(formData.lon) : '',
         };
         // if (!formIsValid()) return;
         const sampleTrustValue = formData.trusted;
         if (!sampleTrustValue) return;
         let docRef;
         if (sampleTrustValue === "trusted") {
-            docRef = doc(db, "trusted_samples", internalCode);
+            docRef = doc(db, "trusted_samples", sampleId);
         } else if (sampleTrustValue === "untrusted") {
-            docRef = doc(db, "untrusted_samples", internalCode);
+            docRef = doc(db, "untrusted_samples", sampleId);
         } else {
-            docRef = doc(db, "unknown_samples", internalCode);
+            docRef = doc(db, "unknown_samples", sampleId);
         }
         setDoc(docRef, sampleData);
         setPageTitle("Sample created!")
@@ -133,8 +154,9 @@ export default function AddSample() {
                         onStateUpdate={(state) => handleChange(state)}
                         onActionButtonClick={(id: string) => onCreateSampleClick(id)}
                         actionButtonTitle="Create sample"
-                        createQrCode={true}
-                        userData={userData} />
+                        isNewSampleForm={true}
+                        userData={userData}
+                        sampleId={sampleId} />
                 </form>}
             </div>
         </div>

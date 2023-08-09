@@ -49,7 +49,7 @@ export default function Samples() {
     const app = initializeAppIfNecessary();
     const router = useRouter();
     const auth = getAuth();
-    const {t} = useTranslation();
+    const { t } = useTranslation();
 
     useEffect(() => {
         showNavBar();
@@ -69,9 +69,9 @@ export default function Samples() {
                                 setUserData(docData as UserData);
                             }
                         }
-                    })
+                    });
                 }
-            });
+            })
         }
     })
 
@@ -87,7 +87,7 @@ export default function Samples() {
         const user = auth.currentUser;
         const samples: any = {};
         const samplesStateArray: any = [];
-        if (!user) return samples;
+        // if (!user) return samples;
         console.log('got here');
         const verifiedSamplesRef = collection(db, collectionName);
         let samplesQuery;
@@ -101,7 +101,7 @@ export default function Samples() {
                     samples[doc.id as unknown as number] = doc.data();
                     samplesStateArray.push({
                         ...docData,
-                        doc_id: doc.id,
+                        code_lab: doc.id,
                     });
                 });
             }
@@ -138,7 +138,7 @@ export default function Samples() {
                 samples[doc.id] = doc.data();
                 samplesStateArray.push({
                     ...docData,
-                    doc_id: doc.id,
+                    code_lab: doc.id,
                 });
             });
 
@@ -157,8 +157,8 @@ export default function Samples() {
                 return;
             }
 
-            let inProgressSamples: any = [{}];
-            let completedSamples: any = [{}];
+            let inProgressSamples: any = [];
+            let completedSamples: any = [];
             trustedSamples.forEach((sample: Sample) => {
                 if (sample.status === 'concluded') {
                     completedSamples.push({
@@ -177,7 +177,7 @@ export default function Samples() {
                 if (sample.status === 'concluded') {
                     completedSamples.push({
                         ...sample,
-                        trusted: 'trusted',
+                        trusted: 'untrusted',
                     })
                 } else {
                     inProgressSamples.push({
@@ -196,7 +196,7 @@ export default function Samples() {
                 } else {
                     inProgressSamples.push({
                         ...sample,
-                        trusted: 'trusted',
+                        trusted: 'unknown',
                     })
                 }
             });
@@ -256,7 +256,7 @@ export default function Samples() {
     return (
         <div className='samples-page-wrapper'>
             <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@48,400,0,0" />
-            {userData.org && <div id="samplesTable" className='samples-wrapper'>
+            {<div id="samplesTable" className='samples-wrapper'>
                 <div className='samples-summary'>
                     {allSamples.inProgress && <div className='summary-box'>
                         <div className='samples-size-label'>{allSamples.inProgress.length}</div>
@@ -279,6 +279,7 @@ export default function Samples() {
                     <p className='header'>{t('completed')}</p>
                     {allSamples.completed && <SamplesTable samplesData={allSamples.completed as Sample[]} canDeleteSamples={isAdmin()} />}
                 </div>
+                {!allSamples.inProgress && !allSamples.completed && <div>No samples to show. Wait to be accepted to an organization to view samples.</div>}
 
             </div>}
         </div>

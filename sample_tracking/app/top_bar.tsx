@@ -80,7 +80,7 @@ export default function TopBar() {
 
     return (
         <div id="top-bar" className='top-bar-wrapper'>
-            <div className="page-title">Timber ID</div>
+            <div onClick={() => router.push('/samples')} className="page-title">Timber ID</div>
             {userData.photoUrl && <img onClick={handleProfileClick} className="profile-photo" src={userData.photoUrl} alt="Trulli" width="32" height="32" />}
             {!userData.photoUrl && <div onClick={handleProfileClick} className="letter-profile profile-photo">{userData.name ? userData.name.charAt(0) : ''}</div>}
             {showMenu && <div className='profile-menu'>

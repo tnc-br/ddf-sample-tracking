@@ -46,5 +46,8 @@
     "notStarted": "Não foi iniciado",
     "concluded": "Concluída",
     "actions": "Actions",
-    "header": "Cabeçalho"
+    "header": "Cabeçalho",
+    "createdBy": "Criado por",
+    "collectedOn": "Coletado em",
+    "validity": "Validade"
   }

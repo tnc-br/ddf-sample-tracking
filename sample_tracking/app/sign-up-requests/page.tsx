@@ -169,6 +169,7 @@ export default function SignUpRequests() {
             name: prospectiveUsers[memberId].name,
             email: prospectiveUsers[memberId].email,
         });
+        deleteMemberFromNewMemberList(memberId);
     }
 
     function deleteMemberFromNewMemberList(memberId: string) {
@@ -234,9 +235,6 @@ export default function SignUpRequests() {
                                 <th>Org Admin</th>
                                 <th>Admin email</th>
                                 <th>Date requested</th>
-                                {/* <th>Approve/reject</th> */}
-                                {/* <th>Admin email</th> */}
-                                {/* <th>Control access</th> */}
                             </tr>
                         </thead>
                         <tbody id="samples-data">
