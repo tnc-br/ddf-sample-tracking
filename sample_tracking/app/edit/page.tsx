@@ -138,7 +138,11 @@ export default function Edit() {
         const currentDateString = `${date.getMonth() + 1}-${date.getDate()}-${date.getFullYear()}`
         const user = auth.currentUser;
         if (!user) return;
-        updateDoc(docRef, formData).then(() => {
+        const docData = {
+            ...formData,
+            last_updated_by: user.displayName,
+        }
+        updateDoc(docRef, docData).then(() => {
             const url = `./sample-details?trusted=${sampleTrustValue}&id=${internalCode}`;
             router.push(url)
         })

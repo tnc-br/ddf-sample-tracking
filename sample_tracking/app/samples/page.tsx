@@ -201,44 +201,6 @@ export default function Samples() {
                 }
             });
 
-
-
-
-
-
-
-            // if (trustedSamples.length > 0) {
-            //     allSamples  = (trustedSamples as Array).map((sample: Sample) => {
-            //         return {
-            //             ...sample,
-            //             trusted: 'trusted',
-            //         };
-            //     });
-            // }
-
-            // // let allSamples = await getSamplesFromCollection('trusted_samples');
-
-            // if (untrustedSamples.length > 0) {
-            //     const updatedSamples = untrustedSamples.map((sample: Sample) => {
-            //         return {
-            //             ...sample,
-            //             trusted: 'untrusted',
-            //         };
-            //     });
-            //     allSamples = allSamples.concat(updatedSamples);
-            // }
-
-            // if (unknownSamples.length > 0) {
-            //     const updatedSamples = unknownSamples.map((sample: Sample) => {
-            //         return {
-            //             ...sample,
-            //             trusted: 'unknown',
-            //         };
-            //     });
-            //     allSamples = allSamples.concat(updatedSamples);
-            // }
-
-            // allSamples = [trustedSamples.length ? ...trustedSamples : [], ...untrustedSamples, ...unknownSamples];
             if (inProgressSamples.length > 0 || completedSamples.length > 0) {
                 setAllSamples({
                     inProgress: inProgressSamples,

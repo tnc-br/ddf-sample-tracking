@@ -204,52 +204,52 @@ export default function SampleDetails() {
                     </div>
                     <div className="detail-row">
                         <div className='detail'>
-                            <span className="detail-name">Sample name</span>
+                            <span className="detail-name">{t('sampleName')}</span>
                             <span className='detail-value'>{selectedDoc['visibility'] || "unknown"}</span>
                         </div>
                         <div className='detail'>
-                            <span className="detail-name">Collection site</span>
+                            <span className="detail-name">{t('collectionSite')}</span>
                             <span className='detail-value'>{selectedDoc['site'] || "unknown"}</span>
                         </div>
                         <div className='detail'>
-                            <span className="detail-name">Supplier name</span>
+                            <span className="detail-name">{t('supplierName')}</span>
                             <span className='detail-value'>{selectedDoc['supplier'] || "unknown"}</span>
                         </div>
                     </div>
 
                     <div className="detail-row">
                         <div className='detail'>
-                            <span className="detail-name">Sample name</span>
+                            <span className="detail-name">{t('sampleName')}</span>
                             <span className='detail-value'>{selectedDoc['sample_name'] || "unknown"}</span>
                         </div>
                         <div className='detail'>
-                            <span className="detail-name">Latitude</span>
+                            <span className="detail-name">{t('latitude')}</span>
                             <span className='detail-value'>{selectedDoc['lat'] || "unknown"}</span>
                         </div>
                         <div className='detail'>
-                            <span className="detail-name">City</span>
+                            <span className="detail-name">{t('city')}</span>
                             <span className='detail-value'>{selectedDoc['city'] || "unknown"}</span>
                         </div>
                     </div>
 
                     <div className="detail-row">
                         <div className='detail'>
-                            <span className="detail-name">Tree species</span>
+                            <span className="detail-name">{t('treeSpecies')}</span>
                             <span className='detail-value'>{selectedDoc['species'] || "unknown"}</span>
                         </div>
                         <div className='detail'>
-                            <span className="detail-name">Longitude</span>
+                            <span className="detail-name">{t('longitude')}</span>
                             <span className='detail-value'>{selectedDoc['lon'] || "unknown"}</span>
                         </div>
                         <div className='detail'>
-                            <span className="detail-name">Collected by</span>
+                            <span className="detail-name">{t('collectedBy')}</span>
                             <span className='detail-value'>{selectedDoc['collected_by']}</span>
                         </div>
                     </div>
 
                     <div className="detail-row">
                         <div className='detail'>
-                            <span className="detail-name">Origin</span>
+                            <span className="detail-name">{t('origin')}</span>
                             <span className='detail-value'>{selectedDoc['d18O_cel']}</span>
                         </div>
                     </div>
