@@ -14,6 +14,7 @@ import 'popper.js';
 import { useRouter } from 'next/navigation'
 var QRCode = require('qrcode');
 import { QRCodeSVG } from "qrcode.react";
+import { useTranslation } from 'react-i18next';
 
 type Sample = {
     last_updated_by: string,
@@ -78,6 +79,7 @@ export default function SampleDetails() {
 
     const app = initializeApp(firebaseConfig);
     const db = getFirestore();
+    const { t } = useTranslation();
 
 
     const auth = getAuth();
@@ -240,8 +242,8 @@ export default function SampleDetails() {
                             <span className='detail-value'>{selectedDoc['lon'] || "unknown"}</span>
                         </div>
                         <div className='detail'>
-                            <span className="detail-name">Collection site</span>
-                            <span className='detail-value'>{selectedDoc['site'] || "unknown"}</span>
+                            <span className="detail-name">Collected by</span>
+                            <span className='detail-value'>{selectedDoc['collected_by']}</span>
                         </div>
                     </div>
 
@@ -249,10 +251,6 @@ export default function SampleDetails() {
                         <div className='detail'>
                             <span className="detail-name">Origin</span>
                             <span className='detail-value'>{selectedDoc['d18O_cel']}</span>
-                        </div>
-                        <div className='detail'>
-                            <span className="detail-name">Collected by</span>
-                            <span className='detail-value'>{selectedDoc['collected_by']}</span>
                         </div>
                     </div>
                 </div>

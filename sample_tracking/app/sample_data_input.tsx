@@ -476,10 +476,6 @@ export default function SampleDataInput(props: SampleDataInputProps) {
                         <td>{currentDateString}</td>
                     </tr>
                     <tr>
-                        <td className='sample-info'>{t('createdBy')}</td>
-                        <td>{props.userData ? props.userData.name : "NA"}</td>
-                    </tr>
-                    <tr>
                         <td className='sample-info'>{t('collectedIn')}</td>
                         <td>{formData.state}</td>
                     </tr>
