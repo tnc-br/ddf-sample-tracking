@@ -30,6 +30,16 @@ type Sample = {
     current_step: string,
     created_on: string,
     org: string,
+    water_pct: WaterPercentageResults,
+    land_use_anthropic_pct: Record<string, number>,
+    land_use_primary_vegetation_pct: Record<string, number>,
+    land_use_secondary_vegetation_or_regrowth_pct: Record<string, number>,
+}
+
+type WaterPercentageResults = {
+    is_point_water: boolean,
+    water_mean_in_1km_buffer: number,
+    water_mean_in_10km_buffer: number,
 }
 
 type UserData = {
@@ -149,6 +159,14 @@ export default function SampleDetails() {
     function showResults() {
         updateTabShown(2);
     }
+
+    function formatAsPercentage(num: number) {
+        return new Intl.NumberFormat('default', {
+          style: 'percent',
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2,
+        }).format(num);
+    } 
 
     function processStep(title: string, stepNumber: number, headingId: string, collapseId: string) {
         let buttonClassName;
@@ -301,6 +319,63 @@ export default function SampleDetails() {
                         </div>
                     </div>
 
+                </div>
+
+                <div className='details'>
+                    <div className='section-title'>
+                        Water details
+                    </div>
+                    <div className="detail-row">
+                        <div className='detail'>
+                            <span className="detail-name">Is lat/lon in water?</span>
+                            <span className='detail-value'>{selectedDoc['water_pct']? (selectedDoc['water_pct']['is_point_water'] ? "YES" : "NO") : "unknown"}</span>
+                        </div>
+                        <div className='detail'>
+                            <span className="detail-name">Percentage of water in a 1km buffer zone</span>
+                            <span className='detail-value'>{selectedDoc['water_pct']? formatAsPercentage(selectedDoc['water_pct']['water_mean_in_1km_buffer']) : "unknown"}</span>
+                        </div>
+                        <div className='detail'>
+                            <span className="detail-name">Percentage of water in a 10km buffer zone</span>
+                            <span className='detail-value'>{selectedDoc['water_pct']? formatAsPercentage(selectedDoc['water_pct']['water_mean_in_10km_buffer']) : "unknown"}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div className='details'>
+                    <div className='section-title'>
+                        Land use details in a 10km buffer radius zone
+                    </div>
+                    <table className="table">
+                        <thead>
+                            <tr>
+                                {/* TODO: read the keys in the Record instead of creating an array */}
+                                <th scope="col">Type</th>
+                                {Array.from({ length: 11 }, (_, index) => (
+                                    <th scope="col" key={index}>{2011 + index}</th>
+                                ))}
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <th scope="row">Anthropic Use (Urban, agriculture, etc)</th>
+                                {Array.from({ length: 11 }, (_, index) => (
+                                    <td>{ selectedDoc['land_use_anthropic_pct'] ? formatAsPercentage(selectedDoc['land_use_anthropic_pct']["" + (2011 + index)]) : "unknown" }</td>
+                                ))}
+                            </tr>
+                            <tr>
+                                <th scope="row">Primary Vegetation</th>
+                                {Array.from({ length: 11 }, (_, index) => (
+                                    <td>{ selectedDoc['land_use_primary_vegetation_pct'] ? formatAsPercentage(selectedDoc['land_use_primary_vegetation_pct']["" + (2011 + index)]) : "unknown" }</td>
+                                ))}
+                            </tr>
+                            <tr>
+                                <th scope="row">Secondary Vegetation and regrowth</th>
+                                {Array.from({ length: 11 }, (_, index) => (
+                                    <td>{ selectedDoc['land_use_secondary_vegetation_or_regrowth_pct'] ? formatAsPercentage(selectedDoc['land_use_secondary_vegetation_or_regrowth_pct']["" + (2011 + index)]) : "unknown" }</td>
+                                ))}
+                            </tr>
+                        </tbody>
+                    </table>
                 </div>
 
                 <div id='qr-code'>
