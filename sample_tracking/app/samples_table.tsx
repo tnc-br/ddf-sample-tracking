@@ -77,7 +77,7 @@ export default function SamplesTable(props: SampleDataProps) {
                 Cell: ({ cell, row, renderedCellValue }) => {
                     return (
                         <div id={row.original.trusted} onClick={onSampleClick} className="actions-button sample-link">
-                            <span id={row.original.code_lab + "-details"}>{renderedCellValue}</span>
+                            <span id={row.original.code_lab}>{renderedCellValue}</span>
                         </div>
                     )
                 },

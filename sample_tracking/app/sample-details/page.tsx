@@ -359,19 +359,19 @@ export default function SampleDetails() {
                             <tr>
                                 <th scope="row">Anthropic Use (Urban, agriculture, etc)</th>
                                 {Array.from({ length: 11 }, (_, index) => (
-                                    <td>{ selectedDoc['land_use_anthropic_pct'] ? formatAsPercentage(selectedDoc['land_use_anthropic_pct']["" + (2011 + index)]) : "unknown" }</td>
+                                    <td key={index}>{ selectedDoc['land_use_anthropic_pct'] ? formatAsPercentage(selectedDoc['land_use_anthropic_pct']["" + (2011 + index)]) : "unknown" }</td>
                                 ))}
                             </tr>
                             <tr>
                                 <th scope="row">Primary Vegetation</th>
                                 {Array.from({ length: 11 }, (_, index) => (
-                                    <td>{ selectedDoc['land_use_primary_vegetation_pct'] ? formatAsPercentage(selectedDoc['land_use_primary_vegetation_pct']["" + (2011 + index)]) : "unknown" }</td>
+                                    <td key={index}>{ selectedDoc['land_use_primary_vegetation_pct'] ? formatAsPercentage(selectedDoc['land_use_primary_vegetation_pct']["" + (2011 + index)]) : "unknown" }</td>
                                 ))}
                             </tr>
                             <tr>
                                 <th scope="row">Secondary Vegetation and regrowth</th>
                                 {Array.from({ length: 11 }, (_, index) => (
-                                    <td>{ selectedDoc['land_use_secondary_vegetation_or_regrowth_pct'] ? formatAsPercentage(selectedDoc['land_use_secondary_vegetation_or_regrowth_pct']["" + (2011 + index)]) : "unknown" }</td>
+                                    <td key={index}>{ selectedDoc['land_use_secondary_vegetation_or_regrowth_pct'] ? formatAsPercentage(selectedDoc['land_use_secondary_vegetation_or_regrowth_pct']["" + (2011 + index)]) : "unknown" }</td>
                                 ))}
                             </tr>
                         </tbody>
