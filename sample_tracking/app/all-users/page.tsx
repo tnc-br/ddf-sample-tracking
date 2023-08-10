@@ -168,13 +168,43 @@ export default function Users() {
                 <div id="usersTable" className='samples-wrapper'>
                     <p className='header'>Pending approval</p>
                     <table className="table">
+                    <thead>
+                        <tr id="table-header">
+                            <th>Name</th>
+                            <th>Organization</th>
+                            <th>Email</th>
+                            <th>Date requested</th>
+                        </tr>
+                    </thead>
+                    <tbody id="samples-data">
+                        {
+                            Object.keys(users).map((key, i) => {
+                                return (
+                                    <tr key={i} id={key}>
+                                        <td>{users[key].name as unknown as string}</td>
+                                        <td>{users[key].org as unknown as string}</td>
+                                        <td>{users[key].email as unknown as string}</td>
+                                        <td>{users[key].date_added as unknown as string}</td>
+                                        <td>
+                                                {!isSiteAdmin(key) && <button onClick={handleRemoveClick} type="button" className="btn btn-sm btn-outline-danger">Remove</button>}
+                                                {showMakeOrgAdminButton(key) && <button onClick={handleMakeOrgAdminClick} type="button" className="btn btn-sm btn-primary">Make org admin</button>}
+                                                {showMakeSiteAdminButton(key) ? <button onClick={handleMakeSiteAdminClick} type="button" className="btn btn-sm btn-primary">Make site admin</button>
+                                                : isSiteAdmin(key) ? <span>User is site admin</span> : <span>User is org admin</span>}
+                                                </td>
+
+                                    </tr>
+                                )
+                            })
+                        }
+                    </tbody>
+                </table>
+                    {/* <table className="table">
                         <thead>
                             <tr id="table-header">
                                 <th>Name</th>
                                 <th>Organization</th>
                                 <th>Email</th>
                                 <th>Date joined</th>
-                                {/* <th>Approve/reject</th> */}
                             </tr>
                         </thead>
                         <tbody id="samples-data">
@@ -192,15 +222,14 @@ export default function Users() {
                                                 {showMakeSiteAdminButton(key) ? <button onClick={handleMakeSiteAdminClick} type="button" className="btn btn-sm btn-primary">Make site admin</button>
                                                 : isSiteAdmin(key) ? <span>User is site admin</span> : <span>User is org admin</span>}
                                                 </td>
-                                            {/* <td><button onClick={handleApproveClick} type="button" className="btn btn-outline-primary">Approve</button>
-                                                <button onClick={handleRejectClick} type="button" className="btn btn-outline-danger">Reject</button></td> */}
+                                            
                                         </tr>
                                     )
 
                                 })
                             }
                         </tbody>
-                    </table>
+                    </table> */}
                 </div>
             </div>
         </div>

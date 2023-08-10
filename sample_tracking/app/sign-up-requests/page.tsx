@@ -130,7 +130,8 @@ export default function SignUpRequests() {
         addDoc(collection(db, "users"), {
             name: prospectiveOrgs[orgName].admin_name,
             email: prospectiveOrgs[orgName].email,
-        })
+        });
+        deleteOrgFromNewOrgLists(orgName);
     }
 
     function deleteOrgFromNewOrgLists(orgName: string) {
@@ -180,154 +181,79 @@ export default function SignUpRequests() {
 
     }
 
-    // getAdminAuth()
-    //     .setCustomUserClaims(uid, { admin: true })
-    //     .then(() => {
-    //         // The new custom claims will propagate to the user's ID token the
-    //         // next time a new one is issued.
-    //     });
-    // return (<div>
-    //     <div className="admin-wrapper">
-    //         <h3 className='page-title'>Sign up requests ({Object.keys(prospectiveUsers).length + Object.keys(prospectiveOrgs).length})</h3>
-    //         <div>
-    //             <div id="pendingApprovalsTable" className="user-table">
-    //                 <p className="section-header">Individuals ({Object.keys(prospectiveUsers).length})</p>
-    //                 <p className="sub-section-header">Join requests from individual users</p>
-    //                 <table className="table">
-    // <thead>
-    //     <tr id="table-header">
-    //         <th>Name</th>
-    //         <th>Organization</th>
-    //         <th>Email</th>
-    //         <th>Date requested</th>
-    //         {/* <th>Role</th> */}
-    //         {/* <th>Approve/reject</th> */}
-    //     </tr>
-    // </thead>
-    //                     <tbody id="samples-data">
-    //                         {
-    //                             Object.keys(prospectiveUsers).map((key, i) => {
-    //                                 return (
-    //                                     <tr key={i} id={key}>
-    //                                         <td>{prospectiveUsers[key].name as unknown as string}</td>
-    //                                         <td>{prospectiveUsers[key].org as unknown as string}</td>
-    //                                         <td>{prospectiveUsers[key].email as unknown as string}</td>
-    //                                         <td>{prospectiveUsers[key].date_requested as unknown as string}</td>
-    //                                         {/* <td>{pendingApprovals[key].role}</td> */}
-    //                                         <td className="approve-reject-wrapper"><button onClick={handleRejectMemberClick} type="button" className="btn btn-outline-danger reject-button">Decline</button>
-    //                                             <button onClick={handleApproveMemberClick} type="button" className="btn btn-outline-primary approve-button">Approve</button>
-    //                                         </td>
-    //                                     </tr>
-    //                                 )
-
-    //                             })
-    //                         }
-    //                     </tbody>
-    //                 </table>
-    //             </div>
-    //             {userData.role === "site_admin" && <div id="usersTable" className='samples-wrapper'>
-    //                 <p className="section-header">Organizations ({Object.keys(prospectiveOrgs).length})</p>
-    //                 <p className="sub-section-header">Join requests from organizations</p>
-    //                 <table className="table">
-                        // <thead>
-                        //     <tr id="table-header">
-                        //         <th>Lab name</th>
-                        //         <th>Org Admin</th>
-                        //         <th>Admin email</th>
-                        //         <th>Date requested</th>
-                        //     </tr>
-                        // </thead>
-    //                     <tbody id="samples-data">
-    //                         {
-    //                             Object.keys(prospectiveOrgs).map((key, i) => {
-    //                                 return (
-    //                                     <tr key={i} id={key}>
-    //                                         <td>{key}</td>
-    //                                         <td>{prospectiveOrgs[key].admin_name as unknown as string}</td>
-    //                                         <td>{prospectiveOrgs[key].email as unknown as string}</td>
-    //                                         <td>{prospectiveOrgs[key].date_requested as unknown as string}</td>
-                                            // <td className="approve-reject-wrapper"><button onClick={handleRejectOrgClick} type="button" className="btn btn-outline-danger reject-button">Decline</button>
-                                            //     <button onClick={handleApproveOrgClick} type="button" className="btn btn-outline-primary approve-button">Approve</button></td>
-    //                                     </tr>
-    //                                 )
-
-    //                             })
-    //                         }
-    //                     </tbody>
-    //                 </table>
-    //             </div>}
-    //         </div>
-    //     </div>
-    // </div>);
-
-
-    return (<div>
+    return (
         <div className='admin-wrapper'>
-            <h3>Sign up requests ({Object.keys(prospectiveUsers).length + Object.keys(prospectiveOrgs).length})</h3>
-            <div>
-                <div id="usersTable" className='samples-wrapper'>
-                    <p className='header'>Users ({Object.keys(prospectiveUsers).length})</p>
-                    <table className="table">
-                        <thead>
-                            <tr id="table-header">
-                                <th>Name</th>
-                                <th>Organization</th>
-                                <th>Email</th>
-                                <th>Date requested</th>
-                            </tr>
-                        </thead>
-                        <tbody id="samples-data">
-                            {
-                                Object.keys(prospectiveUsers).map((key, i) => {
-                                    return (
-                                        <tr key={i} id={key}>
-                                            <td>{prospectiveUsers[key].name as unknown as string}</td>
-                                            <td>{prospectiveUsers[key].org as unknown as string}</td>
-                                            <td>{prospectiveUsers[key].email as unknown as string}</td>
-                                            <td>{prospectiveUsers[key].date_requested as unknown as string}</td>
-                                            <td className="approve-reject-wrapper"><button onClick={handleRejectMemberClick} type="button" className="btn btn-outline-danger reject-button">Decline</button>
-                                                <button onClick={handleApproveMemberClick} type="button" className="btn btn-outline-primary approve-button">Approve</button>
-                                            </td>
-
-                                        </tr>
-                                    )
-                                })
-                            }
-                        </tbody>
-                    </table>
+            <h3 className='header'>Sign up requests ({Object.keys(prospectiveUsers).length + Object.keys(prospectiveOrgs).length})</h3>
+            <div className="details">
+                <div className='section-title'>
+                <p className='section-title'>Users ({Object.keys(prospectiveUsers).length})</p>
                 </div>
-
-
-                <div id="usersTable" className='samples-wrapper'>
-                    <p className="header">Organizations ({Object.keys(prospectiveOrgs).length})</p>
-                    <table className="table">
+                <table className="table">
                     <thead>
-                            <tr id="table-header">
-                                <th>Lab name</th>
-                                <th>Org Admin</th>
-                                <th>Admin email</th>
-                                <th>Date requested</th>
-                            </tr>
-                        </thead>
-                        <tbody id="samples-data">
-                            {
-                                Object.keys(prospectiveOrgs).map((key, i) => {
-                                    return (
-                                        <tr key={i} id={key}>
-                                            <td>{prospectiveOrgs[key].admin_name as unknown as string}</td>
-                                            <td>{prospectiveOrgs[key].email as unknown as string}</td>
-                                            <td>{prospectiveOrgs[key].date_requested as unknown as string}</td>
-                                            <td>{prospectiveOrgs[key].date_requested as unknown as string}</td>
-                                            <td className="approve-reject-wrapper"><button onClick={handleRejectOrgClick} type="button" className="btn btn-outline-danger reject-button">Decline</button>
-                                                <button onClick={handleApproveOrgClick} type="button" className="btn btn-outline-primary approve-button">Approve</button></td>
-                                        </tr>
-                                    )
-                                })
-                            }
-                        </tbody>
-                    </table>
-                </div>
+                        <tr id="table-header">
+                            <th>Name</th>
+                            <th>Organization</th>
+                            <th>Email</th>
+                            <th>Date requested</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {
+                            Object.keys(prospectiveUsers).map((key, i) => {
+                                return (
+                                    <tr key={i} id={key}>
+                                        <td>{prospectiveUsers[key].name as unknown as string}</td>
+                                        <td>{prospectiveUsers[key].org as unknown as string}</td>
+                                        <td>{prospectiveUsers[key].email as unknown as string}</td>
+                                        <td>{prospectiveUsers[key].date_requested as unknown as string}</td>
+                                        <td className="approve-reject-wrapper"><button onClick={handleRejectMemberClick} type="button" className="btn btn-outline-danger reject-button">Decline</button>
+                                            <button onClick={handleApproveMemberClick} type="button" className="btn btn-outline-primary approve-button">Approve</button>
+                                        </td>
+
+                                    </tr>
+                                )
+                            })
+                        }
+                    </tbody>
+                </table>
+
             </div>
+
+
+            <div className='details'>
+                <div className='section-title'>
+                <p className="section-title">Organizations ({Object.keys(prospectiveOrgs).length})</p>
+                </div>
+                <table className="table">
+                    <thead>
+                        <tr id="table-header">
+                            <th>Lab name</th>
+                            <th>Org Admin</th>
+                            <th>Admin email</th>
+                            <th>Date requested</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {
+                            Object.keys(prospectiveOrgs).map((key, i) => {
+                                return (
+                                    <tr key={i} id={key}>
+                                        <td>{prospectiveOrgs[key].admin_name as unknown as string}</td>
+                                        <td>{prospectiveOrgs[key].email as unknown as string}</td>
+                                        <td>{prospectiveOrgs[key].date_requested as unknown as string}</td>
+                                        <td>{prospectiveOrgs[key].date_requested as unknown as string}</td>
+                                        <td className="approve-reject-wrapper"><button onClick={handleRejectOrgClick} type="button" className="btn btn-outline-danger reject-button">Decline</button>
+                                            <button onClick={handleApproveOrgClick} type="button" className="btn btn-outline-primary approve-button">Approve</button></td>
+                                    </tr>
+                                )
+                            })
+                        }
+                    </tbody>
+                </table>
+
+            </div>
+
+
         </div>
-    </div>);
+    )
 }
