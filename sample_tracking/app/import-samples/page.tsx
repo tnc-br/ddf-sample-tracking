@@ -10,7 +10,6 @@ import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { useState, useEffect } from 'react';
 import Alert from "@mui/material/Alert";
 import Stack from "@mui/material/Stack";
-import Nav from '../nav';
 import Papa from 'papaparse';
 import {getRanHex} from '../utils';
 
@@ -237,10 +236,6 @@ export default function ImportCsv() {
     return (
         <div className="import-samples-wrapper">
             <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@48,400,0,0" />
-
-            <div>
-                <Nav />
-            </div>
             <div className="import-form-wrapper">
                 <div className="errors-list">
                     <Stack sx={{ width: '100%' }} spacing={2}>
