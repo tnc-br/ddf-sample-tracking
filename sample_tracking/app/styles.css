@@ -120,7 +120,7 @@
     border-radius: 50%;
     background-color: #1A73E8;
     color: white;
-    padding-top: 4px;
+    padding-top: 6px;
     text-align: center;
 }
 
@@ -138,7 +138,7 @@
     padding: 5px;
 }
 
-.profile-menu > div:hover {
+.profile-menu>div:hover {
     opacity: .7;
 }
 
@@ -149,7 +149,7 @@
 }
 
 .core-page-wrapper {
-    top:100px;
+    top: 100px;
     left: 350px;
 }
 
@@ -219,4 +219,11 @@
 
 .result-instructions {
     margin-bottom: 20px;
+}
+
+.top-bar-wrapper {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: flex-end;
+    font-family: Roboto;
 }
