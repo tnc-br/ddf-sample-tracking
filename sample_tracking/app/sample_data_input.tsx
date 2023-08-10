@@ -402,10 +402,6 @@ export default function SampleDataInput(props: SampleDataInputProps) {
                         <label htmlFor="city">{t('city')}</label>
                         <input onChange={handleChange} value={formData.city} name='city' type="text" className="form-control" id="city" />
                     </div>
-                    <div className="form-group">
-                        <label htmlFor="collectionSite">{t('collectionSite')}</label>
-                        <input onChange={handleChange} value={formData.site} name='site' type="text" className="form-control" id="collectionSite" />
-                    </div>
                 </div>
             </form>
 
