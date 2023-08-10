@@ -32,14 +32,9 @@ export default function TopBar() {
                 if (!user) {
                     router.push('/login');
                 } else {
-                    const userDocRef = doc(db, "users", user.uid);
-                    getDoc(userDocRef).then((docRef) => {
-                        if (docRef.exists()) {
-                            setUserData({
-                                ...docRef.data(),
-                                photoUrl: user.photoURL,
-                            });
-                        }
+                    setUserData({
+                        name: user.displayName,
+                        photoUrl: user.photoURL,
                     })
                 }
             });

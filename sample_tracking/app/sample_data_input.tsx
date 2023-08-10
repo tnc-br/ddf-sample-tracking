@@ -172,6 +172,7 @@ export default function SampleDataInput(props: SampleDataInputProps) {
 
     function checkCurrentTabFormValidity(): boolean {
         const currentTabRef = getCurrentTabFormRef();
+        if (currentTab === 3 && !validateSampleResultsTab()) return false; 
         if (currentTabRef.checkValidity()) {
             // Form is valid, forward to calling component handling.
             if (currentTab === 1 && !formData.trusted) {
@@ -191,10 +192,84 @@ export default function SampleDataInput(props: SampleDataInputProps) {
     }
 
     function validateSampleResultsTab(): boolean {
-        if (!currentTab === 3 || !props.isNewSampleForm) {
+        if (!currentTab === 3) {
             return true;
         }
-        const formData = document.getElementById('results-tab');
+        const d18O_cel = formData.d18O_cel.map((value: string) => parseFloat(value));
+        const oxygen = formData.oxygen.map((value: string) => parseFloat(value));
+        const nitrogen = formData.nitrogen.map((value: string) => parseFloat(value));
+        const n_wood = formData.n_wood.map((value: string) => parseFloat(value));
+        const carbon = formData.carbon.map((value: string) => parseFloat(value));
+        const c_wood = formData.c_wood.map((value: string) => parseFloat(value));
+        const d13C_cel = formData.d13C_cel.map((value: string) => parseFloat(value));
+        const c_cel = formData.c_cel.map((value: string) => parseFloat(value));
+
+        let alertMessage = "";
+        if (d18O_cel) {
+            d18O_cel.forEach((value: number) => {
+                if (value < 20 || value > 32) {
+                    alertMessage = "d18O_cel should be within the range of 20-32";
+                    alert(alertMessage);
+                }
+            })
+        }
+        if (oxygen) {
+            oxygen.forEach((value: number) => {
+                if (value < 20 || value > 32) {
+                    alertMessage = "d180_wood should be within the range of 20-32";
+                    alert(alertMessage);
+                }
+            })
+        }
+        if (nitrogen) {
+            nitrogen.forEach((value: number) => {
+                if (value < -5 || value > 15) {
+                    alertMessage = "d15N_wood should be within the range of 20-32";
+                    alert(alertMessage);
+                }
+            })
+        }
+        if (n_wood) {
+            n_wood.forEach((value: number) => {
+                if (value < 0 || value > 1) {
+                    alertMessage = "%N_wood should be within the range of 20-32";
+                    alert(alertMessage);
+                }
+            })
+        }
+        if (carbon) {
+            carbon.forEach((value: number) => {
+                if (value < -38 || value > -20) {
+                    alertMessage = "d13C_wood should be within the range of 20-32";
+                    alert(alertMessage);
+                }
+            })
+        }
+        if (c_wood) {
+            c_wood.forEach((value: number) => {
+                if (value < 40 || value > 60) {
+                    alertMessage = "%C_wood should be within the range of 20-32";
+                    alert(alertMessage);
+                }
+            })
+        }
+        if (d13C_cel) {
+            carbon.forEach((value: number) => {
+                if (value < -35 || value > -20) {
+                    alertMessage = "d13C_cel should be within the range of 20-32";
+                    alert(alertMessage);
+                }
+            })
+        }
+        if (c_cel) {
+            carbon.forEach((value: number) => {
+                if (value < 40 || value > 60) {
+                    alertMessage = "%C_cel should be within the range of 20-32";
+                    alert(alertMessage);
+                }
+            })
+        }
+        return alertMessage.length < 1;
     }
 
     function handlePrint(elem) {
@@ -327,10 +402,6 @@ export default function SampleDataInput(props: SampleDataInputProps) {
                         <label htmlFor="city">{t('city')}</label>
                         <input onChange={handleChange} value={formData.city} name='city' type="text" className="form-control" id="city" />
                     </div>
-                    <div className="form-group">
-                        <label htmlFor="collectionSite">{t('collectionSite')}</label>
-                        <input onChange={handleChange} value={formData.site} name='site' type="text" className="form-control" id="collectionSite" />
-                    </div>
                 </div>
             </form>
 
@@ -349,15 +420,15 @@ export default function SampleDataInput(props: SampleDataInputProps) {
                     <div className="form-group">
                         <label htmlFor="amount_of_measurements">{t('amountOfMeasurements')}</label>
                         <select onChange={handleChange} value={formData.amount_of_measurementste} required name='amount_of_measurementste' className="form-select" aria-label="Default select example" id="amount_of_measurementste">
-                            <option value="2">2</option>
-                            <option value="3">3</option>
-                            <option value="4">4</option>
-                            <option value="5">5</option>
-                            <option value="6">6</option>
-                            <option value="7">7</option>
-                            <option value="8">8</option>
-                            <option value="9">9</option>
-                            <option value="10">10</option>
+                            <option value={2}>2</option>
+                            <option value={3}>3</option>
+                            <option value={4}>4</option>
+                            <option value={5}>5</option>
+                            <option value={6}>6</option>
+                            <option value={7}>7</option>
+                            <option value={8}>8</option>
+                            <option value={9}>9</option>
+                            <option value={10}>10</option>
                         </select>
                     </div>
                     <div>
@@ -405,10 +476,6 @@ export default function SampleDataInput(props: SampleDataInputProps) {
                         <td>{currentDateString}</td>
                     </tr>
                     <tr>
-                        <td className='sample-info'>{t('createdBy')}</td>
-                        <td>{props.userData.name}</td>
-                    </tr>
-                    <tr>
                         <td className='sample-info'>{t('collectedIn')}</td>
                         <td>{formData.state}</td>
                     </tr>
@@ -439,6 +506,10 @@ export default function SampleDataInput(props: SampleDataInputProps) {
         }
         return (
             <div>
+                <div className="result-instructions">
+                Enter the values for each sample separated by a comma (,).
+                </div>
+                
                 <form id='results-tab' className='grid-columns'>
                     <div className='column-one'>
                         <div className="form-group">
