@@ -162,11 +162,11 @@ export default function SampleDetails() {
 
     function formatAsPercentage(num: number) {
         return new Intl.NumberFormat('default', {
-          style: 'percent',
-          minimumFractionDigits: 2,
-          maximumFractionDigits: 2,
+            style: 'percent',
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2,
         }).format(num);
-    } 
+    }
 
     function processStep(title: string, stepNumber: number, headingId: string, collapseId: string) {
         let buttonClassName;
@@ -275,7 +275,7 @@ export default function SampleDetails() {
 
 
                 <div className='details'>
-                <div className='section-title'>
+                    <div className='section-title'>
                         Result values
                     </div>
                     <div className="detail-row">
@@ -328,15 +328,15 @@ export default function SampleDetails() {
                     <div className="detail-row">
                         <div className='detail'>
                             <span className="detail-name">Is lat/lon in water?</span>
-                            <span className='detail-value'>{selectedDoc['water_pct']? (selectedDoc['water_pct']['is_point_water'] ? "YES" : "NO") : "unknown"}</span>
+                            <span className='detail-value'>{selectedDoc['water_pct'] ? (selectedDoc['water_pct']['is_point_water'] ? "YES" : "NO") : "unknown"}</span>
                         </div>
                         <div className='detail'>
                             <span className="detail-name">Percentage of water in a 1km buffer zone</span>
-                            <span className='detail-value'>{selectedDoc['water_pct']? formatAsPercentage(selectedDoc['water_pct']['water_mean_in_1km_buffer']) : "unknown"}</span>
+                            <span className='detail-value'>{selectedDoc['water_pct'] ? formatAsPercentage(selectedDoc['water_pct']['water_mean_in_1km_buffer']) : "unknown"}</span>
                         </div>
                         <div className='detail'>
                             <span className="detail-name">Percentage of water in a 10km buffer zone</span>
-                            <span className='detail-value'>{selectedDoc['water_pct']? formatAsPercentage(selectedDoc['water_pct']['water_mean_in_10km_buffer']) : "unknown"}</span>
+                            <span className='detail-value'>{selectedDoc['water_pct'] ? formatAsPercentage(selectedDoc['water_pct']['water_mean_in_10km_buffer']) : "unknown"}</span>
                         </div>
                     </div>
                 </div>
@@ -359,19 +359,19 @@ export default function SampleDetails() {
                             <tr>
                                 <th scope="row">Anthropic Use (Urban, agriculture, etc)</th>
                                 {Array.from({ length: 11 }, (_, index) => (
-                                    <td key={index}>{ selectedDoc['land_use_anthropic_pct'] ? formatAsPercentage(selectedDoc['land_use_anthropic_pct']["" + (2011 + index)]) : "unknown" }</td>
+                                    <td key={index}>{selectedDoc['land_use_anthropic_pct'] ? formatAsPercentage(selectedDoc['land_use_anthropic_pct']["" + (2011 + index)]) : "unknown"}</td>
                                 ))}
                             </tr>
                             <tr>
                                 <th scope="row">Primary Vegetation</th>
                                 {Array.from({ length: 11 }, (_, index) => (
-                                    <td key={index}>{ selectedDoc['land_use_primary_vegetation_pct'] ? formatAsPercentage(selectedDoc['land_use_primary_vegetation_pct']["" + (2011 + index)]) : "unknown" }</td>
+                                    <td key={index}>{selectedDoc['land_use_primary_vegetation_pct'] ? formatAsPercentage(selectedDoc['land_use_primary_vegetation_pct']["" + (2011 + index)]) : "unknown"}</td>
                                 ))}
                             </tr>
                             <tr>
                                 <th scope="row">Secondary Vegetation and regrowth</th>
                                 {Array.from({ length: 11 }, (_, index) => (
-                                    <td key={index}>{ selectedDoc['land_use_secondary_vegetation_or_regrowth_pct'] ? formatAsPercentage(selectedDoc['land_use_secondary_vegetation_or_regrowth_pct']["" + (2011 + index)]) : "unknown" }</td>
+                                    <td key={index}>{selectedDoc['land_use_secondary_vegetation_or_regrowth_pct'] ? formatAsPercentage(selectedDoc['land_use_secondary_vegetation_or_regrowth_pct']["" + (2011 + index)]) : "unknown"}</td>
                                 ))}
                             </tr>
                         </tbody>

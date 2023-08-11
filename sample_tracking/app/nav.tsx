@@ -74,10 +74,15 @@ export default function Nav() {
         <div id="nav-wrapper" className='nav-wrapper'>
             <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@48,400,0,0" />
             <ul className="nav flex-column">
-                {canAddSample() && <li className="nav-item">
+                {/* {canAddSample() && <li className="nav-item">
                     <Link className="nav-link add-sample-button" href="./add-sample"><span className="material-symbols-outlined">
                         add
                     </span> {t('addSample')}</Link>
+                </li>} */}
+                {canAddSample() && <li className="nav-item">
+                    <div className="nav-link add-sample-button" onClick={() => setShowAddSampleMenu(!showAddSampleMenu)}><span className="material-symbols-outlined">
+                        add
+                    </span> {t('addSample')}</div>
                 </li>}
                 {canAddSample() && <li className="nav-item">
                     <Link className="nav-link" href="./import-samples">
@@ -114,6 +119,13 @@ export default function Nav() {
                     </span> {t('logOut')}</button>
                 </li> */}
 
+                {showAddSampleMenu && <div className="add-sample-options-wrapper">
+                    <Link className="nav-link" href="./add-sample?status=completed">Completed sample</Link>
+                    <Link className="nav-link" href="./add-sample?status=incomplete">Incomplete sample</Link>
+                    {/* <div><Link href="./add-sample?status=complete" className='add-sample-option'>Completed sample</Link></div>
+                <div><Link href="./add-sample?status=incomplete" className='add-sample-option'>Uncompleted sample</Link></div> */}
+                </div>}
+
             </ul>
             {/* <nav className="navbar navbar-expand-lg navbar-light bg-light">
 
@@ -127,10 +139,7 @@ export default function Nav() {
                 </ul>
                 <button className="my-2 my-lg-0 btn btn-outline-primary my-2 my-sm-0" type="submit" onClick={onLogOutClick}>Log out</button>
             </nav> */}
-            {/* {showAddSampleMenu && <div className="add-sample-options-wrapper">
-                <div><Link href="./add-sample?status=complete" className='add-sample-option'>Completed sample</Link></div>
-                <div><Link href="./add-sample?status=incomplete" className='add-sample-option'>Uncompleted sample</Link></div>
-            </div>} */}
+
         </div>
 
     )
