@@ -115,10 +115,10 @@ export default function SamplesTable(props: SampleDataProps) {
                     return (
                         <div className="action-buttons-wrapper">
                             <div id={(row as Sample).trusted} onClick={onEditSampleClick} className="actions-button">
-                                <span id={(row as Sample).code_lab + "-edit"}>Edit</span>
+                                <span id={(row as Sample).code_lab}>Edit</span>
                             </div>
                             {props.canDeleteSamples && <div id={(row as Sample).trusted} onClick={onDeleteSampleClick} className="actions-button">
-                                <span id={(row as Sample).code_lab + "-delete"}>Delete</span>
+                                <span id={(row as Sample).code_lab}>Delete</span>
                             </div>}
                         </div>
 
