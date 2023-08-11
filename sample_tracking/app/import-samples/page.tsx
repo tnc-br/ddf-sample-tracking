@@ -11,7 +11,7 @@ import { useState, useEffect } from 'react';
 import Alert from "@mui/material/Alert";
 import Stack from "@mui/material/Stack";
 import Papa from 'papaparse';
-import {getRanHex} from '../utils';
+import { getRanHex } from '../utils';
 
 type UserData = {
     name: string,
@@ -55,7 +55,7 @@ export default function ImportCsv() {
         }
 
     })
-    
+
 
     // State to store parsed data
     const [parsedData, setParsedData] = useState([]);
@@ -66,7 +66,7 @@ export default function ImportCsv() {
     // State to store the values
     const [csvValues, setCsvValues] = useState([]);
 
-    const requiredColumns :String[] = [
+    const requiredColumns: string[] = [
         'lat',
         'lon',
         'd18O_cel',
@@ -75,7 +75,7 @@ export default function ImportCsv() {
         'd13C_cel',
     ]
 
-    const inputColumns: String[] = [
+    const inputColumns: string[] = [
         ...requiredColumns,
         "code_lab",
         "Species",
@@ -91,7 +91,7 @@ export default function ImportCsv() {
         setSampleTrust(evt.target.value);
     }
 
-    function addError(error: String) {
+    function addError(error: string) {
         setErrors(errors => [...errors, error]);
     }
 
@@ -110,24 +110,30 @@ export default function ImportCsv() {
         }
 
         // build a counter of all the column types selected
-        var selectedColumnCounts = {};
+        type ColumnCount = {
+            index: number,
+            count: number,
+        }
+        let selectedColumnCounts = new Map<string, ColumnCount>();
         for (var i = 0; i < tableRows.length; i++) {
-            const column = document.getElementById("columnSelect_" + i)!.value;
-            if (selectedColumnCounts[column] == null) {
-                selectedColumnCounts[column] = {};
+            const columnName = (document.getElementById("columnSelect_" + i) as HTMLInputElement)!.value;
+            if (selectedColumnCounts.get(columnName) == null) {
+                let newColumnCount: ColumnCount = {
+                    // index isn't quite right if a column appears multiple times, but either it's the 
+                    // ignored column or we will fail for dupe columns.
+                    index: i,
+                    count: 0,
+                }
+                selectedColumnCounts.set(columnName, newColumnCount);
             }
-            selectedColumnCounts[column].count =
-                1 + (selectedColumnCounts[column] != null ? selectedColumnCounts[column] : 0);
-            // index isn't quite right if a column appears multiple times, but either it's the 
-            // ignored column or we will fail for dupe columns.
-            selectedColumnCounts[column].index = i;
+            let selectedColumn = selectedColumnCounts.get(columnName)!;
+            selectedColumn.count += 1;
         }
 
-        var columnNames = Object.keys(selectedColumnCounts);
-        var columnsToUpload: String[] = [];
+        var columnsToUpload: string[] = [];
         for (var column in inputColumns) {
             var columnName = inputColumns[column];
-            if (columnNames.indexOf(columnName) >= 0) {
+            if (selectedColumnCounts.get(columnName) != null) {
                 columnsToUpload.push(columnName);
             }
         }
@@ -143,7 +149,7 @@ export default function ImportCsv() {
         }
 
         columnsToUpload.forEach(function (col) {
-            if (selectedColumnCounts[col] > 1) {
+            if (selectedColumnCounts.get(col) && selectedColumnCounts.get(col)!.count > 1) {
                 addError('Each column can only be selected once.');
                 return;
             }
@@ -164,17 +170,17 @@ export default function ImportCsv() {
             const internalCode = getRanHex(20);
             const docRef = doc(db, sampleTrust + "_samples", internalCode);
             batch.set(docRef, {
-                'code_lab': row[selectedColumnCounts['code_lab'].index],
+                'code_lab': row[selectedColumnCounts.get('code_lab')!.index],
                 'visibility': sampleVisibility,
-                'species': row[selectedColumnCounts['Species'].index],
-                'site': row[selectedColumnCounts['Site'].index],
-                'state': row[selectedColumnCounts['State'].index],
-                'lat': Number(row[selectedColumnCounts['lat'].index]),
-                'lon': Number(row[selectedColumnCounts['lon'].index]),
-                'd13c_cel': row[selectedColumnCounts['d13C_cel'].index],
-                'd13c_wood': row[selectedColumnCounts['d13C_wood'].index],
-                'd13o_cel': row[selectedColumnCounts['d18O_cel'].index],
-                'd15n_wood': row[selectedColumnCounts['d15N_wood'].index],
+                'species': row[selectedColumnCounts.get('Species')!.index],
+                'site': row[selectedColumnCounts.get('Site')!.index],
+                'state': row[selectedColumnCounts.get('State')!.index],
+                'lat': Number(row[selectedColumnCounts.get('lat')!.index]),
+                'lon': Number(row[selectedColumnCounts.get('lon')!.index]),
+                'd13c_cel': row[selectedColumnCounts.get('d13C_cel')!.index],
+                'd13c_wood': row[selectedColumnCounts.get('d13C_wood')!.index],
+                'd13o_cel': row[selectedColumnCounts.get('d18O_cel')!.index],
+                'd15n_wood': row[selectedColumnCounts.get('d15N_wood')!.index],
                 'created_by': user.uid,
                 // 'current_step': '1. Drying process',
                 'status': 'complete',
@@ -189,11 +195,11 @@ export default function ImportCsv() {
         // TODO - handle errors.
         batch.commit().then(() => {
             const url = `./my-samples`;
-            router.push(url)
+            router.push(url);
         })
     }
 
-    function onFileChanged(event) {
+    function onFileChanged(event: any) {
         setErrors([]);
 
         // TODO - add a check box if there are headers present in the CSV (or assume there are always headers?)
