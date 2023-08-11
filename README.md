@@ -7,3 +7,5 @@ Front end code for [TimberID](https://docs.google.com/document/d/1X5Jk_qoPsGIBDl
 `npm run dev`
 
 A localhost demo will be built on port 3000.
+
+See current live version at [www.timberid.org](https://timberid.org).
