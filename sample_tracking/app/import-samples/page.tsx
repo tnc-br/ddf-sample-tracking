@@ -11,7 +11,7 @@ import { useState, useEffect } from 'react';
 import Alert from "@mui/material/Alert";
 import Stack from "@mui/material/Stack";
 import Papa from 'papaparse';
-import {getRanHex} from '../utils';
+import { getRanHex } from '../utils';
 
 type UserData = {
     name: string,
@@ -55,7 +55,7 @@ export default function ImportCsv() {
         }
 
     })
-    
+
 
     // State to store parsed data
     const [parsedData, setParsedData] = useState([]);
@@ -66,32 +66,39 @@ export default function ImportCsv() {
     // State to store the values
     const [csvValues, setCsvValues] = useState([]);
 
-    const requiredColumns :String[] = [
-        'lat',
-        'lon',
-        'd18O_cel',
-        'd15N_wood',
-        'd13C_wood',
-        'd13C_cel',
+    type ColumnName = {
+        display_name: string,
+        database_name: string,
+    }
+
+    const requiredColumns: ColumnName[] = [
+        { display_name: 'lat', database_name: 'lat' },
+        { display_name: 'lon', database_name: 'lon' },
+        { display_name: 'd18O_cel', database_name: 'd18O_cel' },
+        { display_name: 'd15N_wood', database_name: 'd15N_wood' },
+        { display_name: 'd13C_wood', database_name: 'd13C_wood' },
+        { display_name: 'd13C_cel', database_name: 'd13C_cel' },
     ]
 
-    const inputColumns: String[] = [
+    const inputColumns: ColumnName[] = [
         ...requiredColumns,
-        "code_lab",
-        "Species",
-        "Popular name",
-        "Site",
-        "State",
-        "created_by",
-        "current_state", // TODO - should we assume completed for CSV upload?
-        "date_of_harvest",
+        { display_name: 'code_lab', database_name: 'code_lab' },
+        { display_name: 'Species', database_name: 'species' },
+        { display_name: 'Popular name', database_name: 'popular_name' },
+        { display_name: 'Site', database_name: 'site' },
+        { display_name: 'State', database_name: 'state' },
+        // TODO - determine if we should not default created by to the current user.
+        // { display_name: 'Created By', database_name: 'created_by' },
+        // TODO - should we assume completed for CSV upload?
+        { display_name: 'Current State', database_name: 'current_state' },
+        { display_name: 'Date of Harvest', database_name: 'date_of_harvest' },
     ];
 
     function onSampleTrustChange(evt: any) {
         setSampleTrust(evt.target.value);
     }
 
-    function addError(error: String) {
+    function addError(error: string) {
         setErrors(errors => [...errors, error]);
     }
 
@@ -110,24 +117,37 @@ export default function ImportCsv() {
         }
 
         // build a counter of all the column types selected
-        var selectedColumnCounts = {};
+        type ColumnCount = {
+            index: number,
+            count: number,
+        }
+        let selectedColumnCounts = new Map<ColumnName, ColumnCount>();
         for (var i = 0; i < tableRows.length; i++) {
-            const column = document.getElementById("columnSelect_" + i)!.value;
-            if (selectedColumnCounts[column] == null) {
-                selectedColumnCounts[column] = {};
+            const selectedValue = (document.getElementById("columnSelect_" + i) as HTMLInputElement)!.value;
+            const columnName = inputColumns.find((col: ColumnName) =>
+                col.display_name == selectedValue);
+            if (!columnName && selectedValue != 'Ignore Column') {
+                addError('Invalid column name: ' + selectedValue + '.');
+                return;
             }
-            selectedColumnCounts[column].count =
-                1 + (selectedColumnCounts[column] != null ? selectedColumnCounts[column] : 0);
-            // index isn't quite right if a column appears multiple times, but either it's the 
-            // ignored column or we will fail for dupe columns.
-            selectedColumnCounts[column].index = i;
+
+            if (selectedColumnCounts.get(columnName!) == null) {
+                let newColumnCount: ColumnCount = {
+                    // index isn't quite right if a column appears multiple times, but either it's the 
+                    // ignored column or we will fail for dupe columns.
+                    index: i,
+                    count: 0,
+                }
+                selectedColumnCounts.set(columnName!, newColumnCount);
+            }
+            let selectedColumn = selectedColumnCounts.get(columnName!)!;
+            selectedColumn.count += 1;
         }
 
-        var columnNames = Object.keys(selectedColumnCounts);
-        var columnsToUpload: String[] = [];
+        var columnsToUpload: ColumnName[] = [];
         for (var column in inputColumns) {
             var columnName = inputColumns[column];
-            if (columnNames.indexOf(columnName) >= 0) {
+            if (selectedColumnCounts.get(columnName) != null) {
                 columnsToUpload.push(columnName);
             }
         }
@@ -143,7 +163,7 @@ export default function ImportCsv() {
         }
 
         columnsToUpload.forEach(function (col) {
-            if (selectedColumnCounts[col] > 1) {
+            if (selectedColumnCounts.get(col) && selectedColumnCounts.get(col)!.count > 1) {
                 addError('Each column can only be selected once.');
                 return;
             }
@@ -163,37 +183,33 @@ export default function ImportCsv() {
             var row = csvValues[rowIndex];
             const internalCode = getRanHex(20);
             const docRef = doc(db, sampleTrust + "_samples", internalCode);
-            batch.set(docRef, {
-                'code_lab': row[selectedColumnCounts['code_lab'].index],
-                'visibility': sampleVisibility,
-                'species': row[selectedColumnCounts['Species'].index],
-                'site': row[selectedColumnCounts['Site'].index],
-                'state': row[selectedColumnCounts['State'].index],
-                'lat': Number(row[selectedColumnCounts['lat'].index]),
-                'lon': Number(row[selectedColumnCounts['lon'].index]),
-                'd13c_cel': row[selectedColumnCounts['d13C_cel'].index],
-                'd13c_wood': row[selectedColumnCounts['d13C_wood'].index],
-                'd13o_cel': row[selectedColumnCounts['d18O_cel'].index],
-                'd15n_wood': row[selectedColumnCounts['d15N_wood'].index],
-                'created_by': user.uid,
-                // 'current_step': '1. Drying process',
-                'status': 'complete',
-                'created_on': serverTimestamp(),
-                'last_updated_by': userData.name,
-                'org': userData.org,
-                'org_name': userData.org_name ? userData.org_name : '-',
-                'created_by_name': userData.name,
+            let payload = {
+                visibility: sampleVisibility,
+                status: 'complete',
+                created_by: user.uid,
+                created_by_name: userData.name,
+                created_on: serverTimestamp(),
+                last_updated_by: userData.name,
+                org: userData.org,
+                org_name: userData.org_name ? userData.org_name : '-',
+
+            };
+            selectedColumnCounts.forEach((colCount, colName) => {
+                if (colName != null) {
+                    payload[colName.database_name] = row[colCount.index];
+                }
             });
+            batch.set(docRef, payload);
         }
 
         // TODO - handle errors.
         batch.commit().then(() => {
             const url = `./my-samples`;
-            router.push(url)
+            router.push(url);
         })
     }
 
-    function onFileChanged(event) {
+    function onFileChanged(event: any) {
         setErrors([]);
 
         // TODO - add a check box if there are headers present in the CSV (or assume there are always headers?)
@@ -273,7 +289,8 @@ export default function ImportCsv() {
                                 {tableRows.map((rows, index) => {
                                     return <td key={"header-" + index}><select key={index} id={"columnSelect_" + index}>
                                         <option key={"ignore-" + index}>Ignore Column</option>
-                                        {inputColumns.map((opt) => <option key={index + '-' + opt}>{opt}</option>)})
+                                        {inputColumns.map((opt: ColumnName) =>
+                                            <option key={index + '-' + opt.database_name}>{opt.display_name}</option>)})
                                     </select></td>;
                                 })}
                             </tr>
