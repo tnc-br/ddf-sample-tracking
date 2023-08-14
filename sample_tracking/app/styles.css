@@ -471,3 +471,7 @@ background: var(--m-3-sys-light-primary, #6750A4);
   .detail-row {
     display: flex;
   }
+
+  .submit-buttons {
+    margin: 40px;
+  }

@@ -260,6 +260,7 @@ label {
 
 .qr-code {
   margin: 30px;
+  text-align: center;
 }
 
 .view-sample-link {
@@ -423,18 +424,18 @@ label {
 }
 
 .add-sample-tab-text {
-  
+
   text-align: center;
   font-family: Roboto;
   font-size: 14px;
   font-style: normal;
-  
+
   line-height: 20px;
   /* 142.857% */
   letter-spacing: 0.25px;
 
   color: var(--grey-700, #5F6368);
-font-weight: 400;
+  font-weight: 400;
 }
 
 .add-sample-current-tab-text {

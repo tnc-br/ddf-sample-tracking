@@ -355,7 +355,7 @@ export default function SampleDataInput(props: SampleDataInputProps) {
                             <input onChange={handleChange} value={formData.site} required name='site' type="text" className="form-control" id="collectionSite" />
                         </div>
                     </div>}
-                    {<div className="form-row">
+                    {originIsKnownOrUncertain() && <div className="form-row">
                         <div className="form-group latlon-input" id="inputLatFormGroup">
                             <label htmlFor="inputLat">{t('latitude')}{originIsKnownOrUncertain() && "*"}</label>
                             <input onChange={handleChange} value={formData.lat} required={originIsKnownOrUncertain()} name='lat' type="text" className="form-control" id="inputLat" />
