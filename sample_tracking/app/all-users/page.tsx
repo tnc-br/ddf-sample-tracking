@@ -162,11 +162,11 @@ export default function Users() {
 
 
     return (<div>
-        <div className='admin-wrapper'>
+        <div className='all-users-admin-wrapper'>
             <h3>{userDetails.role === 'admin' ? "My organization" : "All users"}</h3>
             <div>
-                <div id="usersTable" className='samples-wrapper'>
-                    <p className='header'>Pending approval</p>
+                <div id="usersTable">
+                    <p className='all-users-header'>Pending approval</p>
                     <table className="table">
                     <thead>
                         <tr id="table-header">
@@ -198,7 +198,7 @@ export default function Users() {
                         }
                     </tbody>
                 </table>
-                    {/* <table className="table">
+                    {/* <table className="all-users-table">
                         <thead>
                             <tr id="table-header">
                                 <th>Name</th>
@@ -217,9 +217,9 @@ export default function Users() {
                                             <td>{users[key].email as unknown as string}</td>
                                             <td>{users[key].date_added as unknown as string}</td>
                                             <td>
-                                                {!isSiteAdmin(key) && <button onClick={handleRemoveClick} type="button" className="btn btn-sm btn-outline-danger">Remove</button>}
-                                                {showMakeOrgAdminButton(key) && <button onClick={handleMakeOrgAdminClick} type="button" className="btn btn-sm btn-primary">Make org admin</button>}
-                                                {showMakeSiteAdminButton(key) ? <button onClick={handleMakeSiteAdminClick} type="button" className="btn btn-sm btn-primary">Make site admin</button>
+                                                {!isSiteAdmin(key) && <button onClick={handleRemoveClick} type="button" className="all-users-btn btn-sm btn-outline-danger">Remove</button>}
+                                                {showMakeOrgAdminButton(key) && <button onClick={handleMakeOrgAdminClick} type="button" className="all-users-btn btn-sm btn-primary">Make org admin</button>}
+                                                {showMakeSiteAdminButton(key) ? <button onClick={handleMakeSiteAdminClick} type="button" className="all-users-btn btn-sm btn-primary">Make site admin</button>
                                                 : isSiteAdmin(key) ? <span>User is site admin</span> : <span>User is org admin</span>}
                                                 </td>
                                             
