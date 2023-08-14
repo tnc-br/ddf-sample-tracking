@@ -14,7 +14,7 @@ import { speciesList } from './species_list';
 import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
 import { statesList } from './states_list';
 import { municipalitiesList } from './municipalities_list';
-import { getRanHex, hideNavBar } from './utils';
+import { getRanHex, hideNavBar, hideTopBar } from './utils';
 import { useTranslation } from 'react-i18next';
 import './i18n/config';
 
@@ -28,11 +28,14 @@ type UserData = {
 type SampleDataInputProps = {
     onStateUpdate: any,
     onActionButtonClick: any,
+    onTabChange: any,
     baseState: {},
     actionButtonTitle: string,
     isNewSampleForm: boolean,
     userData: UserData,
-    sampleId: string, 
+    sampleId: string,
+    currentTab: number,
+    isCompletedSample: boolean,
 }
 
 export default function SampleDataInput(props: SampleDataInputProps) {
@@ -43,6 +46,8 @@ export default function SampleDataInput(props: SampleDataInputProps) {
     const [currentTab, setCurrentTab] = useState(1);
 
     const [formData, setFormData] = useState(props.baseState);
+    const [numMeasurements, setNumMeasurements] = useState(2);
+    const [currentMeasurementsTab, setCurentMeasurementsTab] = useState(0);
 
     const router = useRouter();
     const { t } = useTranslation();
@@ -50,6 +55,7 @@ export default function SampleDataInput(props: SampleDataInputProps) {
 
     useEffect(() => {
         hideNavBar();
+        hideTopBar();
     })
 
     if (!props || !props.onStateUpdate || !props.onActionButtonClick || !props.baseState || !props.actionButtonTitle) return;
@@ -63,6 +69,7 @@ export default function SampleDataInput(props: SampleDataInputProps) {
         const currentTabRef = getCurrentTabFormRef();
         if (newTab < currentTab || checkCurrentTabFormValidity()) {
             setCurrentTab(newTab);
+            props.onTabChange(newTab);
         }
     }
 
@@ -84,7 +91,7 @@ export default function SampleDataInput(props: SampleDataInputProps) {
             visibility: 'public',
         }
         setFormData(newFormData);
-        props.onStateUpdate(newFormData);
+        props.onStateUpdate(newFormData, currentTab);
     }
 
     function handleSelectPrivateVisibility() {
@@ -93,7 +100,7 @@ export default function SampleDataInput(props: SampleDataInputProps) {
             visibility: 'private',
         }
         setFormData(newFormData);
-        props.onStateUpdate(newFormData);
+        props.onStateUpdate(newFormData, currentTab);
     }
 
     function handleSelectSupplier() {
@@ -102,7 +109,7 @@ export default function SampleDataInput(props: SampleDataInputProps) {
             collected_by: 'supplier',
         }
         setFormData(newFormData);
-        props.onStateUpdate(newFormData);
+        props.onStateUpdate(newFormData, currentTab);
 
     }
 
@@ -112,7 +119,7 @@ export default function SampleDataInput(props: SampleDataInputProps) {
             collected_by: 'my_org',
         }
         setFormData(newFormData);
-        props.onStateUpdate(newFormData);
+        props.onStateUpdate(newFormData, currentTab);
     }
 
 
@@ -124,24 +131,22 @@ export default function SampleDataInput(props: SampleDataInputProps) {
             [evt.target.name]: value
         }
         setFormData(newFormData);
-        let currentTabRef;
-        if (currentTab === 1) {
-            currentTabRef = document.getElementById('info-tab');
-        } else {
-            currentTabRef = document.getElementById('sample-measurements');
-        }
-        props.onStateUpdate(newFormData, currentTabRef);
+        props.onStateUpdate(newFormData, currentTab);
     }
 
     function handleResultChange(evt: any) {
         const value = evt.target.value;
+        let newFormDataMeasurementsArray = formData[evt.target.name];
+        if (!newFormDataMeasurementsArray) {
+            newFormDataMeasurementsArray = [];
+        }
+        newFormDataMeasurementsArray[currentMeasurementsTab] = value;
         const newFormData = {
             ...formData,
-            [evt.target.name]: value.split(','),
+            [evt.target.name]: newFormDataMeasurementsArray,
         }
         setFormData(newFormData);
-        const currentTabRef = document.getElementById('results-tab');
-        props.onStateUpdate(formData, currentTabRef);
+        props.onStateUpdate(formData, currentTab);
     }
 
     function onCancleClick() {
@@ -171,8 +176,9 @@ export default function SampleDataInput(props: SampleDataInputProps) {
     }
 
     function checkCurrentTabFormValidity(): boolean {
+        if (currentTab === 3) return true;
         const currentTabRef = getCurrentTabFormRef();
-        if (currentTab === 3 && !validateSampleResultsTab()) return false; 
+        if (currentTab === 2 && !validateSampleResultsTab()) return false;
         if (currentTabRef.checkValidity()) {
             // Form is valid, forward to calling component handling.
             if (currentTab === 1 && !formData.trusted) {
@@ -192,17 +198,17 @@ export default function SampleDataInput(props: SampleDataInputProps) {
     }
 
     function validateSampleResultsTab(): boolean {
-        if (!currentTab === 3) {
+        if (!currentTab === 2) {
             return true;
         }
-        const d18O_cel = formData.d18O_cel.map((value: string) => parseFloat(value));
-        const oxygen = formData.oxygen.map((value: string) => parseFloat(value));
-        const nitrogen = formData.nitrogen.map((value: string) => parseFloat(value));
-        const n_wood = formData.n_wood.map((value: string) => parseFloat(value));
-        const carbon = formData.carbon.map((value: string) => parseFloat(value));
-        const c_wood = formData.c_wood.map((value: string) => parseFloat(value));
-        const d13C_cel = formData.d13C_cel.map((value: string) => parseFloat(value));
-        const c_cel = formData.c_cel.map((value: string) => parseFloat(value));
+        const d18O_cel = formData.d18O_cel ? formData.d18O_cel.map((value: string) => parseFloat(value)) : [];
+        const oxygen = formData.oxygen ? formData.oxygen.map((value: string) => parseFloat(value)) : [];
+        const nitrogen = formData.nitrogen ? formData.nitrogen.map((value: string) => parseFloat(value)) : [];
+        const n_wood = formData.n_wood ? formData.n_wood.map((value: string) => parseFloat(value)) : [];
+        const carbon = formData.carbon ? formData.carbon.map((value: string) => parseFloat(value)) : [];
+        const c_wood = formData.c_wood ? formData.c_wood.map((value: string) => parseFloat(value)) : [];
+        const d13C_cel = formData.d13C_cel ? formData.d13C_cel.map((value: string) => parseFloat(value)) : [];
+        const c_cel = formData.c_cel ? formData.c_cel.map((value: string) => parseFloat(value)) : [];
 
         let alertMessage = "";
         if (d18O_cel) {
@@ -224,7 +230,7 @@ export default function SampleDataInput(props: SampleDataInputProps) {
         if (nitrogen) {
             nitrogen.forEach((value: number) => {
                 if (value < -5 || value > 15) {
-                    alertMessage = "d15N_wood should be within the range of 20-32";
+                    alertMessage = "d15N_wood should be within the range of -5-15";
                     alert(alertMessage);
                 }
             })
@@ -232,7 +238,7 @@ export default function SampleDataInput(props: SampleDataInputProps) {
         if (n_wood) {
             n_wood.forEach((value: number) => {
                 if (value < 0 || value > 1) {
-                    alertMessage = "%N_wood should be within the range of 20-32";
+                    alertMessage = "%N_wood should be within the range of 0-1";
                     alert(alertMessage);
                 }
             })
@@ -240,7 +246,7 @@ export default function SampleDataInput(props: SampleDataInputProps) {
         if (carbon) {
             carbon.forEach((value: number) => {
                 if (value < -38 || value > -20) {
-                    alertMessage = "d13C_wood should be within the range of 20-32";
+                    alertMessage = "d13C_wood should be within the range of -38- -20";
                     alert(alertMessage);
                 }
             })
@@ -248,23 +254,23 @@ export default function SampleDataInput(props: SampleDataInputProps) {
         if (c_wood) {
             c_wood.forEach((value: number) => {
                 if (value < 40 || value > 60) {
-                    alertMessage = "%C_wood should be within the range of 20-32";
+                    alertMessage = "%C_wood should be within the range of 40-60";
                     alert(alertMessage);
                 }
             })
         }
         if (d13C_cel) {
-            carbon.forEach((value: number) => {
+            d13C_cel.forEach((value: number) => {
                 if (value < -35 || value > -20) {
-                    alertMessage = "d13C_cel should be within the range of 20-32";
+                    alertMessage = "d13C_cel should be within the range of -35 - -20";
                     alert(alertMessage);
                 }
             })
         }
         if (c_cel) {
-            carbon.forEach((value: number) => {
+            c_cel.forEach((value: number) => {
                 if (value < 40 || value > 60) {
-                    alertMessage = "%C_cel should be within the range of 20-32";
+                    alertMessage = "%C_cel should be within the range of 40-60";
                     alert(alertMessage);
                 }
             })
@@ -290,6 +296,15 @@ export default function SampleDataInput(props: SampleDataInputProps) {
         return true;
     }
 
+    function handleMeasurementsTabClick(evt: any) {
+        console.log(evt);
+        setCurentMeasurementsTab(parseInt(evt.target.id));
+    }
+
+    function handleAddMeasurementClick() {
+        setNumMeasurements(numMeasurements + 1);
+    }
+
 
 
     function basicInfoTab() {
@@ -304,18 +319,17 @@ export default function SampleDataInput(props: SampleDataInputProps) {
                             className={formData.visibility === 'private' ? "button_select private_button selected" : "button_select private_button"}>{t('private')}</div>
                     </div>
                     <div className="form-group">
-                        <label htmlFor="sampleName">{t('sampleName')}</label>
+                        <label htmlFor="sampleName">{t('sampleName')}*</label>
                         <input onChange={handleChange} value={formData.sample_name} name='sample_name' required type="text" className="form-control" id="sampleName" />
                     </div>
-                    <div>
-                        <label htmlFor="sampleTrustSelected" defaultValue={sampleTrust}>{t('status')}</label>
+                    {!props.isNewSampleForm && <div>
+                        <label htmlFor="sampleTrustSelected" defaultValue={sampleTrust}>{t('status')}*</label>
                         <select onChange={handleChange} value={formData.status} required name='status' className="form-select" aria-label="Default select example" id="sampleTrustSelected">
                             <option value="unselected">-- Select option --</option>
-                            <option value="not_started">{t('notStarted')}</option>
                             <option value="in_progress">{t('inProgress')}</option>
                             <option value="concluded">{t('concluded')}</option>
                         </select>
-                    </div>
+                    </div>}
                     <div className="form-group">
                         <datalist id="suggestions">
                             {getSpeciesNames().map((speciesName: string) => {
@@ -327,7 +341,7 @@ export default function SampleDataInput(props: SampleDataInputProps) {
                     </div>
 
                     <div>
-                        <label htmlFor="origin" defaultValue={sampleTrust}>{t('origin')}</label>
+                        <label htmlFor="origin" defaultValue={sampleTrust}>{t('origin')}*</label>
                         <select onChange={handleChange} value={formData.trusted} name='trusted' required className="form-select" aria-label="Default select example" id="origin">
                             <option value="unselected">-- Select option -- </option>
                             <option value="unknown">{t('unknown')}</option>
@@ -337,20 +351,20 @@ export default function SampleDataInput(props: SampleDataInputProps) {
                     </div>
                     {originIsKnownOrUncertain() && <div>
                         <div className="form-group">
-                            <label htmlFor="collectionSite">{t('collectionSite')}</label>
+                            <label htmlFor="collectionSite">{t('collectionSite')}*</label>
                             <input onChange={handleChange} value={formData.site} required name='site' type="text" className="form-control" id="collectionSite" />
                         </div>
                     </div>}
-                    {<div className="form-row">
+                    {originIsKnownOrUncertain() && <div className="form-row">
                         <div className="form-group latlon-input" id="inputLatFormGroup">
-                            <label htmlFor="inputLat">{t('latitude')}</label>
+                            <label htmlFor="inputLat">{t('latitude')}{originIsKnownOrUncertain() && "*"}</label>
                             <input onChange={handleChange} value={formData.lat} required={originIsKnownOrUncertain()} name='lat' type="text" className="form-control" id="inputLat" />
                             <div className="invalid-feedback">
                                 Please provide a latitude.
                             </div>
                         </div>
                         <div className="form-group latlon-input">
-                            <label htmlFor="inputLon">{t('longitude')}</label>
+                            <label htmlFor="inputLon">{t('longitude')}{originIsKnownOrUncertain() && "*"}</label>
                             <input onChange={handleChange} value={formData.lon} required={originIsKnownOrUncertain()} name='lon' type="text" className="form-control" id="inputLon" />
                             <div className="invalid-feedback">
                                 Please provide a longitude.
@@ -359,7 +373,7 @@ export default function SampleDataInput(props: SampleDataInputProps) {
                     </div>}
 
                     {originIsKnownOrUncertain() && <div className="form-group">
-                        <label htmlFor="inputState">State</label>
+                        <label htmlFor="inputState">State*</label>
                         <select onChange={handleChange} value={formData.state} required name='state' className="form-select" aria-label="Default select example" id="state">
                             {getStatesList().map((state: string) => {
                                 return (
@@ -411,45 +425,260 @@ export default function SampleDataInput(props: SampleDataInputProps) {
 
     function sampleMeasurementsTab() {
         return (
-            <form id='sample-measurements' className='grid-columns'>
-                <div className='column-one'>
-                    <div className="form-group">
-                        <label htmlFor="measureing_height">{t('measuringHeight')}</label>
-                        <input onChange={handleChange} value={formData.measureing_height} name='measureing_height' type="text" className="form-control" id="measureing_height" />
+            <form id="sample-measurements">
+                <div className='sample-measurements-overview'>
+                    <div className='sample-measurements-overview-row'>
+                        <div className="form-group half-width-entry">
+                            <label htmlFor="measureing_height">{t('measuringHeight')}</label>
+                            <input onChange={handleChange} value={formData.measureing_height} name='measureing_height' type="text" className="form-control" id="measureing_height" />
+                        </div>
+                        <div className='form-group  half-width-entry'>
+                            <label htmlFor="sample_type" defaultValue={sampleTrust}>{t('sampleType')}*</label>
+                            <select onChange={handleChange} value={formData.sample_type} required name='sample_type' className="form-select" aria-label="Default select example" id="sample_type">
+                                <option value="knonw">Disc</option>
+                                <option value="unkown">Triangular</option>
+                                <option value="uncertain">Chunk</option>
+                                <option value="uncertain">Fiber</option>
+                            </select>
+                        </div>
                     </div>
-                    <div className="form-group">
-                        <label htmlFor="amount_of_measurements">{t('amountOfMeasurements')}</label>
-                        <select onChange={handleChange} value={formData.amount_of_measurementste} required name='amount_of_measurementste' className="form-select" aria-label="Default select example" id="amount_of_measurementste">
-                            <option value={2}>2</option>
-                            <option value={3}>3</option>
-                            <option value={4}>4</option>
-                            <option value={5}>5</option>
-                            <option value={6}>6</option>
-                            <option value={7}>7</option>
-                            <option value={8}>8</option>
-                            <option value={9}>9</option>
-                            <option value={10}>10</option>
-                        </select>
+                    <div className='sample-measurements-overview-row'>
+                        <div className='form-group  half-width-entry'>
+                            <label htmlFor="diameter">{t('diameter')}</label>
+                            <input onChange={handleChange} value={formData.diameter} name='diameter' type="text" className="form-control" id="diameter" />
+                        </div>
+                        {/* <div className='form-group  half-width-entry'>
+                            <label htmlFor="amount_of_measurements">{t('amountOfMeasurements')}*</label>
+                            <select onChange={handleChange} value={formData.amount_of_measurementste} required name='amount_of_measurementste' className="form-select" aria-label="Default select example" id="amount_of_measurementste">
+                                <option value={2}>2</option>
+                                <option value={3}>3</option>
+                                <option value={4}>4</option>
+                                <option value={5}>5</option>
+                                <option value={6}>6</option>
+                                <option value={7}>7</option>
+                                <option value={8}>8</option>
+                                <option value={9}>9</option>
+                                <option value={10}>10</option>
+                            </select>
+                        </div> */}
                     </div>
-                    <div>
-                        <label htmlFor="sample_type" defaultValue={sampleTrust}>{t('sampleType')}</label>
-                        <select onChange={handleChange} value={formData.sample_type} required name='sample_type' className="form-select" aria-label="Default select example" id="sample_type">
-                            <option value="knonw">Disc</option>
-                            <option value="unkown">Triangular</option>
-                            <option value="uncertain">Chunk</option>
-                            <option value="uncertain">Fiber</option>
-                        </select>
-                    </div>
-                    <div className="form-group">
-                        <label htmlFor="diameter">{t('diameter')}</label>
-                        <input onChange={handleChange} value={formData.diameter} name='diameter' type="text" className="form-control" id="diameter" />
-                    </div>
-                    <div className="form-group">
-                        <label htmlFor="observations">{t('observations')}</label>
-                        <input onChange={handleChange} value={formData.observations} name='observations' type="text" className="form-control" id="observations" />
+                    <div className='sample-measurements-overview-row'>
+                        <div className="form-group full-width-entry">
+                            <label htmlFor="observations">{t('observations')}</label>
+                            <input onChange={handleChange} value={formData.observations} name='observations' type="text" className="form-control" id="observations" />
+                        </div>
                     </div>
                 </div>
+                <div className="sample-measurements-entry">
+                    <div className="sample-measurements-title">Sample measurements</div>
+                    <div className="sample-measurements-instructions">Enter all the measurements of at least 1 sample to continue</div>
+                    <div onClick={handleAddMeasurementClick} className="button">
+                        <div className="add-measurement-button-wrapper">
+                            <span className="material-symbols-outlined">
+                                add
+                            </span>
+                            <span className='add-measurement-button-text'>Add measurement</span>
+                        </div>
+                    </div>
+                    <div className='measurements-table'>
+                        <div className='measurements-table-tabs'>
+                            <div className='measurements-table-tabs-group'>
+                                {Array.from({ length: numMeasurements }, (_, index) => (
+                                    <div onClick={handleMeasurementsTabClick}>
+                                        <div className={currentMeasurementsTab === index ? "selected-measurements-tab-wrapper measurements-tab-wrapper" : "measurements-tab-wrapper"}>
+                                            <div className='measurements-tab-state-layer'>
+                                                <div className='measurements-tab-contents'>
+                                                    <div id={index.toString()} className='measurements-tab-text'>
+                                                        Measurement {index + 1}
+                                                    </div>
+                                                </div>
+                                                {currentMeasurementsTab === 0 && <div className='measurements-tab-indicator'></div>}
+                                            </div>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                            <div className='measurements-entry-wrapper'>
+                                <div className='measurements-row'>
+                                    <div className="form-group">
+                                        <label htmlFor="d18O_cel">d18O_cel</label>
+                                        <input onChange={handleResultChange} value={formData.d18O_cel ? formData.d18O_cel[currentMeasurementsTab] || '' : ''} name='d18O_cel' type="text" className="form-control" id="d18O_cel" />
+                                    </div>
+                                    <div className="form-group">
+                                        <label htmlFor="oxygen">d18O_wood</label>
+                                        <input onChange={handleResultChange} value={formData.oxygen ? formData.oxygen[currentMeasurementsTab] || '' : ''} name='oxygen' type="text" className="form-control" id="oxygen" />
+                                    </div>
+                                    <div className="form-group">
+                                        <label htmlFor="nitrogen">d15N_wood</label>
+                                        <input onChange={handleResultChange} value={formData.nitrogen ? formData.nitrogen[currentMeasurementsTab] || '' : ''} name='nitrogen' type="text" className="form-control" id="nitrogen" />
+                                    </div>
+                                    <div className="form-group">
+                                        <label htmlFor="n_wood">N_wood</label>
+                                        <input onChange={handleResultChange} value={formData.n_wood ? formData.n_wood[currentMeasurementsTab] || '' : ''} name='n_wood' type="text" className="form-control" id="n_wood" />
+                                    </div>
+                                </div>
+                                <div className='measurements-row'>
+                                    <div className="form-group">
+                                        <label htmlFor="carbon">d13C_wood</label>
+                                        <input onChange={handleResultChange} value={formData.carbon ? formData.carbon[currentMeasurementsTab] || '' : ''} name='carbon' type="text" className="form-control" id="carbon" />
+                                    </div>
+                                    <div className="form-group">
+                                        <label htmlFor="d18O_wood">%C_wood</label>
+                                        <input onChange={handleResultChange} value={formData.c_wood ? formData.c_wood[currentMeasurementsTab] || '' : ''} name='c_wood' type="text" className="form-control" id="c_wood" />
+                                    </div>
+                                    <div className="form-group">
+                                        <label htmlFor="d13C_cel">d13C_cel</label>
+                                        <input onChange={handleResultChange} value={formData.d13C_cel ? formData.d13C_cel[currentMeasurementsTab] || '' : ''} name='d13C_cel' type="text" className="form-control" id="d13C_cel" />
+                                    </div>
+                                    <div className="form-group">
+                                        <label htmlFor="c_cel">%C_cel</label>
+                                        <input onChange={handleResultChange} value={formData.c_cel ? formData.c_cel[currentMeasurementsTab] || '' : ''} name='c_cel' type="text" className="form-control" id="c_cel" />
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+
+                    </div>
+
+                </div>
+
             </form>
+        )
+    }
+
+    function reviewAndSubmitTab() {
+        return (
+            <div>
+                <div className="details">
+                    <div className='section-title'>
+                        Details
+                    </div>
+                    <div className="detail-row">
+                        <div className='detail'>
+                            <span className="detail-name">{t('sampleName')}</span>
+                            <span className='detail-value'>{formData['visibility'] || "unknown"}</span>
+                        </div>
+                        <div className='detail'>
+                            <span className="detail-name">{t('collectionSite')}</span>
+                            <span className='detail-value'>{formData['site'] || "unknown"}</span>
+                        </div>
+                        <div className='detail'>
+                            <span className="detail-name">{t('supplierName')}</span>
+                            <span className='detail-value'>{formData['supplier'] || "unknown"}</span>
+                        </div>
+                    </div>
+
+                    <div className="detail-row">
+                        <div className='detail'>
+                            <span className="detail-name">{t('sampleName')}</span>
+                            <span className='detail-value'>{formData['sample_name'] || "unknown"}</span>
+                        </div>
+                        <div className='detail'>
+                            <span className="detail-name">{t('latitude')}</span>
+                            <span className='detail-value'>{formData['lat'] || "unknown"}</span>
+                        </div>
+                        <div className='detail'>
+                            <span className="detail-name">{t('city')}</span>
+                            <span className='detail-value'>{formData['city'] || "unknown"}</span>
+                        </div>
+                    </div>
+
+                    <div className="detail-row">
+                        <div className='detail'>
+                            <span className="detail-name">{t('treeSpecies')}</span>
+                            <span className='detail-value'>{formData['species'] || "unknown"}</span>
+                        </div>
+                        <div className='detail'>
+                            <span className="detail-name">{t('longitude')}</span>
+                            <span className='detail-value'>{formData['lon'] || "unknown"}</span>
+                        </div>
+                        <div className='detail'>
+                            <span className="detail-name">{t('collectedBy')}</span>
+                            <span className='detail-value'>{formData['collected_by']}</span>
+                        </div>
+                    </div>
+
+                    <div className="detail-row">
+                        <div className='detail'>
+                            <span className="detail-name">{t('origin')}</span>
+                            <span className='detail-value'>{formData['d18O_cel']}</span>
+                        </div>
+                    </div>
+                </div>
+                <div className='measurements-table'>
+                    <div className='measurements-table-tabs'>
+                        <div className='measurements-table-tabs-group'>
+                            {Array.from({ length: numMeasurements }, (_, index) => (
+                                <div onClick={handleMeasurementsTabClick}>
+                                    <div className={currentMeasurementsTab === index ? "selected-measurements-tab-wrapper measurements-tab-wrapper" : "measurements-tab-wrapper"}>
+                                        <div className='measurements-tab-state-layer'>
+                                            <div className='measurements-tab-contents'>
+                                                <div id={index.toString()} className='measurements-tab-text'>
+                                                    Measurement {index + 1}
+                                                </div>
+                                            </div>
+                                            {currentMeasurementsTab === 0 && <div className='measurements-tab-indicator'></div>}
+                                        </div>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                        <div className='measurements-entry-wrapper'>
+                            <div className="detail-row">
+                                <div className='detail'>
+                                    <span className="detail-name">{t('d18O_cel')}</span>
+                                    <span className='detail-value'>{formData.d18O_cel ? formData.d18O_cel[currentMeasurementsTab] || '' : ''}</span>
+                                </div>
+                                <div className='detail'>
+                                    <span className="detail-name">{t('oxygen')}</span>
+                                    <span className='detail-value'>{formData.oxygen ? formData.oxygen[currentMeasurementsTab] || '' : ''}</span>
+                                </div>
+                                <div className='detail'>
+                                    <span className="detail-name">{t('nitrogen')}</span>
+                                    <span className='detail-value'>{formData.nitrogen ? formData.nitrogen[currentMeasurementsTab] || '' : ''}</span>
+                                </div>
+                            </div>
+
+                            <div className="detail-row">
+                                <div className='detail'>
+                                    <span className="detail-name">{t('n_wood')}</span>
+                                    <span className='detail-value'>{formData.n_wood ? formData.n_wood[currentMeasurementsTab] || '' : ''}</span>
+                                </div>
+                                <div className='detail'>
+                                    <span className="detail-name">{t('carbon')}</span>
+                                    <span className='detail-value'>{formData.carbon ? formData.carbon[currentMeasurementsTab] || '' : ''}</span>
+                                </div>
+                                <div className='detail'>
+                                    <span className="detail-name">{t('c_wood')}</span>
+                                    <span className='detail-value'>{formData.c_wood ? formData.c_wood[currentMeasurementsTab] || '' : ''}</span>
+                                </div>
+                            </div>
+
+                            <div className="detail-row">
+                                <div className='detail'>
+                                    <span className="detail-name">{t('d13C_cel')}</span>
+                                    <span className='detail-value'>{formData.d13C_cel ? formData.d13C_cel[currentMeasurementsTab] || '' : ''}</span>
+                                </div>
+                                <div className='detail'>
+                                    <span className="detail-name">{t('c_cel')}</span>
+                                    <span className='detail-value'>{formData.c_cel ? formData.c_cel[currentMeasurementsTab] || '' : ''}</span>
+                                </div>
+
+                            </div>
+
+                            <div className="detail-row">
+                                <div className='detail'>
+                                    <span className="detail-name">{t('origin')}</span>
+                                    <span className='detail-value'>{formData['d18O_cel']}</span>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+
+                </div>
+            </div>
         )
     }
 
@@ -490,9 +719,9 @@ export default function SampleDataInput(props: SampleDataInputProps) {
                 <p className='qr-title'>Sample QR code</p>
                 <p className='qr-subtitle'>Print and paste this QR code on the sample to be analayzed</p>
                 <div id='qr-code'>
-                 <QRCodeSVG value={url} />
+                    <QRCodeSVG value={url} />
                 </div>
-                
+
                 <button onClick={handlePrint} id="print-button" type="button" className="btn btn-primary print-button">Print</button>
 
             </div>
@@ -507,9 +736,9 @@ export default function SampleDataInput(props: SampleDataInputProps) {
         return (
             <div>
                 <div className="result-instructions">
-                Enter the values for each sample separated by a comma (,).
+                    Enter the values for each sample separated by a comma (,).
                 </div>
-                
+
                 <form id='results-tab' className='grid-columns'>
                     <div className='column-one'>
                         <div className="form-group">
@@ -568,6 +797,7 @@ export default function SampleDataInput(props: SampleDataInputProps) {
         return currentTab === 4;
     }
     function shouldShowNextButton(): boolean {
+        if (!props.isCompletedSample) return false;
         if (formData.status === 'concluded') {
             return currentTab < 3;
         } else {
@@ -584,7 +814,7 @@ export default function SampleDataInput(props: SampleDataInputProps) {
         return !userIsOnLastTab();
     }
     function shouldShowActionItemButton(): boolean {
-        const isTabBeforeCreateSample = (formData.status === 'concluded' && currentTab === 3) || (formData.status !== 'concluded' && currentTab === 2);
+        const isTabBeforeCreateSample = (props.isCompletedSample && currentTab === 3) || (!props.isCompletedSample && currentTab === 1);
         return isTabBeforeCreateSample || !props.isNewSampleForm;
     }
     function handleReturnToDashboard() {
@@ -594,7 +824,7 @@ export default function SampleDataInput(props: SampleDataInputProps) {
         let nextTab = currentTab + 1;
         if (formData.status !== 'concluded' && nextTab === 3) {
             nextTab++;
-        } 
+        }
         attemptToUpdateCurrentTab(nextTab);
     }
 
@@ -603,18 +833,13 @@ export default function SampleDataInput(props: SampleDataInputProps) {
     return (
         <div className="add-sample-page-wrapper">
             <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@48,400,0,0&display=optional" />
-            <div className="sample-details-form">
+            <div>
                 <div id='sample-form'>
-                    <div className="tabs">
-                        <div className={currentTab === 1 ? "current_tab" : "unselected_tab"}>{t('basicInfo')}</div>
-                        <div className={currentTab === 2 ? "current_tab" : "unselected_tab"}>{t('sampleMeasurements')}</div>
-                        {formData.status === 'concluded' && <div className={currentTab === 3 ? "current_tab" : "unselected_tab"}>{t('sampleResults')}</div>}
-                        {props.isNewSampleForm && <div className={currentTab === 4 ? "current_tab" : "unselected_tab"}>{t('createSample')}</div>}
-                    </div>
+
                     <div>
                         {currentTab === 1 && basicInfoTab()}
                         {currentTab === 2 && sampleMeasurementsTab()}
-                        {currentTab === 3 && sampleResultsTab()}
+                        {currentTab === 3 && reviewAndSubmitTab()}
                         {currentTab === 4 && createSampleTab()}
                     </div>
                 </div>
