@@ -224,7 +224,7 @@ export default function SamplesTable(props: SampleDataProps) {
                             </button>
                             <button
                                 disabled={!table.getIsSomeRowsSelected()}
-                                type="button" className="btn btn-primary"
+                                type="button" className="btn btn-primary export-button"
                                 onClick={() => onDowloadClick(table.getSelectedRowModel().rows)}>
                                 Export selected
                             </button>
