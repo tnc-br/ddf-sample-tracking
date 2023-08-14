@@ -71,17 +71,22 @@ export default function ImportCsv() {
         database_name: string,
     }
 
+    const resultValues: string[] = ['d18O_cel','nitrogen', 'carbon', 'd13C_cel', 'oxygen', 'c_cel']
+
     const requiredColumns: ColumnName[] = [
-        { display_name: 'lat', database_name: 'lat' },
-        { display_name: 'lon', database_name: 'lon' },
-        { display_name: 'd18O_cel', database_name: 'd18O_cel' },
-        { display_name: 'd15N_wood', database_name: 'd15N_wood' },
-        { display_name: 'd13C_wood', database_name: 'd13C_wood' },
-        { display_name: 'd13C_cel', database_name: 'd13C_cel' },
+        
     ]
 
     const inputColumns: ColumnName[] = [
-        ...requiredColumns,
+        // ...requiredColumns,
+        { display_name: 'lat', database_name: 'lat' },
+        { display_name: 'lon', database_name: 'lon' },
+        { display_name: 'd18O_cel', database_name: 'd18O_cel' },
+        { display_name: 'd15N_wood', database_name: 'nitrogen' },
+        { display_name: 'd13C_wood', database_name: 'carbon' },
+        { display_name: 'd13C_cel', database_name: 'd13C_cel' },
+        { display_name: 'd18O_wood', database_name: 'oxygen' },
+        { display_name: '%C_cel', database_name: 'c_cel' },
         { display_name: 'code_lab', database_name: 'code_lab' },
         { display_name: 'Species', database_name: 'species' },
         { display_name: 'Popular name', database_name: 'popular_name' },
@@ -185,7 +190,7 @@ export default function ImportCsv() {
             const docRef = doc(db, sampleTrust + "_samples", internalCode);
             let payload = {
                 visibility: sampleVisibility,
-                status: 'complete',
+                status: 'concluded',
                 created_by: user.uid,
                 created_by_name: userData.name,
                 created_on: serverTimestamp(),
@@ -199,12 +204,19 @@ export default function ImportCsv() {
                     payload[colName.database_name] = row[colCount.index];
                 }
             });
+            resultValues.forEach((resultValue: string) => {
+                if (payload[resultValue]) {
+                    payload[resultValue] = payload[resultValue].split(',').map((value: string) => parseFloat(value));
+                }
+                
+            })
+
             batch.set(docRef, payload);
         }
 
         // TODO - handle errors.
         batch.commit().then(() => {
-            const url = `./my-samples`;
+            const url = `./samples`;
             router.push(url);
         })
     }
@@ -262,18 +274,16 @@ export default function ImportCsv() {
                         )}
                     </Stack>
                 </div>
-                <label htmlFor="sampleTrustSelected" defaultValue={sampleTrust}>Is this sample trusted?</label>
+                <label htmlFor="sampleTrustSelected" defaultValue={sampleTrust}>What is the origin of this sample?</label>
                 <select onChange={onSampleTrustChange} className="form-select" id="sampleTrustSelected" aria-label="Select sample trusted status">
-                    <option value="untrusted">No</option>
-                    <option value="trusted">Yes</option>
+                    <option value="untrusted">Uncertain</option>
+                    <option value="trusted">Known</option>
                     <option value="unknown">Unkown</option>
                 </select>
                 <label htmlFor="sampleVisibility">Sample visibility</label>
                 <select className="form-select" id="sampleVisibility" aria-label="Select sample visibility">
                     <option value="public">Publicly available</option>
-                    <option value="logged_in">Available to any logged-in user</option>
-                    <option value="organization">Available to my organization only</option>
-                    <option value="private">Private to me and admins only</option>
+                    <option value="organization">Available to only my organization</option>
                 </select>
                 <label htmlFor="formFile" className="form-label">Upload CSV file</label>
                 <input capture onChange={onFileChanged} accept=".csv" className="form-control" type="file" id="formFile" />

@@ -30,14 +30,14 @@
 }
 
 
-.print-button {
+/* .print-button {
   background-color: lightblue;
   width: 86px;
   padding: 5px;
   margin-top: 30px;
   margin-bottom: 30px;
   border-radius: 3px;
-}
+} */
 
 .submit-buttons {
   float: right;
