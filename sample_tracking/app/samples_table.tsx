@@ -90,7 +90,7 @@ export default function SamplesTable(props: SampleDataProps) {
             {
                 accessorFn: (row) => (row as Sample).status ?? '',
                 header: t('status'),
-                size: 200,
+                size: 100,
                 filterVariant: 'select',
 
             },
