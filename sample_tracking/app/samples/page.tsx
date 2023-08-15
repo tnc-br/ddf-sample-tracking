@@ -218,12 +218,11 @@ export default function Samples() {
     return (
         <div className='samples-page-wrapper'>
             <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@48,400,0,0" />
-            {<div id="samplesTable" className='samples-wrapper'>
+            {(allSamples.inProgress || allSamples.completed) ? <div id="samplesTable" className='samples-wrapper'>
                 <div className='samples-summary'>
                     {allSamples.inProgress && <div className='samples-summary-box'>
                         <div className='samples-size-label'>{allSamples.inProgress.length}</div>
                         <span className="samples-badge samples-in-progress">{t('inProgress')}</span>
-                        {/* <div>In progress</div> */}
                     </div>}
 
                     {allSamples.completed && <div className='samples-summary-box'>
@@ -243,7 +242,11 @@ export default function Samples() {
                 </div>
                 {!allSamples.inProgress && !allSamples.completed && <div>No samples to show. Wait to be accepted to an organization to view samples.</div>}
 
-            </div>}
+            </div> :
+                <div className="spinner-grow text-success" role="status">
+                    <span className="sr-only"></span>
+                </div>
+            }
         </div>
     )
 }

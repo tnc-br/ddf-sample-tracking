@@ -76,12 +76,6 @@
     cursor: default;
 }
 
-.samples-actions-button {
-    color: blue !important;
-    text-decoration: underline;
-    cursor: pointer;
-}
-
 .samples-sample-table {
     margin-top: 50px;
 }
@@ -117,4 +111,14 @@
 .samples-completed {
     background: #E6F4EA;
     color:  #137333;
+}
+
+
+.spinner-grow {
+    width: 200px;
+    height: 200px;
+    position: absolute;
+    top: 45%;
+    left: 45%;
+    opacity: .5 !important;
 }

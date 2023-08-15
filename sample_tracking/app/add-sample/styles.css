@@ -45,9 +45,12 @@
 }
 
 .sample-details-form-wrapper {
-  left: 159px;
+  /* left: 159px; */
   top: 124px;
   position: absolute;
+  width: 970px;
+  left: 50%;
+  transform: translate(-50%, 0);
 }
 
 .form-group,
@@ -189,7 +192,7 @@ label {
 }
 
 .page-title-wrapper {
-  position: absolute;
+  /* position: absolute;
   width: 1440px;
   height: 64px;
   padding: 8px 4px;
@@ -197,20 +200,50 @@ label {
   gap: 4px;
   flex-shrink: 0;
   display: flex;
-  left: 10px;
+  left: 10px; */
+
+  display: flex;
+width: 1440px;
+height: 64px;
+padding: 8px 4px;
+align-items: center;
+gap: 4px;
+flex-shrink: 0;
+background: var(--timber-id-sys-light-surface, #F8FAFA);
+}
+
+.add-sample-close-icon {
+  display: flex !important;
+width: 48px;
+height: 48px;
+flex-direction: column;
+justify-content: center;
+align-items: center;
+gap: 10px;
+flex-shrink: 0;
+}
+
+.close-icon {
+  text-decoration: none;
 }
 
 .page-title-text {
-  color: var(--m-3-sys-light-on-surface, #1D1B20);
-
-  /* M3/title/large */
+  /* color: var(--m-3-sys-light-on-surface, #1D1B20);
   font-family: Roboto;
   font-size: 22px;
   font-style: normal;
   font-weight: 400;
   line-height: 28px;
-  /* 127.273% */
-  left: 40px;
+  left: 40px; */
+
+  color: var(--timber-id-sys-light-on-surface, #191C1D);
+
+/* TimberID/title/large */
+font-family: Roboto;
+font-size: 22px;
+font-style: normal;
+font-weight: 400;
+line-height: 28px; /* 127.273% */
 }
 
 .sample-details-section-title {
@@ -332,6 +365,9 @@ label {
   display: flex;
   width: 699px;
   align-items: flex-start;
+  position: relative;
+  left: 50%;
+  transform: translate(-50%, 0);
 }
 
 .add-sample-add-details-tab {

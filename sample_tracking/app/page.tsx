@@ -5,7 +5,7 @@ import 'bootstrap/dist/css/bootstrap.css';
 import { useState, useEffect } from 'react';
 
 import { initializeApp } from "firebase/app";
-import { getAuth } from "firebase/auth";
+import { getAuth, onAuthStateChanged } from "firebase/auth";
 
 import { useRouter } from 'next/navigation'
 import { initializeAppIfNecessary } from './utils';
@@ -22,12 +22,16 @@ export default function Home() {
 
 
   useEffect(() => {
-    if (user) {
-      router.push('/samples');
-    } else {
-      router.push('/login');
-    }
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        router.push('/samples');
+      } else {
+        router.push('/login');
+      }
+    });
   });
 
-
+  return (
+    <div className='initalLoadBackground'></div>
+  )
 }
