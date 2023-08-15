@@ -123,7 +123,23 @@ line-height: 24px; /* 150% */
 letter-spacing: 0.15px;
 }
 
+.legend {
+  display: inline-block;
+  height: 0.8em;
+  width: 0.8em;
+  border-radius: 100%;
+  border: 1px solid black;
+}
 
+.legend.anthropic            { background-color: #fffbc2; }
+.legend.primary-vegetation   { background-color: #09611f; }
+.legend.secondary-vegetation { background-color: #4ea376; }
+
+.mapbiomas-footer {
+  margin-left: auto;
+  font-style: italic;
+  color: #5F6368;
+}
 
 .sample-details {
   border-radius: 8px;

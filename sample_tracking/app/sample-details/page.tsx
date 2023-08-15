@@ -213,6 +213,7 @@ export default function SampleDetails() {
     function DetailsTab() {
 
         const url = `timberid.org/sample-details?trusted=${trusted}&id=${sampleId}`;
+        const mapUrl = `https://storage.googleapis.com/timberid-maps/${sampleId}`;
 
         return (
             <div>
@@ -339,12 +340,14 @@ export default function SampleDetails() {
                             <span className='detail-value'>{selectedDoc['water_pct'] ? formatAsPercentage(selectedDoc['water_pct']['water_mean_in_10km_buffer']) : "unknown"}</span>
                         </div>
                     </div>
+                    <div className='mapbiomas-footer'>Data from MapBiomas, 2021</div>
                 </div>
 
                 <div className='details'>
                     <div className='section-title'>
                         Land use details in a 10km buffer radius zone
                     </div>
+                    <iframe src={mapUrl} frameborder="0" height="300px" width="100%"></iframe>
                     <table className="table">
                         <thead>
                             <tr>
@@ -357,25 +360,26 @@ export default function SampleDetails() {
                         </thead>
                         <tbody>
                             <tr>
-                                <th scope="row">Anthropic Use (Urban, agriculture, etc)</th>
+                                <th scope="row"><div className='anthropic legend'></div> Anthropic Use (Urban, agriculture, etc)</th>
                                 {Array.from({ length: 11 }, (_, index) => (
                                     <td key={index}>{selectedDoc['land_use_anthropic_pct'] ? formatAsPercentage(selectedDoc['land_use_anthropic_pct']["" + (2011 + index)]) : "unknown"}</td>
                                 ))}
                             </tr>
                             <tr>
-                                <th scope="row">Primary Vegetation</th>
+                                <th scope="row"><div className='primary-vegetation legend'></div> Primary Vegetation</th>
                                 {Array.from({ length: 11 }, (_, index) => (
                                     <td key={index}>{selectedDoc['land_use_primary_vegetation_pct'] ? formatAsPercentage(selectedDoc['land_use_primary_vegetation_pct']["" + (2011 + index)]) : "unknown"}</td>
                                 ))}
                             </tr>
                             <tr>
-                                <th scope="row">Secondary Vegetation and regrowth</th>
+                                <th scope="row"><div className='secondary-vegetation legend'></div> Secondary Vegetation and regrowth</th>
                                 {Array.from({ length: 11 }, (_, index) => (
                                     <td key={index}>{selectedDoc['land_use_secondary_vegetation_or_regrowth_pct'] ? formatAsPercentage(selectedDoc['land_use_secondary_vegetation_or_regrowth_pct']["" + (2011 + index)]) : "unknown"}</td>
                                 ))}
                             </tr>
                         </tbody>
                     </table>
+                    <div className='mapbiomas-footer'>Data from MapBiomas, 2021</div>
                 </div>
 
                 <div id='qr-code'>
