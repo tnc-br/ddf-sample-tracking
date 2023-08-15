@@ -177,8 +177,9 @@ export default function SignUpRequests() {
         deleteDoc(doc(db, "new_users", memberId));
         const newProspectiveUsersList = prospectiveUsers;
         delete newProspectiveUsersList[memberId];
-        setProspectiveUsers(newProspectiveUsersList);
+        document.getElementById(memberId)?.remove();
 
+        setProspectiveUsers(newProspectiveUsersList);
     }
 
     return (

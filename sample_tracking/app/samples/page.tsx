@@ -220,25 +220,25 @@ export default function Samples() {
             <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@48,400,0,0" />
             {<div id="samplesTable" className='samples-wrapper'>
                 <div className='samples-summary'>
-                    {allSamples.inProgress && <div className='summary-box'>
+                    {allSamples.inProgress && <div className='samples-summary-box'>
                         <div className='samples-size-label'>{allSamples.inProgress.length}</div>
-                        <span className="badge in-progress">{t('inProgress')}</span>
+                        <span className="samples-badge samples-in-progress">{t('inProgress')}</span>
                         {/* <div>In progress</div> */}
                     </div>}
 
-                    {allSamples.completed && <div className='summary-box'>
+                    {allSamples.completed && <div className='samples-summary-box'>
                         <div className='samples-size-label'>{allSamples.completed.length}</div>
-                        <span className="badge completed">{t('completed')}</span>
+                        <span className="samples-badge samples-completed">{t('completed')}</span>
                     </div>}
                 </div>
 
-                <div className="sample-table">
-                    <p className='header'>{t('inProgress')}</p>
+                <div className="samples-sample-table">
+                    <p className='samples-header'>{t('inProgress')}</p>
                     {allSamples.inProgress && <SamplesTable samplesData={allSamples.inProgress as Sample[]} canDeleteSamples={isAdmin()} />}
                 </div>
 
-                <div className="sample-table">
-                    <p className='header'>{t('completed')}</p>
+                <div className="samples-sample-table">
+                    <p className='samples-header'>{t('completed')}</p>
                     {allSamples.completed && <SamplesTable samplesData={allSamples.completed as Sample[]} canDeleteSamples={isAdmin()} />}
                 </div>
                 {!allSamples.inProgress && !allSamples.completed && <div>No samples to show. Wait to be accepted to an organization to view samples.</div>}

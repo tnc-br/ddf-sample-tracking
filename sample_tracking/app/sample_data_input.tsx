@@ -484,7 +484,7 @@ export default function SampleDataInput(props: SampleDataInputProps) {
                         <div className='measurements-table-tabs'>
                             <div className='measurements-table-tabs-group'>
                                 {Array.from({ length: numMeasurements }, (_, index) => (
-                                    <div onClick={handleMeasurementsTabClick}>
+                                    <div key={index} onClick={handleMeasurementsTabClick}>
                                         <div className={currentMeasurementsTab === index ? "selected-measurements-tab-wrapper measurements-tab-wrapper" : "measurements-tab-wrapper"}>
                                             <div className='measurements-tab-state-layer'>
                                                 <div className='measurements-tab-contents'>
@@ -610,7 +610,7 @@ export default function SampleDataInput(props: SampleDataInputProps) {
                     <div className='measurements-table-tabs'>
                         <div className='measurements-table-tabs-group'>
                             {Array.from({ length: numMeasurements }, (_, index) => (
-                                <div onClick={handleMeasurementsTabClick}>
+                                <div key={index} onClick={handleMeasurementsTabClick}>
                                     <div className={currentMeasurementsTab === index ? "selected-measurements-tab-wrapper measurements-tab-wrapper" : "measurements-tab-wrapper"}>
                                         <div className='measurements-tab-state-layer'>
                                             <div className='measurements-tab-contents'>

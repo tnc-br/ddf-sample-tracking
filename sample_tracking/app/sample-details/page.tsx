@@ -269,7 +269,11 @@ export default function SampleDetails() {
                     <div className="detail-row">
                         <div className='detail'>
                             <span className="detail-name">{t('origin')}</span>
-                            <span className='detail-value'>{selectedDoc['d18O_cel']}</span>
+                            <span className='detail-value'>{selectedDoc['trusted']}</span>
+                        </div>
+                        <div className='detail'>
+                            <span className="detail-name">{t('validity')}</span>
+                            <span className='detail-value'>{selectedDoc['validity']}</span>
                         </div>
                     </div>
                 </div>

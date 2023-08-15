@@ -90,7 +90,7 @@ export default function SamplesTable(props: SampleDataProps) {
             {
                 accessorFn: (row) => (row as Sample).status ?? '',
                 header: t('status'),
-                size: 200,
+                size: 100,
                 filterVariant: 'select',
 
             },
@@ -224,7 +224,7 @@ export default function SamplesTable(props: SampleDataProps) {
                             </button>
                             <button
                                 disabled={!table.getIsSomeRowsSelected()}
-                                type="button" className="btn btn-primary"
+                                type="button" className="btn btn-primary export-button"
                                 onClick={() => onDowloadClick(table.getSelectedRowModel().rows)}>
                                 Export selected
                             </button>
