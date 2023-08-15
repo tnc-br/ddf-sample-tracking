@@ -365,6 +365,9 @@ line-height: 28px; /* 127.273% */
   display: flex;
   width: 699px;
   align-items: flex-start;
+  position: relative;
+  left: 50%;
+  transform: translate(-50%, 0);
 }
 
 .add-sample-add-details-tab {
