@@ -69,7 +69,7 @@ export default function SampleDataInput(props: SampleDataInputProps) {
         const currentTabRef = getCurrentTabFormRef();
         if (newTab < currentTab || checkCurrentTabFormValidity()) {
             setCurrentTab(newTab);
-            props.onTabChange(newTab);
+            if (props.onTabChange) props.onTabChange(newTab);
         }
     }
 
@@ -157,7 +157,7 @@ export default function SampleDataInput(props: SampleDataInputProps) {
         const currentTabRef = getCurrentTabFormRef();
         if (!checkCurrentTabFormValidity()) return;
         props.onActionButtonClick(props.sampleId);
-        attemptToUpdateCurrentTab(4);
+        // attemptToUpdateCurrentTab(4);
         // if (!props.isNewSampleForm) {
         //     props.onActionButtonClick();
         // } else {
@@ -798,11 +798,12 @@ export default function SampleDataInput(props: SampleDataInputProps) {
     }
     function shouldShowNextButton(): boolean {
         if (!props.isCompletedSample) return false;
-        if (formData.status === 'concluded') {
-            return currentTab < 3;
-        } else {
-            return currentTab < 2
-        }
+        return currentTab < 3;
+        // if (formData.status === 'concluded') {
+        //     return currentTab < 3;
+        // } else {
+        //     return currentTab < 2
+        // }
 
     }
 
@@ -820,13 +821,6 @@ export default function SampleDataInput(props: SampleDataInputProps) {
     function handleReturnToDashboard() {
         router.push('/samples')
     }
-    function handleNextButtonClick() {
-        let nextTab = currentTab + 1;
-        if (formData.status !== 'concluded' && nextTab === 3) {
-            nextTab++;
-        }
-        attemptToUpdateCurrentTab(nextTab);
-    }
 
 
 
@@ -840,13 +834,13 @@ export default function SampleDataInput(props: SampleDataInputProps) {
                         {currentTab === 1 && basicInfoTab()}
                         {currentTab === 2 && sampleMeasurementsTab()}
                         {currentTab === 3 && reviewAndSubmitTab()}
-                        {currentTab === 4 && createSampleTab()}
+                        {/* {currentTab === 4 && createSampleTab()} */}
                     </div>
                 </div>
                 <div className='submit-buttons'>
                     {shouldShowCancelButton() && <button type="button" onClick={onCancleClick} className="btn btn-outline-primary">Cancel</button>}
                     {shouldShowBackButton() && <button type="button" onClick={() => attemptToUpdateCurrentTab(currentTab - 1)} className="btn btn-primary">Back</button>}
-                    {shouldShowNextButton() && <button type="button" onClick={handleNextButtonClick} className="btn btn-primary next-button">Next</button>}
+                    {shouldShowNextButton() && <button type="button" onClick={() => attemptToUpdateCurrentTab(currentTab + 1)} className="btn btn-primary next-button">Next</button>}
                     {shouldShowActionItemButton() && <button type="button" onClick={onActionButtonClick} className="btn btn-primary">{props.actionButtonTitle}</button>}
                     {userIsOnLastTab() && <button type="button" onClick={handleReturnToDashboard} className="btn btn-primary">Return to dashboard</button>}
 
