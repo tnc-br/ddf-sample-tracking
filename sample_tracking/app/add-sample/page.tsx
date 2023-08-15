@@ -179,7 +179,7 @@ export default function AddSample() {
         <div>
             <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@48,400,0,0&display=optional" />
             <div className="page-title-wrapper">
-                <Link href="./samples"><span className="material-symbols-outlined">
+                <Link href="./samples"><span className="material-symbols-outlined add-sample-close-icon">
                     close
                 </span></Link>
                 <div className="page-title-text">

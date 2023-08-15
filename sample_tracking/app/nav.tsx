@@ -127,6 +127,14 @@ export default function Nav() {
                 </div>}
 
             </ul>
+            <div>
+                <a href="https://docs.google.com/forms/d/1Wu9vsMlMMnCc-fCGEW5_lwKSr8y7hDPhaZonC1AoP6Q/">
+                    <span className="material-symbols-outlined feedback-icon">
+                        help
+                    </span>
+                </a>
+
+            </div>
             {/* <nav className="navbar navbar-expand-lg navbar-light bg-light">
 
                 <ul className="navbar-nav mr-auto">
