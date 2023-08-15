@@ -351,7 +351,7 @@ export default function SampleDetails() {
                     <div className='section-title'>
                         Land use details in a 10km buffer radius zone
                     </div>
-                    <iframe src={mapUrl} frameborder="0" height="300px" width="100%"></iframe>
+                    {selectedDoc['validity'] ? <iframe src={mapUrl} frameborder="0" height="300px" width="100%"></iframe> : ''} 
                     <table className="table">
                         <thead>
                             <tr>
