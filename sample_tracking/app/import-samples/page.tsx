@@ -63,7 +63,7 @@ export default function ImportCsv() {
     const [sampleTrust, setSampleTrust] = useState('untrusted');
     const [userData, setUserdata] = useState({} as UserData);
     const [errors, setErrors] = useState([] as String[]);
-    const [foundIncorrectValue, setFoundIncorrectValue] = useState(false);
+    const [incorrectValueColumns, setIncorrectValueColumns] = useState([]);
 
     const router = useRouter();
     const app = initializeApp(firebaseConfig);
@@ -160,7 +160,7 @@ export default function ImportCsv() {
             return;
         }
 
-        if (foundIncorrectValue && !(confirm("Result values were found outside of the expected ranges. Are you sure you want to uplaod this data?"))) {
+        if (incorrectValueColumns.length > 0 && !(confirm("Result values were found outside of the expected ranges. Are you sure you want to uplaod this data?"))) {
             return;
         }
 
@@ -306,17 +306,29 @@ export default function ImportCsv() {
     function handleHeaderChange(evt: any) {
         console.log(evt);
         const header = evt.target.value;
-        if (!Object.keys(valueRanges).includes(header)) return;
+        const isResultHeader = Object.keys(valueRanges).includes(header);
+        // if (!Object.keys(valueRanges).includes(header)) return;
+        
         let foundIncorrectValue = false;
         const columnElements = document.getElementsByClassName(evt.target.id);
+        const currentColumnNumber = parseInt(evt.target.id.split('_')[1]);
         for (let i = 0; i < columnElements.length; i++) {
-            const value = parseInt(columnElements[i].childNodes[0].value)
-            if (value < valueRanges[header].min || value > valueRanges[header].max) {
+            const value = parseFloat(columnElements[i].childNodes[0].value)
+            if (isResultHeader && (value < valueRanges[header].min || value > valueRanges[header].max)) {
                 columnElements[i].style.background = 'red';
                 foundIncorrectValue = true;
+                // newIncorrectValueColumns.push(currentColumnNumber);
+            } else {
+                columnElements[i].style.background = 'white';
             }
         }
-        if (foundIncorrectValue) setFoundIncorrectValue(true);
+        const newIncorrectValueColumns = incorrectValueColumns.slice();
+        if (!foundIncorrectValue && incorrectValueColumns.includes(currentColumnNumber)) {
+            newIncorrectValueColumns.splice(newIncorrectValueColumns.indexOf(currentColumnNumber), 1);
+        } else if (foundIncorrectValue && !incorrectValueColumns.includes(currentColumnNumber)) {
+            newIncorrectValueColumns.push(currentColumnNumber);
+        }
+        if (newIncorrectValueColumns.length !== incorrectValueColumns.length) setIncorrectValueColumns(newIncorrectValueColumns);
     }
 
     return (
