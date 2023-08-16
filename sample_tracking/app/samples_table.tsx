@@ -11,15 +11,7 @@ import { MaterialReactTable, type MRT_ColumnDef, type MRT_Row, type MRT_TableIns
 import { initializeAppIfNecessary } from './utils';
 import {
     Box,
-    Button,
-    Dialog,
-    DialogActions,
-    DialogContent,
-    DialogTitle,
     IconButton,
-    MenuItem,
-    Stack,
-    TextField,
     Tooltip,
 } from '@mui/material';
 import { Delete, Edit } from '@mui/icons-material';
@@ -227,20 +219,20 @@ export default function SamplesTable(props: SampleDataProps) {
                     muiTablePaginationProps={{
                         rowsPerPageOptions: [5, 10],
                     }}
-                    renderRowActions={({ row, table }) => (
-                        <Box sx={{ display: 'flex', gap: '1rem' }}>
-                            <Tooltip arrow placement="left" title="Edit">
-                                <IconButton onClick={() => onEditSampleClick(row)}>
-                                    <Edit />
-                                </IconButton>
-                            </Tooltip>
-                            <Tooltip arrow placement="right" title="Delete">
-                                <IconButton color="error" onClick={() => onDeleteSampleClick(row)}>
-                                    <Delete />
-                                </IconButton>
-                            </Tooltip>
-                        </Box>
-                    )}
+                    // renderRowActions={({ row, table }) => (
+                    //     <Box sx={{ display: 'flex', gap: '1rem' }}>
+                    //         <Tooltip arrow placement="left" title="Edit">
+                    //             <IconButton onClick={() => onEditSampleClick(row)}>
+                    //                 <Edit />
+                    //             </IconButton>
+                    //         </Tooltip>
+                    //         <Tooltip arrow placement="right" title="Delete">
+                    //             <IconButton color="error" onClick={() => onDeleteSampleClick(row)}>
+                    //                 <Delete />
+                    //             </IconButton>
+                    //         </Tooltip>
+                    //     </Box>
+                    // )}
                     renderTopToolbarCustomActions={({ table }) => (
                         <div>
                             <button

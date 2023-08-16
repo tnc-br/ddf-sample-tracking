@@ -12,6 +12,8 @@ import Alert from "@mui/material/Alert";
 import Stack from "@mui/material/Stack";
 import Papa from 'papaparse';
 import { getRanHex } from '../utils';
+import { IconButton } from '@mui/material';
+import { Delete } from '@mui/icons-material';
 
 type UserData = {
     name: string,
@@ -20,11 +22,48 @@ type UserData = {
     role: string,
 }
 
+const valueRanges = {
+    'd18O_cel': {
+        'min': 20,
+        'max': 32
+    },
+    'd18O_wood': {
+        'min': 20,
+        'max': 32
+    },
+    'd15N_wood': {
+        'min': -5,
+        'max': 15
+    },
+    '%N_wood': {
+        'min': 0,
+        'max': 1
+    },
+    'd13C_wood': {
+        'min': -38,
+        'max': 20
+    },
+    '%C_wood': {
+        'min': 40,
+        'max': 60
+    },
+    'd13C_cel': {
+        'min': -35,
+        'max': -20
+    },
+    '%C_cel': {
+        'min': 40,
+        'max': 60
+    },
+
+}
+
 export default function ImportCsv() {
     const [user, setUser] = useState({});
     const [sampleTrust, setSampleTrust] = useState('untrusted');
     const [userData, setUserdata] = useState({} as UserData);
     const [errors, setErrors] = useState([] as String[]);
+    const [foundIncorrectValue, setFoundIncorrectValue] = useState(false);
 
     const router = useRouter();
     const app = initializeApp(firebaseConfig);
@@ -71,10 +110,10 @@ export default function ImportCsv() {
         database_name: string,
     }
 
-    const resultValues: string[] = ['d18O_cel','nitrogen', 'carbon', 'd13C_cel', 'oxygen', 'c_cel']
+    const resultValues: string[] = ['d18O_cel', 'nitrogen', 'carbon', 'd13C_cel', 'oxygen', 'c_cel']
 
     const requiredColumns: ColumnName[] = [
-        
+
     ]
 
     const inputColumns: ColumnName[] = [
@@ -118,6 +157,10 @@ export default function ImportCsv() {
             // We could support larger imports by splitting into multiple batches.
             // https://firebase.google.com/docs/firestore/manage-data/transactions#batched-writes
             addError('Import has a limit of 500 entries.');
+            return;
+        }
+
+        if (foundIncorrectValue && !(confirm("Result values were found outside of the expected ranges. Are you sure you want to uplaod this data?"))) {
             return;
         }
 
@@ -208,7 +251,7 @@ export default function ImportCsv() {
                 if (payload[resultValue]) {
                     payload[resultValue] = payload[resultValue].split(',').map((value: string) => parseFloat(value));
                 }
-                
+
             })
 
             batch.set(docRef, payload);
@@ -260,6 +303,21 @@ export default function ImportCsv() {
         });
     }
 
+    function handleHeaderChange(evt: any) {
+        console.log(evt);
+        const header = evt.target.value;
+        if (!Object.keys(valueRanges).includes(header)) return;
+        let foundIncorrectValue = false;
+        const columnElements = document.getElementsByClassName(evt.target.id);
+        for (let i = 0; i < columnElements.length; i++) {
+            const value = columnElements[i];
+            if (value < valueRanges[header].min || value > valueRanges[header].max) {
+                columnElements[i].style.background = 'red';
+                foundIncorrectValue = true;
+            }
+        }
+        if (foundIncorrectValue) setFoundIncorrectValue(true);
+    }
 
     return (
         <div className="import-samples-wrapper">
@@ -290,17 +348,17 @@ export default function ImportCsv() {
                 {/* TODO - add a selector for the type of sample, untrusted, trusted, unknown */}
                 {/* TODO - consider changing the initial button name to "load samples" or similar. Maybe not since we load on doc selection.*/}
                 <div id="sampleReviewTable">
-                    <table>
+                    <table id="importTable">
                         <tbody>
                             <tr id="reviewTableHeader">
                                 {/* TODO - only render the checkbox when the file is loaded. */}
                                 {/*<td><input type="checkbox" id="full-toggle" name="full-toggle" /></td>*/}
                                 {/* TODO - use just a count of columns instead of the header row. */}
                                 {tableRows.map((rows, index) => {
-                                    return <td key={"header-" + index}><select key={index} id={"columnSelect_" + index}>
+                                    return <td key={"header-" + index}><select onChange={handleHeaderChange} key={index} id={"columnSelect_" + index}>
                                         <option key={"ignore-" + index}>Ignore Column</option>
                                         {inputColumns.map((opt: ColumnName) =>
-                                            <option key={index + '-' + opt.database_name}>{opt.display_name}</option>)})
+                                            <option key={index + '-' + opt.database_name}>{opt.display_name}</option>)}
                                     </select></td>;
                                 })}
                             </tr>
@@ -320,7 +378,7 @@ export default function ImportCsv() {
                                         <input type="checkbox" id={"checkbox_" + index} key={"checkbox_" + index} defaultChecked />
                             </td>*/}
                                         {value.map((val, i) => {
-                                            return <td key={"value-" + index + "-" + i}>
+                                            return <td key={"value-" + index + "-" + i} className={"columnSelect_" + i}>
                                                 <input type="text" id={index + "-" + i} value={val} readOnly={true} />
                                             </td>;
                                         })}
