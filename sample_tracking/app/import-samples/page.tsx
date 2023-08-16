@@ -310,7 +310,7 @@ export default function ImportCsv() {
         let foundIncorrectValue = false;
         const columnElements = document.getElementsByClassName(evt.target.id);
         for (let i = 0; i < columnElements.length; i++) {
-            const value = columnElements[i];
+            const value = parseInt(columnElements[i].childNodes[0].value)
             if (value < valueRanges[header].min || value > valueRanges[header].max) {
                 columnElements[i].style.background = 'red';
                 foundIncorrectValue = true;
