@@ -139,7 +139,7 @@ export default function SignUpRequests() {
         let deletedOrgDoc: any = {};
         deletedOrgDoc[orgName] = deleteField();
         updateDoc(newOrgDocRef, deletedOrgDoc);
-        const newProspectiveOrgs = prospectiveOrgs;
+        const newProspectiveOrgs = structuredClone(prospectiveOrgs);
         delete newProspectiveOrgs[orgName];
         setProspectiveOrgs(newProspectiveOrgs);
     }
@@ -179,10 +179,8 @@ export default function SignUpRequests() {
 
     function deleteMemberFromNewMemberList(memberId: string) {
         deleteDoc(doc(db, "new_users", memberId));
-        const newProspectiveUsersList = prospectiveUsers;
+        const newProspectiveUsersList = structuredClone(prospectiveUsers);
         delete newProspectiveUsersList[memberId];
-        document.getElementById(memberId)?.remove();
-
         setProspectiveUsers(newProspectiveUsersList);
     }
 

@@ -183,56 +183,15 @@ export default function SamplesTable(props: SampleDataProps) {
             const deletedDocRef = doc(db, collectionName, row.code_lab);
             deleteDoc(deletedDocRef);
             //send api delete request here, then refetch or update local table data for re-render
-            sampleData.samples.splice(row.index, 1);
+            const updatedSamples = sampleData.samples.slice();
+            updatedSamples.splice(row.index, 1);
             setSampleData({
-                samples: sampleData.samples,
+                samples: updatedSamples,
                 hasBeenUpdated: true,
             });
         },
         [sampleData],
     );
-
-    // function onDeleteSampleClick(evt: any) {
-    //     const sampleId = evt.code_lab;
-    //     const trustedValue = evt.trusted;
-    //     let confirmText = `Are you sure you want to delete sample ${sampleId}?`
-    //     if (confirm(confirmText) === true) {
-    //         let collectionName = `${trustedValue}_samples`;
-    //         const deletedDocRef = doc(db, collectionName, sampleId);
-    //         deleteDoc(deletedDocRef);
-    //     }
-    //     deleteSampleFromSampleState({
-    //         trusted: trustedValue,
-    //         doc_id: sampleId,
-    //     } as Sample);
-    // }
-
-    function deleteSampleFromSampleState(sample: Sample) {
-        let sampleIndex = -1;
-        for (let i = 0; i < sampleData.samples.length; i++) {
-            if (sampleData.samples[i].trusted === sample.trusted && sampleData.samples[i].doc_id === sample.doc_id) {
-                sampleIndex = i;
-                break;
-            }
-        }
-        let newSamplesState = [...sampleData.samples];
-        newSamplesState.splice(sampleIndex, 1);
-        // if (!sampleHasBeenDeletedFromList()) {
-        //     newSamplesState.push({
-        //         updated_state: true,
-        //     } as Sample);
-        // }
-        updateSampleData(newSamplesState);
-    }
-
-    function sampleHasBeenDeletedFromList(): boolean {
-        if (!sampleData.samples) return false;
-        if (sampleData.samples.length > 0) {
-            return sampleData.samples[sampleData.samples.length - 1].updated_state;
-        }
-        return false;
-
-    }
 
 
     function onSampleClick(evt: any) {
