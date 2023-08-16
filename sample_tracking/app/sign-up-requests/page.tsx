@@ -139,7 +139,7 @@ export default function SignUpRequests() {
         let deletedOrgDoc: any = {};
         deletedOrgDoc[orgName] = deleteField();
         updateDoc(newOrgDocRef, deletedOrgDoc);
-        const newProspectiveOrgs = prospectiveOrgs;
+        const newProspectiveOrgs = structuredClone(prospectiveOrgs);
         delete newProspectiveOrgs[orgName];
         setProspectiveOrgs(newProspectiveOrgs);
     }
@@ -147,6 +147,10 @@ export default function SignUpRequests() {
     function handleApproveMemberClick(evt: any) {
         const memberId = evt.target.parentElement.parentElement.id;
         const orgId = prospectiveUsers[memberId].org;
+        if (!orgId) {
+            alert("Prospective user has not selected an organization to join. Once they select an organization, you will be able to approve their membership");
+            return;
+        }
         const userId = prospectiveUsers[memberId].uid
 
         const date = new Date();
@@ -154,7 +158,7 @@ export default function SignUpRequests() {
         const newUserDocRef = doc(db, "users", userId as unknown as string);
         setDoc(newUserDocRef, {
             name: prospectiveUsers[memberId].name,
-            org: prospectiveUsers[memberId].org,
+            org: orgId,
             date_added: dateString,
             role: "member",
             email: prospectiveUsers[memberId].email,
@@ -175,10 +179,8 @@ export default function SignUpRequests() {
 
     function deleteMemberFromNewMemberList(memberId: string) {
         deleteDoc(doc(db, "new_users", memberId));
-        const newProspectiveUsersList = prospectiveUsers;
+        const newProspectiveUsersList = structuredClone(prospectiveUsers);
         delete newProspectiveUsersList[memberId];
-        document.getElementById(memberId)?.remove();
-
         setProspectiveUsers(newProspectiveUsersList);
     }
 

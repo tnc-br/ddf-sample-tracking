@@ -95,7 +95,7 @@
 
 .profile-photo {
     border-radius: 50%;
-    position: absolute;
+    position: fixed;
     right: 20px;
     top: 10px;
     width: 32px;
@@ -110,7 +110,7 @@
     font-weight: 400;
     line-height: 24px;
     letter-spacing: 0.18px;
-    position: absolute;
+    position: fixed;
     top: 10px;
     left: 10px;
     cursor: pointer;
@@ -131,7 +131,7 @@
     flex-direction: column;
     align-items: flex-start;
     background-color: white;
-    position: absolute;
+    position: fixed;
     right: 45px;
     top: 34px;
     border-radius: 10px;

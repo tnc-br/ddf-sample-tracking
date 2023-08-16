@@ -62,7 +62,7 @@ export default function Edit() {
         console.log("Querystring: " + queryString);
         const urlParams = new URLSearchParams(queryString);
         sampleId = urlParams.get('id') ? urlParams.get('id') : searchParams.get('id');
-        trusted = urlParams.get('trusted') ? urlParams.get('trusted') : searchParams.get('trusted'); 
+        trusted = urlParams.get('trusted') ? urlParams.get('trusted') : searchParams.get('trusted');
     }
 
     const router = useRouter();
@@ -95,29 +95,29 @@ export default function Edit() {
         }
     });
 
-    let docRef =  doc(db, "trusted_samples", sampleId!);	
-    if (trusted === 'untrusted') {	
-        docRef = doc(db, "untrusted_samples", sampleId!);	
-    } else if (trusted === 'unknown') {	
-        docRef = doc(db, "unknown_samples", sampleId!);	
-    }	
-    if (Object.keys(selectedDoc).length < 1 && !userData.role && docRef) {	
+    let docRef = doc(db, "trusted_samples", sampleId!);
+    if (trusted === 'untrusted') {
+        docRef = doc(db, "untrusted_samples", sampleId!);
+    } else if (trusted === 'unknown') {
+        docRef = doc(db, "unknown_samples", sampleId!);
+    }
+    if (Object.keys(selectedDoc).length < 1 && !userData.role && docRef) {
         // setHasStartedRequestTrue();	
-        getDoc(docRef).then((docRef) => {	
-            if (docRef.exists()) {	
-                console.log('updated data');	
+        getDoc(docRef).then((docRef) => {
+            if (docRef.exists()) {
+                console.log('updated data');
                 setFormData({
                     ...docRef.data(),
-                    trusted: trusted, 
-                }as Sample);	
-            } else {	
-                console.log('couldnt find data');	
-            }	
-            console.log(docRef);	
-        }).catch((error) => {	
-            console.log(error);	
-        })	
-    }	
+                    trusted: trusted,
+                } as Sample);
+            } else {
+                console.log('couldnt find data');
+            }
+            console.log(docRef);
+        }).catch((error) => {
+            console.log(error);
+        })
+    }
 
     function onCancleClick() {
         router.push('/samples');
@@ -161,19 +161,58 @@ export default function Edit() {
 
     function handleChange(formState: {}) {
         setFormData(formState);
-      }
+    }
 
 
     return (
         <div className="add-sample-page-wrapper">
             <p className="title">Edit sample</p>
+
+
+            <div className="edit-tabs-wrapper">
+                <div className="edit-tab-group">
+                    <div className={currentTab === 1 ? "edit-tab-wrapper edit-current-tab" : "edit-tab-wrapper"}>
+                        <div className="edit-slate-layer">
+                            <div className="edit-tab-content">
+                                <div className='edit-tab-text'>
+                                    Basic info
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div className={currentTab === 2 ? "edit-tab-wrapper edit-current-tab" : "edit-tab-wrapper"}>
+                        <div className="edit-slate-layer">
+                            <div className="edit-tab-content">
+                                <div className='edit-tab-text'>
+                                    Sample measurements
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div className={currentTab === 3 ? "edit-tab-wrapper edit-current-tab" : "edit-tab-wrapper"}>
+                        <div className="edit-slate-layer">
+                            <div className="edit-tab-content">
+                                <div className='edit-tab-text'>
+                                    Results
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
             <div className="sample-details-form">
                 <p>Define the details of your new sample</p>
                 <div>
-                <SampleDataInput baseState={formData}
+                    <SampleDataInput baseState={formData}
                         onStateUpdate={(state) => handleChange(state)}
                         onActionButtonClick={(evt: any) => onUpdateSampleClick()}
-                        actionButtonTitle="Update sample" />
+                        actionButtonTitle="Update sample"
+                        userData={userData}
+                        sampleId={sampleId}
+                        isCompletedSample={true} 
+                        onTabChange={(tab) => setCurrentTab(tab)} />
                 </div>
             </div>
         </div>

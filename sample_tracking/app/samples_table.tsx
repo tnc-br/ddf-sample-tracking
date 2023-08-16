@@ -3,12 +3,18 @@ import 'bootstrap/dist/css/bootstrap.css';
 import { initializeApp } from "firebase/app";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { getFirestore, deleteDoc, doc, collection } from "firebase/firestore";
-import { useState, useMemo, useRef } from 'react';
+import { useState, useMemo, useRef, useCallback } from 'react';
 import './styles.css';
 import { useRouter } from 'next/navigation'
 // import Nav from '../nav';
 import { MaterialReactTable, type MRT_ColumnDef, type MRT_Row, type MRT_TableInstance, type MRT_SortingState, type MRT_PaginationState } from 'material-react-table';
 import { initializeAppIfNecessary } from './utils';
+import {
+    Box,
+    IconButton,
+    Tooltip,
+} from '@mui/material';
+import { Delete, Edit } from '@mui/icons-material';
 
 import { firebaseConfig } from './firebase_config';
 
@@ -45,9 +51,17 @@ interface SampleDataProps {
     canDeleteSamples: boolean,
 }
 
+type SampleData = {
+    samples: Sample[],
+    hasBeenUpdated: boolean,
+}
+
 export default function SamplesTable(props: SampleDataProps) {
 
-    const [sampleData, setSampleData] = useState(props.samplesData as Sample[]);
+    const [sampleData, setSampleData] = useState({
+        samples: props.samplesData as Sample[],
+        hasBeenUpdated: false,
+    });
     // const [hasDeletedSample, setHasDeletedSample] = useState(false);
 
     const router = useRouter();
@@ -55,17 +69,23 @@ export default function SamplesTable(props: SampleDataProps) {
     const db = getFirestore();
     const { t } = useTranslation();
 
-    
+
 
 
     const tableInstanceRef = useRef<MRT_TableInstance<Sample>>(null);
 
-    if (!sampleHasBeenDeletedFromList() && (sampleData && sampleData.length !== props.samplesData.length)) {
-        setSampleData(props.samplesData);
+    if (!sampleData.hasBeenUpdated && (sampleData.samples && sampleData.samples.length !== props.samplesData.length)) {
+        setSampleData({
+            samples: props.samplesData,
+            hasBeenUpdated: false,
+        });
     }
 
     function updateSampleData(newSampleData: Sample[]) {
-        setSampleData(newSampleData);
+        setSampleData({
+            samples: newSampleData,
+            hasBeenUpdated: true,
+        });
     }
 
     const columns = useMemo<MRT_ColumnDef<Sample>[]>(
@@ -76,7 +96,8 @@ export default function SamplesTable(props: SampleDataProps) {
                 size: 150,
                 Cell: ({ cell, row, renderedCellValue }) => {
                     return (
-                        <div id={row.original.trusted} onClick={onSampleClick} className="actions-button sample-link">
+
+                        <div id={row.original.trusted} onClick={() => onSampleClick(row)} className="actions-button sample-link">
                             <span id={row.original.code_lab}>{renderedCellValue}</span>
                         </div>
                     )
@@ -86,13 +107,6 @@ export default function SamplesTable(props: SampleDataProps) {
                 accessorFn: (row) => (row as Sample).sample_name ?? '',
                 header: t('name'),
                 size: 150,
-            },
-            {
-                accessorFn: (row) => (row as Sample).status ?? '',
-                header: t('status'),
-                size: 100,
-                filterVariant: 'select',
-
             },
             {
                 accessorKey: 'validity',
@@ -114,19 +128,31 @@ export default function SamplesTable(props: SampleDataProps) {
                     const row = cell.getValue();
                     return (
                         <div className="action-buttons-wrapper">
-                            <div id={(row as Sample).trusted} onClick={onEditSampleClick} className="actions-button">
+                            {/* <div id={(row as Sample).trusted} onClick={onEditSampleClick} className="actions-button">
                                 <span id={(row as Sample).code_lab}>Edit</span>
+                            </div> */}
+                            <div id={(row as Sample).trusted} >
+                                <IconButton onClick={() => onEditSampleClick(row)}>
+                                    <Edit />
+                                </IconButton>
                             </div>
-                            {props.canDeleteSamples && <div id={(row as Sample).trusted} onClick={onDeleteSampleClick} className="actions-button">
+
+                            {props.canDeleteSamples &&
+                                <div id={(row as Sample).trusted}>
+                                    <IconButton color="error" onClick={() => onDeleteSampleClick(row)}>
+                                        <Delete />
+                                    </IconButton>
+                                </div>}
+                            {/* {props.canDeleteSamples && <div id={(row as Sample).trusted} onClick={onDeleteSampleClick} className="actions-button">
                                 <span id={(row as Sample).code_lab}>Delete</span>
-                            </div>}
+                            </div>} */}
                         </div>
 
                     )
                 },
             }
         ],
-        [sampleData],
+        [sampleData.samples],
     );
 
     const csvOptions = {
@@ -136,64 +162,42 @@ export default function SamplesTable(props: SampleDataProps) {
         showLabels: true,
         useBom: true,
         useKeysAsHeaders: true,
-      };
+    };
     const csvExporter = new ExportToCsv(csvOptions);
 
-    function onDeleteSampleClick(evt: any) {
-        const sampleId = evt.target.id;
-        const trustedValue = evt.currentTarget.id;
-        let confirmText = `Are you sure you want to delete sample ${sampleId}?`
-        if (confirm(confirmText) === true) {
-            let collectionName = `${trustedValue}_samples`;
-            const deletedDocRef = doc(db, collectionName, sampleId);
-            deleteDoc(deletedDocRef);
-        }
-        deleteSampleFromSampleState({
-            trusted: trustedValue,
-            doc_id: sampleId,
-        } as Sample);
-    }
 
-    function deleteSampleFromSampleState(sample: Sample) {
-        let sampleIndex = -1;
-        for (let i = 0; i < sampleData.length; i++) {
-            if (sampleData[i].trusted === sample.trusted && sampleData[i].doc_id === sample.doc_id) {
-                sampleIndex = i;
-                break;
+    const onDeleteSampleClick = useCallback(
+        (row: MRT_Row<Sample>) => {
+            if (!confirm(`Are you sure you want to delete ${row.code_lab}`)) {
+                return;
             }
-        }
-        let newSamplesState = [...sampleData];
-        newSamplesState.splice(sampleIndex, 1);
-        if (!sampleHasBeenDeletedFromList()) {
-            newSamplesState.push({
-                updated_state: true,
-            } as Sample);
-        }
-        updateSampleData(newSamplesState);
-    }
-
-    function sampleHasBeenDeletedFromList(): boolean {
-        if (!sampleData) return false;
-        if(sampleData.length > 0) {
-            return sampleData[sampleData.length - 1].updated_state;
-        }
-        return false;
-        
-    }
+            let collectionName = `${row.trusted}_samples`;
+            const deletedDocRef = doc(db, collectionName, row.code_lab);
+            deleteDoc(deletedDocRef);
+            //send api delete request here, then refetch or update local table data for re-render
+            const updatedSamples = sampleData.samples.slice();
+            updatedSamples.splice(row.index, 1);
+            setSampleData({
+                samples: updatedSamples,
+                hasBeenUpdated: true,
+            });
+        },
+        [sampleData],
+    );
 
 
     function onSampleClick(evt: any) {
-        const url = `./sample-details?trusted=${evt.currentTarget.id}&id=${evt.target.id}`;
+        const url = `./sample-details?trusted=${evt.original.trusted}&id=${evt.original.code_lab}`;
         router.push(url)
     }
 
     function onEditSampleClick(evt: any) {
-        const url = `./edit?trusted=${evt.currentTarget.id}&id=${evt.target.id}`;
+        const url = `./edit?trusted=${evt.trusted}&id=${evt.code_lab}`;
         router.push(url)
     }
 
     function handleDownloadAllData() {
-        csvExporter.generateCsv(sampleData);
+        csvExporter.generateCsv(sampleData.samples);
     }
 
     function onDowloadClick(rows: MRT_Row<Sample>[]) {
@@ -207,7 +211,7 @@ export default function SamplesTable(props: SampleDataProps) {
 
                 <MaterialReactTable
                     columns={columns}
-                    data={sampleData}
+                    data={sampleData.samples}
                     enableFacetedValues
                     enableRowSelection
                     tableInstanceRef={tableInstanceRef}
@@ -215,6 +219,20 @@ export default function SamplesTable(props: SampleDataProps) {
                     muiTablePaginationProps={{
                         rowsPerPageOptions: [5, 10],
                     }}
+                    // renderRowActions={({ row, table }) => (
+                    //     <Box sx={{ display: 'flex', gap: '1rem' }}>
+                    //         <Tooltip arrow placement="left" title="Edit">
+                    //             <IconButton onClick={() => onEditSampleClick(row)}>
+                    //                 <Edit />
+                    //             </IconButton>
+                    //         </Tooltip>
+                    //         <Tooltip arrow placement="right" title="Delete">
+                    //             <IconButton color="error" onClick={() => onDeleteSampleClick(row)}>
+                    //                 <Delete />
+                    //             </IconButton>
+                    //         </Tooltip>
+                    //     </Box>
+                    // )}
                     renderTopToolbarCustomActions={({ table }) => (
                         <div>
                             <button
@@ -228,7 +246,7 @@ export default function SamplesTable(props: SampleDataProps) {
                                 onClick={() => onDowloadClick(table.getSelectedRowModel().rows)}>
                                 Export selected
                             </button>
-                            
+
                         </div>
                     )}
                 />

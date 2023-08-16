@@ -153,7 +153,7 @@ export default function Samples() {
             const trustedSamples = await getSamplesFromCollection('trusted_samples');
             const untrustedSamples = await getSamplesFromCollection('untrusted_samples');
             const unknownSamples = await getSamplesFromCollection('unknown_samples');
-            if (!trustedSamples.length || trustedSamples.length + untrustedSamples.length + unknownSamples.length < 1) {
+            if (trustedSamples.length + untrustedSamples.length + unknownSamples.length < 1) {
                 return;
             }
 
