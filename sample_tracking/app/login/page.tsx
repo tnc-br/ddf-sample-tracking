@@ -10,6 +10,7 @@ import { firebaseConfig } from '../firebase_config';
 import { doc, setDoc, getDocs, collection, getFirestore, updateDoc, arrayUnion, addDoc, getDoc } from "firebase/firestore";
 import './styles.css';
 import { initializeAppIfNecessary, hideNavBar, hideTopBar } from '../utils';
+import Link from 'next/link';
 
 type SignUpData = {
   firstName: string,
@@ -20,6 +21,7 @@ type SignUpData = {
 
 interface LogInProps {
   onSignUpClick: any,
+  onForgotPasswordClick: any,
 }
 
 interface SignUpProps {
@@ -43,6 +45,12 @@ type NewUser = {
   org_name: string
 }
 
+const LogInScreen = {
+  logIn: 'logIn',
+  signUp: 'signUp',
+  forgotPassword: 'forgotPassword'
+}
+
 export default function LogInSignUpPage() {
 
   const router = useRouter()
@@ -58,7 +66,7 @@ export default function LogInSignUpPage() {
   });
 
   const [canSignIn, setCanSignIn] = useState(true);
-
+  const [signInScreen, setSignInScreen] = useState(LogInScreen.logIn);
 
   useEffect(() => {
     hideNavBar();
@@ -77,10 +85,14 @@ export default function LogInSignUpPage() {
     console.log('sign in click');
     setCanSignIn(true);
   }
+  function handleForgotPasswordClick() {
+    setSignInScreen(LogInScreen.forgotPassword);
+  }
+
 
   return (
     <div>
-      {canSignIn ? <Login onSignUpClick={() => handleSignUpClick()} /> : <SignUp onLogInClick={() => handleSignInClick()} />}
+      {canSignIn ? <Login onSignUpClick={() => handleSignUpClick()} onForgotPasswordClick={() => handleForgotPasswordClick()}/> : <SignUp onLogInClick={() => handleSignInClick()} />}
     </div>
 
   )
@@ -194,7 +206,7 @@ function Login(props: LogInProps) {
 
 
               <button type="button" onClick={attemptSignIn} className="btn btn-primary">Sign in</button>
-              <p className="small"><a className="" href="#!">Forgot password</a></p>
+              <p className="small"><div className="" onClick={props.onForgotPasswordClick ? props.onForgotPasswordClick : console.log('Could not find method to handle forgo password')}>Forgot password</div></p>
 
               <p className="small">Or log in with <button className="btn btn-primary" onClick={signInWithGoogle}><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-google" viewBox="0 0 16 16">
                 <path d="M15.545 6.558a9.42 9.42 0 0 1 .139 1.626c0 2.434-.87 4.492-2.384 5.885h.002C11.978 15.292 10.158 16 8 16A8 8 0 1 1 8 0a7.689 7.689 0 0 1 5.352 2.082l-2.284 2.284A4.347 4.347 0 0 0 8 3.166c-2.087 0-3.86 1.408-4.492 3.304a4.792 4.792 0 0 0 0 3.063h.003c.635 1.893 2.405 3.301 4.492 3.301 1.078 0 2.004-.276 2.722-.764h-.003a3.702 3.702 0 0 0 1.599-2.431H8v-3.08h7.545z" />
