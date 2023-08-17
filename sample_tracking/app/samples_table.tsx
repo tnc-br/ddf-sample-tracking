@@ -1,50 +1,16 @@
 "use client";
 import 'bootstrap/dist/css/bootstrap.css';
-import { initializeApp } from "firebase/app";
-import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { getFirestore, deleteDoc, doc, collection } from "firebase/firestore";
 import { useState, useMemo, useRef, useCallback } from 'react';
 import './styles.css';
 import { useRouter } from 'next/navigation'
-// import Nav from '../nav';
 import { MaterialReactTable, type MRT_ColumnDef, type MRT_Row, type MRT_TableInstance, type MRT_SortingState, type MRT_PaginationState } from 'material-react-table';
-import { initializeAppIfNecessary } from './utils';
-import {
-    Box,
-    IconButton,
-    Tooltip,
-} from '@mui/material';
+import { initializeAppIfNecessary, type Sample } from './utils';
+import { IconButton } from '@mui/material';
 import { Delete, Edit } from '@mui/icons-material';
-
-import { firebaseConfig } from './firebase_config';
-
-import { useReactTable } from '@tanstack/react-table'
 import { ExportToCsv } from 'export-to-csv';
 import { useTranslation } from 'react-i18next';
 import './i18n/config';
-
-type Sample = {
-    code_lab: string,
-    visibility: string,
-    sample_name: string,
-    species: string,
-    site: string,
-    state: string,
-    lat: string,
-    lon: string,
-    date_of_harvest: string,
-    created_by: string,
-    current_step: string,
-    status: string,
-    trusted: string,
-    created_on: string,
-    last_updated_by: string,
-    org: string,
-    validity: number,
-    header: string,
-    doc_id: string,
-    updated_state: boolean,
-}
 
 interface SampleDataProps {
     samplesData: any,
@@ -59,18 +25,13 @@ type SampleData = {
 export default function SamplesTable(props: SampleDataProps) {
 
     const [sampleData, setSampleData] = useState({
-        samples: props.samplesData as Sample[],
+        samples: props.samplesData,
         hasBeenUpdated: false,
-    });
-    // const [hasDeletedSample, setHasDeletedSample] = useState(false);
-
+    } as SampleData);
     const router = useRouter();
     const app = initializeAppIfNecessary();
     const db = getFirestore();
     const { t } = useTranslation();
-
-
-
 
     const tableInstanceRef = useRef<MRT_TableInstance<Sample>>(null);
 
@@ -78,13 +39,6 @@ export default function SamplesTable(props: SampleDataProps) {
         setSampleData({
             samples: props.samplesData,
             hasBeenUpdated: false,
-        });
-    }
-
-    function updateSampleData(newSampleData: Sample[]) {
-        setSampleData({
-            samples: newSampleData,
-            hasBeenUpdated: true,
         });
     }
 
@@ -128,9 +82,6 @@ export default function SamplesTable(props: SampleDataProps) {
                     const row = cell.getValue();
                     return (
                         <div className="action-buttons-wrapper">
-                            {/* <div id={(row as Sample).trusted} onClick={onEditSampleClick} className="actions-button">
-                                <span id={(row as Sample).code_lab}>Edit</span>
-                            </div> */}
                             <div id={(row as Sample).trusted} >
                                 <IconButton onClick={() => onEditSampleClick(row)}>
                                     <Edit />
@@ -143,9 +94,6 @@ export default function SamplesTable(props: SampleDataProps) {
                                         <Delete />
                                     </IconButton>
                                 </div>}
-                            {/* {props.canDeleteSamples && <div id={(row as Sample).trusted} onClick={onDeleteSampleClick} className="actions-button">
-                                <span id={(row as Sample).code_lab}>Delete</span>
-                            </div>} */}
                         </div>
 
                     )
@@ -219,20 +167,6 @@ export default function SamplesTable(props: SampleDataProps) {
                     muiTablePaginationProps={{
                         rowsPerPageOptions: [5, 10],
                     }}
-                    // renderRowActions={({ row, table }) => (
-                    //     <Box sx={{ display: 'flex', gap: '1rem' }}>
-                    //         <Tooltip arrow placement="left" title="Edit">
-                    //             <IconButton onClick={() => onEditSampleClick(row)}>
-                    //                 <Edit />
-                    //             </IconButton>
-                    //         </Tooltip>
-                    //         <Tooltip arrow placement="right" title="Delete">
-                    //             <IconButton color="error" onClick={() => onDeleteSampleClick(row)}>
-                    //                 <Delete />
-                    //             </IconButton>
-                    //         </Tooltip>
-                    //     </Box>
-                    // )}
                     renderTopToolbarCustomActions={({ table }) => (
                         <div>
                             <button

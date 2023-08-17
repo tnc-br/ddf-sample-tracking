@@ -1,84 +1,41 @@
 "use client";
 import 'bootstrap/dist/css/bootstrap.css';
 import { getAuth, onAuthStateChanged } from "firebase/auth";
-import { getFirestore, getDocs, collection, query, or, and, where, getDoc, doc } from "firebase/firestore";
-import { useState, useMemo, useRef, useEffect } from 'react';
+import { getFirestore, getDocs, collection, query, or, and, where } from "firebase/firestore";
+import { useState, useEffect } from 'react';
 import './styles.css';
 import { useRouter } from 'next/navigation'
 import SamplesTable from '../samples_table';
-import { initializeAppIfNecessary, showNavBar, showTopBar } from '../utils';
+import { initializeAppIfNecessary, showNavBar, showTopBar, confirmUserLoggedIn, UserRole, type UserData, type Sample } from '../utils';
 import { useTranslation } from 'react-i18next';
 import '../i18n/config';
 
-import { firebaseConfig } from '../firebase_config';
-
-
 export default function Samples() {
 
-    type Sample = {
-        code_lab: string,
-        visibility: string,
-        sample_name: string,
-        species: string,
-        site: string,
-        state: string,
-        lat: string,
-        lon: string,
-        date_of_harvest: string,
-        created_by: string,
-        current_step: string,
-        status: string,
-        trusted: string,
-        created_on: string,
-        last_updated_by: string,
-        org: string,
-    }
-
-    type UserData = {
-        role: string,
-        org: string,
-    }
-
-    const [data, setData] = useState({});
-    const [selectedSample, setSelectedSample] = useState('');
     const [userData, setUserData] = useState({} as UserData);
-    const [samplesState, setSamplesState] = useState([{}]);
-    const [inProgressSamples, setInProgressSamples] = useState([{}]);
-    const [allSamples, setAllSamples] = useState({});
+    const [allSamples, setAllSamples] = useState({
+        completed: [] as Sample[],
+        inProgress: [] as Sample[]
+
+    });
 
     const app = initializeAppIfNecessary();
     const router = useRouter();
     const auth = getAuth();
     const { t } = useTranslation();
+    const db = getFirestore();
 
     useEffect(() => {
         showNavBar();
         showTopBar();
         if (!userData.role || userData.role.length < 1) {
             onAuthStateChanged(auth, (user) => {
-                if (!user) {
-                    router.push('/login');
-                } else {
-                    const userDocRef = doc(db, "users", user.uid);
-                    getDoc(userDocRef).then((docRef) => {
-                        if (docRef.exists()) {
-                            const docData = docRef.data();
-                            if (!docData.role) {
-                                router.push('/tasks');
-                            } else {
-                                setUserData(docData as UserData);
-                            }
-                        }
-                    });
-                }
-            })
+                setUserData(confirmUserLoggedIn(user, db, router))
+            })   
         }
-    })
+    });
 
-
-
-
-    const db = getFirestore();
+    
     if (!allSamples.inProgress && !allSamples.completed) {
         addSamplesToDataList();
     }
@@ -87,13 +44,12 @@ export default function Samples() {
         const user = auth.currentUser;
         const samples: any = {};
         const samplesStateArray: any = [];
-        // if (!user) return samples;
         console.log('got here');
         const verifiedSamplesRef = collection(db, collectionName);
         let samplesQuery;
-        if (userData.role == "site_admin") {
+        if (userData.role == UserRole.SITE_ADMIN) {
             const querySnapshot = await getDocs(collection(db, collectionName)).catch((error) => {
-                console.log("Unable to fetch samples: " + error);
+                console.log("Error: Unable to fetch samples: " + error);
             });
             if (querySnapshot) {
                 querySnapshot.forEach((doc) => {
@@ -105,9 +61,8 @@ export default function Samples() {
                     });
                 });
             }
-
             return samplesStateArray;
-        } else if (userData.role == "admin") {
+        } else if (userData.role == UserRole.ORG_ADMIN) {
             samplesQuery = query(verifiedSamplesRef, where("visibility", "==", "public"));
             samplesQuery = query(verifiedSamplesRef,
                 or(
@@ -118,7 +73,7 @@ export default function Samples() {
         } else if (userData.org != null) {
             samplesQuery = query(verifiedSamplesRef,
                 or(
-                    where("created_by", "==", user.uid),
+                    where("created_by", "==", user!.uid),
                     where("visibility", "==", "public"),
                     where("visibility", "==", "logged_in"),
                     and(
@@ -148,7 +103,7 @@ export default function Samples() {
     }
 
     async function addSamplesToDataList() {
-        if (Object.keys(samplesState[0]).length < 1) {
+        if (allSamples.inProgress.length < 1 && allSamples.completed.length < 1) {
             let allSamples: any = [{}];
             const trustedSamples = await getSamplesFromCollection('trusted_samples');
             const untrustedSamples = await getSamplesFromCollection('untrusted_samples');
@@ -212,13 +167,13 @@ export default function Samples() {
     }
 
     function isAdmin(): boolean {
-        return userData.role === 'admin' || userData.role === 'site_admin';
+        return userData.role === UserRole.ORG_ADMIN || userData.role === UserRole.SITE_ADMIN;
     }
 
     return (
         <div className='samples-page-wrapper'>
             <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@48,400,0,0" />
-            {(allSamples.inProgress || allSamples.completed) ? <div id="samplesTable" className='samples-wrapper'>
+            {(allSamples.inProgress.length > 0 || allSamples.completed.length > 0) ? <div id="samplesTable" className='samples-wrapper'>
                 <div className='samples-summary'>
                     {allSamples.inProgress && <div className='samples-summary-box'>
                         <div className='samples-size-label'>{allSamples.inProgress.length}</div>

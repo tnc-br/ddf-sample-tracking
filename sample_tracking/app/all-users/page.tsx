@@ -1,7 +1,6 @@
 "use client";
 
 
-import { initializeApp as initializeAdminApp } from 'firebase-admin/app';
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { firebaseConfig } from '../firebase_config';
 import { initializeApp } from "firebase/app";
@@ -10,6 +9,7 @@ import './styles.css';
 import { useRouter } from 'next/navigation'
 import 'bootstrap/dist/css/bootstrap.css';
 import { getFirestore, getDocs, collection, updateDoc, doc, setDoc, query, where, arrayRemove, getDoc, deleteDoc } from "firebase/firestore";
+import { initializeAppIfNecessary } from '../utils';
 
 interface NestedSchemas {
     [key: string]: NestedSchemas;
@@ -21,30 +21,12 @@ type UserData = {
 }
 
 export default function Users() {
-    // const [pendingApprovals, setPendingApprovals] = useState({});
-    // const [currentUsers, setCurrentUsers] = useState({});
-    // const [roleAccessStatus, setRoleAccessStatus] = useState({});
-    // const [updateState, setUpdateState] = useState(false);
 
     const [userDetails, setUserDetails] = useState({ role: '', org: '' });
     const [userData, setUserData] = useState({} as UserData);
     const [users, setUsers] = useState({} as NestedSchemas)
 
-    // function addPendingApproval(pendingApproval) {
-    //     setPendingApprovals([...pendingApprovals, pendingApproval]);
-    // }
-
-    // function updateRoleAccessStatus(uid: string, accessPaused: boolean) {
-    //     const updatedValueUserId = `${uid}`;
-    //     let updatedValue = {};
-    //     updatedValue[uid] = accessPaused;
-    //     setRoleAccessStatus(roleAccessStatus => ({
-    //         ...roleAccessStatus,
-    //         ...updatedValue
-    //     }))
-    // }
-    // const adminApp = initializeAdminApp();
-    const app = initializeApp(firebaseConfig);
+    const app = initializeAppIfNecessary();
     const auth = getAuth();
     const router = useRouter();
     const db = getFirestore();

@@ -11,85 +11,25 @@ import { useState, useEffect } from 'react';
 import Alert from "@mui/material/Alert";
 import Stack from "@mui/material/Stack";
 import Papa from 'papaparse';
-import { getRanHex } from '../utils';
+import { getRanHex, confirmUserLoggedIn, resultMeasurementValueRanges as valueRanges, initializeAppIfNecessary, type UserData } from '../utils';
 import { IconButton } from '@mui/material';
 import { Delete } from '@mui/icons-material';
 
-type UserData = {
-    name: string,
-    org: string,
-    org_name: string,
-    role: string,
-}
-
-const valueRanges = {
-    'd18O_cel': {
-        'min': 20,
-        'max': 32
-    },
-    'd18O_wood': {
-        'min': 20,
-        'max': 32
-    },
-    'd15N_wood': {
-        'min': -5,
-        'max': 15
-    },
-    '%N_wood': {
-        'min': 0,
-        'max': 1
-    },
-    'd13C_wood': {
-        'min': -38,
-        'max': 20
-    },
-    '%C_wood': {
-        'min': 40,
-        'max': 60
-    },
-    'd13C_cel': {
-        'min': -35,
-        'max': -20
-    },
-    '%C_cel': {
-        'min': 40,
-        'max': 60
-    },
-
-}
-
 export default function ImportCsv() {
-    const [user, setUser] = useState({});
     const [sampleTrust, setSampleTrust] = useState('untrusted');
     const [userData, setUserdata] = useState({} as UserData);
     const [errors, setErrors] = useState([] as String[]);
     const [incorrectValueColumns, setIncorrectValueColumns] = useState([]);
 
     const router = useRouter();
-    const app = initializeApp(firebaseConfig);
+    const app = initializeAppIfNecessary();
     const auth = getAuth();
     const db = getFirestore();
+
     useEffect(() => {
         if (!userData.role) {
             onAuthStateChanged(auth, (user) => {
-                if (user) {
-                    console.log(user);
-                    setUser(user);
-                    const userDocRef = doc(db, "users", user.uid);
-                    getDoc(userDocRef).then((docRef) => {
-                        if (docRef.exists()) {
-                            const docData = docRef.data();
-                            if (!docData.role) {
-                                router.push('/tasks');
-                            } else {
-                                setUserdata(docData as UserData);
-                            }
-                        }
-                    })
-                }
-                if (!user) {
-                    router.push('/login');
-                }
+                setUserdata(confirmUserLoggedIn(user, db, router));
             });
         }
 
@@ -112,7 +52,6 @@ export default function ImportCsv() {
 
     const resultValues: string[] = ['d18O_cel', 'nitrogen', 'carbon', 'd13C_cel', 'oxygen', 'c_cel']
 
-    const requiredColumns: ColumnName[] = [
 
     ]
 
@@ -308,7 +247,7 @@ export default function ImportCsv() {
         const header = evt.target.value;
         const isResultHeader = Object.keys(valueRanges).includes(header);
         // if (!Object.keys(valueRanges).includes(header)) return;
-        
+
         let foundIncorrectValue = false;
         const columnElements = document.getElementsByClassName(evt.target.id);
         const currentColumnNumber = parseInt(evt.target.id.split('_')[1]);

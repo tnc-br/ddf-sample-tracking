@@ -1,6 +1,96 @@
 import { initializeApp, getApp } from "firebase/app";
 import { firebaseConfig } from './firebase_config';
 import { useEffect } from 'react';
+import { getAuth, onAuthStateChanged, type Auth, type User } from "firebase/auth";
+import { useRouter } from 'next/navigation'
+import { getDoc, doc, type Firestore, type DocumentReference } from "firebase/firestore";
+import { useSearchParams } from 'next/navigation'
+
+export type UserData = {
+  name: string,
+  org: string,
+  org_name: string,
+  role: string,
+}
+
+export type Sample = {
+  code_lab: string,
+  visibility: string,
+  sample_name: string,
+  species: string,
+  site: string,
+  state: string,
+  lat: string,
+  lon: string,
+  date_of_harvest: string,
+  created_by: string,
+  current_step: string,
+  status: string,
+  trusted: string,
+  created_on: string,
+  last_updated_by: string,
+  org: string,
+  validity: number,
+  header: string,
+  doc_id: string,
+  updated_state: boolean,
+  collected_by: string,
+  oxygen: string[],
+  nitrogen: string[],
+  n_wood: string[],
+  carbon: string[],
+  c_wood: string[],
+  c_cel: string[],
+  d13C_cel: string[],
+  d18O_cel: string[]
+  city: string,
+  supplier: string,
+  measureing_height: string,
+  sample_type: string, 
+  diameter: string,
+  observations: string,
+}
+
+export const resultMeasurementValueRanges = {
+  'd18O_cel': {
+      'min': 20,
+      'max': 32
+  },
+  'd18O_wood': {
+      'min': 20,
+      'max': 32
+  },
+  'd15N_wood': {
+      'min': -5,
+      'max': 15
+  },
+  '%N_wood': {
+      'min': 0,
+      'max': 1
+  },
+  'd13C_wood': {
+      'min': -38,
+      'max': 20
+  },
+  '%C_wood': {
+      'min': 40,
+      'max': 60
+  },
+  'd13C_cel': {
+      'min': -35,
+      'max': -20
+  },
+  '%C_cel': {
+      'min': 40,
+      'max': 60
+  },
+}
+
+export const UserRole = {
+  SITE_ADMIN: 'site_admin',
+  ORG_ADMIN: 'admin',
+  MEMBER: 'member',
+}
 
 export function getRanHex(size: number): string {
   let result = [];
@@ -23,31 +113,80 @@ export function initializeAppIfNecessary() {
 
 
 export function showNavBar() {
-    const navBar = document.getElementById('nav-wrapper');
-    if (navBar) {
-      navBar.style.display = "inline";
-    }
+  const navBar = document.getElementById('nav-wrapper');
+  if (navBar) {
+    navBar.style.display = "inline";
+  }
 }
 
 export function showTopBar() {
-    const navBar = document.getElementById('top-bar');
-    if (navBar) {
-      navBar.style.display = "inline";
-    }
+  const navBar = document.getElementById('top-bar');
+  if (navBar) {
+    navBar.style.display = "inline";
+  }
 
 }
 
 export function hideTopBar() {
-    const navBar = document.getElementById('top-bar');
-    if (navBar) {
-      navBar.style.display = "none";
-    }
+  const navBar = document.getElementById('top-bar');
+  if (navBar) {
+    navBar.style.display = "none";
+  }
 
 }
 
 export function hideNavBar() {
-    const navBar = document.getElementById('nav-wrapper');
-    if (navBar) {
-      navBar.style.display = "none";
-    }
+  const navBar = document.getElementById('nav-wrapper');
+  if (navBar) {
+    navBar.style.display = "none";
+  }
+}
+
+export function confirmUserLoggedIn(user: User | null, db: Firestore, router: any, requredRoles?: string[]): UserData {
+  if (!user) {
+    router.push('/login');
+  } else {
+    const userDocRef = doc(db, "users", user.uid);
+    getDoc(userDocRef).then((docRef) => {
+      if (docRef.exists()) {
+        const docData = docRef.data();
+        if (!docData.role) {
+          router.push('/login');
+        } else {
+          if (requredRoles) {
+            if (requredRoles.includes(docData.org)) {
+              return docData as UserData
+            } else {
+              router.push('/login');
+            }
+          }
+          return docData as UserData;
+        }
+      } else {
+        router.push('/login');
+      }
+    });
+  }
+  // This code will never run because the user will either be navigated to the login screen or the user data will be returned.
+  return {} as UserData;
+}
+
+export function getUrlParam(param: string): string | null {
+  if (typeof window !== "undefined") {
+    const searchParams = useSearchParams();
+    const queryString = window.location.search;
+    const urlParams = new URLSearchParams(queryString);
+    return urlParams.get(param) ? urlParams.get(param) : searchParams.get(param);
+  }
+  return null;
+}
+
+export function getDocRefForTrustedValue(trusted: string, db: Firestore, sampleId: string): DocumentReference {
+  if (trusted === "trusted") {
+    return doc(db, "trusted_samples", sampleId);
+  } else if (trusted === "untrusted") {
+    return doc(db, "untrusted_samples", sampleId);
+  } else {
+    return doc(db, "unknown_samples", sampleId);
+  }
 }

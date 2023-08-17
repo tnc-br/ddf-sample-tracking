@@ -2,28 +2,15 @@
 
 import './styles.css';
 import 'bootstrap/dist/css/bootstrap.css';
-var QRCode = require('qrcode');
 import { QRCodeSVG } from "qrcode.react";
 import { useRouter } from 'next/navigation'
-import { doc, setDoc, getFirestore, getDoc } from "firebase/firestore";
-import { initializeApp } from "firebase/app";
-import { firebaseConfig } from './firebase_config';
-import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { useState, useEffect } from 'react';
 import { speciesList } from './species_list';
-import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
 import { statesList } from './states_list';
 import { municipalitiesList } from './municipalities_list';
-import { getRanHex, hideNavBar, hideTopBar } from './utils';
+import { hideNavBar, hideTopBar, resultMeasurementValueRanges as valueRanges, type UserData, type Sample } from './utils';
 import { useTranslation } from 'react-i18next';
 import './i18n/config';
-
-type UserData = {
-    name: string,
-    org: string,
-    org_name: string,
-    role: string,
-}
 
 type SampleDataInputProps = {
     onStateUpdate: any,
@@ -39,13 +26,9 @@ type SampleDataInputProps = {
 }
 
 export default function SampleDataInput(props: SampleDataInputProps) {
-    const [user, setUser] = useState({});
     const [sampleTrust, setSampletrust] = useState('untrusted');
-    // const [isMember, setIsMember] = useState(false);
-    const [userData, setUserdata] = useState(props.userData);
     const [currentTab, setCurrentTab] = useState(1);
-
-    const [formData, setFormData] = useState(props.baseState);
+    const [formData, setFormData] = useState(props.baseState as Sample);
     const [numMeasurements, setNumMeasurements] = useState(2);
     const [currentMeasurementsTab, setCurentMeasurementsTab] = useState(0);
 
@@ -66,7 +49,6 @@ export default function SampleDataInput(props: SampleDataInputProps) {
 
 
     function attemptToUpdateCurrentTab(newTab: number) {
-        const currentTabRef = getCurrentTabFormRef();
         if (newTab < currentTab || checkCurrentTabFormValidity()) {
             setCurrentTab(newTab);
             if (props.onTabChange) props.onTabChange(newTab);
@@ -154,24 +136,17 @@ export default function SampleDataInput(props: SampleDataInputProps) {
     }
 
     function onActionButtonClick() {
-        const currentTabRef = getCurrentTabFormRef();
         if (!checkCurrentTabFormValidity()) return;
         props.onActionButtonClick(props.sampleId);
-        // attemptToUpdateCurrentTab(4);
-        // if (!props.isNewSampleForm) {
-        //     props.onActionButtonClick();
-        // } else {
-        //     attemptToUpdateCurrentTab(4);
-        // }
     }
 
     function getCurrentTabFormRef(): Element {
         if (currentTab === 1) {
-            return document.getElementById('info-tab');
+            return document.getElementById('info-tab')!;
         } else if (currentTab === 2) {
-            return document.getElementById('sample-measurements');
+            return document.getElementById('sample-measurements')!;
         } else {
-            return document.getElementById('results-tab');
+            return document.getElementById('results-tab')!;
         }
     }
 
@@ -183,6 +158,7 @@ export default function SampleDataInput(props: SampleDataInputProps) {
             // Form is valid, forward to calling component handling.
             if (currentTab === 1 && !formData.trusted) {
                 alert("Please select an origin value");
+                return false;
             } else {
                 return true;
             }
@@ -198,9 +174,10 @@ export default function SampleDataInput(props: SampleDataInputProps) {
     }
 
     function validateSampleResultsTab(): boolean {
-        if (!currentTab === 2) {
+        if (currentTab !== 2) {
             return true;
         }
+        
         const d18O_cel = formData.d18O_cel ? formData.d18O_cel.map((value: string) => parseFloat(value)) : [];
         const oxygen = formData.oxygen ? formData.oxygen.map((value: string) => parseFloat(value)) : [];
         const nitrogen = formData.nitrogen ? formData.nitrogen.map((value: string) => parseFloat(value)) : [];
@@ -209,91 +186,21 @@ export default function SampleDataInput(props: SampleDataInputProps) {
         const c_wood = formData.c_wood ? formData.c_wood.map((value: string) => parseFloat(value)) : [];
         const d13C_cel = formData.d13C_cel ? formData.d13C_cel.map((value: string) => parseFloat(value)) : [];
         const c_cel = formData.c_cel ? formData.c_cel.map((value: string) => parseFloat(value)) : [];
+        const resultValues = [d18O_cel, oxygen, nitrogen, n_wood, carbon, c_wood, d13C_cel, c_cel];
+        const resultValueNames = ['d18O_cel', 'oxygen', 'nitrogen', 'n_wood', 'carbon', 'c_wood', 'd13C_cel', 'c_cel'];
 
         let alertMessage = "";
-        if (d18O_cel) {
-            d18O_cel.forEach((value: number) => {
-                if (value < 20 || value > 32) {
-                    alertMessage = "d18O_cel should be within the range of 20-32";
+        resultValues.forEach((resultValue: number[]|null, index: number) => {
+            const resultCategory = resultValueNames[index];
+            if (!resultValue || resultValue.length < 1) return;
+            resultValue.forEach((value: number) => {
+                if (value < valueRanges[resultCategory].min || value > valueRanges[resultCategory].max) {
+                    alertMessage = `${resultValue} should be within the range of ${valueRanges[resultCategory].min} - ${valueRanges[resultCategory].max}`;
                     alert(alertMessage);
                 }
-            })
-        }
-        if (oxygen) {
-            oxygen.forEach((value: number) => {
-                if (value < 20 || value > 32) {
-                    alertMessage = "d180_wood should be within the range of 20-32";
-                    alert(alertMessage);
-                }
-            })
-        }
-        if (nitrogen) {
-            nitrogen.forEach((value: number) => {
-                if (value < -5 || value > 15) {
-                    alertMessage = "d15N_wood should be within the range of -5-15";
-                    alert(alertMessage);
-                }
-            })
-        }
-        if (n_wood) {
-            n_wood.forEach((value: number) => {
-                if (value < 0 || value > 1) {
-                    alertMessage = "%N_wood should be within the range of 0-1";
-                    alert(alertMessage);
-                }
-            })
-        }
-        if (carbon) {
-            carbon.forEach((value: number) => {
-                if (value < -38 || value > -20) {
-                    alertMessage = "d13C_wood should be within the range of -38- -20";
-                    alert(alertMessage);
-                }
-            })
-        }
-        if (c_wood) {
-            c_wood.forEach((value: number) => {
-                if (value < 40 || value > 60) {
-                    alertMessage = "%C_wood should be within the range of 40-60";
-                    alert(alertMessage);
-                }
-            })
-        }
-        if (d13C_cel) {
-            d13C_cel.forEach((value: number) => {
-                if (value < -35 || value > -20) {
-                    alertMessage = "d13C_cel should be within the range of -35 - -20";
-                    alert(alertMessage);
-                }
-            })
-        }
-        if (c_cel) {
-            c_cel.forEach((value: number) => {
-                if (value < 40 || value > 60) {
-                    alertMessage = "%C_cel should be within the range of 40-60";
-                    alert(alertMessage);
-                }
-            })
-        }
+            });
+        })
         return alertMessage.length < 1;
-    }
-
-    function handlePrint(elem) {
-        const mywindow = window.open('', 'PRINT', 'height=400,width=600');
-        if (!mywindow) return;
-        mywindow.document.write('<html><head><title>' + document.title + '</title>');
-        mywindow.document.write('</head><body >');
-        mywindow.document.write('<h1>' + document.title + '</h1>');
-        mywindow.document.write(document.getElementById('qr-code').innerHTML);
-        mywindow.document.write('</body></html>');
-
-        mywindow.document.close(); // necessary for IE >= 10
-        mywindow.focus(); // necessary for IE >= 10*/
-
-        mywindow.print();
-        mywindow.close();
-
-        return true;
     }
 
     function handleMeasurementsTabClick(evt: any) {
@@ -447,20 +354,6 @@ export default function SampleDataInput(props: SampleDataInputProps) {
                             <label htmlFor="diameter">{t('diameter')}</label>
                             <input onChange={handleChange} value={formData.diameter} name='diameter' type="text" className="form-control" id="diameter" />
                         </div>
-                        {/* <div className='form-group  half-width-entry'>
-                            <label htmlFor="amount_of_measurements">{t('amountOfMeasurements')}*</label>
-                            <select onChange={handleChange} value={formData.amount_of_measurementste} required name='amount_of_measurementste' className="form-select" aria-label="Default select example" id="amount_of_measurementste">
-                                <option value={2}>2</option>
-                                <option value={3}>3</option>
-                                <option value={4}>4</option>
-                                <option value={5}>5</option>
-                                <option value={6}>6</option>
-                                <option value={7}>7</option>
-                                <option value={8}>8</option>
-                                <option value={9}>9</option>
-                                <option value={10}>10</option>
-                            </select>
-                        </div> */}
                     </div>
                     <div className='sample-measurements-overview-row'>
                         <div className="form-group full-width-entry">
@@ -682,116 +575,6 @@ export default function SampleDataInput(props: SampleDataInputProps) {
         )
     }
 
-    function createSampleTab() {
-        const sampleId = props.sampleId;
-        const today = new Date();
-        const currentDateString = today.toLocaleDateString();
-        const url = `timberid.org/sample-details?trusted=${formData.trusted}&id=${sampleId}`;
-
-        return (<div>
-            <p>Summary</p>
-            <table className="table table-borderless sample-info-table">
-                <tbody>
-                    <tr>
-                        <td className="sample-info">Id</td>
-                        <td>{sampleId}</td>
-                    </tr>
-                    <tr>
-                        <td className='sample-info'>{t('species')}</td>
-                        <td>{formData.species}</td>
-                    </tr>
-                    <tr>
-                        <td className='sample-info'>{t('dateCreated')}</td>
-                        <td>{currentDateString}</td>
-                    </tr>
-                    <tr>
-                        <td className='sample-info'>{t('collectedIn')}</td>
-                        <td>{formData.state}</td>
-                    </tr>
-                    <tr>
-                        <td className='sample-info'>{t('collectedOn')}</td>
-                        <td>{formData.date_collected}</td>
-                    </tr>
-                </tbody>
-
-            </table>
-            <div>
-                <p className='qr-title'>Sample QR code</p>
-                <p className='qr-subtitle'>Print and paste this QR code on the sample to be analayzed</p>
-                <div id='qr-code'>
-                    <QRCodeSVG value={url} />
-                </div>
-
-                <button onClick={handlePrint} id="print-button" type="button" className="btn btn-primary print-button">Print</button>
-
-            </div>
-
-        </div>)
-    }
-
-    function sampleResultsTab() {
-        if (formData.status !== 'concluded') {
-            attemptToUpdateCurrentTab(currentTab + 1);
-        }
-        return (
-            <div>
-                <div className="result-instructions">
-                    Enter the values for each sample separated by a comma (,).
-                </div>
-
-                <form id='results-tab' className='grid-columns'>
-                    <div className='column-one'>
-                        <div className="form-group">
-                            <label htmlFor="d18O_cel">d18O_cel</label>
-                            <input onChange={handleResultChange} value={formData.d18O_cel ? formData.d18O_cel.toString() : ''} name='d18O_cel' type="text" className="form-control" id="d18O_cel" />
-                        </div>
-                    </div>
-                    <div className='column-one'>
-                        <div className="form-group">
-                            <label htmlFor="oxygen">d18O_wood</label>
-                            <input onChange={handleResultChange} value={formData.oxygen ? formData.oxygen.toString() : ''} name='oxygen' type="text" className="form-control" id="oxygen" />
-                        </div>
-                    </div>
-                    <div className='column-one'>
-                        <div className="form-group">
-                            <label htmlFor="nitrogen">d15N_wood</label>
-                            <input onChange={handleResultChange} value={formData.nitrogen ? formData.nitrogen.toString() : ''} name='nitrogen' type="text" className="form-control" id="nitrogen" />
-                        </div>
-                    </div>
-                    <div className='column-one'>
-                        <div className="form-group">
-                            <label htmlFor="n_wood">N_wood</label>
-                            <input onChange={handleResultChange} value={formData.n_wood ? formData.n_wood.toString() : ''} name='n_wood' type="text" className="form-control" id="n_wood" />
-                        </div>
-                    </div>
-                    <div className='column-one'>
-                        <div className="form-group">
-                            <label htmlFor="carbon">d13C_wood</label>
-                            <input onChange={handleResultChange} value={formData.carbon ? formData.carbon.toString() : ''} name='carbon' type="text" className="form-control" id="carbon" />
-                        </div>
-                    </div>
-                    <div className='column-one'>
-                        <div className="form-group">
-                            <label htmlFor="d18O_wood">%C_wood</label>
-                            <input onChange={handleResultChange} value={formData.c_wood ? formData.c_wood.toString() : ''} name='c_wood' type="text" className="form-control" id="c_wood" />
-                        </div>
-                    </div>
-                    <div className='column-one'>
-                        <div className="form-group">
-                            <label htmlFor="d13C_cel">d13C_cel</label>
-                            <input onChange={handleResultChange} value={formData.d13C_cel ? formData.d13C_cel.toString() : ''} name='d13C_cel' type="text" className="form-control" id="d13C_cel" />
-                        </div>
-                    </div>
-                    <div className='column-one'>
-                        <div className="form-group">
-                            <label htmlFor="c_cel">%C_cel</label>
-                            <input onChange={handleResultChange} value={formData.c_cel ? formData.c_cel.toString() : ''} name='c_cel' type="text" className="form-control" id="c_cel" />
-                        </div>
-                    </div>
-                </form>
-            </div>
-        )
-    }
 
     function userIsOnLastTab(): boolean {
         return currentTab === 4;
@@ -799,12 +582,6 @@ export default function SampleDataInput(props: SampleDataInputProps) {
     function shouldShowNextButton(): boolean {
         if (!props.isCompletedSample) return false;
         return currentTab < 3;
-        // if (formData.status === 'concluded') {
-        //     return currentTab < 3;
-        // } else {
-        //     return currentTab < 2
-        // }
-
     }
 
     function shouldShowBackButton(): boolean {
@@ -821,8 +598,6 @@ export default function SampleDataInput(props: SampleDataInputProps) {
     function handleReturnToDashboard() {
         router.push('/samples')
     }
-
-
 
     return (
         <div className="add-sample-page-wrapper">

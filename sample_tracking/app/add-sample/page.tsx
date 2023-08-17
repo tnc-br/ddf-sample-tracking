@@ -6,43 +6,24 @@ var QRCode = require('qrcode');
 import { QRCodeSVG } from "qrcode.react";
 import { useRouter } from 'next/navigation'
 import { doc, setDoc, getFirestore, getDoc } from "firebase/firestore";
-import { initializeApp, getApp } from "firebase/app";
-import { firebaseConfig } from '../firebase_config';
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { useState, useEffect } from 'react';
-import { speciesList } from '../species_list';
-import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
-import { statesList } from '../states_list';
-import { municipalitiesList } from '../municipalities_list';
 import SampleDataInput from '../sample_data_input';
-import { initializeAppIfNecessary, getRanHex } from '../utils';
+import { initializeAppIfNecessary, getRanHex, confirmUserLoggedIn, getUrlParam, type UserData, type Sample } from '../utils';
 import { useSearchParams } from 'next/navigation'
 import { useTranslation } from 'react-i18next';
 import Link from 'next/link';
 
-
-
-type UserData = {
-    name: string,
-    org: string,
-    org_name: string,
-    role: string,
-}
-
 export default function AddSample() {
-    const [user, setUser] = useState({});
-    const [sampleTrust, setSampletrust] = useState('untrusted');
-    // const [isMember, setIsMember] = useState(false);
     const [userData, setUserdata] = useState({} as UserData);
     const [currentTab, setCurrentTab] = useState(1);
-    const [pageTitle, setPageTitle] = useState("Create a new sample");
     const [sampleId, setSampleID] = useState('');
     const [sampleCreationFinished, setSampleCreationFinished] = useState(false);
 
     const [formData, setFormData] = useState({
         visibility: 'public',
         collected_by: 'supplier',
-    });
+    } as Sample);
 
     const router = useRouter();
     const app = initializeAppIfNecessary();
@@ -50,63 +31,34 @@ export default function AddSample() {
     const db = getFirestore();
     const { t } = useTranslation();
 
-    let status = "completed";
-    const searchParams = useSearchParams();
-    if (typeof window !== "undefined" && !formData.status) {
-        const queryString = window.location.search;
-        console.log("Querystring: " + queryString);
-        const urlParams = new URLSearchParams(queryString);
-        status = urlParams.get('status') ? urlParams.get('status') : searchParams.get('status');
+    // Make sure the user is logged in. 
+    useEffect(() => {
+        if (!userData.role) {
+            onAuthStateChanged(auth, (user) => {
+                setUserdata(confirmUserLoggedIn(user, db, router));
+            });
+        }
+    });
+
+    // Check if we are creating a completed or incomplete sample because there is a specific UI for each sample type.
+    // This information is passed as a URL param. 
+
+    if (!formData.status) {
+        let status = getUrlParam('status');
         setFormData({
             ...formData,
             status: status === 'completed' ? 'concluded' : 'in_progress',
         });
     }
 
+    // Assign a new sampleID for the sample being created 
     if (sampleId.length < 1) {
         setSampleID(getRanHex(20));
-    }
-
-    useEffect(() => {
-        if (!userData.role) {
-            onAuthStateChanged(auth, (user) => {
-                if (user) {
-                    console.log(user);
-                    setUser(user);
-                    const userDocRef = doc(db, "users", user.uid);
-                    getDoc(userDocRef).then((docRef) => {
-                        if (docRef.exists()) {
-                            const docData = docRef.data();
-                            if (!docData.role) {
-                                router.push('/tasks');
-                            } else {
-                                setUserdata(docData as UserData);
-                            }
-                        }
-                    })
-                }
-                if (!user) {
-                    router.push('/login');
-                }
-            });
-        }
-    });
-
-    function onCancleClick() {
-        router.replace('/samples');
-    }
-
-    function sampleHasRequiredFieldsSet(): boolean {
-        return true;
     }
 
     function onCreateSampleClick(sampleId: string) {
         if (!sampleId) {
             console.log("Error: SampleId not provided when trying to create sample");
-        }
-        if (!sampleHasRequiredFieldsSet()) {
-            alert("Not all required fields are filled out to submit a sample.");
-            return;
         }
         const user = auth.currentUser;
         if (!user) return;
@@ -130,7 +82,8 @@ export default function AddSample() {
             lat: formData.lat ? parseFloat(formData.lat) : '',
             lon: formData.lon ? parseFloat(formData.lon) : '',
         };
-        // if (!formIsValid()) return;
+
+        // Determine which collection in the database to add the new sample. 
         const sampleTrustValue = formData.trusted;
         if (!sampleTrustValue) return;
         let docRef;
@@ -146,7 +99,7 @@ export default function AddSample() {
 
     }
 
-    function handleChange(formState: {}, currentTab: number) {
+    function handleChange(formState: Sample, currentTab: number) {
         setFormData(formState);
     }
 
@@ -188,11 +141,8 @@ export default function AddSample() {
             </div>
             <div >
 
-                
-
-                {/* <p className="title">{pageTitle}</p> */}
                 <div className="sample-details-form-wrapper">
-                {formData.status === 'concluded' && !sampleCreationFinished && <div className="add-sample-tab-bar">
+                    {formData.status === 'concluded' && !sampleCreationFinished && <div className="add-sample-tab-bar">
                         <div className='add-sample-add-details-tab'>
                             <div className='add-sample-tab-number-wrapper'>
                                 <div className='leading-divider'>
@@ -204,7 +154,7 @@ export default function AddSample() {
                             </div>
                             <div className='add-sample-tab-text-wrapper'>
                                 <div className={currentTab >= 1 ? "dd-sample-current-tab-text add-sample-tab-text" : "add-sample-tab-text"}>
-                                Add details
+                                    Add details
                                 </div>
                             </div>
                         </div>
@@ -221,7 +171,7 @@ export default function AddSample() {
                             </div>
                             <div className='add-sample-tab-text-wrapper'>
                                 <div className={currentTab >= 2 ? "dd-sample-current-tab-text add-sample-tab-text" : "add-sample-tab-text"}>
-                                Add sample measurements
+                                    Add sample measurements
                                 </div>
                             </div>
                         </div>
@@ -238,7 +188,7 @@ export default function AddSample() {
                             </div>
                             <div className='add-sample-tab-text-wrapper'>
                                 <div className={currentTab === 3 ? "dd-sample-current-tab-text add-sample-tab-text" : "add-sample-tab-text"}>
-                                Review and create
+                                    Review and create
                                 </div>
                             </div>
                         </div>
@@ -269,14 +219,6 @@ export default function AddSample() {
                         </div>
 
                     </div>}
-
-                    {/* {formData.status === 'concluded' && <div className="tabs">
-                        <div className={currentTab === 1 ? "current_tab" : "unselected_tab"}>{t('basicInfo')}</div>
-                        <div className={currentTab === 2 ? "current_tab" : "unselected_tab"}>{t('sampleMeasurements')}</div>
-                        {formData.status === 'concluded' && <div className={currentTab === 3 ? "current_tab" : "unselected_tab"}>{t('sampleResults')}</div>}
-                        <div className={currentTab === 4 ? "current_tab" : "unselected_tab"}>{t('createSample')}</div>
-                    </div>} */}
-                    
 
                     {userData && !sampleCreationFinished && <div id="sample-form">
                         <SampleDataInput baseState={formData}

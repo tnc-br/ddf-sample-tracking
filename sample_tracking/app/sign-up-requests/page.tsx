@@ -10,12 +10,7 @@ import './styles.css';
 import { useRouter } from 'next/navigation'
 import 'bootstrap/dist/css/bootstrap.css';
 import { getFirestore, getDocs, collection, updateDoc, doc, setDoc, addDoc, getDoc, arrayUnion, arrayRemove, deleteField, query, where, deleteDoc } from "firebase/firestore";
-import { showNavBar, showTopBar, getRanHex } from '../utils';
-
-type UserData = {
-    role: string,
-    org: string,
-}
+import { showNavBar, showTopBar, getRanHex, confirmUserLoggedIn, type UserData } from '../utils';
 
 interface NestedSchemas {
     [key: string]: NestedSchemas;
@@ -39,21 +34,8 @@ export default function SignUpRequests() {
         showTopBar();
         if (Object.keys(userData).length < 1) {
             onAuthStateChanged(auth, (user) => {
-                if (!user) {
-                    router.push('/login');
-                } else {
-                    const userDocRef = doc(db, "users", user.uid);
-                    getDoc(userDocRef).then((docRef) => {
-                        if (docRef.exists()) {
-                            const docData = docRef.data();
-                            if (docData.role !== 'admin' && docData.role !== 'site_admin') {
-                                router.push('/tasks');
-                            }
-                            setUserData(docRef.data() as UserData);
-                        }
-                    })
-                }
-            });
+                setUserData(confirmUserLoggedIn(user, db, router, ['admin', 'site_admin']));
+            })   
         }
     })
 
