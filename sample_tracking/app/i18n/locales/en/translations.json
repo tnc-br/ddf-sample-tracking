@@ -40,13 +40,14 @@
     "completed": "Completed",
     "collectedIn": "Collected in",
     "dateCreated": "Date created",
-    "unknown": "unknown",
-    "known": "known",
-    "uncertain": "uncertain",
+    "unknown": "Unknown",
+    "known": "Known",
+    "uncertain": "Uncertain",
     "notStarted": "Not started",
     "concluded": "Concluded",
     "actions": "Actions",
     "header": "Header",
     "createdBy": "Created by",
-    "collectedOn": "Collected on"
+    "collectedOn": "Collected on",
+    "supplierName": "Supplier name"
   }

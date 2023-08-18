@@ -40,13 +40,14 @@
     "completed": "Concluída",
     "collectedIn": "Coletado em",
     "dateCreated": "Data Criada",
-    "unknown": "desconhecida",
-    "known": "conhecida",
-    "uncertain": "incerta",
+    "unknown": "Desconhecida",
+    "known": "Conhecida",
+    "uncertain": "Incerta",
     "notStarted": "Não foi iniciado",
     "concluded": "Concluída",
     "actions": "Actions",
     "header": "Cabeçalho",
     "createdBy": "Criado por",
-    "collectedOn": "Coletado em"
+    "collectedOn": "Coletado em",
+    "supplierName": "Nome do Fornecedor"
   }

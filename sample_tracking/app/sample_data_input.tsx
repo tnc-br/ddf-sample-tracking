@@ -14,7 +14,7 @@ import { speciesList } from './species_list';
 import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
 import { statesList } from './states_list';
 import { municipalitiesList } from './municipalities_list';
-import { getRanHex, hideNavBar, hideTopBar } from './utils';
+import { getRanHex, hideNavBar, hideTopBar, verifyLatLonFormat } from './utils';
 import { useTranslation } from 'react-i18next';
 import './i18n/config';
 
@@ -177,12 +177,20 @@ export default function SampleDataInput(props: SampleDataInputProps) {
 
     function checkCurrentTabFormValidity(): boolean {
         if (currentTab === 3) return true;
+
         const currentTabRef = getCurrentTabFormRef();
         if (currentTab === 2 && !validateSampleResultsTab()) return false;
         if (currentTabRef.checkValidity()) {
             // Form is valid, forward to calling component handling.
-            if (currentTab === 1 && !formData.trusted) {
-                alert("Please select an origin value");
+            if (currentTab === 1) {
+                if (!formData.trusted) {
+                    alert("Please select an origin value");
+                }
+                if ((document.getElementById('inputLat') && !verifyLatLonFormat(document.getElementById('inputLat').value)) ||
+                    (document.getElementById('inputLon') && !verifyLatLonFormat(document.getElementById('inputLon').value))) {
+                    alert("Latitude and longitude should be in the format xx.xxxx");
+                    return false;
+                }
             } else {
                 return true;
             }
@@ -191,6 +199,7 @@ export default function SampleDataInput(props: SampleDataInputProps) {
             currentTabRef.reportValidity();
             return false;
         }
+        return true;
     }
 
     function originIsKnownOrUncertain(): boolean {

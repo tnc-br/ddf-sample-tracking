@@ -51,3 +51,7 @@ export function hideNavBar() {
       navBar.style.display = "none";
     }
 }
+
+export function verifyLatLonFormat(input: string) {
+  return input.charAt(2) === '.' && input.length > 3;
+}

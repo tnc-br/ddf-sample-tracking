@@ -49,6 +49,7 @@ type Sample = {
 interface SampleDataProps {
     samplesData: any,
     canDeleteSamples: boolean,
+    showValidity: boolean,
 }
 
 type SampleData = {
@@ -88,7 +89,10 @@ export default function SamplesTable(props: SampleDataProps) {
         });
     }
 
-    const columns = useMemo<MRT_ColumnDef<Sample>[]>(
+    let columns;
+
+    props.showValidity ? 
+    columns = useMemo<MRT_ColumnDef<Sample>[]>(
         () => [
             {
                 accessorKey: 'code_lab',
@@ -153,7 +157,68 @@ export default function SamplesTable(props: SampleDataProps) {
             }
         ],
         [sampleData.samples],
-    );
+    ) :
+    columns = useMemo<MRT_ColumnDef<Sample>[]>(
+        () => [
+            {
+                accessorKey: 'code_lab',
+                header: t('internalCode'),
+                size: 150,
+                Cell: ({ cell, row, renderedCellValue }) => {
+                    return (
+
+                        <div id={row.original.trusted} onClick={() => onSampleClick(row)} className="actions-button sample-link">
+                            <span id={row.original.code_lab}>{renderedCellValue}</span>
+                        </div>
+                    )
+                },
+            },
+            {
+                accessorFn: (row) => (row as Sample).sample_name ?? '',
+                header: t('name'),
+                size: 150,
+            },
+            {
+                accessorFn: (row) => (row as Sample).last_updated_by ?? '',
+                header: t('lastUpdatedBy'),
+                size: 150,
+                filterVariant: 'select',
+            },
+            {
+                accessorFn: (row) => row,
+                header: t('actions'),
+                size: 100,
+                Cell: ({ cell }) => {
+                    const row = cell.getValue();
+                    return (
+                        <div className="action-buttons-wrapper">
+                            {/* <div id={(row as Sample).trusted} onClick={onEditSampleClick} className="actions-button">
+                                <span id={(row as Sample).code_lab}>Edit</span>
+                            </div> */}
+                            <div id={(row as Sample).trusted} >
+                                <IconButton onClick={() => onEditSampleClick(row)}>
+                                    <Edit />
+                                </IconButton>
+                            </div>
+
+                            {props.canDeleteSamples &&
+                                <div id={(row as Sample).trusted}>
+                                    <IconButton color="error" onClick={() => onDeleteSampleClick(row)}>
+                                        <Delete />
+                                    </IconButton>
+                                </div>}
+                            {/* {props.canDeleteSamples && <div id={(row as Sample).trusted} onClick={onDeleteSampleClick} className="actions-button">
+                                <span id={(row as Sample).code_lab}>Delete</span>
+                            </div>} */}
+                        </div>
+
+                    )
+                },
+            }
+        ],
+        [sampleData.samples],
+    )  
+
 
     const csvOptions = {
         fieldSeparator: ',',
