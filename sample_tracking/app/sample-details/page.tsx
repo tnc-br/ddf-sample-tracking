@@ -223,7 +223,7 @@ export default function SampleDetails() {
                     </div>
                     <div className="detail-row">
                         <div className='detail'>
-                            <span className="detail-name">{t('sampleName')}</span>
+                            <span className="detail-name">{t('visibility')}</span>
                             <span className='detail-value'>{selectedDoc['visibility'] || "unknown"}</span>
                         </div>
                         <div className='detail'>
