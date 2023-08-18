@@ -6,38 +6,11 @@ import { useState, useMemo, useRef, useEffect } from 'react';
 import './styles.css';
 import { useRouter } from 'next/navigation'
 import SamplesTable from '../samples_table';
-import { initializeAppIfNecessary, showNavBar, showTopBar } from '../utils';
+import { type Sample, type UserData, initializeAppIfNecessary, showNavBar, showTopBar, confirmUserLoggedIn } from '../utils';
 import { useTranslation } from 'react-i18next';
 import '../i18n/config';
 
-import { firebaseConfig } from '../firebase_config';
-
-
 export default function Samples() {
-
-    type Sample = {
-        code_lab: string,
-        visibility: string,
-        sample_name: string,
-        species: string,
-        site: string,
-        state: string,
-        lat: string,
-        lon: string,
-        date_of_harvest: string,
-        created_by: string,
-        current_step: string,
-        status: string,
-        trusted: string,
-        created_on: string,
-        last_updated_by: string,
-        org: string,
-    }
-
-    type UserData = {
-        role: string,
-        org: string,
-    }
 
     const [data, setData] = useState({});
     const [selectedSample, setSelectedSample] = useState('');
@@ -56,22 +29,8 @@ export default function Samples() {
         showTopBar();
         if (!userData.role || userData.role.length < 1) {
             onAuthStateChanged(auth, (user) => {
-                if (!user) {
-                    router.push('/login');
-                } else {
-                    const userDocRef = doc(db, "users", user.uid);
-                    getDoc(userDocRef).then((docRef) => {
-                        if (docRef.exists()) {
-                            const docData = docRef.data();
-                            if (!docData.role) {
-                                router.push('/tasks');
-                            } else {
-                                setUserData(docData as UserData);
-                            }
-                        }
-                    });
-                }
-            })
+                setUserData(confirmUserLoggedIn(user, db, router));
+            });
         }
     })
 
