@@ -98,13 +98,18 @@ export default function LogInSignUpPage() {
 
 
   return (
-    <div>
+    <div >
       {
-        signInScreen === LogInScreen.LOG_IN ? <Login onSignUpClick={() => handleSignUpClick()} onForgotPasswordClick={() => handleForgotPasswordClick()}/> :
-        signInScreen === LogInScreen.SIGN_UP ? <SignUp onLogInClick={() => handleSignInClick()} /> :
-        <ForgotPassword returnToSignInClick={() => handleReturnToSignInClick()}/>
+        signInScreen === LogInScreen.FORGOT_PASSWORD ?
+          <ForgotPassword returnToSignInClick={() => handleReturnToSignInClick()} /> :
+          <div className='login-page-wrapper'>
+            <Login onSignUpClick={() => handleSignUpClick()} onForgotPasswordClick={() => handleForgotPasswordClick()} />
+            <SignUp onLogInClick={() => handleSignInClick()} />
+          </div>
+
+
       }
-      
+
       {/* {canSignIn ? <Login onSignUpClick={() => handleSignUpClick()} onForgotPasswordClick={() => handleForgotPasswordClick()}/> : <SignUp onLogInClick={() => handleSignInClick()} />} */}
     </div>
 
