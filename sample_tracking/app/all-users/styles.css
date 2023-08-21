@@ -16,3 +16,82 @@
 button {
     margin: 0px;
 }
+
+.all-users-title {
+    color: #000;
+
+    /* M3/headline/medium */
+    font-family: Roboto;
+    font-size: 28px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 36px;
+    /* 128.571% */
+}
+
+
+.all-users-tab-wrapper {
+    display: flex;
+    width: 1087px;
+    flex-direction: column;
+    align-items: flex-start;
+    cursor: pointer;
+    margin-top: 40px;
+    margin-bottom: 40px;
+}
+
+.all-users-tab-group {
+    display: flex;
+    align-items: flex-start;
+    align-self: stretch;
+}
+
+.all-users-tab {
+    display: flex;
+    height: 48px;
+    flex-direction: column;
+    justify-content: flex-end;
+    align-items: center;
+    flex: 1 0 0;
+    background: var(--timber-id-sys-light-surface, #F8FAFA);
+}
+
+.all-users-slate-wrapper {
+    display: flex;
+    padding: 0px 16px;
+    flex-direction: column;
+    justify-content: flex-end;
+    align-items: center;
+    flex: 1 0 0;
+    align-self: stretch;
+}
+
+.all-users-tab-contents {
+    display: flex;
+    height: 48px;
+    padding: 14px 0px;
+    flex-direction: column;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 12px;
+}
+
+.all-users-tab-text {
+    color: var(--timber-id-sys-light-on-surface, #191C1D);
+    text-align: center;
+
+    /* TimberID/title/small */
+    font-family: Roboto;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 500;
+    line-height: 20px;
+    position: relative;
+    top: 50%;
+    transform: translate(0, 25%);
+    /* 142.857% */
+}
+
+.all-users-selected-tab {
+    border-bottom: 2px solid blue;
+}

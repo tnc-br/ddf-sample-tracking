@@ -49,5 +49,10 @@
     "header": "Header",
     "createdBy": "Created by",
     "collectedOn": "Collected on",
-    "supplierName": "Supplier name"
+    "supplierName": "Supplier name",
+    "admin": "Admin",
+    "numberOfUsers": "Number of users",
+    "email": "Email",
+    "organization": "Organization",
+    "dateAdded": "Date added"
   }

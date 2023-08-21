@@ -11,6 +11,9 @@ export type UserData = {
   org: string,
   org_name: string,
   role: string,
+  user_id: string,
+  email: string,
+  date_added: string,
 }
 
 export type Sample = {

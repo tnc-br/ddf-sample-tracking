@@ -8,7 +8,7 @@ import './styles.css';
 import { useRouter } from 'next/navigation'
 // import Nav from '../nav';
 import { MaterialReactTable, type MRT_ColumnDef, type MRT_Row, type MRT_TableInstance, type MRT_SortingState, type MRT_PaginationState } from 'material-react-table';
-import { initializeAppIfNecessary } from './utils';
+import { initializeAppIfNecessary, type Sample } from './utils';
 import {
     Box,
     IconButton,
@@ -23,28 +23,6 @@ import { ExportToCsv } from 'export-to-csv';
 import { useTranslation } from 'react-i18next';
 import './i18n/config';
 
-type Sample = {
-    code_lab: string,
-    visibility: string,
-    sample_name: string,
-    species: string,
-    site: string,
-    state: string,
-    lat: string,
-    lon: string,
-    date_of_harvest: string,
-    created_by: string,
-    current_step: string,
-    status: string,
-    trusted: string,
-    created_on: string,
-    last_updated_by: string,
-    org: string,
-    validity: number,
-    header: string,
-    doc_id: string,
-    updated_state: boolean,
-}
 
 interface SampleDataProps {
     samplesData: any,
