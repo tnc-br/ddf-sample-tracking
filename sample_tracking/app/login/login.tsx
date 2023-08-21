@@ -22,7 +22,7 @@ export default function Login(props: LogInProps) {
     function attemptSignIn() {
         const email = (document.getElementById('email') as HTMLInputElement).value;
         const password = (document.getElementById('password') as HTMLInputElement).value;
-        console.log('username: ' + loginInfo.email + ' password: ' + loginInfo.password);
+        console.log('username: ' + email + ' password: ' + password);
         signInWithEmailAndPassword(auth, email, password)
             .then((userCredential) => {
                 // Signed in 
@@ -125,7 +125,7 @@ export default function Login(props: LogInProps) {
                             <div className="forgot-password-content-wrapper">
                                 <div className="forgot-password-input-text">
                                     <form id="email-form">
-                                        <input required className="forgot-password-text form-control" name='email' type="text" id="email" />
+                                        <input required className="forgot-password-text form-control" name='password' type="password" id="password" />
                                     </form>
                                 </div>
                                 <div className="forgot-passowrd-label-text-wrapper">
