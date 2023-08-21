@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation'
 import { getAuth, createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
 import { doc, getDocs, collection, getFirestore, updateDoc, addDoc } from "firebase/firestore";
+import InputField from '../input-field';
 
 
 interface SignUpProps {
@@ -25,17 +26,23 @@ interface OrgsSchemas {
 }
 
 type NewUser = {
-    name: string,
+    firstName: string,
+    lastName: string,
     email: string,
+    password: string,
+    confirmPassword: string,
     date_requested: string,
     org: string,
     uid: string,
-    org_name: string
+    orgName: string,
+    newOrgName: string,
 }
 
 export default function SignUp(props: SignUpProps) {
 
     const router = useRouter()
+
+    const [formData, setFormData] = useState({} as NewUser);
 
     const [signUpTab, setSignUpTab] = useState(0);
     const [signUpData, setSignUpData] = useState({
@@ -88,39 +95,42 @@ export default function SignUp(props: SignUpProps) {
     }
 
     async function handleSignUpButtonClicked() {
-        const email = (document.getElementById('email') as HTMLInputElement).value;
-        const password = (document.getElementById('password') as HTMLInputElement).value;
-        const reEnterPassword = (document.getElementById('reEnterPassword') as HTMLInputElement).value;
-        const name = `${signUpData.firstName} ${signUpData.lastName}`;
-        const newOrgName = (document.getElementById('newOrgName') ? (document.getElementById('newOrgName') as HTMLInputElement).value : '');
-        if (password !== reEnterPassword) {
+
+        const accountInfo = document.getElementById('account-info');
+        if (!accountInfo.checkValidity()) {
+            accountInfo.reportValidity();
+            return;
+        }
+        if (!formData.firstName || !formData.lastName || !formData.email || !formData.password || !formData.confirmPassword || !formData.orgName) {
+            return;
+        }
+        if (formData.password !== formData.confirmPassword) {
             console.log('Passwords dont match');
             alert("The passwords you entered don't match.");
             return;
         }
-        await createUserWithEmailAndPassword(auth, email, password);
+
+        const newOrgName = formData.newOrgName ? formData.newOrgName : '';
+        const orgName = formData.orgName;
+        const name = `${formData.firstName} ${formData.lastName}`;
+        const labValue = orgName ? availableOrgs[orgName] : '';
+
+        await createUserWithEmailAndPassword(auth, formData.email, formData.password);
         const user = auth.currentUser;
         if (!user) return;
         await updateProfile(auth.currentUser, {
             displayName: name,
         });
 
-        // const docRef = doc(db, "users", auth.currentUser!.uid);
-        // setDoc(docRef, {
-        //   lab: signUpData.lab,
-        //   name: name,
-        //   role_approval_status: "needs_approval",
-        // });
-
         const date = new Date();
         const dateString = `${date.getMonth() + 1} ${date.getDate()} ${date.getFullYear()}`;
-        if (signUpData.lab === 'NEW') {
+        if (newOrgName) {
             const newOrgDoc = doc(db, "new_users", "new_orgs");
             let newObj: NestedSchemas = {};
             newObj[newOrgName] = {
                 admin_id: auth.currentUser!.uid,
                 admin_name: name,
-                email: email,
+                email: formData.email,
                 date_requested: dateString,
             }
             updateDoc(newOrgDoc, newObj);
@@ -128,27 +138,12 @@ export default function SignUp(props: SignUpProps) {
 
             addDoc(collection(db, "new_users"), {
                 name: name,
-                email: email,
+                email: formData.email,
                 date_requested: dateString,
                 org: signUpData.lab,
                 uid: auth.currentUser!.uid,
                 org_name: signUpData.labName,
             });
-
-            const newUser = {
-                name: name,
-                email: email,
-                date_requested: dateString,
-                org: signUpData.lab,
-                uid: auth.currentUser!.uid,
-                org_name: signUpData.labName,
-            }
-
-            // addUserToNewUsersCollection(newUser)
-            // updateDoc(newUserDocRef, {
-            //   prospective_members: arrayUnion(auth.currentUser!.uid),
-
-            // });
         }
         router.push('/samples');
     }
@@ -167,60 +162,44 @@ export default function SignUp(props: SignUpProps) {
 
     }
 
+    function handleChange(evt: any) {
+        let value = evt.target.value;
+        value === "Create new organization" ? "NEW" : value;
+        // if (evt.target.name) === 'orgName' {
+        //     value = value === 'Create new organization' ? "NEW" : availableOrgs[labName];
+        // }
+        const newFormData = {
+            ...formData,
+            [evt.target.name]: value
+        }
+        setFormData(newFormData);
+    }
+
+    function handleNextClick() {
+        const detailsForm = document.getElementById('details-tab');
+        if (!detailsForm) return;
+        if (!detailsForm.checkValidity()) {
+            detailsForm.reportValidity();
+        } else {
+            setSignUpTab(1);
+        }
+
+    }
+
 
     function yourDetailsTab() {
         return (
-            <div>
-                <p className="forgot-password-header">Sign in</p>
+            <form id="details-tab">
+                <p className="forgot-password-header">Sign up</p>
+                <InputField labelName="First name" inputID="firstName" fieldValue={formData.firstName} handleChange={(evt: any) => handleChange(evt)} />
+                <InputField labelName="Last name" inputID="lastName" fieldValue={formData.lastName} handleChange={(evt: any) => handleChange(evt)} />
                 <div className="forgot-password-entry-wrapper">
                     <div className="forgot-password-entry">
                         <div className="forgot-password-slate-entry">
                             <div className="forgot-password-content-wrapper">
                                 <div className="forgot-password-input-text">
-                                    <form id="email-form">
-                                        <input required className="forgot-password-text form-control" name='email' type="text" id="email" />
-                                    </form>
-                                </div>
-                                <div className="forgot-passowrd-label-text-wrapper">
-                                    <div className="forgot-password-label-text">
-                                        First name
-                                    </div>
-
-                                </div>
-
-                            </div>
-                        </div>
-                    </div>
-
-                </div>
-                <div className="forgot-password-entry-wrapper">
-                    <div className="forgot-password-entry">
-                        <div className="forgot-password-slate-entry">
-                            <div className="forgot-password-content-wrapper">
-                                <div className="forgot-password-input-text">
-                                    <form id="email-form">
-                                        <input required className="forgot-password-text form-control" name='email' type="text" id="email" />
-                                    </form>
-                                </div>
-                                <div className="forgot-passowrd-label-text-wrapper">
-                                    <div className="forgot-password-label-text">
-                                        Last name
-                                    </div>
-
-                                </div>
-
-                            </div>
-                        </div>
-                    </div>
-
-                </div>
-                <div className="forgot-password-entry-wrapper">
-                    <div className="forgot-password-entry">
-                        <div className="forgot-password-slate-entry">
-                            <div className="forgot-password-content-wrapper">
-                                <div className="forgot-password-input-text">
-                                    <form id="email-form">
-                                        <select required className="form-control" id="labSelect">
+                                    <div className='org-input'>
+                                        <select required onChange={handleChange} className="form-control" name="orgName" id="orgName">
                                             <option key="newOrgOption" id="newOrgOption">Create new organization</option>
                                             {
                                                 Object.keys(availableOrgs).map((key, i) => {
@@ -230,20 +209,27 @@ export default function SignUp(props: SignUpProps) {
                                                 })
                                             }
                                         </select>
-                                    </form>
+                                    </div>
                                 </div>
                                 <div className="forgot-passowrd-label-text-wrapper">
                                     <div className="forgot-password-label-text">
                                         Organization
                                     </div>
-
                                 </div>
-
                             </div>
                         </div>
                     </div>
                 </div>
-            </div>
+                <div onClick={handleNextClick} className="forgot-password-button-wrapper">
+                    <div className="forgot-password-button">
+                        <div className='forgot-password-button-text'>
+                            Next
+                        </div>
+                    </div>
+                </div>
+            </form>
+
+
 
 
             //   <form id="your-details-tab" className='your-details-tab'>
@@ -275,28 +261,45 @@ export default function SignUp(props: SignUpProps) {
 
     function accountInfo() {
         return (
-            <div className='account-info-tab'>
-                {signUpData['lab'] === "NEW" && <div className="form-outline mb-4">
-                    <input required type="text" name="newOrgName" autoComplete="off" placeholder='New organization name' id="newOrgName" className="form-control form-control-lg" />
-                </div>}
-
-                <div className="form-outline mb-4">
-                    <input required type="email" name="email" autoComplete="off" placeholder='Email address' id="email" className="form-control form-control-lg" />
+            <form id="account-info">
+                <p className="forgot-password-header">
+                    <span onClick={() => setSignUpTab(0)} className="material-symbols-outlined back-arrow">
+                        arrow_back
+                    </span>Sign up</p>
+                {formData['orgName'] === "NEW" && <InputField labelName="New org name" inputID="newOrgName" fieldValue={formData.newOrgName} handleChange={(evt: any) => handleChange(evt)} />}
+                <InputField labelName="Email" inputID="email" fieldValue={formData.email} handleChange={(evt: any) => handleChange(evt)} />
+                <InputField labelName="Password" inputID="password" fieldValue={formData.password} handleChange={(evt: any) => handleChange(evt)} />
+                <InputField labelName="Re-enter password" inputID="confirmPassword" fieldValue={formData.confirmPassword} handleChange={(evt: any) => handleChange(evt)}  />
+                <div onClick={handleSignUpButtonClicked} className="forgot-password-button-wrapper">
+                    <div className="forgot-password-button">
+                        <div className='forgot-password-button-text'>
+                            Sign up
+                        </div>
+                    </div>
                 </div>
+            </form>
+            // <div className='account-info-tab'>
+            // {signUpData['lab'] === "NEW" && <div className="form-outline mb-4">
+            //     <input required type="text" name="newOrgName" autoComplete="off" placeholder='New organization name' id="newOrgName" className="form-control form-control-lg" />
+            // </div>}
 
-                <div className="form-outline mb-4">
-                    <input required type="password" name="password" placeholder='Password' id="password" className="form-control form-control-lg" />
-                </div>
+            // <div className="form-outline mb-4">
+            //     <input required type="email" name="email" autoComplete="off" placeholder='Email address' id="email" className="form-control form-control-lg" />
+            // </div>
 
-                <div className="form-outline mb-4">
-                    <input required type="password" name="passwordConfirmed" placeholder='Re-enter password' id="reEnterPassword" className="form-control form-control-lg" />
-                </div>
+            // <div className="form-outline mb-4">
+            //     <input required type="password" name="password" placeholder='Password' id="password" className="form-control form-control-lg" />
+            // </div>
 
-                <div className="d-flex justify-content-center">
-                    <button type="button" onClick={handleSignUpButtonClicked} className="btn btn-primary">Sign up</button>
+            // <div className="form-outline mb-4">
+            //     <input required type="password" name="passwordConfirmed" placeholder='Re-enter password' id="reEnterPassword" className="form-control form-control-lg" />
+            // </div>
 
-                </div>
-            </div>
+            //     <div className="d-flex justify-content-center">
+            //         <button type="button" onClick={handleSignUpButtonClicked} className="btn btn-primary">Sign up</button>
+
+            //     </div>
+            // </div>
 
         )
     }

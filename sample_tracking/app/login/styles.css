@@ -307,3 +307,9 @@ svg {
     display: flex;
     justify-content: center;
 }
+
+.org-input {
+    position: relative;
+    left: -15px;
+    width: 253px;
+}

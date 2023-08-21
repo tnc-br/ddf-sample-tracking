@@ -134,13 +134,3 @@ export function confirmUserLoggedIn(user: User | null, db: Firestore, router: an
   // This code will never run because the user will either be navigated to the login screen or the user data will be returned.
   return {} as UserData;
 }
-
-export function getUrlParam(param: string): string | null {
-  if (typeof window !== "undefined") {
-    const searchParams = useSearchParams();
-    const queryString = window.location.search;
-    const urlParams = new URLSearchParams(queryString);
-    return urlParams.get(param) ? urlParams.get(param) : searchParams.get(param);
-  }
-  return null;
-}
