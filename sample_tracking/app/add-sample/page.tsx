@@ -15,7 +15,7 @@ import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
 import { statesList } from '../states_list';
 import { municipalitiesList } from '../municipalities_list';
 import SampleDataInput from '../sample_data_input';
-import { initializeAppIfNecessary, getRanHex } from '../utils';
+import { initializeAppIfNecessary, getRanHex, confirmUserLoggedIn } from '../utils';
 import { useSearchParams } from 'next/navigation'
 import { useTranslation } from 'react-i18next';
 import Link from 'next/link';
@@ -70,24 +70,7 @@ export default function AddSample() {
     useEffect(() => {
         if (!userData.role) {
             onAuthStateChanged(auth, (user) => {
-                if (user) {
-                    console.log(user);
-                    setUser(user);
-                    const userDocRef = doc(db, "users", user.uid);
-                    getDoc(userDocRef).then((docRef) => {
-                        if (docRef.exists()) {
-                            const docData = docRef.data();
-                            if (!docData.role) {
-                                router.push('/tasks');
-                            } else {
-                                setUserdata(docData as UserData);
-                            }
-                        }
-                    })
-                }
-                if (!user) {
-                    router.push('/login');
-                }
+                setUserdata(confirmUserLoggedIn(user, db, router));
             });
         }
     });

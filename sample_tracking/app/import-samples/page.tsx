@@ -11,16 +11,9 @@ import { useState, useEffect } from 'react';
 import Alert from "@mui/material/Alert";
 import Stack from "@mui/material/Stack";
 import Papa from 'papaparse';
-import { getRanHex } from '../utils';
+import { type UserData, getRanHex, confirmUserLoggedIn, initializeAppIfNecessary } from '../utils';
 import { IconButton } from '@mui/material';
 import { Delete } from '@mui/icons-material';
-
-type UserData = {
-    name: string,
-    org: string,
-    org_name: string,
-    role: string,
-}
 
 const valueRanges = {
     'd18O_cel': {
@@ -66,30 +59,13 @@ export default function ImportCsv() {
     const [incorrectValueColumns, setIncorrectValueColumns] = useState([]);
 
     const router = useRouter();
-    const app = initializeApp(firebaseConfig);
+    const app = initializeAppIfNecessary();
     const auth = getAuth();
     const db = getFirestore();
     useEffect(() => {
         if (!userData.role) {
             onAuthStateChanged(auth, (user) => {
-                if (user) {
-                    console.log(user);
-                    setUser(user);
-                    const userDocRef = doc(db, "users", user.uid);
-                    getDoc(userDocRef).then((docRef) => {
-                        if (docRef.exists()) {
-                            const docData = docRef.data();
-                            if (!docData.role) {
-                                router.push('/tasks');
-                            } else {
-                                setUserdata(docData as UserData);
-                            }
-                        }
-                    })
-                }
-                if (!user) {
-                    router.push('/login');
-                }
+                setUserdata(confirmUserLoggedIn(user, db, router));
             });
         }
 

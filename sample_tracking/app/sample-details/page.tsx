@@ -7,7 +7,7 @@ import { firebaseConfig } from '../firebase_config';
 import { useSearchParams, usePathname } from 'next/navigation'
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { useState, useEffect } from 'react';
-import { showNavBar, showTopBar } from '../utils';
+import { type UserData, type Sample, showNavBar, showTopBar, confirmUserLoggedIn, initializeAppIfNecessary } from '../utils';
 import 'jquery';
 import 'popper.js';
 // import 'bootstrap/dist/js/bootstrap.bundle.min';
@@ -16,35 +16,11 @@ var QRCode = require('qrcode');
 import { QRCodeSVG } from "qrcode.react";
 import { useTranslation } from 'react-i18next';
 
-type Sample = {
-    last_updated_by: string,
-    site: string,
-    state: string,
-    org_name: string,
-    lon: string,
-    lat: string,
-    species: string,
-    created_by: string,
-    date_completed: string,
-    created_by_name: string,
-    current_step: string,
-    created_on: string,
-    org: string,
-    water_pct: WaterPercentageResults,
-    land_use_anthropic_pct: Record<string, number>,
-    land_use_primary_vegetation_pct: Record<string, number>,
-    land_use_secondary_vegetation_or_regrowth_pct: Record<string, number>,
-}
 
 type WaterPercentageResults = {
     is_point_water: boolean,
     water_mean_in_1km_buffer: number,
     water_mean_in_10km_buffer: number,
-}
-
-type UserData = {
-    role: string,
-    org: string,
 }
 
 
@@ -87,7 +63,7 @@ export default function SampleDetails() {
     }
 
 
-    const app = initializeApp(firebaseConfig);
+    const app = initializeAppIfNecessary();
     const db = getFirestore();
     const { t } = useTranslation();
 
@@ -101,21 +77,7 @@ export default function SampleDetails() {
 
         if (!userData.role) {
             onAuthStateChanged(auth, (user) => {
-                if (!user) {
-                    router.push('/login');
-                } else {
-                    const userDocRef = doc(db, "users", user.uid);
-                    getDoc(userDocRef).then((user) => {
-                        if (user.exists()) {
-                            const docData = user.data();
-                            if (!docData.role) {
-                                router.push('/tasks');
-                            } else {
-                                setUserData(docData as UserData);
-                            }
-                        }
-                    })
-                }
+                setUserData(confirmUserLoggedIn(user, db, router));
             });
         }
     });
