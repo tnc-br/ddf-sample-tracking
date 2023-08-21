@@ -10,10 +10,14 @@ import './styles.css';
 import { useRouter } from 'next/navigation'
 import 'bootstrap/dist/css/bootstrap.css';
 import { getFirestore, getDocs, collection, updateDoc, doc, setDoc, query, where, arrayRemove, getDoc, deleteDoc } from "firebase/firestore";
-import {type UserData, confirmUserLoggedIn, initializeAppIfNecessary } from '../utils';
 
 interface NestedSchemas {
     [key: string]: NestedSchemas;
+}
+
+type UserData = {
+    role: string,
+    org: string,
 }
 
 export default function Users() {
@@ -40,7 +44,7 @@ export default function Users() {
     //     }))
     // }
     // const adminApp = initializeAdminApp();
-    const app = initializeAppIfNecessary();
+    const app = initializeApp(firebaseConfig);
     const auth = getAuth();
     const router = useRouter();
     const db = getFirestore();
@@ -48,7 +52,20 @@ export default function Users() {
     useEffect(() => {
         if (!userData.role || userData.role.length < 1) {
             onAuthStateChanged(auth, (user) => {
-                setUserData(confirmUserLoggedIn(user, db, router));
+                if (!user) {
+                    router.push('/login');
+                } else {
+                    const userDocRef = doc(db, "users", user.uid);
+                    getDoc(userDocRef).then((docRef) => {
+                        if (docRef.exists()) {
+                            const docData = docRef.data();
+                            if (docData.role !== 'admin' && docData.role !== 'site_admin') {
+                                router.push('/tasks');
+                            }
+                            setUserData(docRef.data() as UserData);
+                        }
+                    });
+                }
             });
         }
     })

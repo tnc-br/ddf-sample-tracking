@@ -29,13 +29,27 @@ export default function Samples() {
         showTopBar();
         if (!userData.role || userData.role.length < 1) {
             onAuthStateChanged(auth, (user) => {
-                setUserData(confirmUserLoggedIn(user, db, router));
-            });
+                if (!user) {
+                    router.push('/login');
+                } else {
+                    const userDocRef = doc(db, "users", user.uid);
+                    getDoc(userDocRef).then((docRef) => {
+                        if (docRef.exists()) {
+                            const docData = docRef.data();
+                            if (!docData.role) {
+                                router.push('/tasks');
+                            } else {
+                                setUserData(docData as UserData);
+                            }
+                        }
+                    });
+                }
+                if (!user) {
+                    router.push('/login');
+                }
+            })
         }
     })
-
-
-
 
     const db = getFirestore();
     if (!allSamples.inProgress && !allSamples.completed) {

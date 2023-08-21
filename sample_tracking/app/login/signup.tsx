@@ -140,9 +140,9 @@ export default function SignUp(props: SignUpProps) {
                 name: name,
                 email: formData.email,
                 date_requested: dateString,
-                org: signUpData.lab,
+                org: labValue,
                 uid: auth.currentUser!.uid,
-                org_name: signUpData.labName,
+                org_name: newOrgName
             });
         }
         router.push('/samples');

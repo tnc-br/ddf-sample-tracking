@@ -127,7 +127,9 @@ export function confirmUserLoggedIn(user: User | null, db: Firestore, router: an
           return docData as UserData;
         }
       } else {
-        router.push('/login');
+        return {
+          name: user.displayName ? user.displayName : '',
+        } as UserData;
       }
     });
   }
