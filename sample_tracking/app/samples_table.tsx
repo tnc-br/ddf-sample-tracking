@@ -23,11 +23,11 @@ import { ExportToCsv } from 'export-to-csv';
 import { useTranslation } from 'react-i18next';
 import './i18n/config';
 
-
 interface SampleDataProps {
     samplesData: any,
     canDeleteSamples: boolean,
     showValidity: boolean,
+    allowExport: boolean,
 }
 
 type SampleData = {
@@ -94,6 +94,22 @@ export default function SamplesTable(props: SampleDataProps) {
                 enableColumnFilter: false, // Consider a range filter if we have ~complete data.
             },
             {
+                accessorKey: 'created_by_name',
+                header: t('createdBy'),
+                size: 100,
+            },
+
+            {
+                accessorKey: 'org',
+                header: t('organization'),
+                size: 100,
+            },
+            {
+                accessorKey: 'trusted',
+                header: t('origin'),
+                size: 100,
+            },
+            {
                 accessorFn: (row) => (row as Sample).last_updated_by ?? '',
                 header: t('lastUpdatedBy'),
                 size: 150,
@@ -102,7 +118,7 @@ export default function SamplesTable(props: SampleDataProps) {
             {
                 accessorFn: (row) => row,
                 header: t('actions'),
-                size: 100,
+                size: 50,
                 Cell: ({ cell }) => {
                     const row = cell.getValue();
                     return (
@@ -192,7 +208,7 @@ export default function SamplesTable(props: SampleDataProps) {
                     columns={columns}
                     data={sampleData.samples}
                     enableFacetedValues
-                    enableRowSelection
+                    enableRowSelection={props.allowExport}
                     tableInstanceRef={tableInstanceRef}
                     globalFilterFn="contains"
                     muiTablePaginationProps={{
@@ -214,17 +230,20 @@ export default function SamplesTable(props: SampleDataProps) {
                     // )}
                     renderTopToolbarCustomActions={({ table }) => (
                         <div>
-                            <button
-                                type="button" className="btn btn-primary export-button"
-                                onClick={handleDownloadAllData}>
-                                Export all data
-                            </button>
-                            <button
-                                disabled={!table.getIsSomeRowsSelected()}
-                                type="button" className="btn btn-primary export-button"
-                                onClick={() => onDowloadClick(table.getSelectedRowModel().rows)}>
-                                Export selected
-                            </button>
+                            {props.allowExport && <div>
+                                <button
+                                    type="button" className="btn btn-primary export-button"
+                                    onClick={handleDownloadAllData}>
+                                    Export all data
+                                </button>
+                                <button
+                                    disabled={!table.getIsSomeRowsSelected()}
+                                    type="button" className="btn btn-primary export-button"
+                                    onClick={() => onDowloadClick(table.getSelectedRowModel().rows)}>
+                                    Export selected
+                                </button>
+                            </div>}
+
 
                         </div>
                     )}

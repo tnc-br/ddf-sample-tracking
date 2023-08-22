@@ -206,12 +206,12 @@ export default function Samples() {
 
                 <div className="samples-sample-table">
                     <p className='samples-header'>{t('inProgress')}</p>
-                    {allSamples.inProgress && <SamplesTable samplesData={allSamples.inProgress as Sample[]} canDeleteSamples={isAdmin()} showValidity={false} />}
+                    {allSamples.inProgress && <SamplesTable samplesData={allSamples.inProgress as Sample[]} canDeleteSamples={isAdmin()} showValidity={false} allowExport={false} />}
                 </div>
 
                 <div className="samples-sample-table">
                     <p className='samples-header'>{t('completed')}</p>
-                    {allSamples.completed && <SamplesTable samplesData={allSamples.completed as Sample[]} canDeleteSamples={isAdmin()} showValidity={true} />}
+                    {allSamples.completed && <SamplesTable samplesData={allSamples.completed as Sample[]} canDeleteSamples={isAdmin()} showValidity={true} allowExport={true} />}
                 </div>
                 {!allSamples.inProgress && !allSamples.completed && <div>No samples to show. Wait to be accepted to an organization to view samples.</div>}
 

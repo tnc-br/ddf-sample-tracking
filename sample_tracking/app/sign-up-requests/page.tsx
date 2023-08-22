@@ -126,6 +126,7 @@ export default function SignUpRequests() {
             email: prospectiveOrgs[orgName].email,
             role: "admin",
             date_added: dateString,
+            org_name: orgName,
         });
         deleteOrgFromNewOrgLists(orgName);
     }

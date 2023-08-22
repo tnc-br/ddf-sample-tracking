@@ -255,7 +255,7 @@ export default function Users() {
         <div className='all-users-admin-wrapper'>
             <h3 className='all-users-title'>{userDetails.role === 'admin' ? "My organization" : "All users"}</h3>
 
-            <div className="all-users-tab-wrapper">
+            {userData.role === "site_admin" && <div className="all-users-tab-wrapper">
                 <div className="all-users-tab-group">
                     <div onClick={() => setCurrentTab(1)} className={currentTab === 1 ? 'all-users-selected-tab all-users-tab' : 'all-users-tab'}>
                         <div className="all-users-slate-wrapper">
@@ -272,7 +272,7 @@ export default function Users() {
                         </div>
                     </div>
                 </div>
-            </div>
+            </div>}
             <div>
                 {currentTab === 1 && <MaterialReactTable
                     columns={userColumns}
