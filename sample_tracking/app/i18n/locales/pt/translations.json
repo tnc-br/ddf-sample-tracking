@@ -49,5 +49,9 @@
     "header": "Cabeçalho",
     "createdBy": "Criado por",
     "collectedOn": "Coletado em",
-    "supplierName": "Nome do Fornecedor"
+    "supplierName": "Nome do Fornecedor",
+    "admin": "Administrador",
+    "numberOfUsers": "Número de usuários",
+    "email": "e-mail",
+    "organization": "Organização"
   }

@@ -11,6 +11,9 @@ export type UserData = {
   org: string,
   org_name: string,
   role: string,
+  user_id: string,
+  email: string,
+  date_added: string,
 }
 
 export type Sample = {
@@ -30,6 +33,7 @@ export type Sample = {
   created_on: string,
   last_updated_by: string,
   org: string,
+  org_name: string,
   validity: number,
   header: string,
   doc_id: string,
@@ -49,6 +53,7 @@ export type Sample = {
   sample_type: string, 
   diameter: string,
   observations: string,
+  created_by_name: string,
 }
 
 

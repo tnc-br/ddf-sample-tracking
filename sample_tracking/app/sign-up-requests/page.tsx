@@ -113,6 +113,11 @@ export default function SignUpRequests() {
         const newOrgRef = doc(db, "organizations", orgId);
         setDoc(newOrgRef, {
             org_name: orgName,
+            admins: [{
+                name: prospectiveOrgs[orgName].admin_name,
+                email: prospectiveOrgs[orgName].email,
+                id: prospectiveOrgs[orgName].admin_id,
+            }]
         });
         const newUserDocRef = doc(db, "users", adminId);
         setDoc(newUserDocRef, {
@@ -121,6 +126,7 @@ export default function SignUpRequests() {
             email: prospectiveOrgs[orgName].email,
             role: "admin",
             date_added: dateString,
+            org_name: orgName,
         });
         deleteOrgFromNewOrgLists(orgName);
     }
