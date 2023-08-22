@@ -19,6 +19,7 @@ import { initializeAppIfNecessary, getRanHex, confirmUserLoggedIn } from '../uti
 import { useSearchParams } from 'next/navigation'
 import { useTranslation } from 'react-i18next';
 import Link from 'next/link';
+import { TextField } from '@mui/material';
 
 
 
@@ -68,10 +69,32 @@ export default function AddSample() {
     }
 
     useEffect(() => {
-        if (!userData.role) {
+        // if (!userData.role) {
+        //     onAuthStateChanged(auth, (user) => {
+        //         setUserdata(confirmUserLoggedIn(user, db, router));
+        //     });
+        // }
+        if (!userData.role || userData.role.length < 1) {
             onAuthStateChanged(auth, (user) => {
-                setUserdata(confirmUserLoggedIn(user, db, router));
-            });
+                if (!user) {
+                    router.push('/login');
+                } else {
+                    const userDocRef = doc(db, "users", user.uid);
+                    getDoc(userDocRef).then((docRef) => {
+                        if (docRef.exists()) {
+                            const docData = docRef.data();
+                            if (!docData.role) {
+                                router.push('/tasks');
+                            } else {
+                                setUserdata(docData as UserData);
+                            }
+                        }
+                    });
+                }
+                if (!user) {
+                    router.push('/login');
+                }
+            })
         }
     });
 
