@@ -16,6 +16,10 @@ import { statesList } from './states_list';
 import { municipalitiesList } from './municipalities_list';
 import { getRanHex, hideNavBar, hideTopBar, verifyLatLonFormat } from './utils';
 import { useTranslation } from 'react-i18next';
+import { TextField, Autocomplete, MenuItem, InputAdornment } from '@mui/material';
+import { LocalizationProvider, DatePicker } from '@mui/x-date-pickers';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
+import dayjs from 'dayjs';
 import './i18n/config';
 
 type UserData = {
@@ -123,12 +127,30 @@ export default function SampleDataInput(props: SampleDataInputProps) {
     }
 
 
-    function handleChange(evt: any) {
-        const value =
-            evt.target.type === "checkbox" ? evt.target.checked : evt.target.value;
-        const newFormData = {
-            ...formData,
-            [evt.target.name]: value
+    function handleChange(evt: any, newValue?: any) {
+        let newFormData;
+        if (evt.$d) {
+            const value = evt.$d;
+            newFormData = {
+                ...formData,
+                date_collected: evt.$d
+            }
+        } else {
+            let value;
+            let name;
+            if (newValue && newValue.length) {
+                value = newValue;
+                const id = evt.target.id;
+                name = id.substring(0, id.indexOf('-option'));
+            } else {
+                value = evt.target.type === "checkbox" ? evt.target.checked : evt.$d ? evt.$d : evt.target.value;
+                name = evt.target.name;
+            }
+
+            newFormData = {
+                ...formData,
+                [name]: value
+            }
         }
         setFormData(newFormData);
         props.onStateUpdate(newFormData, currentTab);
@@ -136,7 +158,7 @@ export default function SampleDataInput(props: SampleDataInputProps) {
 
     function handleResultChange(evt: any) {
         const value = evt.target.value;
-        let newFormDataMeasurementsArray = formData[evt.target.name];
+        let newFormDataMeasurementsArray = structuredClone(formData[evt.target.name]);
         if (!newFormDataMeasurementsArray) {
             newFormDataMeasurementsArray = [];
         }
@@ -185,6 +207,7 @@ export default function SampleDataInput(props: SampleDataInputProps) {
             if (currentTab === 1) {
                 if (!formData.trusted) {
                     alert("Please select an origin value");
+                    return false;
                 }
                 if ((document.getElementById('inputLat') && !verifyLatLonFormat(document.getElementById('inputLat').value)) ||
                     (document.getElementById('inputLon') && !verifyLatLonFormat(document.getElementById('inputLon').value))) {
@@ -314,6 +337,20 @@ export default function SampleDataInput(props: SampleDataInputProps) {
         setNumMeasurements(numMeasurements + 1);
     }
 
+    const originValues = {
+        Unknown: 'unknown',
+        Known: 'trusted',
+        Uncertain: 'untrusted'
+    }
+
+    const sampleTypeValues = {
+        Disc: 'disk',
+        Triangular: 'triangular',
+        Chunk: 'chunk',
+        Fiber: 'fiber'
+
+    }
+
 
 
     function basicInfoTab() {
@@ -327,45 +364,99 @@ export default function SampleDataInput(props: SampleDataInputProps) {
                         <div onClick={handleSelectPrivateVisibility}
                             className={formData.visibility === 'private' ? "button_select private_button selected" : "button_select private_button"}>{t('private')}</div>
                     </div>
-                    <div className="form-group">
+                    {/* <div className="form-group">
                         <label htmlFor="sampleName">{t('sampleName')}*</label>
                         <input onChange={handleChange} value={formData.sample_name} name='sample_name' required type="text" className="form-control" id="sampleName" />
-                    </div>
-                    {!props.isNewSampleForm && <div>
-                        <label htmlFor="sampleTrustSelected" defaultValue={sampleTrust}>{t('status')}*</label>
-                        <select onChange={handleChange} value={formData.status} required name='status' className="form-select" aria-label="Default select example" id="sampleTrustSelected">
-                            <option value="unselected">-- Select option --</option>
-                            <option value="in_progress">{t('inProgress')}</option>
-                            <option value="concluded">{t('concluded')}</option>
-                        </select>
-                    </div>}
-                    <div className="form-group">
-                        <datalist id="suggestions">
-                            {getSpeciesNames().map((speciesName: string) => {
-                                return (<option key={speciesName}>{speciesName}</option>)
-                            })}
-                        </datalist>
-                        <label htmlFor="treeSpecies">{t('treeSpecies')}</label>
-                        <input onChange={handleChange} value={formData.species} name='species' type="text" autoComplete="on" list="suggestions" className="form-control" id="treeSpecies" />
+                    </div> */}
+                    <div className='input-text-field-wrapper'>
+                        <TextField
+                            required
+                            size='small'
+                            fullWidth
+                            id="sampleName"
+                            name="sample_name"
+                            label={t('sampleName')}
+                            onChange={handleChange}
+                            value={formData.sample_name}
+                        />
                     </div>
 
-                    <div>
-                        <label htmlFor="origin" defaultValue={sampleTrust}>{t('origin')}*</label>
-                        <select onChange={handleChange} value={formData.trusted} name='trusted' required className="form-select" aria-label="Default select example" id="origin">
-                            <option value="unselected">-- Select option -- </option>
-                            <option value="unknown">{t('unknown')}</option>
-                            <option value="trusted">{t('known')}</option>
-                            <option value="untrusted">{t('uncertain')}</option>
-                        </select>
+                    <div className='input-text-field-wrapper'>
+                        <Autocomplete
+                            disablePortal
+                            size='small'
+                            fullWidth
+                            id="species"
+                            name="species"
+                            // onHighlightChange={((evt: any) => console.log(evt))}
+                            // onInputChange={handleChange}
+                            onChange={handleChange}
+                            value={formData.species}
+                            options={getSpeciesNames()}
+                            sx={{ width: 300 }}
+                            renderInput={(params) =>
+                                <TextField
+                                    {...params}
+                                    label={t('treeSpecies')}
+                                />}
+                            value={formData.species}
+                        />
                     </div>
-                    {originIsKnownOrUncertain() && <div>
-                        <div className="form-group">
-                            <label htmlFor="collectionSite">{t('collectionSite')}*</label>
-                            <input onChange={handleChange} value={formData.site} required name='site' type="text" className="form-control" id="collectionSite" />
-                        </div>
-                    </div>}
+
+                    <div className='input-text-field-wrapper'>
+                        <TextField
+                            id="origin"
+                            size='small'
+                            fullWidth
+                            select
+                            required
+                            name="trusted"
+                            label={t('origin')}
+                            onChange={handleChange}
+                            value={formData.trusted ? formData.trusted : "unknown"}
+                        >
+                            {Object.keys(originValues).map((originLabel: string) => (
+                                <MenuItem key={originLabel} value={originValues[originLabel]}>
+                                    {originLabel}
+                                </MenuItem>
+                            ))}
+                        </TextField>
+                    </div>
+                    {originIsKnownOrUncertain() &&
+                        <div className='input-text-field-wrapper'>
+                            <TextField
+                                required
+                                size='small'
+                                fullWidth
+                                id="collectionSite"
+                                name="site"
+                                label={t('collectionSite')}
+                                onChange={handleChange}
+                                value={formData.site}
+                            />
+                        </div>}
                     {originIsKnownOrUncertain() && <div className="form-row">
-                        <div className="form-group latlon-input" id="inputLatFormGroup">
+                        <TextField
+                            required
+                            size='small'
+                            fullWidth
+                            id="inputLat"
+                            name="lat"
+                            label={t('latitude')}
+                            onChange={handleChange}
+                            value={formData.lat}
+                        />
+                        <TextField
+                            required
+                            size='small'
+                            fullWidth
+                            id="inputLon"
+                            name="lon"
+                            label={t('longitude')}
+                            onChange={handleChange}
+                            value={formData.lon}
+                        />
+                        {/* <div className="form-group latlon-input" id="inputLatFormGroup">
                             <label htmlFor="inputLat">{t('latitude')}{originIsKnownOrUncertain() && "*"}</label>
                             <input onChange={handleChange} value={formData.lat} required={originIsKnownOrUncertain()} name='lat' type="text" className="form-control" id="inputLat" />
                             <div className="invalid-feedback">
@@ -378,31 +469,48 @@ export default function SampleDataInput(props: SampleDataInputProps) {
                             <div className="invalid-feedback">
                                 Please provide a longitude.
                             </div>
-                        </div>
+                        </div> */}
                     </div>}
 
-                    {originIsKnownOrUncertain() && <div className="form-group">
-                        <label htmlFor="inputState">State*</label>
-                        <select onChange={handleChange} value={formData.state} required name='state' className="form-select" aria-label="Default select example" id="state">
-                            {getStatesList().map((state: string) => {
-                                return (
-                                    <option key={state} value={state}>{state}</option>
-                                )
-                            })}
-                        </select>
-                    </div>}
-                    {originIsKnownOrUncertain() && <div className="form-group">
-                        <datalist id="municipalitySuggestions">
-                            {getMunicipalitiesList().map((municipality: string) => {
-                                return (<option key={municipality}>{municipality}</option>)
-                            })}
-                        </datalist>
-                        <label htmlFor="municipality">{t('municipality')}</label>
-                        <input onChange={handleChange} value={formData.municipality} name='municipality' type="text" autoComplete="on" list="municipalitySuggestions" className="form-control" id="municipality" />
-                    </div>}
-                    <label htmlFor="date_collected">{t('dateCollected')}</label>
-                    <br />
-                    <input onChange={handleChange} value={formData.date_collected} name='date_collected' type="date" id="date_collected"></input>
+                    {originIsKnownOrUncertain() &&
+                        <div className='input-text-field-wrapper'>
+                            <Autocomplete
+                                disablePortal
+                                size='small'
+                                fullWidth
+                                id="state"
+                                options={getStatesList()}
+                                sx={{ width: 300 }}
+                                renderInput={(params) => <TextField {...params} label={t('state')} />}
+                                onChange={handleChange}
+                                value={formData.state}
+                            />
+                        </div>}
+                    {originIsKnownOrUncertain() &&
+
+                        <div className='input-text-field-wrapper'>
+                            <Autocomplete
+                                disablePortal
+                                size='small'
+                                fullWidth
+                                id="municipality"
+                                options={getMunicipalitiesList()}
+                                sx={{ width: 300 }}
+                                renderInput={(params) => <TextField {...params} label={t('municipality')} />}
+                                onChange={handleChange}
+                                value={formData.municipality}
+                            />
+                        </div>}
+
+                    <div className='input-text-field-wrapper'>
+                        <LocalizationProvider dateAdapter={AdapterDayjs}>
+                            <DatePicker
+                                label={t('dateCollected')}
+                                value={dayjs(formData.date_collected)}
+                                slotProps={{ textField: { size: 'small' } }}
+                                onChange={handleChange} />
+                        </LocalizationProvider>
+                    </div>
                 </div>
                 <div className='column_two'>
 
@@ -415,15 +523,29 @@ export default function SampleDataInput(props: SampleDataInputProps) {
                                 className={formData.collected_by === 'my_org' ? "button_select private_button selected" : "button_select private_button"}>{t('myOrg')}</div>
                         </div>
                     </div>
-                    <div>
-                        {formData.collected_by === "supplier" && <div className="form-group">
-                            <label htmlFor="supplier">{t('supplier')}</label>
-                            <input onChange={handleChange} value={formData.supplier} name='supplier' type="text" className="form-control" id="supplier" />
+                    {formData.collected_by === "supplier" &&
+                        <div className='input-text-field-wrapper'>
+                            <TextField
+                                size='small'
+                                fullWidth
+                                id="supplier"
+                                name="supplier"
+                                label={t('supplier')}
+                                onChange={handleChange}
+                                value={formData.supplier}
+                            />
                         </div>}
-                    </div>
-                    <div className="form-group">
-                        <label htmlFor="city">{t('city')}</label>
-                        <input onChange={handleChange} value={formData.city} name='city' type="text" className="form-control" id="city" />
+
+                    <div className='input-text-field-wrapper'>
+                        <TextField
+                            size='small'
+                            fullWidth
+                            id="city"
+                            name="city"
+                            label={t('city')}
+                            onChange={handleChange}
+                            value={formData.city}
+                        />
                     </div>
                 </div>
             </form>
@@ -437,11 +559,43 @@ export default function SampleDataInput(props: SampleDataInputProps) {
             <form id="sample-measurements">
                 <div className='sample-measurements-overview'>
                     <div className='sample-measurements-overview-row'>
-                        <div className="form-group half-width-entry">
+                        <div className='input-text-field-wrapper half-width'>
+                            <TextField
+                                size='small'
+                                fullWidth
+                                id="supplier"
+                                name="measureing_height"
+                                label={t('measuringHeight')}
+                                onChange={handleChange}
+                                value={formData.measureing_height}
+                            />
+                        </div>
+                        {/* <div className="form-group half-width-entry">
                             <label htmlFor="measureing_height">{t('measuringHeight')}</label>
                             <input onChange={handleChange} value={formData.measureing_height} name='measureing_height' type="text" className="form-control" id="measureing_height" />
+                        </div> */}
+
+                        <div className='input-text-field-wrapper half-width'>
+                            <TextField
+                                id="sample_type"
+                                size='small'
+                                fullWidth
+                                select
+                                name="sample_type"
+                                label={t('sampleType')}
+                                onChange={handleChange}
+                                value={formData.sample_type ? formData.sample_type : ""}
+                            >
+                                {Object.keys(sampleTypeValues).map((sampleTypeLabel: string) => (
+                                    <MenuItem key={sampleTypeLabel} value={sampleTypeValues[sampleTypeLabel]}>
+                                        {sampleTypeLabel}
+                                    </MenuItem>
+                                ))}
+                            </TextField>
                         </div>
-                        <div className='form-group  half-width-entry'>
+
+
+                        {/* <div className='form-group  half-width-entry'>
                             <label htmlFor="sample_type" defaultValue={sampleTrust}>{t('sampleType')}*</label>
                             <select onChange={handleChange} value={formData.sample_type} required name='sample_type' className="form-select" aria-label="Default select example" id="sample_type">
                                 <option value="knonw">Disc</option>
@@ -449,33 +603,42 @@ export default function SampleDataInput(props: SampleDataInputProps) {
                                 <option value="uncertain">Chunk</option>
                                 <option value="uncertain">Fiber</option>
                             </select>
-                        </div>
-                    </div>
-                    <div className='sample-measurements-overview-row'>
-                        <div className='form-group  half-width-entry'>
-                            <label htmlFor="diameter">{t('diameter')}</label>
-                            <input onChange={handleChange} value={formData.diameter} name='diameter' type="text" className="form-control" id="diameter" />
-                        </div>
-                        {/* <div className='form-group  half-width-entry'>
-                            <label htmlFor="amount_of_measurements">{t('amountOfMeasurements')}*</label>
-                            <select onChange={handleChange} value={formData.amount_of_measurementste} required name='amount_of_measurementste' className="form-select" aria-label="Default select example" id="amount_of_measurementste">
-                                <option value={2}>2</option>
-                                <option value={3}>3</option>
-                                <option value={4}>4</option>
-                                <option value={5}>5</option>
-                                <option value={6}>6</option>
-                                <option value={7}>7</option>
-                                <option value={8}>8</option>
-                                <option value={9}>9</option>
-                                <option value={10}>10</option>
-                            </select>
                         </div> */}
                     </div>
                     <div className='sample-measurements-overview-row'>
-                        <div className="form-group full-width-entry">
+                        <div className='input-text-field-wrapper half-width'>
+                            <TextField
+                                size='small'
+                                fullWidth
+                                id="supplier"
+                                name="diameter"
+                                label={t('diameter')}
+                                onChange={handleChange}
+                                value={formData.diameter}
+                            />
+                        </div>
+                        {/* <div className='form-group  half-width-entry'>
+                            <label htmlFor="diameter">{t('diameter')}</label>
+                            <input onChange={handleChange} value={formData.diameter} name='diameter' type="text" className="form-control" id="diameter" />
+                        </div> */}
+
+                    </div>
+                    <div className='sample-measurements-overview-row'>
+                        <div className='input-text-field-wrapper full-width'>
+                            <TextField
+                                size='small'
+                                fullWidth
+                                id="supplier"
+                                name="observations"
+                                label={t('observations')}
+                                onChange={handleChange}
+                                value={formData.observations}
+                            />
+                        </div>
+                        {/* <div className="form-group full-width-entry">
                             <label htmlFor="observations">{t('observations')}</label>
                             <input onChange={handleChange} value={formData.observations} name='observations' type="text" className="form-control" id="observations" />
-                        </div>
+                        </div> */}
                     </div>
                 </div>
                 <div className="sample-measurements-entry">
@@ -509,40 +672,131 @@ export default function SampleDataInput(props: SampleDataInputProps) {
                             </div>
                             <div className='measurements-entry-wrapper'>
                                 <div className='measurements-row'>
-                                    <div className="form-group">
-                                        <label htmlFor="d18O_cel">d18O_cel</label>
-                                        <input onChange={handleResultChange} value={formData.d18O_cel ? formData.d18O_cel[currentMeasurementsTab] || '' : ''} name='d18O_cel' type="text" className="form-control" id="d18O_cel" />
+                                    <div className="quarter-width">
+                                        <TextField
+                                            size='small'
+                                            fullWidth
+                                            id="d18O_cel"
+                                            name="d18O_cel"
+                                            label={t('d18O_cel')}
+                                            onChange={handleResultChange}
+                                            value={formData.d18O_cel ? formData.d18O_cel[currentMeasurementsTab] || '' : ''}
+                                        />
                                     </div>
-                                    <div className="form-group">
+                                    <div className="quarter-width">
+                                        <TextField
+                                            size='small'
+                                            fullWidth
+                                            id="oxygen"
+                                            name="oxygen"
+                                            label="d18O_wood"
+                                            onChange={handleResultChange}
+                                            value={formData.oxygen ? formData.oxygen[currentMeasurementsTab] || '' : ''}
+                                        />
+                                    </div>
+                                    <div className="quarter-width">
+                                        <TextField
+                                            size='small'
+                                            fullWidth
+                                            id="nitrogen"
+                                            name="nitrogen"
+                                            label="d15N_wood"
+                                            onChange={handleResultChange}
+                                            value={formData.nitrogen ? formData.nitrogen[currentMeasurementsTab] || '' : ''}
+                                        />
+                                    </div>
+                                    <div className="quarter-width">
+                                        <TextField
+                                            size='small'
+                                            fullWidth
+                                            id="n_wood"
+                                            name="n_wood"
+                                            label="N_wood"
+                                            onChange={handleResultChange}
+                                            value={formData.n_wood ? formData.n_wood[currentMeasurementsTab] || '' : ''}
+
+                                        />
+                                    </div>
+                                    {/* <div className="form-group">
                                         <label htmlFor="oxygen">d18O_wood</label>
                                         <input onChange={handleResultChange} value={formData.oxygen ? formData.oxygen[currentMeasurementsTab] || '' : ''} name='oxygen' type="text" className="form-control" id="oxygen" />
-                                    </div>
-                                    <div className="form-group">
+                                    </div> */}
+                                    {/* <div className="form-group">
                                         <label htmlFor="nitrogen">d15N_wood</label>
                                         <input onChange={handleResultChange} value={formData.nitrogen ? formData.nitrogen[currentMeasurementsTab] || '' : ''} name='nitrogen' type="text" className="form-control" id="nitrogen" />
-                                    </div>
-                                    <div className="form-group">
+                                    </div> */}
+                                    {/* <div className="form-group">
                                         <label htmlFor="n_wood">N_wood</label>
                                         <input onChange={handleResultChange} value={formData.n_wood ? formData.n_wood[currentMeasurementsTab] || '' : ''} name='n_wood' type="text" className="form-control" id="n_wood" />
-                                    </div>
+                                    </div> */}
                                 </div>
                                 <div className='measurements-row'>
-                                    <div className="form-group">
+                                    <div className="quarter-width">
+                                        <TextField
+                                            size='small'
+                                            fullWidth
+                                            id="carbon"
+                                            name="carbon"
+                                            label="d13C_wood"
+                                            onChange={handleResultChange}
+                                            value={formData.carbon ? formData.c_cel[currentMeasurementsTab] || '' : ''}
+                                        />
+                                    </div>
+                                    <div className="quarter-width">
+                                        <TextField
+                                            size='small'
+                                            fullWidth
+                                            id="c_wood"
+                                            name="c_wood"
+                                            label="%C_wood"
+                                            onChange={handleResultChange}
+                                            value={formData.c_wood ? formData.c_wood[currentMeasurementsTab] || '' : ''}
+                                            InputProps={{
+                                                endAdornment: <InputAdornment position="end">%</InputAdornment>
+                                            }}
+                                        />
+                                    </div>
+                                    <div className="quarter-width">
+                                        <TextField
+                                            size='small'
+                                            fullWidth
+                                            id="d13C_cel"
+                                            name="d13C_cel"
+                                            label="d13C_cel"
+                                            onChange={handleResultChange}
+                                            value={formData.d13C_cel ? formData.d13C_cel[currentMeasurementsTab] || '' : ''}
+                                        />
+                                    </div>
+                                    <div className="quarter-width">
+                                        <TextField
+                                            size='small'
+                                            fullWidth
+                                            id="c_cel"
+                                            name="c_cel"
+                                            label="%C_cel"
+                                            onChange={handleResultChange}
+                                            value={formData.c_cel ? formData.c_cel[currentMeasurementsTab] || '' : ''}
+                                            InputProps={{
+                                                endAdornment: <InputAdornment position="end">%</InputAdornment>
+                                            }}
+                                        />
+                                    </div>
+                                    {/* <div className="form-group">
                                         <label htmlFor="carbon">d13C_wood</label>
                                         <input onChange={handleResultChange} value={formData.carbon ? formData.carbon[currentMeasurementsTab] || '' : ''} name='carbon' type="text" className="form-control" id="carbon" />
-                                    </div>
-                                    <div className="form-group">
+                                    </div> */}
+                                    {/* <div className="form-group">
                                         <label htmlFor="d18O_wood">%C_wood</label>
                                         <input onChange={handleResultChange} value={formData.c_wood ? formData.c_wood[currentMeasurementsTab] || '' : ''} name='c_wood' type="text" className="form-control" id="c_wood" />
-                                    </div>
-                                    <div className="form-group">
+                                    </div> */}
+                                    {/* <div className="form-group">
                                         <label htmlFor="d13C_cel">d13C_cel</label>
                                         <input onChange={handleResultChange} value={formData.d13C_cel ? formData.d13C_cel[currentMeasurementsTab] || '' : ''} name='d13C_cel' type="text" className="form-control" id="d13C_cel" />
-                                    </div>
-                                    <div className="form-group">
+                                    </div> */}
+                                    {/* <div className="form-group">
                                         <label htmlFor="c_cel">%C_cel</label>
                                         <input onChange={handleResultChange} value={formData.c_cel ? formData.c_cel[currentMeasurementsTab] || '' : ''} name='c_cel' type="text" className="form-control" id="c_cel" />
-                                    </div>
+                                    </div> */}
                                 </div>
 
                             </div>
@@ -611,7 +865,7 @@ export default function SampleDataInput(props: SampleDataInputProps) {
                     <div className="detail-row">
                         <div className='detail'>
                             <span className="detail-name">{t('origin')}</span>
-                            <span className='detail-value'>{formData['d18O_cel']}</span>
+                            <span className='detail-value'>{formData['trusted']}</span>
                         </div>
                     </div>
                 </div>

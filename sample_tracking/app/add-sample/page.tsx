@@ -22,6 +22,7 @@ import Link from 'next/link';
 
 
 
+
 type UserData = {
     name: string,
     org: string,
@@ -68,10 +69,32 @@ export default function AddSample() {
     }
 
     useEffect(() => {
-        if (!userData.role) {
+        // if (!userData.role) {
+        //     onAuthStateChanged(auth, (user) => {
+        //         setUserdata(confirmUserLoggedIn(user, db, router));
+        //     });
+        // }
+        if (!userData.role || userData.role.length < 1) {
             onAuthStateChanged(auth, (user) => {
-                setUserdata(confirmUserLoggedIn(user, db, router));
-            });
+                if (!user) {
+                    router.push('/login');
+                } else {
+                    const userDocRef = doc(db, "users", user.uid);
+                    getDoc(userDocRef).then((docRef) => {
+                        if (docRef.exists()) {
+                            const docData = docRef.data();
+                            if (!docData.role) {
+                                router.push('/tasks');
+                            } else {
+                                setUserdata(docData as UserData);
+                            }
+                        }
+                    });
+                }
+                if (!user) {
+                    router.push('/login');
+                }
+            })
         }
     });
 
@@ -101,7 +124,7 @@ export default function AddSample() {
             created_on: currentDateString,
             last_updated_by: userData.name,
             org: userData.org,
-            org_name: userData.org_name,
+            org_name: userData.org_name ? userData.org_name : '',
             created_by_name: userData.name,
             code_lab: sampleId,
             oxygen: formData.oxygen ? formData.oxygen.map((value: string) => parseFloat(value)) : [],
