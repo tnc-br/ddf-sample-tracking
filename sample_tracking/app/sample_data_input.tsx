@@ -19,6 +19,7 @@ import { useTranslation } from 'react-i18next';
 import { TextField, Autocomplete, MenuItem, InputAdornment } from '@mui/material';
 import { LocalizationProvider, DatePicker } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
+import dayjs from 'dayjs';
 import './i18n/config';
 
 type UserData = {
@@ -126,7 +127,7 @@ export default function SampleDataInput(props: SampleDataInputProps) {
     }
 
 
-    function handleChange(evt: any) {
+    function handleChange(evt: any, newValue?: any) {
         let newFormData;
         if (evt.$d) {
             const value = evt.$d;
@@ -135,10 +136,20 @@ export default function SampleDataInput(props: SampleDataInputProps) {
                 date_collected: evt.$d
             }
         } else {
-            const value = evt.target.type === "checkbox" ? evt.target.checked : evt.$d ? evt.$d : evt.target.value;
+            let value;
+            let name;
+            if (newValue && newValue.length) {
+                value = newValue;
+                const id = evt.target.id;
+                name = id.substring(0, id.indexOf('-option'));
+            } else {
+                value = evt.target.type === "checkbox" ? evt.target.checked : evt.$d ? evt.$d : evt.target.value;
+                name = evt.target.name;
+            }
+
             newFormData = {
                 ...formData,
-                [evt.target.name]: value
+                [name]: value
             }
         }
         setFormData(newFormData);
@@ -375,12 +386,19 @@ export default function SampleDataInput(props: SampleDataInputProps) {
                             disablePortal
                             size='small'
                             fullWidth
-                            id="treeSpecies"
+                            id="species"
                             name="species"
+                            // onHighlightChange={((evt: any) => console.log(evt))}
+                            // onInputChange={handleChange}
+                            onChange={handleChange}
+                            value={formData.species}
                             options={getSpeciesNames()}
                             sx={{ width: 300 }}
-                            renderInput={(params) => <TextField {...params} label={t('treeSpecies')} />}
-                            onChange={handleChange}
+                            renderInput={(params) =>
+                                <TextField
+                                    {...params}
+                                    label={t('treeSpecies')}
+                                />}
                             value={formData.species}
                         />
                     </div>
@@ -488,7 +506,7 @@ export default function SampleDataInput(props: SampleDataInputProps) {
                         <LocalizationProvider dateAdapter={AdapterDayjs}>
                             <DatePicker
                                 label={t('dateCollected')}
-                                value={formData.date_collected}
+                                value={dayjs(formData.date_collected)}
                                 slotProps={{ textField: { size: 'small' } }}
                                 onChange={handleChange} />
                         </LocalizationProvider>
@@ -511,7 +529,7 @@ export default function SampleDataInput(props: SampleDataInputProps) {
                                 size='small'
                                 fullWidth
                                 id="supplier"
-                                name="site"
+                                name="supplier"
                                 label={t('supplier')}
                                 onChange={handleChange}
                                 value={formData.supplier}
@@ -522,7 +540,7 @@ export default function SampleDataInput(props: SampleDataInputProps) {
                         <TextField
                             size='small'
                             fullWidth
-                            id="supplier"
+                            id="city"
                             name="city"
                             label={t('city')}
                             onChange={handleChange}
@@ -847,7 +865,7 @@ export default function SampleDataInput(props: SampleDataInputProps) {
                     <div className="detail-row">
                         <div className='detail'>
                             <span className="detail-name">{t('origin')}</span>
-                            <span className='detail-value'>{formData['d18O_cel']}</span>
+                            <span className='detail-value'>{formData['trusted']}</span>
                         </div>
                     </div>
                 </div>

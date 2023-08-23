@@ -19,7 +19,7 @@ import { initializeAppIfNecessary, getRanHex, confirmUserLoggedIn } from '../uti
 import { useSearchParams } from 'next/navigation'
 import { useTranslation } from 'react-i18next';
 import Link from 'next/link';
-import { TextField } from '@mui/material';
+
 
 
 
@@ -124,7 +124,7 @@ export default function AddSample() {
             created_on: currentDateString,
             last_updated_by: userData.name,
             org: userData.org,
-            org_name: userData.org_name,
+            org_name: userData.org_name ? userData.org_name : '',
             created_by_name: userData.name,
             code_lab: sampleId,
             oxygen: formData.oxygen ? formData.oxygen.map((value: string) => parseFloat(value)) : [],
