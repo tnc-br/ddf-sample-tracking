@@ -30,7 +30,6 @@ type UserData = {
 }
 
 type SampleDataInputProps = {
-    onStateUpdate: any,
     onActionButtonClick: any,
     onTabChange: any,
     baseState: {},
@@ -62,7 +61,7 @@ export default function SampleDataInput(props: SampleDataInputProps) {
         hideTopBar();
     })
 
-    if (!props || !props.onStateUpdate || !props.onActionButtonClick || !props.baseState || !props.actionButtonTitle) return;
+    if (!props || !props.onActionButtonClick || !props.baseState || !props.actionButtonTitle) return;
 
     if (Object.keys(props.baseState).length > Object.keys(formData).length) {
         setFormData(props.baseState);
@@ -95,7 +94,6 @@ export default function SampleDataInput(props: SampleDataInputProps) {
             visibility: 'public',
         }
         setFormData(newFormData);
-        props.onStateUpdate(newFormData, currentTab);
     }
 
     function handleSelectPrivateVisibility() {
@@ -104,7 +102,6 @@ export default function SampleDataInput(props: SampleDataInputProps) {
             visibility: 'private',
         }
         setFormData(newFormData);
-        props.onStateUpdate(newFormData, currentTab);
     }
 
     function handleSelectSupplier() {
@@ -113,7 +110,6 @@ export default function SampleDataInput(props: SampleDataInputProps) {
             collected_by: 'supplier',
         }
         setFormData(newFormData);
-        props.onStateUpdate(newFormData, currentTab);
 
     }
 
@@ -123,7 +119,6 @@ export default function SampleDataInput(props: SampleDataInputProps) {
             collected_by: 'my_org',
         }
         setFormData(newFormData);
-        props.onStateUpdate(newFormData, currentTab);
     }
 
 
@@ -153,7 +148,6 @@ export default function SampleDataInput(props: SampleDataInputProps) {
             }
         }
         setFormData(newFormData);
-        props.onStateUpdate(newFormData, currentTab);
     }
 
     function handleResultChange(evt: any) {
@@ -168,7 +162,6 @@ export default function SampleDataInput(props: SampleDataInputProps) {
             [evt.target.name]: newFormDataMeasurementsArray,
         }
         setFormData(newFormData);
-        props.onStateUpdate(formData, currentTab);
     }
 
     function onCancleClick() {
@@ -178,13 +171,7 @@ export default function SampleDataInput(props: SampleDataInputProps) {
     function onActionButtonClick() {
         const currentTabRef = getCurrentTabFormRef();
         if (!checkCurrentTabFormValidity()) return;
-        props.onActionButtonClick(props.sampleId);
-        // attemptToUpdateCurrentTab(4);
-        // if (!props.isNewSampleForm) {
-        //     props.onActionButtonClick();
-        // } else {
-        //     attemptToUpdateCurrentTab(4);
-        // }
+        props.onActionButtonClick(props.sampleId, formData);
     }
 
     function getCurrentTabFormRef(): Element {
@@ -399,7 +386,6 @@ export default function SampleDataInput(props: SampleDataInputProps) {
                                     {...params}
                                     label={t('treeSpecies')}
                                 />}
-                            value={formData.species}
                         />
                     </div>
 

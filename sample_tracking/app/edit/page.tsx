@@ -16,7 +16,7 @@ import { statesList } from '../states_list';
 import { municipalitiesList } from '../municipalities_list';
 import SampleDataInput from '../sample_data_input';
 import { useSearchParams } from 'next/navigation'
-import { type Sample, type UserData, confirmUserLoggedIn, initializeAppIfNecessary } from '../utils';
+import { type Sample, type UserData, confirmUserLoggedIn, initializeAppIfNecessary, getDocRefForTrustedValue } from '../utils';
 
 
 export default function Edit() {
@@ -49,12 +49,34 @@ export default function Edit() {
     useEffect(() => {
         if (!userData.role) {
             onAuthStateChanged(auth, (user) => {
-                setUserdata(confirmUserLoggedIn(user, db, router));
-            });
+                if (!user) {
+                    router.push('/login');
+                } else {
+                    const userDocRef = doc(db, "users", user.uid);
+                    getDoc(userDocRef).then((docRef) => {
+                        if (docRef.exists()) {
+                            const docData = docRef.data();
+                            if (!docData.org) {
+                                router.push('/samples');
+                            } else {
+                                setUserdata(docData as UserData);
+                            }
+                        }
+                    });
+                }
+                if (!user) {
+                    router.push('/login');
+                }
+            })
         }
     });
 
-    let docRef = getDocRefForTrustedValue(trusted!, db, sampleId!);
+    let docRef = doc(db, "trusted_samples", sampleId!);
+    if (trusted === 'untrusted') {
+        docRef = doc(db, "untrusted_samples", sampleId!);
+    } else if (trusted === 'unknown') {
+        docRef = doc(db, "unknown_samples", sampleId!);
+    }
     if (Object.keys(selectedDoc).length < 1 && !userData.role && docRef) {
         getDoc(docRef).then((docRef) => {
             if (docRef.exists()) {
@@ -71,14 +93,33 @@ export default function Edit() {
         })
     }
 
-    function onUpdateSampleClick() {
-        let docRef = getDocRefForTrustedValue(trusted!, db, sampleId!);
+    function onUpdateSampleClick(updatedFormData: Sample) {
+        if (!updatedFormData) return;
+        let docRef = doc(db, "trusted_samples", sampleId!);
+        if (trusted === 'untrusted') {
+            docRef = doc(db, "untrusted_samples", sampleId!);
+        } else if (trusted === 'unknown') {
+            docRef = doc(db, "unknown_samples", sampleId!);
+        }
         const date = new Date();
         const currentDateString = `${date.getMonth() + 1}-${date.getDate()}-${date.getFullYear()}`
         const user = auth.currentUser;
         if (!user) return;
+        console.log("Form data on update: " + formData.species)
+        const sampleData = {
+            ...updatedFormData,
+            oxygen: updatedFormData.oxygen ? updatedFormData.oxygen.map((value: string) => parseFloat(value)) : [],
+            nitrogen: updatedFormData.nitrogen ? updatedFormData.nitrogen.map((value: string) => parseFloat(value)) : [],
+            n_wood: updatedFormData.n_wood ? updatedFormData.n_wood.map((value: string) => parseFloat(value)) : [],
+            carbon: updatedFormData.carbon ? updatedFormData.carbon.map((value: string) => parseFloat(value)) : [],
+            c_wood: updatedFormData.c_wood ? updatedFormData.c_wood.map((value: string) => parseFloat(value)) : [],
+            c_cel: updatedFormData.c_cel ? updatedFormData.c_cel.map((value: string) => parseFloat(value)) : [],
+            d13C_cel: updatedFormData.d13C_cel ? updatedFormData.d13C_cel.map((value: string) => parseFloat(value)) : [],
+            lat: updatedFormData.lat ? parseFloat(updatedFormData.lat) : '',
+            lon: updatedFormData.lon ? parseFloat(updatedFormData.lon) : '',
+        } 
         const docData = {
-            ...formData,
+            ...sampleData,
             last_updated_by: user.displayName,
             last_updated_on: currentDateString,
         }
@@ -92,6 +133,8 @@ export default function Edit() {
     function handleChange(formState: Sample) {
         setFormData(formState);
     }
+
+    console.log("form data: " + formData.species);
 
 
     return (
@@ -136,12 +179,12 @@ export default function Edit() {
                 <p>Define the details of your new sample</p>
                 <div>
                     <SampleDataInput baseState={formData}
-                        onStateUpdate={(state) => handleChange(state)}
-                        onActionButtonClick={(evt: any) => onUpdateSampleClick()}
+                        // onStateUpdate={(state) => handleChange(state)}
+                        onActionButtonClick={(sampleID: string, updatedFormData: Sample) => onUpdateSampleClick(updatedFormData)}
                         actionButtonTitle="Update sample"
                         userData={userData}
                         sampleId={sampleId}
-                        isCompletedSample={true} 
+                        isCompletedSample={true}
                         onTabChange={(tab) => setCurrentTab(tab)} />
                 </div>
             </div>

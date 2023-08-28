@@ -29,7 +29,6 @@ export default function SampleDetails() {
     const [selectedDoc, setDoc] = useState({} as Sample);
     const [hasStartedRequest, setHasStartedRequest] = useState(false);
     const [tabShown, setTabShown] = useState(0);
-    const [userData, setUserData] = useState({} as UserData);
 
     function updateStateDoc(data: Sample) {
         setDoc(data);
@@ -75,11 +74,12 @@ export default function SampleDetails() {
         showNavBar();
         showTopBar();
 
-        if (!userData.role) {
-            onAuthStateChanged(auth, (user) => {
-                setUserData(confirmUserLoggedIn(user, db, router));
-            });
-        }
+        onAuthStateChanged(auth, (user) => {
+            if (!user) {
+                router.push('/login');
+
+            }
+        })
     });
 
     let docRef = doc(db, "trusted_samples", sampleId!);
@@ -88,7 +88,7 @@ export default function SampleDetails() {
     } else if (trusted === 'unknown') {
         docRef = doc(db, "unknown_samples", sampleId!);
     }
-    if (Object.keys(selectedDoc).length < 1 && !hasStartedRequest && !userData.role && docRef) {
+    if (Object.keys(selectedDoc).length < 1 && !hasStartedRequest && docRef) {
         // setHasStartedRequestTrue();	
         getDoc(docRef).then((docRef) => {
             if (docRef.exists()) {
@@ -313,7 +313,7 @@ export default function SampleDetails() {
                     <div className='section-title'>
                         Land use details in a 10km buffer radius zone
                     </div>
-                    {selectedDoc['validity'] ? <iframe src={mapUrl} frameborder="0" height="300px" width="100%"></iframe> : ''} 
+                    {selectedDoc['validity'] ? <iframe src={mapUrl} frameborder="0" height="300px" width="100%"></iframe> : ''}
                     <table className="table">
                         <thead>
                             <tr>

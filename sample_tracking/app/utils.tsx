@@ -50,10 +50,14 @@ export type Sample = {
   city: string,
   supplier: string,
   measureing_height: string,
-  sample_type: string, 
+  sample_type: string,
   diameter: string,
   observations: string,
   created_by_name: string,
+}
+
+export interface NestedSchemas {
+  [key: string]: NestedSchemas;
 }
 
 
@@ -78,33 +82,33 @@ export function initializeAppIfNecessary() {
 
 
 export function showNavBar() {
-    const navBar = document.getElementById('nav-wrapper');
-    if (navBar) {
-      navBar.style.display = "inline";
-    }
+  const navBar = document.getElementById('nav-wrapper');
+  if (navBar) {
+    navBar.style.display = "inline";
+  }
 }
 
 export function showTopBar() {
-    const navBar = document.getElementById('top-bar');
-    if (navBar) {
-      navBar.style.display = "inline";
-    }
+  const navBar = document.getElementById('top-bar');
+  if (navBar) {
+    navBar.style.display = "inline";
+  }
 
 }
 
 export function hideTopBar() {
-    const navBar = document.getElementById('top-bar');
-    if (navBar) {
-      navBar.style.display = "none";
-    }
+  const navBar = document.getElementById('top-bar');
+  if (navBar) {
+    navBar.style.display = "none";
+  }
 
 }
 
 export function hideNavBar() {
-    const navBar = document.getElementById('nav-wrapper');
-    if (navBar) {
-      navBar.style.display = "none";
-    }
+  const navBar = document.getElementById('nav-wrapper');
+  if (navBar) {
+    navBar.style.display = "none";
+  }
 }
 
 export function verifyLatLonFormat(input: string) {
@@ -140,4 +144,21 @@ export function confirmUserLoggedIn(user: User | null, db: Firestore, router: an
   }
   // This code will never run because the user will either be navigated to the login screen or the user data will be returned.
   return {} as UserData;
+}
+
+export function getSearchParam(param: string): string | null {
+  const searchParams = useSearchParams();
+  const queryString = window.location.search;
+  const urlParams = new URLSearchParams(queryString);
+  return urlParams.get(param) ? urlParams.get(param) : searchParams.get(param);
+}
+
+export function getDocRefForTrustedValue(trusted: string, db: Firestore, sampleId: string): DocumentReference {
+  let docRef = doc(db, "trusted_samples", sampleId!);
+  if (trusted === 'untrusted') {
+    docRef = doc(db, "untrusted_samples", sampleId!);
+  } else if (trusted === 'unknown') {
+    docRef = doc(db, "unknown_samples", sampleId!);
+  }
+  return docRef;
 }
