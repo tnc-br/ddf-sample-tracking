@@ -107,10 +107,8 @@ describe('Samples', () => {
             render(<Edit />)
         });
         await waitFor(() => expect(mockSamplesTableFn).toHaveBeenCalledTimes(1));
-        console.log("call: " + Object.keys(mockSamplesTableFn.mock.calls[0][0]));
         const onActionButtonClick = mockSamplesTableFn.mock.calls[0][0].onActionButtonClick;
         const onStateUpdate = mockSamplesTableFn.mock.calls[0][0].onStateUpdate;
-        console.log("onActionButtonClick: " + onActionButtonClick);
         const newFormState = {
             oxygen: ['12','13'],
             species: 'testSpecies',
@@ -120,7 +118,6 @@ describe('Samples', () => {
         })
         await waitFor(() => expect(updateDoc).toHaveBeenCalledTimes(1));
         const sampleCreated = updateDoc.mock.calls[0][1];
-        console.log("sample created: " + Object.keys(updateDoc.mock.calls[0][1]));
         expect(sampleCreated.last_updated_by).toBe("Test name");
         expect(sampleCreated.species).toBe('testSpecies')
         expect(sampleCreated.oxygen).toStrictEqual([12, 13])

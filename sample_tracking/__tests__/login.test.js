@@ -20,7 +20,6 @@ describe('Login', () => {
     useRouter.mockImplementation(() => ({
       push,
     }));
-    const onLoginClick = () => console.log("test");
     const onForgotPasswordClick = () => console.log("test");
     const mockedSignIn = jest.mocked(signInWithEmailAndPassword);
     const mockGetAuth = jest.mocked(getAuth);
@@ -29,7 +28,6 @@ describe('Login', () => {
     mockGetAuth.mockResolvedValue(Promise.resolve("TestAuth"));
     mockedSignIn.mockResolvedValue(Promise.resolve("Test"));
     mockGetFirestore.mockResolvedValue(Promise.resolve("Test"));
-    // mockUseRouter.mockResolvedValue(Promise.resolve("Test"));
 
     render(<Login onLoginClick={onLoginClick} onForgotPasswordClick={onForgotPasswordClick} />)
 

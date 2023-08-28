@@ -98,10 +98,8 @@ describe('Samples', () => {
             render(<AddSample />)
         });
         await waitFor(() => expect(mockSamplesTableFn).toHaveBeenCalledTimes(1));
-        console.log("call: " + Object.keys(mockSamplesTableFn.mock.calls[0][0]));
         const onActionButtonClick = mockSamplesTableFn.mock.calls[0][0].onActionButtonClick;
         const onStateUpdate = mockSamplesTableFn.mock.calls[0][0].onStateUpdate;
-        console.log("onstateupdate: " + onStateUpdate);
         const newFormState = {
             oxygen: ['12','13'],
             species: 'testSpecies',
