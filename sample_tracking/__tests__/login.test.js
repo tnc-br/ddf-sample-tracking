@@ -20,6 +20,7 @@ describe('Login', () => {
     useRouter.mockImplementation(() => ({
       push,
     }));
+    const onLoginClick = () => console.log("test");
     const onForgotPasswordClick = () => console.log("test");
     const mockedSignIn = jest.mocked(signInWithEmailAndPassword);
     const mockGetAuth = jest.mocked(getAuth);
