@@ -108,16 +108,16 @@ export default function Edit() {
         console.log("Form data on update: " + formData.species)
         const sampleData = {
             ...updatedFormData,
-            oxygen: updatedFormData.oxygen ? updatedFormData.oxygen.map((value: string) => parseFloat(value)) : [],
-            nitrogen: updatedFormData.nitrogen ? updatedFormData.nitrogen.map((value: string) => parseFloat(value)) : [],
+            d18O_wood: updatedFormData.d18O_wood ? updatedFormData.d18O_wood.map((value: string) => parseFloat(value)) : [],
+            d15N_wood: updatedFormData.d15N_wood ? updatedFormData.d15N_wood.map((value: string) => parseFloat(value)) : [],
             n_wood: updatedFormData.n_wood ? updatedFormData.n_wood.map((value: string) => parseFloat(value)) : [],
-            carbon: updatedFormData.carbon ? updatedFormData.carbon.map((value: string) => parseFloat(value)) : [],
+            d13C_wood: updatedFormData.d13C_wood ? updatedFormData.d13C_wood.map((value: string) => parseFloat(value)) : [],
             c_wood: updatedFormData.c_wood ? updatedFormData.c_wood.map((value: string) => parseFloat(value)) : [],
             c_cel: updatedFormData.c_cel ? updatedFormData.c_cel.map((value: string) => parseFloat(value)) : [],
             d13C_cel: updatedFormData.d13C_cel ? updatedFormData.d13C_cel.map((value: string) => parseFloat(value)) : [],
             lat: updatedFormData.lat ? parseFloat(updatedFormData.lat) : '',
             lon: updatedFormData.lon ? parseFloat(updatedFormData.lon) : '',
-        } 
+        }
         const docData = {
             ...sampleData,
             last_updated_by: user.displayName,
@@ -139,12 +139,12 @@ export default function Edit() {
 
     return (
         <div className="add-sample-page-wrapper">
-            <p className="title">Edit sample</p>
+            <p className="title">Edit sample {formData.sample_name}</p>
 
 
             <div className="edit-tabs-wrapper">
                 <div className="edit-tab-group">
-                    <div className={currentTab === 1 ? "edit-tab-wrapper edit-current-tab" : "edit-tab-wrapper"}>
+                    <div onClick={() => setCurrentTab(1)} className={currentTab === 1 ? "edit-tab-wrapper edit-current-tab" : "edit-tab-wrapper"}>
                         <div className="edit-slate-layer">
                             <div className="edit-tab-content">
                                 <div className='edit-tab-text'>
@@ -153,7 +153,7 @@ export default function Edit() {
                             </div>
                         </div>
                     </div>
-                    <div className={currentTab === 2 ? "edit-tab-wrapper edit-current-tab" : "edit-tab-wrapper"}>
+                    <div onClick={() => setCurrentTab(2)} className={currentTab === 2 ? "edit-tab-wrapper edit-current-tab" : "edit-tab-wrapper"}>
                         <div className="edit-slate-layer">
                             <div className="edit-tab-content">
                                 <div className='edit-tab-text'>
@@ -162,11 +162,11 @@ export default function Edit() {
                             </div>
                         </div>
                     </div>
-                    <div className={currentTab === 3 ? "edit-tab-wrapper edit-current-tab" : "edit-tab-wrapper"}>
+                    <div onClick={() => setCurrentTab(3)} className={currentTab === 3 ? "edit-tab-wrapper edit-current-tab" : "edit-tab-wrapper"}>
                         <div className="edit-slate-layer">
                             <div className="edit-tab-content">
                                 <div className='edit-tab-text'>
-                                    Results
+                                    Review
                                 </div>
                             </div>
                         </div>
@@ -176,7 +176,6 @@ export default function Edit() {
 
 
             <div className="sample-details-form">
-                <p>Define the details of your new sample</p>
                 <div>
                     <SampleDataInput baseState={formData}
                         // onStateUpdate={(state) => handleChange(state)}
@@ -184,6 +183,7 @@ export default function Edit() {
                         actionButtonTitle="Update sample"
                         sampleId={sampleId}
                         isCompletedSample={true}
+                        currentTab={currentTab}
                         onTabChange={(tab) => setCurrentTab(tab)} />
                 </div>
             </div>

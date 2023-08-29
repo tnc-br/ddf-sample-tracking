@@ -25,10 +25,11 @@ type SampleDataInputProps = {
     isNewSampleForm: boolean,
     sampleId: string,
     isCompletedSample: boolean,
+    currentTab: number,
 }
 
 export default function SampleDataInput(props: SampleDataInputProps) {
-    const [currentTab, setCurrentTab] = useState(1);
+    const [currentTab, setCurrentTab] = useState(props.currentTab ? props.currentTab : 1);
     const [formData, setFormData] = useState(props.baseState);
     const [numMeasurements, setNumMeasurements] = useState(2);
     const [currentMeasurementsTab, setCurentMeasurementsTab] = useState(0);
@@ -204,10 +205,10 @@ export default function SampleDataInput(props: SampleDataInputProps) {
             return true;
         }
         const d18O_cel = formData.d18O_cel ? formData.d18O_cel.map((value: string) => parseFloat(value)) : [];
-        const oxygen = formData.oxygen ? formData.oxygen.map((value: string) => parseFloat(value)) : [];
-        const nitrogen = formData.nitrogen ? formData.nitrogen.map((value: string) => parseFloat(value)) : [];
+        const d18O_wood = formData.d18O_wood ? formData.d18O_wood.map((value: string) => parseFloat(value)) : [];
+        const d15N_wood = formData.d15N_wood ? formData.d15N_wood.map((value: string) => parseFloat(value)) : [];
         const n_wood = formData.n_wood ? formData.n_wood.map((value: string) => parseFloat(value)) : [];
-        const carbon = formData.carbon ? formData.carbon.map((value: string) => parseFloat(value)) : [];
+        const d13C_wood = formData.d13C_wood ? formData.d13C_wood.map((value: string) => parseFloat(value)) : [];
         const c_wood = formData.c_wood ? formData.c_wood.map((value: string) => parseFloat(value)) : [];
         const d13C_cel = formData.d13C_cel ? formData.d13C_cel.map((value: string) => parseFloat(value)) : [];
         const c_cel = formData.c_cel ? formData.c_cel.map((value: string) => parseFloat(value)) : [];
@@ -221,16 +222,16 @@ export default function SampleDataInput(props: SampleDataInputProps) {
                 }
             })
         }
-        if (oxygen) {
-            oxygen.forEach((value: number) => {
+        if (d18O_wood) {
+            d18O_wood.forEach((value: number) => {
                 if (value < 20 || value > 32) {
                     alertMessage = "d180_wood should be within the range of 20-32";
                     alert(alertMessage);
                 }
             })
         }
-        if (nitrogen) {
-            nitrogen.forEach((value: number) => {
+        if (d15N_wood) {
+            d15N_wood.forEach((value: number) => {
                 if (value < -5 || value > 15) {
                     alertMessage = "d15N_wood should be within the range of -5-15";
                     alert(alertMessage);
@@ -245,8 +246,8 @@ export default function SampleDataInput(props: SampleDataInputProps) {
                 }
             })
         }
-        if (carbon) {
-            carbon.forEach((value: number) => {
+        if (d13C_wood) {
+            d13C_wood.forEach((value: number) => {
                 if (value < -38 || value > -20) {
                     alertMessage = "d13C_wood should be within the range of -38- -20";
                     alert(alertMessage);
@@ -578,11 +579,41 @@ export default function SampleDataInput(props: SampleDataInputProps) {
                                 value={formData.diameter}
                             />
                         </div>
-                        {/* <div className='form-group  half-width-entry'>
-                            <label htmlFor="diameter">{t('diameter')}</label>
-                            <input onChange={handleChange} value={formData.diameter} name='diameter' type="text" className="form-control" id="diameter" />
-                        </div> */}
-
+                        <div className='input-text-field-wrapper half-width'>
+                            <TextField
+                                size='small'
+                                fullWidth
+                                id="avp"
+                                name="avp"
+                                label="AVP"
+                                onChange={handleChange}
+                                value={formData.avp}
+                            />
+                        </div>
+                    </div>
+                    <div className='sample-measurements-overview-row'>
+                        <div className='input-text-field-wrapper half-width'>
+                            <TextField
+                                size='small'
+                                fullWidth
+                                id="mean_annual_temperature"
+                                name="mean_annual_temperature"
+                                label={t('meanAnnualTemperature')}
+                                onChange={handleChange}
+                                value={formData.mean_annual_temperature}
+                            />
+                        </div>
+                        <div className='input-text-field-wrapper half-width'>
+                            <TextField
+                                size='small'
+                                fullWidth
+                                id="mean_annual_precipitation"
+                                name="mean_annual_precipitation"
+                                label={t('meanAnnualPrecipitation')}
+                                onChange={handleChange}
+                                value={formData.mean_annual_precipitation}
+                            />
+                        </div>
                     </div>
                     <div className='sample-measurements-overview-row'>
                         <div className='input-text-field-wrapper full-width'>
@@ -625,7 +656,6 @@ export default function SampleDataInput(props: SampleDataInputProps) {
                                                         Measurement {index + 1}
                                                     </div>
                                                 </div>
-                                                {currentMeasurementsTab === 0 && <div className='measurements-tab-indicator'></div>}
                                             </div>
                                         </div>
                                     </div>
@@ -648,22 +678,22 @@ export default function SampleDataInput(props: SampleDataInputProps) {
                                         <TextField
                                             size='small'
                                             fullWidth
-                                            id="oxygen"
-                                            name="oxygen"
+                                            id="d18O_wood"
+                                            name="d18O_wood"
                                             label="d18O_wood"
                                             onChange={handleResultChange}
-                                            value={formData.oxygen ? formData.oxygen[currentMeasurementsTab] || '' : ''}
+                                            value={formData.d18O_wood ? formData.d18O_wood[currentMeasurementsTab] || '' : ''}
                                         />
                                     </div>
                                     <div className="quarter-width">
                                         <TextField
                                             size='small'
                                             fullWidth
-                                            id="nitrogen"
-                                            name="nitrogen"
+                                            id="d15N_wood"
+                                            name="d15N_wood"
                                             label="d15N_wood"
                                             onChange={handleResultChange}
-                                            value={formData.nitrogen ? formData.nitrogen[currentMeasurementsTab] || '' : ''}
+                                            value={formData.d15N_wood ? formData.d15N_wood[currentMeasurementsTab] || '' : ''}
                                         />
                                     </div>
                                     <div className="quarter-width">
@@ -679,12 +709,12 @@ export default function SampleDataInput(props: SampleDataInputProps) {
                                         />
                                     </div>
                                     {/* <div className="form-group">
-                                        <label htmlFor="oxygen">d18O_wood</label>
-                                        <input onChange={handleResultChange} value={formData.oxygen ? formData.oxygen[currentMeasurementsTab] || '' : ''} name='oxygen' type="text" className="form-control" id="oxygen" />
+                                        <label htmlFor="d18O_wood">d18O_wood</label>
+                                        <input onChange={handleResultChange} value={formData.d18O_wood ? formData.d18O_wood[currentMeasurementsTab] || '' : ''} name='d18O_wood' type="text" className="form-control" id="d18O_wood" />
                                     </div> */}
                                     {/* <div className="form-group">
-                                        <label htmlFor="nitrogen">d15N_wood</label>
-                                        <input onChange={handleResultChange} value={formData.nitrogen ? formData.nitrogen[currentMeasurementsTab] || '' : ''} name='nitrogen' type="text" className="form-control" id="nitrogen" />
+                                        <label htmlFor="d15N_wood">d15N_wood</label>
+                                        <input onChange={handleResultChange} value={formData.d15N_wood ? formData.d15N_wood[currentMeasurementsTab] || '' : ''} name='d15N_wood' type="text" className="form-control" id="d15N_wood" />
                                     </div> */}
                                     {/* <div className="form-group">
                                         <label htmlFor="n_wood">N_wood</label>
@@ -696,11 +726,11 @@ export default function SampleDataInput(props: SampleDataInputProps) {
                                         <TextField
                                             size='small'
                                             fullWidth
-                                            id="carbon"
-                                            name="carbon"
+                                            id="d13C_wood"
+                                            name="d13C_wood"
                                             label="d13C_wood"
                                             onChange={handleResultChange}
-                                            value={formData.carbon ? formData.c_cel[currentMeasurementsTab] || '' : ''}
+                                            value={formData.d13C_wood ? formData.c_cel[currentMeasurementsTab] || '' : ''}
                                         />
                                     </div>
                                     <div className="quarter-width">
@@ -743,8 +773,8 @@ export default function SampleDataInput(props: SampleDataInputProps) {
                                         />
                                     </div>
                                     {/* <div className="form-group">
-                                        <label htmlFor="carbon">d13C_wood</label>
-                                        <input onChange={handleResultChange} value={formData.carbon ? formData.carbon[currentMeasurementsTab] || '' : ''} name='carbon' type="text" className="form-control" id="carbon" />
+                                        <label htmlFor="d13C_wood">d13C_wood</label>
+                                        <input onChange={handleResultChange} value={formData.d13C_wood ? formData.d13C_wood[currentMeasurementsTab] || '' : ''} name='d13C_wood' type="text" className="form-control" id="d13C_wood" />
                                     </div> */}
                                     {/* <div className="form-group">
                                         <label htmlFor="d18O_wood">%C_wood</label>
@@ -855,12 +885,12 @@ export default function SampleDataInput(props: SampleDataInputProps) {
                                     <span className='detail-value'>{formData.d18O_cel ? formData.d18O_cel[currentMeasurementsTab] || '' : ''}</span>
                                 </div>
                                 <div className='detail'>
-                                    <span className="detail-name">{t('oxygen')}</span>
-                                    <span className='detail-value'>{formData.oxygen ? formData.oxygen[currentMeasurementsTab] || '' : ''}</span>
+                                    <span className="detail-name">d18O_wood</span>
+                                    <span className='detail-value'>{formData.d18O_wood ? formData.d18O_wood[currentMeasurementsTab] || '' : ''}</span>
                                 </div>
                                 <div className='detail'>
-                                    <span className="detail-name">{t('nitrogen')}</span>
-                                    <span className='detail-value'>{formData.nitrogen ? formData.nitrogen[currentMeasurementsTab] || '' : ''}</span>
+                                    <span className="detail-name">{t('d15N_wood')}</span>
+                                    <span className='detail-value'>{formData.d15N_wood ? formData.d15N_wood[currentMeasurementsTab] || '' : ''}</span>
                                 </div>
                             </div>
 
@@ -870,8 +900,8 @@ export default function SampleDataInput(props: SampleDataInputProps) {
                                     <span className='detail-value'>{formData.n_wood ? formData.n_wood[currentMeasurementsTab] || '' : ''}</span>
                                 </div>
                                 <div className='detail'>
-                                    <span className="detail-name">{t('carbon')}</span>
-                                    <span className='detail-value'>{formData.carbon ? formData.carbon[currentMeasurementsTab] || '' : ''}</span>
+                                    <span className="detail-name">{t('d13C_wood')}</span>
+                                    <span className='detail-value'>{formData.d13C_wood ? formData.d13C_wood[currentMeasurementsTab] || '' : ''}</span>
                                 </div>
                                 <div className='detail'>
                                     <span className="detail-name">{t('c_wood')}</span>
