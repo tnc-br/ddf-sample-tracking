@@ -113,7 +113,7 @@ export default function Users() {
         }
     }
 
-    if (userData.role === "site_admin" && orgDataArray.length < 1) {
+    if (userData.role === "site_admin" && userDataArray.length > 0 && orgDataArray.length < 1) {
         getDocs(collection(db, "organizations")).then((querySnapshot) => {
             console.log('made request to get orgs');
             let orgList: OrgData[] = [];

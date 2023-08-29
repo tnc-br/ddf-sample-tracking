@@ -5,13 +5,8 @@ import 'bootstrap/dist/css/bootstrap.css';
 var QRCode = require('qrcode');
 import { QRCodeSVG } from "qrcode.react";
 import { useRouter } from 'next/navigation'
-import { doc, setDoc, getFirestore, getDoc } from "firebase/firestore";
-import { initializeApp } from "firebase/app";
-import { firebaseConfig } from './firebase_config';
-import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { useState, useEffect } from 'react';
 import { speciesList } from './species_list';
-import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
 import { statesList } from './states_list';
 import { municipalitiesList } from './municipalities_list';
 import { getRanHex, hideNavBar, hideTopBar, verifyLatLonFormat, type UserData } from './utils';
@@ -59,7 +54,6 @@ export default function SampleDataInput(props: SampleDataInputProps) {
     function attemptToUpdateCurrentTab(newTab: number) {
         const currentTabRef = getCurrentTabFormRef();
         if (newTab < currentTab || checkCurrentTabFormValidity()) {
-            console.log("updated current tab")
             setCurrentTab(newTab);
             if (props.onTabChange) props.onTabChange(newTab);
         }
@@ -195,7 +189,6 @@ export default function SampleDataInput(props: SampleDataInputProps) {
             }
 
         } else {
-            console.log("returning false")
             currentTabRef.reportValidity();
             return false;
         }
@@ -306,7 +299,6 @@ export default function SampleDataInput(props: SampleDataInputProps) {
     }
 
     function handleMeasurementsTabClick(evt: any) {
-        console.log(evt);
         setCurentMeasurementsTab(parseInt(evt.target.id));
     }
 
@@ -340,10 +332,6 @@ export default function SampleDataInput(props: SampleDataInputProps) {
                         <div onClick={handleSelectPrivateVisibility}
                             className={formData.visibility === 'private' ? "button_select private_button selected" : "button_select private_button"}>{t('private')}</div>
                     </div>
-                    {/* <div className="form-group">
-                        <label htmlFor="sampleName">{t('sampleName')}*</label>
-                        <input onChange={handleChange} value={formData.sample_name} name='sample_name' required type="text" className="form-control" id="sampleName" />
-                    </div> */}
                     <div className='input-text-field-wrapper'>
                         <TextField
                             required
@@ -364,8 +352,6 @@ export default function SampleDataInput(props: SampleDataInputProps) {
                             fullWidth
                             id="species"
                             name="species"
-                            // onHighlightChange={((evt: any) => console.log(evt))}
-                            // onInputChange={handleChange}
                             onChange={handleChange}
                             value={formData.species}
                             options={getSpeciesNames()}
