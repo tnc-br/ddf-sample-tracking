@@ -9,11 +9,7 @@ import { useRouter } from 'next/navigation'
 // import Nav from '../nav';
 import { MaterialReactTable, type MRT_ColumnDef, type MRT_Row, type MRT_TableInstance, type MRT_SortingState, type MRT_PaginationState } from 'material-react-table';
 import { initializeAppIfNecessary, type Sample } from './utils';
-import {
-    Box,
-    IconButton,
-    Tooltip,
-} from '@mui/material';
+import { Box, Button, ListItemIcon, MenuItem, Typography, IconButton,  Tooltip,  } from '@mui/material';
 import { Delete, Edit } from '@mui/icons-material';
 
 import { firebaseConfig } from './firebase_config';
@@ -28,6 +24,7 @@ interface SampleDataProps {
     canDeleteSamples: boolean,
     showValidity: boolean,
     allowExport: boolean,
+    userOrg: string,
 }
 
 type SampleData = {
@@ -200,7 +197,7 @@ export default function SamplesTable(props: SampleDataProps) {
     }
 
     return (
-        <div className='samples-page-wrapper'>
+        <div className='samples-page-wrapper' id="samples-table-wrapper">
             <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@48,400,0,0" />
             <div>
 
@@ -214,20 +211,34 @@ export default function SamplesTable(props: SampleDataProps) {
                     muiTablePaginationProps={{
                         rowsPerPageOptions: [5, 10],
                     }}
-                    // renderRowActions={({ row, table }) => (
-                    //     <Box sx={{ display: 'flex', gap: '1rem' }}>
-                    //         <Tooltip arrow placement="left" title="Edit">
-                    //             <IconButton onClick={() => onEditSampleClick(row)}>
-                    //                 <Edit />
-                    //             </IconButton>
-                    //         </Tooltip>
-                    //         <Tooltip arrow placement="right" title="Delete">
-                    //             <IconButton color="error" onClick={() => onDeleteSampleClick(row)}>
-                    //                 <Delete />
-                    //             </IconButton>
-                    //         </Tooltip>
-                    //     </Box>
-                    // )}
+
+                    // renderRowActionMenuItems={({ row, closeMenu }) => [
+                    //     <MenuItem
+                    //     disabled={!canDeleteSamples && row.original.org !== userOrg}
+                    //         key={0}
+                    //         onClick={() => {
+                    //             onEditSampleClick(row.original)
+                    //             closeMenu();
+                    //         }}
+                    //         sx={{ m: 0 }}
+                    //     >
+                    //         Edit
+                    //     </MenuItem>,
+                    //     <MenuItem
+                    //         disabled={!canDeleteSamples && row.original.org !== userOrg}
+                    //         key={1}
+                    //         onClick={() => {
+                    //             onDeleteSampleClick(row.original)
+                    //             closeMenu();
+                    //         }}
+                    //         sx={{ m: 0 }}
+                    //     >
+                    //         Delete
+                    //     </MenuItem>,
+                        
+                    // ]}
+
+
                     renderTopToolbarCustomActions={({ table }) => (
                         <div>
                             {props.allowExport && <div>

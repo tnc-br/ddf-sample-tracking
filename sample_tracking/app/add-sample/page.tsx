@@ -35,6 +35,7 @@ export default function AddSample() {
     const [formData, setFormData] = useState({
         visibility: 'public',
         collected_by: 'supplier',
+        trusted: 'unknown',
     });
 
     const router = useRouter();
@@ -289,7 +290,6 @@ export default function AddSample() {
                             onTabChange={(tab) => handleTabChange(tab)}
                             actionButtonTitle="Create sample"
                             isNewSampleForm={true}
-                            userData={userData}
                             sampleId={sampleId}
                             isCompletedSample={formData.status === 'concluded' ? true : false} />
                     </div>}

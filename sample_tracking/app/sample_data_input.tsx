@@ -14,7 +14,7 @@ import { speciesList } from './species_list';
 import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
 import { statesList } from './states_list';
 import { municipalitiesList } from './municipalities_list';
-import { getRanHex, hideNavBar, hideTopBar, verifyLatLonFormat } from './utils';
+import { getRanHex, hideNavBar, hideTopBar, verifyLatLonFormat, type UserData } from './utils';
 import { useTranslation } from 'react-i18next';
 import { TextField, Autocomplete, MenuItem, InputAdornment } from '@mui/material';
 import { LocalizationProvider, DatePicker } from '@mui/x-date-pickers';
@@ -22,38 +22,26 @@ import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
 import dayjs from 'dayjs';
 import './i18n/config';
 
-type UserData = {
-    name: string,
-    org: string,
-    org_name: string,
-    role: string,
-}
-
 type SampleDataInputProps = {
     onActionButtonClick: any,
     onTabChange: any,
     baseState: {},
     actionButtonTitle: string,
     isNewSampleForm: boolean,
-    userData: UserData,
     sampleId: string,
-    currentTab: number,
     isCompletedSample: boolean,
 }
 
 export default function SampleDataInput(props: SampleDataInputProps) {
-    const [user, setUser] = useState({});
-    const [sampleTrust, setSampletrust] = useState('untrusted');
-    // const [isMember, setIsMember] = useState(false);
-    const [userData, setUserdata] = useState(props.userData);
     const [currentTab, setCurrentTab] = useState(1);
-
     const [formData, setFormData] = useState(props.baseState);
     const [numMeasurements, setNumMeasurements] = useState(2);
     const [currentMeasurementsTab, setCurentMeasurementsTab] = useState(0);
 
     const router = useRouter();
     const { t } = useTranslation();
+
+    
 
 
     useEffect(() => {
@@ -71,6 +59,7 @@ export default function SampleDataInput(props: SampleDataInputProps) {
     function attemptToUpdateCurrentTab(newTab: number) {
         const currentTabRef = getCurrentTabFormRef();
         if (newTab < currentTab || checkCurrentTabFormValidity()) {
+            console.log("updated current tab")
             setCurrentTab(newTab);
             if (props.onTabChange) props.onTabChange(newTab);
         }
@@ -206,6 +195,7 @@ export default function SampleDataInput(props: SampleDataInputProps) {
             }
 
         } else {
+            console.log("returning false")
             currentTabRef.reportValidity();
             return false;
         }
@@ -339,7 +329,6 @@ export default function SampleDataInput(props: SampleDataInputProps) {
     }
 
 
-
     function basicInfoTab() {
         return (
             <form id='info-tab' className='grid-columns'>
@@ -364,7 +353,7 @@ export default function SampleDataInput(props: SampleDataInputProps) {
                             name="sample_name"
                             label={t('sampleName')}
                             onChange={handleChange}
-                            value={formData.sample_name}
+                            value={formData.sample_name ? formData.sample_name : ''}
                         />
                     </div>
 
@@ -798,7 +787,7 @@ export default function SampleDataInput(props: SampleDataInputProps) {
 
     function reviewAndSubmitTab() {
         return (
-            <div>
+            <div id="review-and-submit">
                 <div className="details">
                     <div className='section-title'>
                         Details
@@ -978,82 +967,12 @@ export default function SampleDataInput(props: SampleDataInputProps) {
         </div>)
     }
 
-    function sampleResultsTab() {
-        if (formData.status !== 'concluded') {
-            attemptToUpdateCurrentTab(currentTab + 1);
-        }
-        return (
-            <div>
-                <div className="result-instructions">
-                    Enter the values for each sample separated by a comma (,).
-                </div>
-
-                <form id='results-tab' className='grid-columns'>
-                    <div className='column-one'>
-                        <div className="form-group">
-                            <label htmlFor="d18O_cel">d18O_cel</label>
-                            <input onChange={handleResultChange} value={formData.d18O_cel ? formData.d18O_cel.toString() : ''} name='d18O_cel' type="text" className="form-control" id="d18O_cel" />
-                        </div>
-                    </div>
-                    <div className='column-one'>
-                        <div className="form-group">
-                            <label htmlFor="oxygen">d18O_wood</label>
-                            <input onChange={handleResultChange} value={formData.oxygen ? formData.oxygen.toString() : ''} name='oxygen' type="text" className="form-control" id="oxygen" />
-                        </div>
-                    </div>
-                    <div className='column-one'>
-                        <div className="form-group">
-                            <label htmlFor="nitrogen">d15N_wood</label>
-                            <input onChange={handleResultChange} value={formData.nitrogen ? formData.nitrogen.toString() : ''} name='nitrogen' type="text" className="form-control" id="nitrogen" />
-                        </div>
-                    </div>
-                    <div className='column-one'>
-                        <div className="form-group">
-                            <label htmlFor="n_wood">N_wood</label>
-                            <input onChange={handleResultChange} value={formData.n_wood ? formData.n_wood.toString() : ''} name='n_wood' type="text" className="form-control" id="n_wood" />
-                        </div>
-                    </div>
-                    <div className='column-one'>
-                        <div className="form-group">
-                            <label htmlFor="carbon">d13C_wood</label>
-                            <input onChange={handleResultChange} value={formData.carbon ? formData.carbon.toString() : ''} name='carbon' type="text" className="form-control" id="carbon" />
-                        </div>
-                    </div>
-                    <div className='column-one'>
-                        <div className="form-group">
-                            <label htmlFor="d18O_wood">%C_wood</label>
-                            <input onChange={handleResultChange} value={formData.c_wood ? formData.c_wood.toString() : ''} name='c_wood' type="text" className="form-control" id="c_wood" />
-                        </div>
-                    </div>
-                    <div className='column-one'>
-                        <div className="form-group">
-                            <label htmlFor="d13C_cel">d13C_cel</label>
-                            <input onChange={handleResultChange} value={formData.d13C_cel ? formData.d13C_cel.toString() : ''} name='d13C_cel' type="text" className="form-control" id="d13C_cel" />
-                        </div>
-                    </div>
-                    <div className='column-one'>
-                        <div className="form-group">
-                            <label htmlFor="c_cel">%C_cel</label>
-                            <input onChange={handleResultChange} value={formData.c_cel ? formData.c_cel.toString() : ''} name='c_cel' type="text" className="form-control" id="c_cel" />
-                        </div>
-                    </div>
-                </form>
-            </div>
-        )
-    }
-
     function userIsOnLastTab(): boolean {
         return currentTab === 4;
     }
     function shouldShowNextButton(): boolean {
         if (!props.isCompletedSample) return false;
         return currentTab < 3;
-        // if (formData.status === 'concluded') {
-        //     return currentTab < 3;
-        // } else {
-        //     return currentTab < 2
-        // }
-
     }
 
     function shouldShowBackButton(): boolean {
@@ -1072,7 +991,7 @@ export default function SampleDataInput(props: SampleDataInputProps) {
     }
 
 
-
+    
     return (
         <div className="add-sample-page-wrapper">
             <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@48,400,0,0&display=optional" />
@@ -1088,9 +1007,9 @@ export default function SampleDataInput(props: SampleDataInputProps) {
                 </div>
                 <div className='submit-buttons'>
                     {shouldShowCancelButton() && <button type="button" onClick={onCancleClick} className="btn btn-outline-primary">Cancel</button>}
-                    {shouldShowBackButton() && <button type="button" onClick={() => attemptToUpdateCurrentTab(currentTab - 1)} className="btn btn-primary">Back</button>}
-                    {shouldShowNextButton() && <button type="button" onClick={() => attemptToUpdateCurrentTab(currentTab + 1)} className="btn btn-primary next-button">Next</button>}
-                    {shouldShowActionItemButton() && <button type="button" onClick={onActionButtonClick} className="btn btn-primary">{props.actionButtonTitle}</button>}
+                    {shouldShowBackButton() && <button type="button" id="samples-data-back-button" onClick={() => attemptToUpdateCurrentTab(currentTab - 1)} className="btn btn-primary">Back</button>}
+                    {shouldShowNextButton() && <button type="button" id="samples-data-next-button" onClick={() => attemptToUpdateCurrentTab(currentTab + 1)} className="btn btn-primary next-button">Next</button>}
+                    {shouldShowActionItemButton() && <button id="action-button" type="button" onClick={onActionButtonClick} className="btn btn-primary">{props.actionButtonTitle}</button>}
                     {userIsOnLastTab() && <button type="button" onClick={handleReturnToDashboard} className="btn btn-primary">Return to dashboard</button>}
 
                 </div>

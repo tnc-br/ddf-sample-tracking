@@ -182,7 +182,6 @@ export default function Edit() {
                         // onStateUpdate={(state) => handleChange(state)}
                         onActionButtonClick={(sampleID: string, updatedFormData: Sample) => onUpdateSampleClick(updatedFormData)}
                         actionButtonTitle="Update sample"
-                        userData={userData}
                         sampleId={sampleId}
                         isCompletedSample={true}
                         onTabChange={(tab) => setCurrentTab(tab)} />
