@@ -75,6 +75,17 @@ export async function getUserData(userId: string): Promise<utils.UserData> {
     }
 }
 
+export async function getNewUserData(userId: string): Promise<utils.UserData> {
+    const db = getFirestore();
+    const userDocRef = doc(db, "new_users", userId);
+    const userDoc = await getDoc(userDocRef);
+    if (userDoc.exists()) {
+        return userDoc.data() as utils.UserData;
+    } else {
+        return {} as utils.UserData;
+    }
+}
+
 export function setSample(trustedValue: string, sampleId: string, sample: utils.Sample) {
     if (!trustedValue) return;
     const db = getFirestore();

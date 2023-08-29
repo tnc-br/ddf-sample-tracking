@@ -2,7 +2,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation'
 import { getAuth, createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
-import { doc, getDocs, collection, getFirestore, updateDoc, addDoc } from "firebase/firestore";
+import { doc, getDocs, collection, getFirestore, updateDoc, addDoc, setDoc } from "firebase/firestore";
 import InputField from '../input-field';
 
 
@@ -135,14 +135,14 @@ export default function SignUp(props: SignUpProps) {
             }
             updateDoc(newOrgDoc, newObj);
         } else {
-
-            addDoc(collection(db, "new_users"), {
+            const newDocRef = doc(db, "new_users", auth.currentUser!.uid);
+            setDoc(newDocRef, {
                 name: name,
                 email: formData.email,
                 date_requested: dateString,
                 org: labValue,
                 uid: auth.currentUser!.uid,
-                org_name: newOrgName
+                org_name: orgName
             });
         }
         router.push('/samples');

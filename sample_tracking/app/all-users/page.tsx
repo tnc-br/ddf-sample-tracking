@@ -187,7 +187,17 @@ export default function Users() {
         const removedMemberId = userData.user_id;
         const confirmString = `Are you sure you want to remove ${userData.name}?`
         if (!confirm(confirmString)) return;
-        deleteDoc(doc(db, "users", removedMemberId));
+        updateDoc(doc(db, "users", removedMemberId), {
+            org: "",
+            org_name: "",
+            role: "",
+        });
+        if (userData.email) {
+            updateDoc(doc(db, "organizations", userData.org), {
+                members: arrayRemove(userData.email)
+            })
+        }
+        
         // delete users[removedMemberId];
     }
 

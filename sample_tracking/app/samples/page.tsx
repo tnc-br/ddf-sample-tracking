@@ -10,7 +10,7 @@ import { getSamplesFromCollection, getUserData } from '../firebase_utils';
 import { useTranslation } from 'react-i18next';
 import '../i18n/config';
 
-export default function Samples() {
+export default async function Samples() {
 
     const [data, setData] = useState({});
     const [selectedSample, setSelectedSample] = useState('');
@@ -32,12 +32,16 @@ export default function Samples() {
                 if (!user) {
                     router.push('/login');
                 } else {
-                    getUserData(user.uid).then((userData: UserData) => {
+                    const userData = getUserData(user.uid);
+                    if (userData.org) {
                         setUserData(userData);
-                    })
-                }
-                if (!user) {
-                    router.push('/login');
+                    } else {
+                        const newUserData = getNewUserData(user.uid);
+                        if (newUserData.org && newUserData.org.length < 1) {
+                            router.push('./select-org');
+                        }
+
+                    }
                 }
             })
         }

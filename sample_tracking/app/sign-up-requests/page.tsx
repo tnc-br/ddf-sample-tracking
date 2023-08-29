@@ -11,6 +11,7 @@ import { useRouter } from 'next/navigation'
 import 'bootstrap/dist/css/bootstrap.css';
 import { getFirestore, getDocs, collection, updateDoc, doc, setDoc, addDoc, getDoc, arrayUnion, arrayRemove, deleteField, query, where, deleteDoc } from "firebase/firestore";
 import { showNavBar, showTopBar, getRanHex } from '../utils';
+import { getUserData } from '../firebase_utils';
 
 type UserData = {
     role: string,
@@ -150,7 +151,7 @@ export default function SignUpRequests() {
         setProspectiveOrgs(newProspectiveOrgs);
     }
 
-    function handleApproveMemberClick(evt: any) {
+    async function handleApproveMemberClick(evt: any) {
         const memberId = evt.target.parentElement.parentElement.id;
         const orgId = prospectiveUsers[memberId].org;
         if (!orgId) {
@@ -161,14 +162,30 @@ export default function SignUpRequests() {
 
         const date = new Date();
         const dateString = `${date.getMonth() + 1} ${date.getDate()} ${date.getFullYear()}`;
+        const potentialUserData = await getUserData(userId as unknown as string);
         const newUserDocRef = doc(db, "users", userId as unknown as string);
-        setDoc(newUserDocRef, {
-            name: prospectiveUsers[memberId].name,
-            org: orgId,
-            date_added: dateString,
-            role: "member",
-            email: prospectiveUsers[memberId].email,
-        });
+        if (potentialUserData.email) {
+            updateDoc(newUserDocRef, {
+                org: orgId,
+                org_name: prospectiveUsers[memberId].org_name,
+                date_added: dateString,
+                role: "member",
+            })
+        } else {
+            setDoc(newUserDocRef, {
+                name: prospectiveUsers[memberId].name,
+                org: orgId,
+                org_name: prospectiveUsers[memberId].org_name,
+                date_added: dateString,
+                role: "member",
+                email: prospectiveUsers[memberId].email,
+            });
+        }
+
+        const orgDocRef = doc(db, "organizations", orgId);
+        updateDoc(orgDocRef, {
+            members: arrayUnion(prospectiveUsers[memberId].email),
+        })
         // const deleteDocRef = doc(db, "new_users", memberId);
         deleteMemberFromNewMemberList(memberId);
 
@@ -195,7 +212,7 @@ export default function SignUpRequests() {
             <h3 className='header'>Sign up requests ({Object.keys(prospectiveUsers).length + Object.keys(prospectiveOrgs).length})</h3>
             <div className="details">
                 <div className='section-title'>
-                <p className='section-title'>Users ({Object.keys(prospectiveUsers).length})</p>
+                    <p className='section-title'>Users ({Object.keys(prospectiveUsers).length})</p>
                 </div>
                 <table className="table">
                     <thead>
@@ -231,7 +248,7 @@ export default function SignUpRequests() {
 
             <div className='details'>
                 <div className='section-title'>
-                <p className="section-title">Organizations ({Object.keys(prospectiveOrgs).length})</p>
+                    <p className="section-title">Organizations ({Object.keys(prospectiveOrgs).length})</p>
                 </div>
                 <table className="table">
                     <thead>

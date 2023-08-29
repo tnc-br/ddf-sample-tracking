@@ -48,7 +48,7 @@ export default function SelectOrg() {
                         if (docRef.exists()) {
                             // User exists in users collection already, they should not be here to select a new organization.
                             console.log("Error: user already exists. Forwarding to samples page");
-                            // router.push('/samples');
+                            router.push('/samples');
                         }
                     });
                     const newUsersCollectionRef = collection(db, "new_users");
