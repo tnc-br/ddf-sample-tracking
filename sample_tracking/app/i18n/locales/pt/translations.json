@@ -53,5 +53,7 @@
     "admin": "Administrador",
     "numberOfUsers": "Número de usuários",
     "email": "e-mail",
-    "organization": "Organização"
+    "organization": "Organização",
+    "meanAnnualTemperature": "Temperatura média anual",
+    "meanAnnualPrecipitation": "Precipitação média anual"
   }

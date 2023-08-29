@@ -1,12 +1,12 @@
 "use client";
 import 'bootstrap/dist/css/bootstrap.css';
 import { getAuth, onAuthStateChanged } from "firebase/auth";
-import { getFirestore, getDocs, collection, query, or, and, where, getDoc, doc } from "firebase/firestore";
 import { useState, useMemo, useRef, useEffect } from 'react';
 import './styles.css';
 import { useRouter } from 'next/navigation'
 import SamplesTable from '../samples_table';
-import { type Sample, type UserData, initializeAppIfNecessary, showNavBar, showTopBar, confirmUserLoggedIn } from '../utils';
+import { type Sample, type UserData, initializeAppIfNecessary, showNavBar, showTopBar } from '../utils';
+import { getSamplesFromCollection, getUserData } from '../firebase_utils';
 import { useTranslation } from 'react-i18next';
 import '../i18n/config';
 
@@ -32,17 +32,9 @@ export default function Samples() {
                 if (!user) {
                     router.push('/login');
                 } else {
-                    const userDocRef = doc(db, "users", user.uid);
-                    getDoc(userDocRef).then((docRef) => {
-                        if (docRef.exists()) {
-                            const docData = docRef.data();
-                            if (!docData.role) {
-                                router.push('/tasks');
-                            } else {
-                                setUserData(docData as UserData);
-                            }
-                        }
-                    });
+                    getUserData(user.uid).then((userData: UserData) => {
+                        setUserData(userData);
+                    })
                 }
                 if (!user) {
                     router.push('/login');
@@ -51,82 +43,18 @@ export default function Samples() {
         }
     })
 
-    const db = getFirestore();
     if (!allSamples.inProgress && !allSamples.completed) {
         addSamplesToDataList();
-    }
-
-    async function getSamplesFromCollection(collectionName: string): Promise<Map<string, Map<string, string>>[]> {
-        const user = auth.currentUser;
-        const samples: any = {};
-        const samplesStateArray: any = [];
-        // if (!user) return samples;
-        console.log('got here');
-        const verifiedSamplesRef = collection(db, collectionName);
-        let samplesQuery;
-        if (userData.role == "site_admin") {
-            const querySnapshot = await getDocs(collection(db, collectionName)).catch((error) => {
-                console.log("Unable to fetch samples: " + error);
-            });
-            if (querySnapshot) {
-                querySnapshot.forEach((doc) => {
-                    const docData = doc.data();
-                    samples[doc.id as unknown as number] = doc.data();
-                    samplesStateArray.push({
-                        ...docData,
-                        code_lab: doc.id,
-                    });
-                });
-            }
-
-            return samplesStateArray;
-        } else if (userData.role == "admin") {
-            samplesQuery = query(verifiedSamplesRef, where("visibility", "==", "public"));
-            samplesQuery = query(verifiedSamplesRef,
-                or(
-                    where("visibility", "==", "public"),
-                    where("visibility", "==", "logged_in"),
-                    where("org", "==", userData.org)
-                ));
-        } else if (userData.org != null) {
-            samplesQuery = query(verifiedSamplesRef,
-                or(
-                    where("created_by", "==", user.uid),
-                    where("visibility", "==", "public"),
-                    where("visibility", "==", "logged_in"),
-                    and(
-                        where("visibility", "==", "organization"),
-                        where("org", "==", userData.org)),
-                ))
-        } else {
-            samplesQuery = query(verifiedSamplesRef, where("visibility", "==", "public"));
-        }
-
-        const querySnapshot = await getDocs(samplesQuery).catch((error) => {
-            console.log("Unable to fetch samples: " + error);
-        });
-        if (querySnapshot) {
-            querySnapshot.forEach((doc) => {
-                const docData = doc.data();
-                samples[doc.id] = doc.data();
-                samplesStateArray.push({
-                    ...docData,
-                    code_lab: doc.id,
-                });
-            });
-
-        }
-
-        return samplesStateArray;
     }
 
     async function addSamplesToDataList() {
         if (Object.keys(samplesState[0]).length < 1) {
             let allSamples: any = [{}];
-            const trustedSamples = await getSamplesFromCollection('trusted_samples');
-            const untrustedSamples = await getSamplesFromCollection('untrusted_samples');
-            const unknownSamples = await getSamplesFromCollection('unknown_samples');
+            const trustedSamples = await getSamplesFromCollection(userData, 'trusted_samples');
+            const untrustedSamples = await getSamplesFromCollection(userData, 'untrusted_samples');
+            const unknownSamples = await getSamplesFromCollection(userData, 'unknown_samples');
             if (trustedSamples.length + untrustedSamples.length + unknownSamples.length < 1) {
+                console.log("returning early")
                 return;
             }
 
@@ -175,6 +103,7 @@ export default function Samples() {
             });
 
             if (inProgressSamples.length > 0 || completedSamples.length > 0) {
+                console.log("samples: " + inProgressSamples)
                 setAllSamples({
                     inProgress: inProgressSamples,
                     completed: completedSamples,
@@ -187,6 +116,8 @@ export default function Samples() {
     function isAdmin(): boolean {
         return userData.role === 'admin' || userData.role === 'site_admin';
     }
+
+    console.log("got here again: " + allSamples.completed)
 
     return (
         <div className='samples-page-wrapper'>

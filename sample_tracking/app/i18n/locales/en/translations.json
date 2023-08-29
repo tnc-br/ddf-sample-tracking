@@ -56,5 +56,7 @@
   "organization": "Organization",
   "dateAdded": "Date added",
   "state": "State",
-  "measuringHeight": "Measuring height"
+  "measuringHeight": "Measuring height",
+  "meanAnnualTemperature": "Mean annual temperature",
+  "meanAnnualPrecipitation": "Mean annual precipitation"
 }

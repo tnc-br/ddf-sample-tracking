@@ -5,16 +5,11 @@ import 'bootstrap/dist/css/bootstrap.css';
 var QRCode = require('qrcode');
 import { QRCodeSVG } from "qrcode.react";
 import { useRouter } from 'next/navigation'
-import { doc, setDoc, getFirestore, getDoc } from "firebase/firestore";
-import { initializeApp } from "firebase/app";
-import { firebaseConfig } from './firebase_config';
-import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { useState, useEffect } from 'react';
 import { speciesList } from './species_list';
-import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
 import { statesList } from './states_list';
 import { municipalitiesList } from './municipalities_list';
-import { getRanHex, hideNavBar, hideTopBar, verifyLatLonFormat } from './utils';
+import { getRanHex, hideNavBar, hideTopBar, verifyLatLonFormat, type UserData } from './utils';
 import { useTranslation } from 'react-i18next';
 import { TextField, Autocomplete, MenuItem, InputAdornment } from '@mui/material';
 import { LocalizationProvider, DatePicker } from '@mui/x-date-pickers';
@@ -22,33 +17,19 @@ import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
 import dayjs from 'dayjs';
 import './i18n/config';
 
-type UserData = {
-    name: string,
-    org: string,
-    org_name: string,
-    role: string,
-}
-
 type SampleDataInputProps = {
-    onStateUpdate: any,
     onActionButtonClick: any,
     onTabChange: any,
     baseState: {},
     actionButtonTitle: string,
     isNewSampleForm: boolean,
-    userData: UserData,
     sampleId: string,
-    currentTab: number,
     isCompletedSample: boolean,
+    currentTab: number,
 }
 
 export default function SampleDataInput(props: SampleDataInputProps) {
-    const [user, setUser] = useState({});
-    const [sampleTrust, setSampletrust] = useState('untrusted');
-    // const [isMember, setIsMember] = useState(false);
-    const [userData, setUserdata] = useState(props.userData);
-    const [currentTab, setCurrentTab] = useState(1);
-
+    const [currentTab, setCurrentTab] = useState(props.currentTab ? props.currentTab : 1);
     const [formData, setFormData] = useState(props.baseState);
     const [numMeasurements, setNumMeasurements] = useState(2);
     const [currentMeasurementsTab, setCurentMeasurementsTab] = useState(0);
@@ -56,13 +37,15 @@ export default function SampleDataInput(props: SampleDataInputProps) {
     const router = useRouter();
     const { t } = useTranslation();
 
+    
+
 
     useEffect(() => {
         hideNavBar();
         hideTopBar();
     })
 
-    if (!props || !props.onStateUpdate || !props.onActionButtonClick || !props.baseState || !props.actionButtonTitle) return;
+    if (!props || !props.onActionButtonClick || !props.baseState || !props.actionButtonTitle) return;
 
     if (Object.keys(props.baseState).length > Object.keys(formData).length) {
         setFormData(props.baseState);
@@ -95,7 +78,6 @@ export default function SampleDataInput(props: SampleDataInputProps) {
             visibility: 'public',
         }
         setFormData(newFormData);
-        props.onStateUpdate(newFormData, currentTab);
     }
 
     function handleSelectPrivateVisibility() {
@@ -104,7 +86,6 @@ export default function SampleDataInput(props: SampleDataInputProps) {
             visibility: 'private',
         }
         setFormData(newFormData);
-        props.onStateUpdate(newFormData, currentTab);
     }
 
     function handleSelectSupplier() {
@@ -113,7 +94,6 @@ export default function SampleDataInput(props: SampleDataInputProps) {
             collected_by: 'supplier',
         }
         setFormData(newFormData);
-        props.onStateUpdate(newFormData, currentTab);
 
     }
 
@@ -123,7 +103,6 @@ export default function SampleDataInput(props: SampleDataInputProps) {
             collected_by: 'my_org',
         }
         setFormData(newFormData);
-        props.onStateUpdate(newFormData, currentTab);
     }
 
 
@@ -153,7 +132,6 @@ export default function SampleDataInput(props: SampleDataInputProps) {
             }
         }
         setFormData(newFormData);
-        props.onStateUpdate(newFormData, currentTab);
     }
 
     function handleResultChange(evt: any) {
@@ -168,7 +146,6 @@ export default function SampleDataInput(props: SampleDataInputProps) {
             [evt.target.name]: newFormDataMeasurementsArray,
         }
         setFormData(newFormData);
-        props.onStateUpdate(formData, currentTab);
     }
 
     function onCancleClick() {
@@ -178,13 +155,7 @@ export default function SampleDataInput(props: SampleDataInputProps) {
     function onActionButtonClick() {
         const currentTabRef = getCurrentTabFormRef();
         if (!checkCurrentTabFormValidity()) return;
-        props.onActionButtonClick(props.sampleId);
-        // attemptToUpdateCurrentTab(4);
-        // if (!props.isNewSampleForm) {
-        //     props.onActionButtonClick();
-        // } else {
-        //     attemptToUpdateCurrentTab(4);
-        // }
+        props.onActionButtonClick(props.sampleId, formData);
     }
 
     function getCurrentTabFormRef(): Element {
@@ -234,10 +205,10 @@ export default function SampleDataInput(props: SampleDataInputProps) {
             return true;
         }
         const d18O_cel = formData.d18O_cel ? formData.d18O_cel.map((value: string) => parseFloat(value)) : [];
-        const oxygen = formData.oxygen ? formData.oxygen.map((value: string) => parseFloat(value)) : [];
-        const nitrogen = formData.nitrogen ? formData.nitrogen.map((value: string) => parseFloat(value)) : [];
+        const d18O_wood = formData.d18O_wood ? formData.d18O_wood.map((value: string) => parseFloat(value)) : [];
+        const d15N_wood = formData.d15N_wood ? formData.d15N_wood.map((value: string) => parseFloat(value)) : [];
         const n_wood = formData.n_wood ? formData.n_wood.map((value: string) => parseFloat(value)) : [];
-        const carbon = formData.carbon ? formData.carbon.map((value: string) => parseFloat(value)) : [];
+        const d13C_wood = formData.d13C_wood ? formData.d13C_wood.map((value: string) => parseFloat(value)) : [];
         const c_wood = formData.c_wood ? formData.c_wood.map((value: string) => parseFloat(value)) : [];
         const d13C_cel = formData.d13C_cel ? formData.d13C_cel.map((value: string) => parseFloat(value)) : [];
         const c_cel = formData.c_cel ? formData.c_cel.map((value: string) => parseFloat(value)) : [];
@@ -251,16 +222,16 @@ export default function SampleDataInput(props: SampleDataInputProps) {
                 }
             })
         }
-        if (oxygen) {
-            oxygen.forEach((value: number) => {
+        if (d18O_wood) {
+            d18O_wood.forEach((value: number) => {
                 if (value < 20 || value > 32) {
                     alertMessage = "d180_wood should be within the range of 20-32";
                     alert(alertMessage);
                 }
             })
         }
-        if (nitrogen) {
-            nitrogen.forEach((value: number) => {
+        if (d15N_wood) {
+            d15N_wood.forEach((value: number) => {
                 if (value < -5 || value > 15) {
                     alertMessage = "d15N_wood should be within the range of -5-15";
                     alert(alertMessage);
@@ -275,8 +246,8 @@ export default function SampleDataInput(props: SampleDataInputProps) {
                 }
             })
         }
-        if (carbon) {
-            carbon.forEach((value: number) => {
+        if (d13C_wood) {
+            d13C_wood.forEach((value: number) => {
                 if (value < -38 || value > -20) {
                     alertMessage = "d13C_wood should be within the range of -38- -20";
                     alert(alertMessage);
@@ -329,7 +300,6 @@ export default function SampleDataInput(props: SampleDataInputProps) {
     }
 
     function handleMeasurementsTabClick(evt: any) {
-        console.log(evt);
         setCurentMeasurementsTab(parseInt(evt.target.id));
     }
 
@@ -352,7 +322,6 @@ export default function SampleDataInput(props: SampleDataInputProps) {
     }
 
 
-
     function basicInfoTab() {
         return (
             <form id='info-tab' className='grid-columns'>
@@ -364,10 +333,6 @@ export default function SampleDataInput(props: SampleDataInputProps) {
                         <div onClick={handleSelectPrivateVisibility}
                             className={formData.visibility === 'private' ? "button_select private_button selected" : "button_select private_button"}>{t('private')}</div>
                     </div>
-                    {/* <div className="form-group">
-                        <label htmlFor="sampleName">{t('sampleName')}*</label>
-                        <input onChange={handleChange} value={formData.sample_name} name='sample_name' required type="text" className="form-control" id="sampleName" />
-                    </div> */}
                     <div className='input-text-field-wrapper'>
                         <TextField
                             required
@@ -377,7 +342,7 @@ export default function SampleDataInput(props: SampleDataInputProps) {
                             name="sample_name"
                             label={t('sampleName')}
                             onChange={handleChange}
-                            value={formData.sample_name}
+                            value={formData.sample_name ? formData.sample_name : ''}
                         />
                     </div>
 
@@ -388,8 +353,6 @@ export default function SampleDataInput(props: SampleDataInputProps) {
                             fullWidth
                             id="species"
                             name="species"
-                            // onHighlightChange={((evt: any) => console.log(evt))}
-                            // onInputChange={handleChange}
                             onChange={handleChange}
                             value={formData.species}
                             options={getSpeciesNames()}
@@ -399,7 +362,6 @@ export default function SampleDataInput(props: SampleDataInputProps) {
                                     {...params}
                                     label={t('treeSpecies')}
                                 />}
-                            value={formData.species}
                         />
                     </div>
 
@@ -617,11 +579,41 @@ export default function SampleDataInput(props: SampleDataInputProps) {
                                 value={formData.diameter}
                             />
                         </div>
-                        {/* <div className='form-group  half-width-entry'>
-                            <label htmlFor="diameter">{t('diameter')}</label>
-                            <input onChange={handleChange} value={formData.diameter} name='diameter' type="text" className="form-control" id="diameter" />
-                        </div> */}
-
+                        <div className='input-text-field-wrapper half-width'>
+                            <TextField
+                                size='small'
+                                fullWidth
+                                id="avp"
+                                name="avp"
+                                label="AVP"
+                                onChange={handleChange}
+                                value={formData.avp}
+                            />
+                        </div>
+                    </div>
+                    <div className='sample-measurements-overview-row'>
+                        <div className='input-text-field-wrapper half-width'>
+                            <TextField
+                                size='small'
+                                fullWidth
+                                id="mean_annual_temperature"
+                                name="mean_annual_temperature"
+                                label={t('meanAnnualTemperature')}
+                                onChange={handleChange}
+                                value={formData.mean_annual_temperature}
+                            />
+                        </div>
+                        <div className='input-text-field-wrapper half-width'>
+                            <TextField
+                                size='small'
+                                fullWidth
+                                id="mean_annual_precipitation"
+                                name="mean_annual_precipitation"
+                                label={t('meanAnnualPrecipitation')}
+                                onChange={handleChange}
+                                value={formData.mean_annual_precipitation}
+                            />
+                        </div>
                     </div>
                     <div className='sample-measurements-overview-row'>
                         <div className='input-text-field-wrapper full-width'>
@@ -664,7 +656,6 @@ export default function SampleDataInput(props: SampleDataInputProps) {
                                                         Measurement {index + 1}
                                                     </div>
                                                 </div>
-                                                {currentMeasurementsTab === 0 && <div className='measurements-tab-indicator'></div>}
                                             </div>
                                         </div>
                                     </div>
@@ -687,22 +678,22 @@ export default function SampleDataInput(props: SampleDataInputProps) {
                                         <TextField
                                             size='small'
                                             fullWidth
-                                            id="oxygen"
-                                            name="oxygen"
+                                            id="d18O_wood"
+                                            name="d18O_wood"
                                             label="d18O_wood"
                                             onChange={handleResultChange}
-                                            value={formData.oxygen ? formData.oxygen[currentMeasurementsTab] || '' : ''}
+                                            value={formData.d18O_wood ? formData.d18O_wood[currentMeasurementsTab] || '' : ''}
                                         />
                                     </div>
                                     <div className="quarter-width">
                                         <TextField
                                             size='small'
                                             fullWidth
-                                            id="nitrogen"
-                                            name="nitrogen"
+                                            id="d15N_wood"
+                                            name="d15N_wood"
                                             label="d15N_wood"
                                             onChange={handleResultChange}
-                                            value={formData.nitrogen ? formData.nitrogen[currentMeasurementsTab] || '' : ''}
+                                            value={formData.d15N_wood ? formData.d15N_wood[currentMeasurementsTab] || '' : ''}
                                         />
                                     </div>
                                     <div className="quarter-width">
@@ -718,12 +709,12 @@ export default function SampleDataInput(props: SampleDataInputProps) {
                                         />
                                     </div>
                                     {/* <div className="form-group">
-                                        <label htmlFor="oxygen">d18O_wood</label>
-                                        <input onChange={handleResultChange} value={formData.oxygen ? formData.oxygen[currentMeasurementsTab] || '' : ''} name='oxygen' type="text" className="form-control" id="oxygen" />
+                                        <label htmlFor="d18O_wood">d18O_wood</label>
+                                        <input onChange={handleResultChange} value={formData.d18O_wood ? formData.d18O_wood[currentMeasurementsTab] || '' : ''} name='d18O_wood' type="text" className="form-control" id="d18O_wood" />
                                     </div> */}
                                     {/* <div className="form-group">
-                                        <label htmlFor="nitrogen">d15N_wood</label>
-                                        <input onChange={handleResultChange} value={formData.nitrogen ? formData.nitrogen[currentMeasurementsTab] || '' : ''} name='nitrogen' type="text" className="form-control" id="nitrogen" />
+                                        <label htmlFor="d15N_wood">d15N_wood</label>
+                                        <input onChange={handleResultChange} value={formData.d15N_wood ? formData.d15N_wood[currentMeasurementsTab] || '' : ''} name='d15N_wood' type="text" className="form-control" id="d15N_wood" />
                                     </div> */}
                                     {/* <div className="form-group">
                                         <label htmlFor="n_wood">N_wood</label>
@@ -735,11 +726,11 @@ export default function SampleDataInput(props: SampleDataInputProps) {
                                         <TextField
                                             size='small'
                                             fullWidth
-                                            id="carbon"
-                                            name="carbon"
+                                            id="d13C_wood"
+                                            name="d13C_wood"
                                             label="d13C_wood"
                                             onChange={handleResultChange}
-                                            value={formData.carbon ? formData.c_cel[currentMeasurementsTab] || '' : ''}
+                                            value={formData.d13C_wood ? formData.c_cel[currentMeasurementsTab] || '' : ''}
                                         />
                                     </div>
                                     <div className="quarter-width">
@@ -782,8 +773,8 @@ export default function SampleDataInput(props: SampleDataInputProps) {
                                         />
                                     </div>
                                     {/* <div className="form-group">
-                                        <label htmlFor="carbon">d13C_wood</label>
-                                        <input onChange={handleResultChange} value={formData.carbon ? formData.carbon[currentMeasurementsTab] || '' : ''} name='carbon' type="text" className="form-control" id="carbon" />
+                                        <label htmlFor="d13C_wood">d13C_wood</label>
+                                        <input onChange={handleResultChange} value={formData.d13C_wood ? formData.d13C_wood[currentMeasurementsTab] || '' : ''} name='d13C_wood' type="text" className="form-control" id="d13C_wood" />
                                     </div> */}
                                     {/* <div className="form-group">
                                         <label htmlFor="d18O_wood">%C_wood</label>
@@ -812,7 +803,7 @@ export default function SampleDataInput(props: SampleDataInputProps) {
 
     function reviewAndSubmitTab() {
         return (
-            <div>
+            <div id="review-and-submit">
                 <div className="details">
                     <div className='section-title'>
                         Details
@@ -894,12 +885,12 @@ export default function SampleDataInput(props: SampleDataInputProps) {
                                     <span className='detail-value'>{formData.d18O_cel ? formData.d18O_cel[currentMeasurementsTab] || '' : ''}</span>
                                 </div>
                                 <div className='detail'>
-                                    <span className="detail-name">{t('oxygen')}</span>
-                                    <span className='detail-value'>{formData.oxygen ? formData.oxygen[currentMeasurementsTab] || '' : ''}</span>
+                                    <span className="detail-name">d18O_wood</span>
+                                    <span className='detail-value'>{formData.d18O_wood ? formData.d18O_wood[currentMeasurementsTab] || '' : ''}</span>
                                 </div>
                                 <div className='detail'>
-                                    <span className="detail-name">{t('nitrogen')}</span>
-                                    <span className='detail-value'>{formData.nitrogen ? formData.nitrogen[currentMeasurementsTab] || '' : ''}</span>
+                                    <span className="detail-name">{t('d15N_wood')}</span>
+                                    <span className='detail-value'>{formData.d15N_wood ? formData.d15N_wood[currentMeasurementsTab] || '' : ''}</span>
                                 </div>
                             </div>
 
@@ -909,8 +900,8 @@ export default function SampleDataInput(props: SampleDataInputProps) {
                                     <span className='detail-value'>{formData.n_wood ? formData.n_wood[currentMeasurementsTab] || '' : ''}</span>
                                 </div>
                                 <div className='detail'>
-                                    <span className="detail-name">{t('carbon')}</span>
-                                    <span className='detail-value'>{formData.carbon ? formData.carbon[currentMeasurementsTab] || '' : ''}</span>
+                                    <span className="detail-name">{t('d13C_wood')}</span>
+                                    <span className='detail-value'>{formData.d13C_wood ? formData.d13C_wood[currentMeasurementsTab] || '' : ''}</span>
                                 </div>
                                 <div className='detail'>
                                     <span className="detail-name">{t('c_wood')}</span>
@@ -992,82 +983,12 @@ export default function SampleDataInput(props: SampleDataInputProps) {
         </div>)
     }
 
-    function sampleResultsTab() {
-        if (formData.status !== 'concluded') {
-            attemptToUpdateCurrentTab(currentTab + 1);
-        }
-        return (
-            <div>
-                <div className="result-instructions">
-                    Enter the values for each sample separated by a comma (,).
-                </div>
-
-                <form id='results-tab' className='grid-columns'>
-                    <div className='column-one'>
-                        <div className="form-group">
-                            <label htmlFor="d18O_cel">d18O_cel</label>
-                            <input onChange={handleResultChange} value={formData.d18O_cel ? formData.d18O_cel.toString() : ''} name='d18O_cel' type="text" className="form-control" id="d18O_cel" />
-                        </div>
-                    </div>
-                    <div className='column-one'>
-                        <div className="form-group">
-                            <label htmlFor="oxygen">d18O_wood</label>
-                            <input onChange={handleResultChange} value={formData.oxygen ? formData.oxygen.toString() : ''} name='oxygen' type="text" className="form-control" id="oxygen" />
-                        </div>
-                    </div>
-                    <div className='column-one'>
-                        <div className="form-group">
-                            <label htmlFor="nitrogen">d15N_wood</label>
-                            <input onChange={handleResultChange} value={formData.nitrogen ? formData.nitrogen.toString() : ''} name='nitrogen' type="text" className="form-control" id="nitrogen" />
-                        </div>
-                    </div>
-                    <div className='column-one'>
-                        <div className="form-group">
-                            <label htmlFor="n_wood">N_wood</label>
-                            <input onChange={handleResultChange} value={formData.n_wood ? formData.n_wood.toString() : ''} name='n_wood' type="text" className="form-control" id="n_wood" />
-                        </div>
-                    </div>
-                    <div className='column-one'>
-                        <div className="form-group">
-                            <label htmlFor="carbon">d13C_wood</label>
-                            <input onChange={handleResultChange} value={formData.carbon ? formData.carbon.toString() : ''} name='carbon' type="text" className="form-control" id="carbon" />
-                        </div>
-                    </div>
-                    <div className='column-one'>
-                        <div className="form-group">
-                            <label htmlFor="d18O_wood">%C_wood</label>
-                            <input onChange={handleResultChange} value={formData.c_wood ? formData.c_wood.toString() : ''} name='c_wood' type="text" className="form-control" id="c_wood" />
-                        </div>
-                    </div>
-                    <div className='column-one'>
-                        <div className="form-group">
-                            <label htmlFor="d13C_cel">d13C_cel</label>
-                            <input onChange={handleResultChange} value={formData.d13C_cel ? formData.d13C_cel.toString() : ''} name='d13C_cel' type="text" className="form-control" id="d13C_cel" />
-                        </div>
-                    </div>
-                    <div className='column-one'>
-                        <div className="form-group">
-                            <label htmlFor="c_cel">%C_cel</label>
-                            <input onChange={handleResultChange} value={formData.c_cel ? formData.c_cel.toString() : ''} name='c_cel' type="text" className="form-control" id="c_cel" />
-                        </div>
-                    </div>
-                </form>
-            </div>
-        )
-    }
-
     function userIsOnLastTab(): boolean {
         return currentTab === 4;
     }
     function shouldShowNextButton(): boolean {
         if (!props.isCompletedSample) return false;
         return currentTab < 3;
-        // if (formData.status === 'concluded') {
-        //     return currentTab < 3;
-        // } else {
-        //     return currentTab < 2
-        // }
-
     }
 
     function shouldShowBackButton(): boolean {
@@ -1086,7 +1007,7 @@ export default function SampleDataInput(props: SampleDataInputProps) {
     }
 
 
-
+    
     return (
         <div className="add-sample-page-wrapper">
             <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@48,400,0,0&display=optional" />
@@ -1102,9 +1023,9 @@ export default function SampleDataInput(props: SampleDataInputProps) {
                 </div>
                 <div className='submit-buttons'>
                     {shouldShowCancelButton() && <button type="button" onClick={onCancleClick} className="btn btn-outline-primary">Cancel</button>}
-                    {shouldShowBackButton() && <button type="button" onClick={() => attemptToUpdateCurrentTab(currentTab - 1)} className="btn btn-primary">Back</button>}
-                    {shouldShowNextButton() && <button type="button" onClick={() => attemptToUpdateCurrentTab(currentTab + 1)} className="btn btn-primary next-button">Next</button>}
-                    {shouldShowActionItemButton() && <button type="button" onClick={onActionButtonClick} className="btn btn-primary">{props.actionButtonTitle}</button>}
+                    {shouldShowBackButton() && <button type="button" id="samples-data-back-button" onClick={() => attemptToUpdateCurrentTab(currentTab - 1)} className="btn btn-primary">Back</button>}
+                    {shouldShowNextButton() && <button type="button" id="samples-data-next-button" onClick={() => attemptToUpdateCurrentTab(currentTab + 1)} className="btn btn-primary next-button">Next</button>}
+                    {shouldShowActionItemButton() && <button id="action-button" type="button" onClick={onActionButtonClick} className="btn btn-primary">{props.actionButtonTitle}</button>}
                     {userIsOnLastTab() && <button type="button" onClick={handleReturnToDashboard} className="btn btn-primary">Return to dashboard</button>}
 
                 </div>

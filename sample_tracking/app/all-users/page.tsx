@@ -28,33 +28,15 @@ type OrgData = {
 }
 
 export default function Users() {
-    // const [pendingApprovals, setPendingApprovals] = useState({});
-    // const [currentUsers, setCurrentUsers] = useState({});
-    // const [roleAccessStatus, setRoleAccessStatus] = useState({});
-    // const [updateState, setUpdateState] = useState(false);
 
-    const [userDetails, setUserDetails] = useState({ role: '', org: '' });
+    // const [userDetails, setUserDetails] = useState({ role: '', org: '' });
     const [userData, setUserData] = useState({} as UserData);
-    const [users, setUsers] = useState({} as NestedSchemas)
+    // const [users, setUsers] = useState({} as NestedSchemas)
     const [currentTab, setCurrentTab] = useState(1);
 
     const [userDataArray, setUserDataArray] = useState([] as UserData[]);
     const [orgDataArray, setOrgDataArray] = useState([] as OrgData[])
 
-    // function addPendingApproval(pendingApproval) {
-    //     setPendingApprovals([...pendingApprovals, pendingApproval]);
-    // }
-
-    // function updateRoleAccessStatus(uid: string, accessPaused: boolean) {
-    //     const updatedValueUserId = `${uid}`;
-    //     let updatedValue = {};
-    //     updatedValue[uid] = accessPaused;
-    //     setRoleAccessStatus(roleAccessStatus => ({
-    //         ...roleAccessStatus,
-    //         ...updatedValue
-    //     }))
-    // }
-    // const adminApp = initializeAdminApp();
     const app = initializeApp(firebaseConfig);
     const auth = getAuth();
     const router = useRouter();
@@ -72,6 +54,7 @@ export default function Users() {
                     const userDocRef = doc(db, "users", user.uid);
                     getDoc(userDocRef).then((docRef) => {
                         if (docRef.exists()) {
+                            
                             const docData = docRef.data();
                             if (docData.role !== 'admin' && docData.role !== 'site_admin') {
                                 router.push('/tasks');
@@ -84,19 +67,21 @@ export default function Users() {
         }
     })
 
+    console.log("User array: " + userDataArray);
+
 
     if (userDataArray.length < 1) {
         const usersListArray: UserData[] = [];
         if (userData.role === 'site_admin') {
+            console.log("hereee!!!")
+
             getDocs(collection(db, "users")).then((querySnapshot) => {
                 console.log('made request to get users');
-                const usersList: NestedSchemas = {};
 
                 querySnapshot.forEach((doc) => {
                     const docData = doc.data();
                     console.log(docData);
                     if (docData.org) {
-                        usersList[doc.id] = docData;
                         usersListArray.push({
                             ...docData,
                             user_id: doc.id,
@@ -104,32 +89,31 @@ export default function Users() {
                     }
 
                 });
-                if (Object.keys(usersList).length > 0) {
-                    setUsers(usersList);
+                if (usersListArray.length > 0) {
+                    console.log("setting user data array " + usersListArray)
+                    // setUsers(usersList);
                     setUserDataArray(usersListArray)
                 }
             });
         } else if (userData.role === 'admin') {
             const q = query(collection(db, "users"), where("org", "==", userData.org));
             const docRef = getDocs(q).then((querySnapshot) => {
-                const usersList: NestedSchemas = {};
                 querySnapshot.forEach((doc) => {
                     const docData = doc.data();
-                    usersList[doc.id] = docData;
                     usersListArray.push({
                         ...docData,
                         user_id: doc.id,
                     } as UserData);
                 })
-                if (Object.keys(usersList).length > 0) {
-                    setUsers(usersList);
+                if (usersListArray.length > 0) {
+                    // setUsers(usersList);
                     setUserDataArray(usersListArray);
                 }
             })
         }
     }
 
-    if (userData.role === "site_admin" && orgDataArray.length < 1) {
+    if (userData.role === "site_admin" && userDataArray.length > 0 && orgDataArray.length < 1) {
         getDocs(collection(db, "organizations")).then((querySnapshot) => {
             console.log('made request to get orgs');
             let orgList: OrgData[] = [];
@@ -204,7 +188,7 @@ export default function Users() {
         const confirmString = `Are you sure you want to remove ${userData.name}?`
         if (!confirm(confirmString)) return;
         deleteDoc(doc(db, "users", removedMemberId));
-        delete users[removedMemberId];
+        // delete users[removedMemberId];
     }
 
     function handleMakeOrgAdminClick(userData: UserData) {
@@ -231,42 +215,24 @@ export default function Users() {
         });
     }
 
-    function showMakeOrgAdminButton(id: string): boolean {
-        const userRole = users[id].role as unknown as string;
-        return (userRole !== 'admin' && userRole !== 'site_admin');
-    }
-
-    function showMakeSiteAdminButton(id: string): boolean {
-        const userRole = users[id].role as unknown as string;
-        return userRole !== 'site_admin' && userData.role === 'site_admin';
-    }
-
-    function showRemoveUserButton(id: string): boolean {
-        const userRole = users[id].role as unknown as string;
-        return userRole !== 'site_admin';
-    }
-
-    function isSiteAdmin(id: string): boolean {
-        const userRole = users[id].role as unknown as string;
-        return userRole === 'site_admin';
-    }
+    console.log("User array end: " + userDataArray.length);
 
     return (<div>
         <div className='all-users-admin-wrapper'>
-            <h3 className='all-users-title'>{userDetails.role === 'admin' ? "My organization" : "All users"}</h3>
+            <h3 className='all-users-title'>{userData.role === 'admin' ? "My organization" : "All users"}</h3>
 
             {userData.role === "site_admin" && <div className="all-users-tab-wrapper">
-                <div className="all-users-tab-group">
-                    <div onClick={() => setCurrentTab(1)} className={currentTab === 1 ? 'all-users-selected-tab all-users-tab' : 'all-users-tab'}>
-                        <div className="all-users-slate-wrapper">
-                            <div className="all-users-tab-contents">
+                <div  className="all-users-tab-group">
+                    <div  onClick={() => setCurrentTab(1)} className={currentTab === 1 ? 'all-users-selected-tab all-users-tab' : 'all-users-tab'}>
+                        <div  className="all-users-slate-wrapper">
+                            <div id="individuals-title" className="all-users-tab-contents">
                                 <p className="all-users-tab-text">Individuals ({userDataArray.length})</p>
                             </div>
                         </div>
                     </div>
-                    <div onClick={() => setCurrentTab(2)} className={currentTab === 2 ? 'all-users-selected-tab all-users-tab' : 'all-users-tab'}>
+                    <div onClick={() => setCurrentTab(2)} className={currentTab === 2 ? 'all-users-selected-tab all-users-tab' : 'all-users-tab'} id="all-users-tab-2">
                         <div className="all-users-slate-wrapper">
-                            <div className="all-users-tab-contents">
+                            <div id="organizations-title" className="all-users-tab-contents">
                                 <p className="all-users-tab-text">Organizations ({orgDataArray.length})</p>
                             </div>
                         </div>
@@ -330,43 +296,6 @@ export default function Users() {
                         rowsPerPageOptions: [5, 10],
                     }}
                 />}
-
-
-
-                {/* <div id="usersTable">
-                    <p className='all-users-header'>Pending approval</p>
-                    <table className="table">
-                    <thead>
-                        <tr id="table-header">
-                            <th>Name</th>
-                            <th>Organization</th>
-                            <th>Email</th>
-                            <th>Date requested</th>
-                        </tr>
-                    </thead>
-                    <tbody id="samples-data">
-                        {
-                            Object.keys(users).map((key, i) => {
-                                return (
-                                    <tr key={i} id={key}>
-                                        <td>{users[key].name as unknown as string}</td>
-                                        <td>{users[key].org as unknown as string}</td>
-                                        <td>{users[key].email as unknown as string}</td>
-                                        <td>{users[key].date_added as unknown as string}</td>
-                                        <td>
-                                                {!isSiteAdmin(key) && <button onClick={handleRemoveClick} type="button" className="btn btn-sm btn-outline-danger">Remove</button>}
-                                                {showMakeOrgAdminButton(key) && <button onClick={handleMakeOrgAdminClick} type="button" className="btn btn-sm btn-primary">Make org admin</button>}
-                                                {showMakeSiteAdminButton(key) ? <button onClick={handleMakeSiteAdminClick} type="button" className="btn btn-sm btn-primary">Make site admin</button>
-                                                : isSiteAdmin(key) ? <span>User is site admin</span> : <span>User is org admin</span>}
-                                                </td>
-
-                                    </tr>
-                                )
-                            })
-                        }
-                    </tbody>
-                </table>
-                </div> */}
 
             </div>
         </div>

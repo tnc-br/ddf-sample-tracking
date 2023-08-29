@@ -15,20 +15,12 @@ import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
 import { statesList } from '../states_list';
 import { municipalitiesList } from '../municipalities_list';
 import SampleDataInput from '../sample_data_input';
-import { initializeAppIfNecessary, getRanHex, confirmUserLoggedIn } from '../utils';
+import { initializeAppIfNecessary, getRanHex, confirmUserLoggedIn, type UserData, Sample } from '../utils';
 import { useSearchParams } from 'next/navigation'
 import { useTranslation } from 'react-i18next';
 import Link from 'next/link';
+import { setSample } from '../firebase_utils';
 
-
-
-
-type UserData = {
-    name: string,
-    org: string,
-    org_name: string,
-    role: string,
-}
 
 export default function AddSample() {
     const [user, setUser] = useState({});
@@ -43,6 +35,7 @@ export default function AddSample() {
     const [formData, setFormData] = useState({
         visibility: 'public',
         collected_by: 'supplier',
+        trusted: 'unknown',
     });
 
     const router = useRouter();
@@ -83,8 +76,8 @@ export default function AddSample() {
                     getDoc(userDocRef).then((docRef) => {
                         if (docRef.exists()) {
                             const docData = docRef.data();
-                            if (!docData.role) {
-                                router.push('/tasks');
+                            if (!docData.org) {
+                                router.push('/samples');
                             } else {
                                 setUserdata(docData as UserData);
                             }
@@ -106,7 +99,9 @@ export default function AddSample() {
         return true;
     }
 
-    function onCreateSampleClick(sampleId: string) {
+    function onCreateSampleClick(sampleId: string, formSampleData: Sample) {
+        console.log("form sample data: " + formSampleData);
+        if (!formSampleData) return;
         if (!sampleId) {
             console.log("Error: SampleId not provided when trying to create sample");
         }
@@ -119,7 +114,7 @@ export default function AddSample() {
         const date = new Date();
         const currentDateString = `${date.getMonth() + 1}-${date.getDate()}-${date.getFullYear()}`
         const sampleData = {
-            ...formData,
+            ...formSampleData,
             created_by: auth.currentUser!.uid,
             created_on: currentDateString,
             last_updated_by: userData.name,
@@ -127,29 +122,32 @@ export default function AddSample() {
             org_name: userData.org_name ? userData.org_name : '',
             created_by_name: userData.name,
             code_lab: sampleId,
-            oxygen: formData.oxygen ? formData.oxygen.map((value: string) => parseFloat(value)) : [],
-            nitrogen: formData.nitrogen ? formData.nitrogen.map((value: string) => parseFloat(value)) : [],
-            n_wood: formData.n_wood ? formData.n_wood.map((value: string) => parseFloat(value)) : [],
-            carbon: formData.carbon ? formData.carbon.map((value: string) => parseFloat(value)) : [],
-            c_wood: formData.c_wood ? formData.c_wood.map((value: string) => parseFloat(value)) : [],
-            c_cel: formData.c_cel ? formData.c_cel.map((value: string) => parseFloat(value)) : [],
-            d13C_cel: formData.d13C_cel ? formData.d13C_cel.map((value: string) => parseFloat(value)) : [],
-            lat: formData.lat ? parseFloat(formData.lat) : '',
-            lon: formData.lon ? parseFloat(formData.lon) : '',
+            d18O_wood: formSampleData.d18O_wood ? formSampleData.d18O_wood.map((value: string) => parseFloat(value)) : [],
+            d15N_wood: formSampleData.d15N_wood ? formSampleData.d15N_wood.map((value: string) => parseFloat(value)) : [],
+            n_wood: formSampleData.n_wood ? formSampleData.n_wood.map((value: string) => parseFloat(value)) : [],
+            d13C_wood: formSampleData.d13C_wood ? formSampleData.d13C_wood.map((value: string) => parseFloat(value)) : [],
+            c_wood: formSampleData.c_wood ? formSampleData.c_wood.map((value: string) => parseFloat(value)) : [],
+            c_cel: formSampleData.c_cel ? formSampleData.c_cel.map((value: string) => parseFloat(value)) : [],
+            d13C_cel: formSampleData.d13C_cel ? formSampleData.d13C_cel.map((value: string) => parseFloat(value)) : [],
+            lat: formSampleData.lat ? parseFloat(formSampleData.lat) : '',
+            lon: formSampleData.lon ? parseFloat(formSampleData.lon) : '',
         };
         // if (!formIsValid()) return;
-        const sampleTrustValue = formData.trusted;
-        if (!sampleTrustValue) return;
-        let docRef;
-        if (sampleTrustValue === "trusted") {
-            docRef = doc(db, "trusted_samples", sampleId);
-        } else if (sampleTrustValue === "untrusted") {
-            docRef = doc(db, "untrusted_samples", sampleId);
-        } else {
-            docRef = doc(db, "unknown_samples", sampleId);
-        }
-        setDoc(docRef, sampleData);
+        setSample(sampleData.trusted, sampleId, sampleData);
+        // const sampleTrustValue = formData.trusted;
+        // if (!sampleTrustValue) return;
+        // let docRef;
+        // if (sampleTrustValue === "trusted") {
+        //     docRef = doc(db, "trusted_samples", sampleId);
+        // } else if (sampleTrustValue === "untrusted") {
+        //     docRef = doc(db, "untrusted_samples", sampleId);
+        // } else {
+        //     docRef = doc(db, "unknown_samples", sampleId);
+        // }
+
+        // setDoc(docRef, sampleData);
         setSampleCreationFinished(true);
+        setFormData(sampleData);
 
     }
 
@@ -287,12 +285,11 @@ export default function AddSample() {
 
                     {userData && !sampleCreationFinished && <div id="sample-form">
                         <SampleDataInput baseState={formData}
-                            onStateUpdate={(state) => handleChange(state)}
-                            onActionButtonClick={(id: string) => onCreateSampleClick(id)}
+                            // onStateUpdate={(state) => handleChange(state)}
+                            onActionButtonClick={(id: string, formSampleData: Sample) => onCreateSampleClick(id, formSampleData)}
                             onTabChange={(tab) => handleTabChange(tab)}
                             actionButtonTitle="Create sample"
                             isNewSampleForm={true}
-                            userData={userData}
                             sampleId={sampleId}
                             isCompletedSample={formData.status === 'concluded' ? true : false} />
                     </div>}

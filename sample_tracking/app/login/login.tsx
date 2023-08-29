@@ -8,6 +8,7 @@ import Image from 'next/image'
 interface LogInProps {
     onSignUpClick: any,
     onForgotPasswordClick: any,
+    // router: any,
 }
 
 export default function Login(props: LogInProps) {
@@ -139,10 +140,10 @@ export default function Login(props: LogInProps) {
                         </div>
                     </div>
                 </div>
-                <p className="small"><div className="login-forgot-password-button" onClick={props.onForgotPasswordClick ? props.onForgotPasswordClick : console.log('Could not find method to handle forgo password')}>Forgot password</div></p>
+                <div className="login-forgot-password-button" onClick={props.onForgotPasswordClick ? props.onForgotPasswordClick : console.log('Could not find method to handle forgo password')}><p>Forgot password</p></div>
                 <div className="forgot-password-button-wrapper">
                     <div className="forgot-password-button">
-                        <div onClick={attemptSignIn} className='forgot-password-button-text'>
+                        <div onClick={attemptSignIn} className='forgot-password-button-text' id="signInButton">
                             Submit
                         </div>
                     </div>
@@ -154,7 +155,7 @@ export default function Login(props: LogInProps) {
 
                 </div>
                 <p className="login-or-label">Or</p>
-                <div onClick={signInWithGoogle} className="login-with-google-wrapper">
+                <div onClick={signInWithGoogle} className="login-with-google-wrapper" id="googleSignInButton">
                     <div className="login-google-icon-wrapper">
                         <Image src="/google-icon.svg" alt="google" width="22" height="22" />
                     </div>
