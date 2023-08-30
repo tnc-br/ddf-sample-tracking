@@ -10,7 +10,7 @@ import { getSamplesFromCollection, getUserData } from '../firebase_utils';
 import { useTranslation } from 'react-i18next';
 import '../i18n/config';
 
-export default async function Samples() {
+export default function Samples() {
 
     const [data, setData] = useState({});
     const [selectedSample, setSelectedSample] = useState('');
@@ -32,16 +32,12 @@ export default async function Samples() {
                 if (!user) {
                     router.push('/login');
                 } else {
-                    const userData = getUserData(user.uid);
-                    if (userData.org) {
+                    getUserData(user.uid).then((userData: UserData) => {
                         setUserData(userData);
-                    } else {
-                        const newUserData = getNewUserData(user.uid);
-                        if (newUserData.org && newUserData.org.length < 1) {
-                            router.push('./select-org');
-                        }
-
-                    }
+                    })
+                }
+                if (!user) {
+                    router.push('/login');
                 }
             })
         }
@@ -121,8 +117,6 @@ export default async function Samples() {
         return userData.role === 'admin' || userData.role === 'site_admin';
     }
 
-    console.log("got here again: " + allSamples.completed)
-
     return (
         <div className='samples-page-wrapper'>
             <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@48,400,0,0" />
@@ -158,6 +152,3 @@ export default async function Samples() {
         </div>
     )
 }
-
-
-

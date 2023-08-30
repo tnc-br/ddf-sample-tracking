@@ -137,6 +137,7 @@
     border-radius: 10px;
     background-color: lightblue;
     padding: 5px;
+    z-index: 100;
 }
 
 .profile-menu>div:hover {

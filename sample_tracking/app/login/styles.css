@@ -313,3 +313,8 @@ svg {
     left: -15px;
     width: 253px;
 }
+
+.login-input-wrapper {
+    margin-top: 30px;
+    margin-bottom: 30px;
+}

@@ -2,6 +2,7 @@ import './styles.css';
 import { getAuth, sendPasswordResetEmail } from "firebase/auth";
 import { useState } from "react";
 import Image from 'next/image'
+import { TextField } from '@mui/material';
 
 interface ForgotPasswordProps {
     returnToSignInClick: any
@@ -46,26 +47,19 @@ export default function ForgotPassword(props: ForgotPasswordProps) {
                     <p className="forgot-password-header"><span onClick={handleReturnClick} className="material-symbols-outlined back-arrow">
                         arrow_back
                     </span>Forgot password</p>
-                    <div className="forgot-password-entry-wrapper">
-                        <div className="forgot-password-entry">
-                            <div className="forgot-password-slate-entry">
-                                <div className="forgot-password-content-wrapper">
-                                    <div className="forgot-password-input-text">
-                                        <form id="email-form">
-                                            <input required className="forgot-password-text form-control" name='email' type="text" id="email" />
-                                        </form>
-                                    </div>
-                                    <div className="forgot-passowrd-label-text-wrapper">
-                                        <div className="forgot-password-label-text">
-                                            Email address
-                                        </div>
-
-                                    </div>
-
-                                </div>
-                            </div>
+                    <form id="email-form">
+                        <div className="login-input-wrapper">
+                            <TextField
+                                size='small'
+                                fullWidth
+                                required
+                                id="email"
+                                name="email"
+                                label="Email address"
+                            />
                         </div>
-                    </div>
+
+                    </form>
                     <div className="forgot-password-button-wrapper">
                         <div className="forgot-password-button">
                             <div onClick={handleSubmitButtonClick} className='forgot-password-button-text'>

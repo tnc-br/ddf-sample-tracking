@@ -48,7 +48,7 @@ export default function SignUpRequests() {
                         if (docRef.exists()) {
                             const docData = docRef.data();
                             if (docData.role !== 'admin' && docData.role !== 'site_admin') {
-                                router.push('/tasks');
+                                router.push('/samples');
                             }
                             setUserData(docRef.data() as UserData);
                         }
@@ -84,10 +84,12 @@ export default function SignUpRequests() {
                             pendingOrgs[orgName] = docData[orgName];
                         })
                     } else {
-                        // orgId = doc.id;
-                        const data = doc.data();
-                        pendingUsers[doc.id] = data;
-
+                        // If the prospective members have not selected the org they wish to join yet, 
+                        // they can't be approved and shouldn't be shown on the pending users list. 
+                        if (docData.org) {
+                            const data = doc.data();
+                            pendingUsers[doc.id] = data;
+                        }
                     }
                 });
                 if (Object.keys(pendingOrgs).length > 0 && Object.keys(prospectiveOrgs).length < 1) {

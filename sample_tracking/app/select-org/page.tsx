@@ -45,7 +45,7 @@ export default function SelectOrg() {
                     console.log(user);
                     const userDocRef = doc(db, "users", user.uid);
                     getDoc(userDocRef).then((docRef) => {
-                        if (docRef.exists()) {
+                        if (docRef.exists() && docRef.data().org.length > 0) {
                             // User exists in users collection already, they should not be here to select a new organization.
                             console.log("Error: user already exists. Forwarding to samples page");
                             router.push('/samples');
@@ -88,7 +88,7 @@ export default function SelectOrg() {
         const newUserDocRef = doc(db, "new_users", userDocId);
         updateDoc(newUserDocRef, {
             org: orgId,
-            orgName: orgName,
+            org_name: orgName,
         });
 
         router.push('/samples');

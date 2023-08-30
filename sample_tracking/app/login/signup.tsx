@@ -4,6 +4,7 @@ import { useRouter } from 'next/navigation'
 import { getAuth, createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
 import { doc, getDocs, collection, getFirestore, updateDoc, addDoc, setDoc } from "firebase/firestore";
 import InputField from '../input-field';
+import { TextField, Autocomplete, MenuItem, InputAdornment } from '@mui/material';
 
 
 interface SignUpProps {
@@ -68,6 +69,7 @@ export default function SignUp(props: SignUpProps) {
                 const docData = doc.data();
                 orgs[docData['org_name']] = doc.id;
             });
+            orgs["Create new organization"] = "NEW";
             setAvailableOrgs(orgs as OrgsSchemas);
         });
     }
@@ -110,7 +112,7 @@ export default function SignUp(props: SignUpProps) {
             return;
         }
 
-        const newOrgName = formData.newOrgName ? formData.newOrgName : '';
+        const newOrgName = formData.newOrgName ? formData.newOrgName : null;
         const orgName = formData.orgName;
         const name = `${formData.firstName} ${formData.lastName}`;
         const labValue = orgName ? availableOrgs[orgName] : '';
@@ -164,7 +166,7 @@ export default function SignUp(props: SignUpProps) {
 
     function handleChange(evt: any) {
         let value = evt.target.value;
-        value === "Create new organization" ? "NEW" : value;
+        value = value === "Create new organization" ? "NEW" : value;
         // if (evt.target.name) === 'orgName' {
         //     value = value === 'Create new organization' ? "NEW" : availableOrgs[labName];
         // }
@@ -186,40 +188,53 @@ export default function SignUp(props: SignUpProps) {
 
     }
 
-
     function yourDetailsTab() {
         return (
             <form id="details-tab">
                 <p className="forgot-password-header">Sign up</p>
-                <InputField labelName="First name" inputID="firstName" fieldValue={formData.firstName} handleChange={(evt: any) => handleChange(evt)} />
-                <InputField labelName="Last name" inputID="lastName" fieldValue={formData.lastName} handleChange={(evt: any) => handleChange(evt)} />
-                <div className="forgot-password-entry-wrapper">
-                    <div className="forgot-password-entry">
-                        <div className="forgot-password-slate-entry">
-                            <div className="forgot-password-content-wrapper">
-                                <div className="forgot-password-input-text">
-                                    <div className='org-input'>
-                                        <select required onChange={handleChange} className="form-control" name="orgName" id="orgName">
-                                            <option key="newOrgOption" id="newOrgOption">Create new organization</option>
-                                            {
-                                                Object.keys(availableOrgs).map((key, i) => {
-                                                    return (
-                                                        <option key={key} id={key}>{key}</option>
-                                                    )
-                                                })
-                                            }
-                                        </select>
-                                    </div>
-                                </div>
-                                <div className="forgot-passowrd-label-text-wrapper">
-                                    <div className="forgot-password-label-text">
-                                        Organization
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                <div className="login-input-wrapper">
+                    <TextField
+                        size='small'
+                        fullWidth
+                        required
+                        id="firstName"
+                        name="firstName"
+                        label="First name"
+                        value={formData.firstName}
+                        onChange={(evt: any) => handleChange(evt)}
+                    />
                 </div>
+                <div className="login-input-wrapper">
+                    <TextField
+                        size='small'
+                        fullWidth
+                        required
+                        id="lastName"
+                        name="lastName"
+                        label="Last name"
+                        value={formData.lastName}
+                        onChange={(evt: any) => handleChange(evt)}
+                    />
+                </div>
+                <div className='input-text-field-wrapper'>
+                        <TextField
+                            id="orgName"
+                            size='small'
+                            fullWidth
+                            select
+                            required
+                            name="orgName"
+                            label="Organization"
+                            onChange={(evt: any) => handleChange(evt)}
+                            // value={formData.trusted ? formData.trusted : "unknown"}
+                        >
+                            {Object.keys(availableOrgs).map((orgValue: string) => (
+                                <MenuItem key={orgValue} value={orgValue}>
+                                    {orgValue}
+                                </MenuItem>
+                            ))}
+                        </TextField>
+                    </div>
                 <div onClick={handleNextClick} className="forgot-password-button-wrapper">
                     <div className="forgot-password-button">
                         <div className='forgot-password-button-text'>
@@ -228,34 +243,6 @@ export default function SignUp(props: SignUpProps) {
                     </div>
                 </div>
             </form>
-
-
-
-
-            //   <form id="your-details-tab" className='your-details-tab'>
-            //     <div className="form-outline mb-4">
-            //       <input required type="text" name="name" placeholder='First name' id="firstName" className="form-control form-control-lg" />
-            //     </div>
-
-            //     <div className="form-outline mb-4">
-            //       <input required type="text" name="name" placeholder='Last name' id="lastName" className="form-control form-control-lg" />
-            //     </div>
-
-            //     <div className="form-group">
-            //       <label htmlFor="labSelect">Organization</label>
-            //       <select required className="form-control" id="labSelect">
-            //         <option key="newOrgOption" id="newOrgOption">Create new organization</option>
-            //         {
-            //           Object.keys(availableOrgs).map((key, i) => {
-            //             return (
-            //               <option key={key} id={key}>{key}</option>
-            //             )
-            //           })
-            //         }
-            //       </select>
-            //     </div>
-            //     <button type="button" onClick={finishYourDetailsTab} className="btn btn-primary">Next</button>
-            //   </form>
         )
     }
 
@@ -266,10 +253,60 @@ export default function SignUp(props: SignUpProps) {
                     <span onClick={() => setSignUpTab(0)} className="material-symbols-outlined back-arrow">
                         arrow_back
                     </span>Sign up</p>
-                {formData['orgName'] === "NEW" && <InputField labelName="New org name" inputID="newOrgName" fieldValue={formData.newOrgName} handleChange={(evt: any) => handleChange(evt)} />}
-                <InputField labelName="Email" inputID="email" fieldValue={formData.email} handleChange={(evt: any) => handleChange(evt)} />
-                <InputField labelName="Password" inputID="password" fieldValue={formData.password} handleChange={(evt: any) => handleChange(evt)} />
-                <InputField labelName="Re-enter password" inputID="confirmPassword" fieldValue={formData.confirmPassword} handleChange={(evt: any) => handleChange(evt)}  />
+                {formData['orgName'] === "NEW" && 
+                <div className="login-input-wrapper">
+                <TextField
+                    size='small'
+                    fullWidth
+                    required
+                    id="newOrgName"
+                    name="newOrgName"
+                    label="New org name"
+                    value={formData.newOrgName}
+                    onChange={(evt: any) => handleChange(evt)}
+                />
+            </div>
+                // <InputField labelName="New org name" inputID="newOrgName" fieldValue={formData.newOrgName} handleChange={(evt: any) => handleChange(evt)} />
+                }
+                <div className="login-input-wrapper">
+                    <TextField
+                        size='small'
+                        fullWidth
+                        required
+                        id="email"
+                        name="email"
+                        label="Email"
+                        value={formData.email}
+                        onChange={(evt: any) => handleChange(evt)}
+                    />
+                </div>
+                <div className="login-input-wrapper">
+                    <TextField
+                        size='small'
+                        fullWidth
+                        required
+                        type="password"
+                        id="password"
+                        name="password"
+                        label="Password"
+                        onChange={(evt: any) => handleChange(evt)}
+                    />
+                </div>
+                <div className="login-input-wrapper">
+                    <TextField
+                        size='small'
+                        fullWidth
+                        required
+                        type="password"
+                        id="confirmPassword"
+                        name="confirmPassword"
+                        label="Confirm password"
+                        onChange={(evt: any) => handleChange(evt)}
+                    />
+                </div>
+                {/* <InputField labelName="Email" inputID="email" fieldValue={formData.email} handleChange={(evt: any) => handleChange(evt)} /> */}
+                {/* <InputField labelName="Password" inputID="password" fieldValue={formData.password} handleChange={(evt: any) => handleChange(evt)} /> */}
+                {/* <InputField labelName="Re-enter password" inputID="confirmPassword" fieldValue={formData.confirmPassword} handleChange={(evt: any) => handleChange(evt)}  /> */}
                 <div onClick={handleSignUpButtonClicked} className="forgot-password-button-wrapper">
                     <div className="forgot-password-button">
                         <div className='forgot-password-button-text'>
