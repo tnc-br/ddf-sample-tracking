@@ -49,31 +49,18 @@ export default function SelectOrg() {
                             // User exists in users collection already, they should not be here to select a new organization.
                             console.log("Error: user already exists. Forwarding to samples page");
                             router.push('/samples');
-                        }
+                        } 
                     });
-                    const newUsersCollectionRef = collection(db, "new_users");
-                    const newUserQuery = query(newUsersCollectionRef,
-                        where("email", "==", user.email)
-                    );
-
-                    getDocs(newUserQuery).then((querySnapshot) => {
-                        if (querySnapshot.size > 1) {
-                            console.log("Error: Found more than one new user with this email.");
-                            return;
-                        }
-                        querySnapshot.forEach((docRef) => {
+                    getDoc(doc(db, "new_users", user.uid)).then((docRef) => {
+                        if (docRef.exists()) {
                             const data = docRef.data();
-                            // if (data.exists()) {
                             if (data.org) {
                                 console.log("Error: this new user already has a pending org request. Forwarding to samples.");
                                 router.push('/samples');
                             }
                             setNewUserDocId(docRef.id);
-                            // }
-                        });
 
-                    }).catch((error) => {
-                        console.log("Unable to fetch new user in new_users collection: " + error);
+                        }
                     });
                 }
             });
@@ -94,15 +81,16 @@ export default function SelectOrg() {
         });
     }
 
-    function handleOrgSelectButtonClick(evt: any) {
+    async function handleOrgSelectButtonClick(evt: any) {
         console.log(evt);
         const orgName = (document.getElementById('orgSelect') as HTMLInputElement).value;
         const orgId = availableOrgs[orgName];
-        const newUserDocRef = doc(db, "new_users", userDocId)
+        const newUserDocRef = doc(db, "new_users", userDocId);
         updateDoc(newUserDocRef, {
             org: orgId,
             orgName: orgName,
         });
+
         router.push('/samples');
     }
 

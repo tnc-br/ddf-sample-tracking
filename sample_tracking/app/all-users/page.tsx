@@ -54,7 +54,7 @@ export default function Users() {
                     const userDocRef = doc(db, "users", user.uid);
                     getDoc(userDocRef).then((docRef) => {
                         if (docRef.exists()) {
-                            
+
                             const docData = docRef.data();
                             if (docData.role !== 'admin' && docData.role !== 'site_admin') {
                                 router.push('/tasks');
@@ -187,17 +187,30 @@ export default function Users() {
         const removedMemberId = userData.user_id;
         const confirmString = `Are you sure you want to remove ${userData.name}?`
         if (!confirm(confirmString)) return;
-        updateDoc(doc(db, "users", removedMemberId), {
-            org: "",
-            org_name: "",
-            role: "",
+        deleteDoc(doc(db, "users", removedMemberId));
+        setDoc(doc(db, "new_users", removedMemberId), {
+            email: userData.email,
+            name: userData.name,
+            uid: removedMemberId,
         });
         if (userData.email) {
             updateDoc(doc(db, "organizations", userData.org), {
                 members: arrayRemove(userData.email)
             })
         }
-        
+        let index;
+        userDataArray.forEach((userDataObject: UserData, userDataIndex: number) => {
+            if (userDataObject.user_id === userData.user_id) {
+                index = userDataIndex;
+            }
+        });
+        if (index) {
+            const newUserDataArray = structuredClone(userDataArray);
+            delete newUserDataArray[index];
+            setUserDataArray(newUserDataArray);
+        }
+
+
         // delete users[removedMemberId];
     }
 
@@ -216,7 +229,7 @@ export default function Users() {
     }
 
     function handleMakeSiteAdminClick(userData: UserData) {
-        const newSiteAdminId =userData.user_id;
+        const newSiteAdminId = userData.user_id;
         const confirmString = `Are you sure you want to make ${userData.name} a site admin?`
         if (!confirm(confirmString)) return;
         const userDocRef = doc(db, "users", newSiteAdminId);
@@ -232,9 +245,9 @@ export default function Users() {
             <h3 className='all-users-title'>{userData.role === 'admin' ? "My organization" : "All users"}</h3>
 
             {userData.role === "site_admin" && <div className="all-users-tab-wrapper">
-                <div  className="all-users-tab-group">
-                    <div  onClick={() => setCurrentTab(1)} className={currentTab === 1 ? 'all-users-selected-tab all-users-tab' : 'all-users-tab'}>
-                        <div  className="all-users-slate-wrapper">
+                <div className="all-users-tab-group">
+                    <div onClick={() => setCurrentTab(1)} className={currentTab === 1 ? 'all-users-selected-tab all-users-tab' : 'all-users-tab'}>
+                        <div className="all-users-slate-wrapper">
                             <div id="individuals-title" className="all-users-tab-contents">
                                 <p className="all-users-tab-text">Individuals ({userDataArray.length})</p>
                             </div>
@@ -262,7 +275,7 @@ export default function Users() {
                     }}
                     renderRowActionMenuItems={({ row, closeMenu }) => [
                         <MenuItem
-                            disabled={userData.role !== "site_admin" || row.original.role === "site_admin"}
+                            disabled={userData.role !== "site_admin" || (row.original && row.original.role === "site_admin")}
                             key={0}
                             onClick={() => {
                                 handleMakeSiteAdminClick(row.original);
@@ -273,7 +286,7 @@ export default function Users() {
                             Make site admin
                         </MenuItem>,
                         <MenuItem
-                            disabled={row.original.role === "site_admin" || row.original.role === "admin"}
+                            disabled={(row.original && row.original.role === "site_admin") || (row.original && row.original.role === "admin")}
                             key={1}
                             onClick={() => {
                                 handleMakeOrgAdminClick(row.original);
@@ -284,7 +297,7 @@ export default function Users() {
                             Make org admin
                         </MenuItem>,
                         <MenuItem
-                            disabled={row.original.role === "site_admin"}
+                            disabled={(row.original && row.original.role === "site_admin")}
                             key={2}
                             onClick={() => {
                                 handleRemoveClick(row.original);
