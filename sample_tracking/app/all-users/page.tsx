@@ -57,7 +57,7 @@ export default function Users() {
                             
                             const docData = docRef.data();
                             if (docData.role !== 'admin' && docData.role !== 'site_admin') {
-                                router.push('/tasks');
+                                router.push('/samples');
                             }
                             setUserData(docRef.data() as UserData);
                         }
@@ -188,6 +188,17 @@ export default function Users() {
         const confirmString = `Are you sure you want to remove ${userData.name}?`
         if (!confirm(confirmString)) return;
         deleteDoc(doc(db, "users", removedMemberId));
+        setDoc(doc(db, "new_users", removedMemberId), {
+            email: userData.email,
+            uid: userData.user_id,
+            name: userData.name
+        })
+        if (userData.email) {
+            updateDoc(doc(db, "organizations", userData.org), {
+                members: arrayRemove(userData.email)
+            })
+        }
+        
         // delete users[removedMemberId];
     }
 

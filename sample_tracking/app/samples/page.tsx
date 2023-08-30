@@ -117,8 +117,6 @@ export default function Samples() {
         return userData.role === 'admin' || userData.role === 'site_admin';
     }
 
-    console.log("got here again: " + allSamples.completed)
-
     return (
         <div className='samples-page-wrapper'>
             <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@48,400,0,0" />
@@ -154,6 +152,3 @@ export default function Samples() {
         </div>
     )
 }
-
-
-
