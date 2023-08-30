@@ -9,7 +9,7 @@ import { useRouter } from 'next/navigation'
 // import Nav from '../nav';
 import { MaterialReactTable, type MRT_ColumnDef, type MRT_Row, type MRT_TableInstance, type MRT_SortingState, type MRT_PaginationState } from 'material-react-table';
 import { initializeAppIfNecessary, type Sample } from './utils';
-import { Box, Button, ListItemIcon, MenuItem, Typography, IconButton,  Tooltip,  } from '@mui/material';
+import { Box, Button, ListItemIcon, MenuItem, Typography, IconButton, Tooltip, } from '@mui/material';
 import { Delete, Edit } from '@mui/icons-material';
 
 import { firebaseConfig } from './firebase_config';
@@ -18,6 +18,7 @@ import { useReactTable } from '@tanstack/react-table'
 import { ExportToCsv } from 'export-to-csv';
 import { useTranslation } from 'react-i18next';
 import './i18n/config';
+import { ConfirmationBox, ConfirmationProps } from './confirmation_box';
 
 interface SampleDataProps {
     samplesData: any,
@@ -38,6 +39,8 @@ export default function SamplesTable(props: SampleDataProps) {
         samples: props.samplesData as Sample[],
         hasBeenUpdated: false,
     });
+    const [showConfirmationBox, setShowConfirmationBox] = useState(false);
+    const [confirmationBoxData, setConfirmationBoxData] = useState({} as ConfirmationProps)
     // const [hasDeletedSample, setHasDeletedSample] = useState(false);
 
     const router = useRouter();
@@ -160,19 +163,46 @@ export default function SamplesTable(props: SampleDataProps) {
 
     const onDeleteSampleClick = useCallback(
         (row: MRT_Row<Sample>) => {
-            if (!confirm(`Are you sure you want to delete ${row.code_lab}`)) {
-                return;
+            const deleteSampleFunction = () => {
+                let collectionName = `${row.trusted}_samples`;
+                const deletedDocRef = doc(db, collectionName, row.code_lab);
+                deleteDoc(deletedDocRef);
+                //send api delete request here, then refetch or update local table data for re-render
+                const updatedSamples = sampleData.samples.slice();
+                let index;
+                updatedSamples.forEach((sample: Sample, sampleIndex: number) => {
+                    if (sample.code_lab === row.code_lab) {
+                        index = sampleIndex;
+                        return;
+                    }
+                });
+                if (index) {
+                    updatedSamples.splice(index, 1);
+                    setSampleData({
+                        samples: updatedSamples,
+                        hasBeenUpdated: true,
+                    });
+                }
+
+                setConfirmationBoxData({} as ConfirmationProps);
             }
-            let collectionName = `${row.trusted}_samples`;
-            const deletedDocRef = doc(db, collectionName, row.code_lab);
-            deleteDoc(deletedDocRef);
-            //send api delete request here, then refetch or update local table data for re-render
-            const updatedSamples = sampleData.samples.slice();
-            updatedSamples.splice(row.index, 1);
-            setSampleData({
-                samples: updatedSamples,
-                hasBeenUpdated: true,
-            });
+            const cancelDeleteFunction = () => {
+                setConfirmationBoxData({} as ConfirmationProps);
+            }
+            const title = `Are you sure you want to delete ${row.code_lab}`;
+            const actionButtonTitle = "Delete";
+            setConfirmationBoxData({
+                title: title,
+                actionButtonTitle: actionButtonTitle,
+                onActionButtonClick: deleteSampleFunction,
+                onCancelButtonClick: cancelDeleteFunction,
+            })
+
+            // if (!confirm(`Are you sure you want to delete ${row.code_lab}`)) {
+            //     return;
+            // }
+
+
         },
         [sampleData],
     );
@@ -235,7 +265,7 @@ export default function SamplesTable(props: SampleDataProps) {
                     //     >
                     //         Delete
                     //     </MenuItem>,
-                        
+
                     // ]}
 
 
@@ -260,6 +290,7 @@ export default function SamplesTable(props: SampleDataProps) {
                     )}
                 />
             </div>
+            {Object.keys(confirmationBoxData).length > 0 && <ConfirmationBox {...confirmationBoxData} />}
         </div>
     )
 }
