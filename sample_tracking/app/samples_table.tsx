@@ -40,7 +40,7 @@ export default function SamplesTable(props: SampleDataProps) {
         hasBeenUpdated: false,
     });
     const [showConfirmationBox, setShowConfirmationBox] = useState(false);
-    const [confirmationBoxData, setConfirmationBoxData] = useState({} as ConfirmationProps)
+    const [confirmationBoxData, setConfirmationBoxData] = useState(null as ConfirmationProps|null)
     // const [hasDeletedSample, setHasDeletedSample] = useState(false);
 
     const router = useRouter();
@@ -184,10 +184,10 @@ export default function SamplesTable(props: SampleDataProps) {
                     });
                 }
 
-                setConfirmationBoxData({} as ConfirmationProps);
+                setConfirmationBoxData(null);
             }
             const cancelDeleteFunction = () => {
-                setConfirmationBoxData({} as ConfirmationProps);
+                setConfirmationBoxData(null);
             }
             const title = `Are you sure you want to delete ${row.code_lab}`;
             const actionButtonTitle = "Delete";
@@ -290,7 +290,7 @@ export default function SamplesTable(props: SampleDataProps) {
                     )}
                 />
             </div>
-            {Object.keys(confirmationBoxData).length > 0 && <ConfirmationBox {...confirmationBoxData} />}
+            {confirmationBoxData && <ConfirmationBox {...confirmationBoxData} />}
         </div>
     )
 }
