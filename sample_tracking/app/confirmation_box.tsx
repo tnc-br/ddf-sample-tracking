@@ -10,8 +10,8 @@ import DialogTitle from '@mui/material/DialogTitle';
 export type ConfirmationProps = {
     title: string,
     dialogueContent?: string,
-    actionButtonTitle: string,
-    onActionButtonClick: Function,
+    actionButtonTitle?: string,
+    onActionButtonClick?: Function,
     onCancelButtonClick: Function,
 }
 
@@ -36,12 +36,15 @@ export function ConfirmationBox(props: ConfirmationProps) {
             {props.dialogueContent ? props.dialogueContent : ""}
           </DialogContentText>
         </DialogContent>
-        <DialogActions>
+        {props.actionButtonTitle && <DialogActions>
           <Button onClick={() => props.onCancelButtonClick()}>Cancel</Button>
-          <Button onClick={() => props.onActionButtonClick()} autoFocus>
+          {props.onActionButtonClick && <Button onClick={() => props.onActionButtonClick!()} autoFocus>
             {props.actionButtonTitle}
-          </Button>
-        </DialogActions>
+          </Button>}
+        </DialogActions>}
+        {!props.actionButtonTitle && <DialogActions>
+          <Button onClick={() => props.onCancelButtonClick()}>Ok</Button>
+        </DialogActions>}
       </Dialog>
     </div>
   );
