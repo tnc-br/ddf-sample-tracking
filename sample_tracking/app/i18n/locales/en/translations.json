@@ -58,5 +58,8 @@
   "state": "State",
   "measuringHeight": "Measuring height",
   "meanAnnualTemperature": "Mean annual temperature",
-  "meanAnnualPrecipitation": "Mean annual precipitation"
+  "meanAnnualPrecipitation": "Mean annual precipitation",
+  "removeUserConfirmation": "Are you sure you want to remove {{ user }}",
+  "makeOrgAdminConfirmation": "Are you sure you want to make {{ user }} an org admin?",
+  "makeSiteAdminConfirmation": "Are you sure you want to make {{ user }} a site admin?"
 }
