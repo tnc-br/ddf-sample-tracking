@@ -52,9 +52,7 @@ export default function TopBar() {
                 setShowMenu(!showMenu)
                 return;
             }
-            if (popupContainer?.contains(event.target)) {
-                console.log("Clicked Inside");
-            } else {
+            if (!popupContainer?.contains(event.target)) {
                 setShowMenu(false)
             }
         });

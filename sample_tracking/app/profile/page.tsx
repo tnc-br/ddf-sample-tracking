@@ -10,10 +10,13 @@ import { getFirestore, getDoc, doc, deleteDoc } from "firebase/firestore";
 import { TextField, Autocomplete, MenuItem, InputAdornment } from '@mui/material';
 import { useTranslation } from 'react-i18next';
 
-interface OrgsSchemas {
-    [key: string]: string;
-}
-
+/**
+ * Page to display user account info and the option to delete an account. 
+ * - Fetches user data from the "users" collection to render on the page. 
+ * - If a user is not logged in they are forwarded to the login page.
+ * - If a user deletes their account, their account is deleted in firebase
+ *   auth and their document in the "users" collection is deleted.
+ */
 export default function Profile() {
     const [userData, setUserData] = useState(null as UserData | null)
 
@@ -35,12 +38,7 @@ export default function Profile() {
                     const userDocRef = doc(db, "users", user.uid);
                     getDoc(userDocRef).then((docRef) => {
                         if (docRef.exists()) {
-                            const docData = docRef.data();
-                            if (!docData.org) {
-                                router.push('/samples');
-                            } else {
-                                setUserData(docData as UserData);
-                            }
+                            setUserData(docRef.data() as UserData);
                         }
                     });
                 }
@@ -65,8 +63,6 @@ export default function Profile() {
         }
 
     }
-
-
 
     return (
         <div>

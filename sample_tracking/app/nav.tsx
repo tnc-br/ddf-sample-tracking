@@ -48,23 +48,12 @@ export default function Nav() {
                 setShowAddSampleMenu(!showAddSampleMenu)
                 return;
             }
-            if (popupContainer?.contains(event.target)) {
-                console.log("Clicked Inside");
-            } else {
+            if (!popupContainer?.contains(event.target)) {
                 setShowAddSampleMenu(false)
             }
         });
 
     })
-
-
-    function onLogOutClick() {
-        signOut(auth).then(() => {
-            router.replace('/login');
-        }).catch((error) => {
-            console.log('Unable to log out: ' + error);
-        });
-    }
 
     function canAddSample() {
         return role === 'admin' || role === 'member' || role === 'site_admin';
@@ -120,19 +109,6 @@ export default function Nav() {
                 </a>
 
             </div>
-            {/* <nav className="navbar navbar-expand-lg navbar-light bg-light">
-
-                <ul className="navbar-nav mr-auto">
-                    <li className="nav-item active">
-                        <a className="nav-link" href="/add-sample">Add samples <span className="sr-only">(current)</span></a>
-                    </li>
-                    <li className="nav-item">
-                        <a className="nav-link" href="/samples">Samples</a>
-                    </li>
-                </ul>
-                <button className="my-2 my-lg-0 btn btn-outline-primary my-2 my-sm-0" type="submit" onClick={onLogOutClick}>Log out</button>
-            </nav> */}
-
         </div>
 
     )

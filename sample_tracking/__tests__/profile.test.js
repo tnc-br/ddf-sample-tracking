@@ -132,6 +132,9 @@ jest.mock('react-i18next', () => ({
 
 describe('Profile', () => {
 
+    /**
+     * Checks to make sure user data is properly requested and represented on the page. 
+     */
     it('renders page correctly', async () => {
         act(() => {
             render(<Profile />)
@@ -144,10 +147,14 @@ describe('Profile', () => {
         expect(deleteButton).toBeTruthy();
     });
 
+    /**
+     * Checks to make sure that if a user clicks the delete account button, they are
+     * correctly deleted from firebase auth and their document in the "users" collection is deleted.
+     */
     it('deletes user correctly', async () => {
         const confirmMethod = jest.fn(() => true);
         global.confirm = confirmMethod;
-        
+
         act(() => {
             render(<Profile />)
         });
@@ -157,12 +164,12 @@ describe('Profile', () => {
         fireEvent(
             deleteButton,
             new MouseEvent('click', {
-              bubbles: true,
-              cancelable: true,
+                bubbles: true,
+                cancelable: true,
             }),
-          );
-          expect(confirmMethod).toHaveBeenCalledTimes(1);
-          expect(deleteUser).toHaveBeenCalledTimes(1);
-          await waitFor(() => expect(deleteDoc).toHaveBeenCalledTimes(1));
+        );
+        expect(confirmMethod).toHaveBeenCalledTimes(1);
+        expect(deleteUser).toHaveBeenCalledTimes(1);
+        await waitFor(() => expect(deleteDoc).toHaveBeenCalledTimes(1));
     });
 });
