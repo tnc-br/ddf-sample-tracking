@@ -8,25 +8,6 @@ import { act } from 'react-dom/test-utils';
 import { deleteUser } from "firebase/auth";
 
 
-const userDataDoc = {
-    data: jest.fn(() => {
-        return {
-            name: 'test name',
-            email: 'testname@gmail.com',
-            org: 'testorg'
-        }
-    })
-}
-
-const orgDataDoc = {
-    data: jest.fn(() => {
-        return {
-            name: 'Google org',
-            admin: 'test admin'
-        }
-    })
-}
-
 jest.mock('react-i18next');
 jest.mock('../app/firebase_utils');
 jest.mock('next/navigation', () => {
@@ -148,14 +129,6 @@ jest.mock('react-i18next', () => ({
     }
 }));
 
-const mockSamplesTableFn = jest.fn();
-
-jest.mock("material-react-table", () => ({
-    MaterialReactTable: (props) => {
-        mockSamplesTableFn(props);
-        return <mock-table data-testid="modal" />;
-    },
-}));
 
 describe('Profile', () => {
 
