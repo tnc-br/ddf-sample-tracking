@@ -15,9 +15,10 @@ export type ConfirmationProps = {
     onCancelButtonClick: Function,
 }
 
+/**
+ * Component to render screen confirmation boxes. 
+ */
 export function ConfirmationBox(props: ConfirmationProps) {
-//   const [open, setOpen] = React.useState(false);
-
 
   return (
     <div>

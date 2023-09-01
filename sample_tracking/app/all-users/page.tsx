@@ -28,11 +28,12 @@ type OrgData = {
     number_of_users: number,
 }
 
+/**
+ * Component for showing list of all users to be viewed by admins. 
+ * Site admins will be able to view all site users, and organization admins will only be able to view members in their org.
+ */
 export default function Users() {
-
-    // const [userDetails, setUserDetails] = useState({ role: '', org: '' });
     const [userData, setUserData] = useState({} as UserData);
-    // const [users, setUsers] = useState({} as NestedSchemas)
     const [currentTab, setCurrentTab] = useState(1);
 
     const [userDataArray, setUserDataArray] = useState([] as UserData[]);
@@ -221,7 +222,7 @@ export default function Users() {
             setConfirmationBoxData(null);
         }
         const title = t('removeUserConfirmation', {user: userData.name});
-        const actionButtonTitle = "Remove";
+        const actionButtonTitle = t('remove');
         setConfirmationBoxData({
             title: title,
             actionButtonTitle: actionButtonTitle,
@@ -251,7 +252,7 @@ export default function Users() {
             setConfirmationBoxData(null);
         }
         const title = t('makeOrgAdminConfirmation', {user: userData.name});
-        const actionButtonTitle = "Confirm";
+        const actionButtonTitle = t('confirm');
         setConfirmationBoxData({
             title: title,
             actionButtonTitle: actionButtonTitle,
@@ -277,7 +278,7 @@ export default function Users() {
         }
         const title = t('makeSiteAdminConfirmation', {user: userData.name});
         // const title = `Are you sure you want to make ${userData.name} a site admin?`;
-        const actionButtonTitle = "Confirm";
+        const actionButtonTitle = t('confirm');
         setConfirmationBoxData({
             title: title,
             actionButtonTitle: actionButtonTitle,

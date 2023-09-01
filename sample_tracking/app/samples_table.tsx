@@ -191,8 +191,8 @@ export default function SamplesTable(props: SampleDataProps) {
             const cancelDeleteFunction = () => {
                 setConfirmationBoxData(null);
             }
-            const title = `Are you sure you want to delete ${row.code_lab}`;
-            const actionButtonTitle = "Delete";
+            const title = t('confirmDeleteSample', {sample: row.code_lab});
+            const actionButtonTitle = t('delete');
             setConfirmationBoxData({
                 title: title,
                 actionButtonTitle: actionButtonTitle,
