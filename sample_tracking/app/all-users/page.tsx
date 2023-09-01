@@ -206,7 +206,8 @@ export default function Users() {
         const cancelDeleteFunction = () => {
             setConfirmationBoxData(null);
         }
-        const title = `Are you sure you want to remove ${userData.name}?`;
+        const title = t('removeUserConfirmation', {user: userData.name});
+        // const title = `Are you sure you want to remove ${userData.name}?`;
         const actionButtonTitle = "Remove";
         setConfirmationBoxData({
             title: title,

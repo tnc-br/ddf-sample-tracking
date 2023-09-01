@@ -55,5 +55,6 @@
     "email": "e-mail",
     "organization": "Organização",
     "meanAnnualTemperature": "Temperatura média anual",
-    "meanAnnualPrecipitation": "Precipitação média anual"
+    "meanAnnualPrecipitation": "Precipitação média anual",
+    "removeUserConfirmation": "Você tem certeza que deseja remover {{user}}"
   }
