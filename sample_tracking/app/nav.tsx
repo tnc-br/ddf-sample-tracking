@@ -41,17 +41,21 @@ export default function Nav() {
             });
         }
 
+        document.addEventListener("mousedown", (event) => {
+            const popupContainer = document.getElementById("add-sample-popup");
+            const addSampleButton = document.getElementById('add-sample-button');
+            if (addSampleButton?.contains(event.target)) {
+                setShowAddSampleMenu(!showAddSampleMenu)
+                return;
+            }
+            if (popupContainer?.contains(event.target)) {
+                console.log("Clicked Inside");
+            } else {
+                setShowAddSampleMenu(false)
+            }
+        });
+
     })
-
-
-    // onAuthStateChanged(auth, (user) => {
-    //     if (user) {
-    //         user.getIdTokenResult(true).then((token) => {
-    //             // setIsAdmin(token.claims.role === 'admin');
-    //             setRole(token.claims.role);
-    //         })
-    //     }
-    // });
 
 
     function onLogOutClick() {
@@ -74,13 +78,8 @@ export default function Nav() {
         <div id="nav-wrapper" className='nav-wrapper'>
             <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@48,400,0,0" />
             <ul className="nav flex-column">
-                {/* {canAddSample() && <li className="nav-item">
-                    <Link className="nav-link add-sample-button" href="./add-sample"><span className="material-symbols-outlined">
-                        add
-                    </span> {t('addSample')}</Link>
-                </li>} */}
                 {canAddSample() && <li className="nav-item">
-                    <div className="nav-link add-sample-button" onClick={() => setShowAddSampleMenu(!showAddSampleMenu)}><span className="material-symbols-outlined">
+                    <div id='add-sample-button' className="nav-link add-sample-button"><span className="material-symbols-outlined">
                         add
                     </span> {t('addSample')}</div>
                 </li>}
@@ -89,11 +88,6 @@ export default function Nav() {
                         <span className="material-symbols-outlined">cloud_upload</span>
                         {t('importSamples')}</Link>
                 </li>}
-                {/* {canAddSample() && <li className="nav-item">
-                    <Link className="nav-link" href="./my-samples"> <span className="material-symbols-outlined">
-                        labs
-                    </span>{t('mySamples')}</Link>
-                </li>} */}
                 <li className="nav-item">
                     <Link className="nav-link" href="./samples"> <span className="material-symbols-outlined">
                         lab_panel
@@ -112,18 +106,9 @@ export default function Nav() {
                     </li>}
 
                 </div>
-
-                {/* <li className="nav-item">
-                    <button className="nav-link" onClick={onLogOutClick}> <span className="material-symbols-outlined">
-                        logout
-                    </span> {t('logOut')}</button>
-                </li> */}
-
-                {showAddSampleMenu && <div className="add-sample-options-wrapper">
+                {showAddSampleMenu && <div id='add-sample-popup' className="add-sample-options-wrapper">
                     <Link className="nav-link" href="./add-sample?status=completed">Completed sample</Link>
                     <Link className="nav-link" href="./add-sample?status=incomplete">Incomplete sample</Link>
-                    {/* <div><Link href="./add-sample?status=complete" className='add-sample-option'>Completed sample</Link></div>
-                <div><Link href="./add-sample?status=incomplete" className='add-sample-option'>Uncompleted sample</Link></div> */}
                 </div>}
 
             </ul>

@@ -4,10 +4,11 @@ import './styles.css';
 import InputTopBar from "../input-top-bar"
 import { type UserData, hideNavBar, hideTopBar, initializeAppIfNecessary } from '../utils';
 import { useState, useEffect, useRef } from 'react';
-import { getAuth, onAuthStateChanged } from "firebase/auth";
+import { getAuth, onAuthStateChanged, deleteUser } from "firebase/auth";
 import { useRouter } from 'next/navigation'
-import { getFirestore, getDoc, doc } from "firebase/firestore";
+import { getFirestore, getDoc, doc, deleteDoc } from "firebase/firestore";
 import { TextField, Autocomplete, MenuItem, InputAdornment } from '@mui/material';
+import { useTranslation } from 'react-i18next';
 
 interface OrgsSchemas {
     [key: string]: string;
@@ -21,6 +22,7 @@ export default function Profile() {
     const app = initializeAppIfNecessary();
     const auth = getAuth();
     const db = getFirestore();
+    const { t } = useTranslation();
 
     useEffect(() => {
         hideNavBar();
@@ -48,15 +50,27 @@ export default function Profile() {
 
     if (!userData) return;
 
-    function handleSaveClick() {
-
+    function handleDeleteButton() {
+        const user = auth.currentUser;
+        if (!user) return;
+        if (confirm(t('deleteActConfirmation'))) {
+            deleteUser(user).then(async () => {
+                const deletedUserDoc = doc(db, 'users', userData!.user_id);
+                await deleteDoc(deletedUserDoc);
+                router.push('./login');
+            }).catch((error) => {
+                console.log("Error: unable to delete act: " + userData?.user_id);
+                console.log(error);
+            })
+        }
+        
     }
 
 
 
     return (
         <div>
-            <InputTopBar title="Edit personal information" />
+            <InputTopBar title="Profile" />
             <div className='profile-info-wrapper'>
                 <div className='profile-info-input-wrapper'>
                     <div className='profile-personal-information-wrapper'>
@@ -66,69 +80,52 @@ export default function Profile() {
 
                     </div>
                     <div className='profile-input-wrapper'>
-                        <TextField
-                            size='small'
-                            fullWidth
-                            required
-                            id="name"
-                            name="name"
-                            label="Name"
-                            value={userData.name}
-                        />
+                        <span className='profile-data-wrapper'>
+                            Name
+                        </span>
+                        <span className='profile-data-point-wrapper'>
+                            {userData.name}
+                        </span>
                     </div>
 
                     <div className='profile-input-wrapper'>
-                        <TextField
-                            size='small'
-                            fullWidth
-                            required
-                            id="email"
-                            name="email"
-                            label="Email"
-                            value={userData.email}
-                        />
+                        <span className='profile-data-wrapper'>
+                            Email
+                        </span>
+                        <span className='profile-data-point-wrapper'>
+                            {userData.email}
+                        </span>
                     </div>
                     <div className='profile-input-wrapper'>
-                        <TextField
-                            size='small'
-                            fullWidth
-                            required
-                            id="org"
-                            name="org"
-                            label="Org"
-                            value={userData.org_name}
-                        />
-                    </div>
-
-                    <div onClick={handleSaveClick} className='button-wrapper save-button-wrapper'>
-                        <div className='save-button-layer'>
-                            <div className='button-text save-button-text'>
-                                Save
-                            </div>
-                        </div>
+                        <span className='profile-data-wrapper'>
+                            Organization
+                        </span>
+                        <span className='profile-data-point-wrapper'>
+                            {userData.org_name}
+                        </span>
                     </div>
                 </div>
                 <div className='delete-section'>
-                <div className='profile-delete-wrapper'>
-                    <div className='profile-personal-information-text'>
-                        Delete
-                    </div>
-                </div>
-                <div className='profile-delete-subtitle'>
-                    <div className='profile-delete-subtitle-text'>
-                        Delete my account
-                    </div>
-                </div>
-                <div className='button-wrapper delete-button-wrapper'>
-                    <div className='save-button-layer'>
-                        <div className='button-text delete-button-text'>
+                    <div className='profile-delete-wrapper'>
+                        <div className='profile-personal-information-text'>
                             Delete
                         </div>
                     </div>
-                </div>
+                    <div className='profile-delete-subtitle'>
+                        <div className='profile-delete-subtitle-text'>
+                            Delete my account
+                        </div>
+                    </div>
+                    <div onClick={handleDeleteButton} className='button-wrapper delete-button-wrapper'>
+                        <div className='save-button-layer'>
+                            <div className='button-text delete-button-text'>
+                                Delete
+                            </div>
+                        </div>
+                    </div>
 
                 </div>
-                
+
             </div>
 
         </div>

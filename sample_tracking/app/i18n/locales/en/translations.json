@@ -59,5 +59,6 @@
   "measuringHeight": "Measuring height",
   "meanAnnualTemperature": "Mean annual temperature",
   "meanAnnualPrecipitation": "Mean annual precipitation",
-  "myOrganization": "My organization"
+  "myOrganization": "My organization",
+  "deleteActConfirmation": "Are you sure you want to delete your account?"
 }
