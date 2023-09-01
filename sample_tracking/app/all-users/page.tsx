@@ -16,6 +16,7 @@ import { MaterialReactTable, type MRT_ColumnDef, type MRT_Row, type MRT_TableIns
 import { useTranslation } from 'react-i18next';
 import '../i18n/config';
 import { Box, Button, ListItemIcon, MenuItem, Typography } from '@mui/material';
+import { ConfirmationBox, ConfirmationProps } from '../confirmation_box';
 
 interface NestedSchemas {
     [key: string]: NestedSchemas;
@@ -27,15 +28,17 @@ type OrgData = {
     number_of_users: number,
 }
 
+/**
+ * Component for showing list of all users to be viewed by admins. 
+ * Site admins will be able to view all site users, and organization admins will only be able to view members in their org.
+ */
 export default function Users() {
-
-    // const [userDetails, setUserDetails] = useState({ role: '', org: '' });
     const [userData, setUserData] = useState({} as UserData);
-    // const [users, setUsers] = useState({} as NestedSchemas)
     const [currentTab, setCurrentTab] = useState(1);
 
     const [userDataArray, setUserDataArray] = useState([] as UserData[]);
     const [orgDataArray, setOrgDataArray] = useState([] as OrgData[])
+    const [confirmationBoxData, setConfirmationBoxData] = useState(null as ConfirmationProps | null);
 
     const app = initializeApp(firebaseConfig);
     const auth = getAuth();
@@ -54,13 +57,15 @@ export default function Users() {
                     const userDocRef = doc(db, "users", user.uid);
                     getDoc(userDocRef).then((docRef) => {
                         if (docRef.exists()) {
-                            
+
                             const docData = docRef.data();
                             if (docData.role !== 'admin' && docData.role !== 'site_admin') {
                                 router.push('/samples');
                             }
                             setUserData(docRef.data() as UserData);
                         }
+                    }).catch((error) => {
+                        console.log(error)
                     });
                 }
             });
@@ -94,6 +99,8 @@ export default function Users() {
                     // setUsers(usersList);
                     setUserDataArray(usersListArray)
                 }
+            }).catch((error) => {
+                console.log(error);
             });
         } else if (userData.role === 'admin') {
             const q = query(collection(db, "users"), where("org", "==", userData.org));
@@ -109,7 +116,9 @@ export default function Users() {
                     // setUsers(usersList);
                     setUserDataArray(usersListArray);
                 }
-            })
+            }).catch((error) => {
+                console.log(error);
+            });
         }
     }
 
@@ -130,6 +139,8 @@ export default function Users() {
             if (orgList.length > 0) {
                 setOrgDataArray(orgList);
             }
+        }).catch((error) => {
+            console.log(error);
         });
     }
 
@@ -184,46 +195,96 @@ export default function Users() {
     );
 
     function handleRemoveClick(userData: UserData) {
-        const removedMemberId = userData.user_id;
-        const confirmString = `Are you sure you want to remove ${userData.name}?`
-        if (!confirm(confirmString)) return;
-        deleteDoc(doc(db, "users", removedMemberId));
-        setDoc(doc(db, "new_users", removedMemberId), {
-            email: userData.email,
-            uid: userData.user_id,
-            name: userData.name
-        })
-        if (userData.email) {
-            updateDoc(doc(db, "organizations", userData.org), {
-                members: arrayRemove(userData.email)
+
+        const removeUserFunction = () => {
+            const removedMemberId = userData.user_id;
+            deleteDoc(doc(db, "users", removedMemberId)).catch((error) => {
+                console.log(error);
+            });
+            setDoc(doc(db, "new_users", removedMemberId), {
+                email: userData.email,
+                uid: userData.user_id,
+                name: userData.name
+            }).catch((error) => {
+                console.log(error);
             })
+            if (userData.email) {
+                updateDoc(doc(db, "organizations", userData.org), {
+                    members: arrayRemove(userData.email)
+                }).catch((error) => {
+                    console.log(error);
+                })
+            }
+
+            setConfirmationBoxData(null);
         }
-        
+        const cancelDeleteFunction = () => {
+            setConfirmationBoxData(null);
+        }
+        const title = t('removeUserConfirmation', {user: userData.name});
+        const actionButtonTitle = t('remove');
+        setConfirmationBoxData({
+            title: title,
+            actionButtonTitle: actionButtonTitle,
+            onActionButtonClick: removeUserFunction,
+            onCancelButtonClick: cancelDeleteFunction,
+        })
+
         // delete users[removedMemberId];
     }
 
     function handleMakeOrgAdminClick(userData: UserData) {
-        const newOrgAdminId = userData.user_id;
         if (userData.role as unknown as string === 'site_admin') {
             // Cannot demote site_admin to org_admin
             return;
         }
-        const confirmString = `Are you sure you want to make ${userData.name} an org admin?`
-        if (!confirm(confirmString)) return;
-        const userDocRef = doc(db, "users", newOrgAdminId);
-        updateDoc(userDocRef, {
-            role: "admin",
-        });
+
+        const makeAdminFunction = () => {
+            const newOrgAdminId = userData.user_id;
+            const userDocRef = doc(db, "users", newOrgAdminId);
+            updateDoc(userDocRef, {
+                role: "admin",
+            });
+
+            setConfirmationBoxData(null);
+        }
+        const cancelFunction = () => {
+            setConfirmationBoxData(null);
+        }
+        const title = t('makeOrgAdminConfirmation', {user: userData.name});
+        const actionButtonTitle = t('confirm');
+        setConfirmationBoxData({
+            title: title,
+            actionButtonTitle: actionButtonTitle,
+            onActionButtonClick: makeAdminFunction,
+            onCancelButtonClick: cancelFunction,
+        })
     }
 
     function handleMakeSiteAdminClick(userData: UserData) {
-        const newSiteAdminId =userData.user_id;
-        const confirmString = `Are you sure you want to make ${userData.name} a site admin?`
-        if (!confirm(confirmString)) return;
-        const userDocRef = doc(db, "users", newSiteAdminId);
-        updateDoc(userDocRef, {
-            role: "site_admin",
-        });
+
+
+        const makeAdminFunction = () => {
+            const newSiteAdminId = userData.user_id;
+            const userDocRef = doc(db, "users", newSiteAdminId);
+            updateDoc(userDocRef, {
+                role: "site_admin",
+            });
+
+            setConfirmationBoxData(null);
+        }
+        const cancelFunction = () => {
+            setConfirmationBoxData(null);
+        }
+        const title = t('makeSiteAdminConfirmation', {user: userData.name});
+        // const title = `Are you sure you want to make ${userData.name} a site admin?`;
+        const actionButtonTitle = t('confirm');
+        setConfirmationBoxData({
+            title: title,
+            actionButtonTitle: actionButtonTitle,
+            onActionButtonClick: makeAdminFunction,
+            onCancelButtonClick: cancelFunction,
+        })
     }
 
     console.log("User array end: " + userDataArray.length);
@@ -233,9 +294,9 @@ export default function Users() {
             <h3 className='all-users-title'>{userData.role === 'admin' ? "My organization" : "All users"}</h3>
 
             {userData.role === "site_admin" && <div className="all-users-tab-wrapper">
-                <div  className="all-users-tab-group">
-                    <div  onClick={() => setCurrentTab(1)} className={currentTab === 1 ? 'all-users-selected-tab all-users-tab' : 'all-users-tab'}>
-                        <div  className="all-users-slate-wrapper">
+                <div className="all-users-tab-group">
+                    <div onClick={() => setCurrentTab(1)} className={currentTab === 1 ? 'all-users-selected-tab all-users-tab' : 'all-users-tab'}>
+                        <div className="all-users-slate-wrapper">
                             <div id="individuals-title" className="all-users-tab-contents">
                                 <p className="all-users-tab-text">Individuals ({userDataArray.length})</p>
                             </div>
@@ -310,5 +371,6 @@ export default function Users() {
 
             </div>
         </div>
+        {confirmationBoxData && <ConfirmationBox {...confirmationBoxData} />}
     </div>);
 }

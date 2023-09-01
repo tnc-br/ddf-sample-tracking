@@ -64,5 +64,8 @@
   "personalInformation": "Personal information",
   "delete": "Delete",
   "deleteMyAccount": "Delete my account",
-  "profile": "Profile"
+  "profile": "Profile",
+  "removeUserConfirmation": "Are you sure you want to remove {{ user }}",
+  "makeOrgAdminConfirmation": "Are you sure you want to make {{ user }} an org admin?",
+  "makeSiteAdminConfirmation": "Are you sure you want to make {{ user }} a site admin?"
 }
