@@ -63,34 +63,34 @@ export default function Profile() {
                 console.log(error);
             })
         }
-        
+
     }
 
 
 
     return (
         <div>
-            <InputTopBar title="Profile" />
+            <InputTopBar title={t('profile')} />
             <div className='profile-info-wrapper'>
                 <div className='profile-info-input-wrapper'>
                     <div className='profile-personal-information-wrapper'>
                         <div className='profile-personal-information-text'>
-                            Personal information
+                            {t('personalInformation')}
                         </div>
 
                     </div>
                     <div className='profile-input-wrapper'>
                         <span className='profile-data-wrapper'>
-                            Name
+                            {t('name')}
                         </span>
-                        <span className='profile-data-point-wrapper'>
+                        <span id="profile-name" className='profile-data-point-wrapper'>
                             {userData.name}
                         </span>
                     </div>
 
                     <div className='profile-input-wrapper'>
                         <span className='profile-data-wrapper'>
-                            Email
+                            {t('email')}
                         </span>
                         <span className='profile-data-point-wrapper'>
                             {userData.email}
@@ -98,7 +98,7 @@ export default function Profile() {
                     </div>
                     <div className='profile-input-wrapper'>
                         <span className='profile-data-wrapper'>
-                            Organization
+                            {t('organization')}
                         </span>
                         <span className='profile-data-point-wrapper'>
                             {userData.org_name}
@@ -108,18 +108,18 @@ export default function Profile() {
                 <div className='delete-section'>
                     <div className='profile-delete-wrapper'>
                         <div className='profile-personal-information-text'>
-                            Delete
+                            {t('delete')}
                         </div>
                     </div>
                     <div className='profile-delete-subtitle'>
                         <div className='profile-delete-subtitle-text'>
-                            Delete my account
+                            {t('deleteMyAccount')}
                         </div>
                     </div>
-                    <div onClick={handleDeleteButton} className='button-wrapper delete-button-wrapper'>
+                    <div id="delete-button" onClick={handleDeleteButton} className='button-wrapper delete-button-wrapper'>
                         <div className='save-button-layer'>
                             <div className='button-text delete-button-text'>
-                                Delete
+                                {t('delete')}
                             </div>
                         </div>
                     </div>

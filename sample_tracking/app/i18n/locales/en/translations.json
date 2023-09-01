@@ -60,5 +60,9 @@
   "meanAnnualTemperature": "Mean annual temperature",
   "meanAnnualPrecipitation": "Mean annual precipitation",
   "myOrganization": "My organization",
-  "deleteActConfirmation": "Are you sure you want to delete your account?"
+  "deleteActConfirmation": "Are you sure you want to delete your account?",
+  "personalInformation": "Personal information",
+  "delete": "Delete",
+  "deleteMyAccount": "Delete my account",
+  "profile": "Profile"
 }
