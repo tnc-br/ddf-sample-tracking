@@ -57,8 +57,6 @@ export default function TopBar() {
             } else {
                 setShowMenu(false)
             }
-
-
         });
 
     })
