@@ -182,6 +182,8 @@ export default function SamplesTable(props: SampleDataProps) {
                         samples: updatedSamples,
                         hasBeenUpdated: true,
                     });
+                } else {
+                    console.log(`Error: Unable to find index for ${row.code_lab} and could not remove row from table.`);
                 }
 
                 setConfirmationBoxData(null);
@@ -197,12 +199,6 @@ export default function SamplesTable(props: SampleDataProps) {
                 onActionButtonClick: deleteSampleFunction,
                 onCancelButtonClick: cancelDeleteFunction,
             })
-
-            // if (!confirm(`Are you sure you want to delete ${row.code_lab}`)) {
-            //     return;
-            // }
-
-
         },
         [sampleData],
     );
@@ -241,34 +237,6 @@ export default function SamplesTable(props: SampleDataProps) {
                     muiTablePaginationProps={{
                         rowsPerPageOptions: [5, 10],
                     }}
-
-                    // renderRowActionMenuItems={({ row, closeMenu }) => [
-                    //     <MenuItem
-                    //     disabled={!canDeleteSamples && row.original.org !== userOrg}
-                    //         key={0}
-                    //         onClick={() => {
-                    //             onEditSampleClick(row.original)
-                    //             closeMenu();
-                    //         }}
-                    //         sx={{ m: 0 }}
-                    //     >
-                    //         Edit
-                    //     </MenuItem>,
-                    //     <MenuItem
-                    //         disabled={!canDeleteSamples && row.original.org !== userOrg}
-                    //         key={1}
-                    //         onClick={() => {
-                    //             onDeleteSampleClick(row.original)
-                    //             closeMenu();
-                    //         }}
-                    //         sx={{ m: 0 }}
-                    //     >
-                    //         Delete
-                    //     </MenuItem>,
-
-                    // ]}
-
-
                     renderTopToolbarCustomActions={({ table }) => (
                         <div>
                             {props.allowExport && <div>

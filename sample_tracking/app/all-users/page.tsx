@@ -63,6 +63,8 @@ export default function Users() {
                             }
                             setUserData(docRef.data() as UserData);
                         }
+                    }).catch((error) => {
+                        console.log(error)
                     });
                 }
             });
@@ -96,6 +98,8 @@ export default function Users() {
                     // setUsers(usersList);
                     setUserDataArray(usersListArray)
                 }
+            }).catch((error) => {
+                console.log(error);
             });
         } else if (userData.role === 'admin') {
             const q = query(collection(db, "users"), where("org", "==", userData.org));
@@ -111,7 +115,9 @@ export default function Users() {
                     // setUsers(usersList);
                     setUserDataArray(usersListArray);
                 }
-            })
+            }).catch((error) => {
+                console.log(error);
+            });
         }
     }
 
@@ -132,6 +138,8 @@ export default function Users() {
             if (orgList.length > 0) {
                 setOrgDataArray(orgList);
             }
+        }).catch((error) => {
+            console.log(error);
         });
     }
 
@@ -189,15 +197,21 @@ export default function Users() {
 
         const removeUserFunction = () => {
             const removedMemberId = userData.user_id;
-            deleteDoc(doc(db, "users", removedMemberId));
+            deleteDoc(doc(db, "users", removedMemberId)).catch((error) => {
+                console.log(error);
+            });
             setDoc(doc(db, "new_users", removedMemberId), {
                 email: userData.email,
                 uid: userData.user_id,
                 name: userData.name
+            }).catch((error) => {
+                console.log(error);
             })
             if (userData.email) {
                 updateDoc(doc(db, "organizations", userData.org), {
                     members: arrayRemove(userData.email)
+                }).catch((error) => {
+                    console.log(error);
                 })
             }
 
@@ -207,7 +221,6 @@ export default function Users() {
             setConfirmationBoxData(null);
         }
         const title = t('removeUserConfirmation', {user: userData.name});
-        // const title = `Are you sure you want to remove ${userData.name}?`;
         const actionButtonTitle = "Remove";
         setConfirmationBoxData({
             title: title,
@@ -237,7 +250,7 @@ export default function Users() {
         const cancelFunction = () => {
             setConfirmationBoxData(null);
         }
-        const title = `Are you sure you want to make ${userData.name} an org admin?`;
+        const title = t('makeOrgAdminConfirmation', {user: userData.name});
         const actionButtonTitle = "Confirm";
         setConfirmationBoxData({
             title: title,
@@ -262,7 +275,8 @@ export default function Users() {
         const cancelFunction = () => {
             setConfirmationBoxData(null);
         }
-        const title = `Are you sure you want to make ${userData.name} a site admin?`;
+        const title = t('makeSiteAdminConfirmation', {user: userData.name});
+        // const title = `Are you sure you want to make ${userData.name} a site admin?`;
         const actionButtonTitle = "Confirm";
         setConfirmationBoxData({
             title: title,

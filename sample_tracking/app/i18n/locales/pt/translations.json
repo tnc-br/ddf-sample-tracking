@@ -56,5 +56,7 @@
     "organization": "Organização",
     "meanAnnualTemperature": "Temperatura média anual",
     "meanAnnualPrecipitation": "Precipitação média anual",
-    "removeUserConfirmation": "Você tem certeza que deseja remover {{user}}"
+    "removeUserConfirmation": "Você tem certeza que deseja remover {{user}}",
+    "makeOrgAdminConfirmation": "Tem certeza de que deseja tornar {{ user }} um administrador da organização?",
+    "makeSiteAdminConfirmation": "Tem certeza de que deseja tornar {{ user }} um administrador do site?"
   }
