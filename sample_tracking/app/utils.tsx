@@ -14,6 +14,7 @@ export type UserData = {
   user_id: string,
   email: string,
   date_added: string,
+  photoUrl: string,
 }
 
 export type Sample = {
