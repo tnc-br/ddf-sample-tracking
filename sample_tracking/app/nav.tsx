@@ -12,6 +12,7 @@ import { getFirestore, getDoc, doc } from "firebase/firestore";
 import Link from 'next/link';
 import { useTranslation } from 'react-i18next';
 import './i18n/config';
+import ImportSamples from './import-samples'
 
 
 /**
@@ -78,9 +79,10 @@ export default function Nav() {
                     </span> {t('addSample')}</div>
                 </li>}
                 {canAddSample() && <li className="nav-item">
-                    <Link className="nav-link" href="./import-samples">
+                    {/* <Link className="nav-link" href="./import-samples">
                         <span className="material-symbols-outlined">cloud_upload</span>
-                        {t('importSamples')}</Link>
+                        {t('importSamples')}</Link> */}
+                        <div><ImportSamples /></div>
                 </li>}
                 <li className="nav-item">
                     <Link className="nav-link" href="./samples"> <span className="material-symbols-outlined">

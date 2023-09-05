@@ -55,10 +55,47 @@ export type Sample = {
   diameter: string,
   observations: string,
   created_by_name: string,
+  measurements: {},
 }
 
 export interface NestedSchemas {
   [key: string]: NestedSchemas;
+}
+
+const resultRanges = {
+  'd18O_cel': {
+    'min': 20,
+    'max': 32
+  },
+  'd18O_wood': {
+    'min': 20,
+    'max': 32
+  },
+  'd15N_wood': {
+    'min': -5,
+    'max': 15
+  },
+  'n_wood': {
+    'min': 0,
+    'max': 1
+  },
+  'd13C_wood': {
+    'min': -38,
+    'max': 20
+  },
+  'c_wood': {
+    'min': 40,
+    'max': 60
+  },
+  'd13C_cel': {
+    'min': -35,
+    'max': -20
+  },
+  'c_cel': {
+    'min': 40,
+    'max': 60
+  },
+
 }
 
 
@@ -155,4 +192,33 @@ export function getDocRefForTrustedValue(trusted: string, db: Firestore, sampleI
     docRef = doc(db, "unknown_samples", sampleId!);
   }
   return docRef;
+}
+
+
+export function validateImportedEntry(data: {}): string {
+  let errors = '';
+  const headers = Object.keys(data);
+  headers.forEach((header: string) => {
+    if (!Object.keys(resultRanges).includes(header)) return;
+    let foundIncorrectValue = false;
+    const columnElements = document.getElementsByClassName(evt.target.id);
+    const currentColumnNumber = parseInt(evt.target.id.split('_')[1]);
+    for (let i = 0; i < columnElements.length; i++) {
+      const value = parseFloat(columnElements[i].childNodes[0].value)
+      if (isResultHeader && (value < resultRanges[header].min || value > resultRanges[header].max)) {
+        errors += `${header} should be within the range ${resultRanges[header].min} and ${resultRanges[header].max}, `;
+      }
+    }
+  })
+  if (!headers.includes('lat') || !headers.includes('lon')) {
+    errors += 'lat and lon are required, '
+  }
+  if (!headers.includes('origin')) {
+    errors += 'origin value is required, '
+  } else {
+    if (!['known', 'unknown', 'uncertain'].includes(data.origin)) {
+      errors += 'origin value should be one of the following: known, uncertain, or unknown'
+    }
+  }
+  return errors;
 }
