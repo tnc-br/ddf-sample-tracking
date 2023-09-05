@@ -3,7 +3,6 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation'
 import { getAuth, createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
 import { doc, getDocs, collection, getFirestore, updateDoc, addDoc, setDoc } from "firebase/firestore";
-import InputField from '../input-field';
 import { TextField, Autocomplete, MenuItem, InputAdornment } from '@mui/material';
 
 
@@ -39,6 +38,11 @@ type NewUser = {
     newOrgName: string,
 }
 
+/**
+ * Component to handle signing a user up using Firebase auth. When a user signs up they are added to the 'new_users' collection. 
+ * If a user is trying to register a new organization, they are added to the 'new_orgs' document in the 'new_users' collection. 
+ * This data will then be fetched by admins in the SignUpRequests component to be approved/rejected. 
+ */
 export default function SignUp(props: SignUpProps) {
 
     const router = useRouter()
@@ -64,7 +68,6 @@ export default function SignUp(props: SignUpProps) {
     if (Object.keys(availableOrgs).length < 1) {
         const orgs: OrgsSchemas = {};
         getDocs(collection(db, "organizations")).then((querySnapshot) => {
-            console.log('made request to organizations');
             querySnapshot.forEach((doc) => {
                 const docData = doc.data();
                 orgs[docData['org_name']] = doc.id;
@@ -107,7 +110,6 @@ export default function SignUp(props: SignUpProps) {
             return;
         }
         if (formData.password !== formData.confirmPassword) {
-            console.log('Passwords dont match');
             alert("The passwords you entered don't match.");
             return;
         }
@@ -167,9 +169,6 @@ export default function SignUp(props: SignUpProps) {
     function handleChange(evt: any) {
         let value = evt.target.value;
         value = value === "Create new organization" ? "NEW" : value;
-        // if (evt.target.name) === 'orgName' {
-        //     value = value === 'Create new organization' ? "NEW" : availableOrgs[labName];
-        // }
         const newFormData = {
             ...formData,
             [evt.target.name]: value
@@ -266,7 +265,6 @@ export default function SignUp(props: SignUpProps) {
                     onChange={(evt: any) => handleChange(evt)}
                 />
             </div>
-                // <InputField labelName="New org name" inputID="newOrgName" fieldValue={formData.newOrgName} handleChange={(evt: any) => handleChange(evt)} />
                 }
                 <div className="login-input-wrapper">
                     <TextField
@@ -304,9 +302,6 @@ export default function SignUp(props: SignUpProps) {
                         onChange={(evt: any) => handleChange(evt)}
                     />
                 </div>
-                {/* <InputField labelName="Email" inputID="email" fieldValue={formData.email} handleChange={(evt: any) => handleChange(evt)} /> */}
-                {/* <InputField labelName="Password" inputID="password" fieldValue={formData.password} handleChange={(evt: any) => handleChange(evt)} /> */}
-                {/* <InputField labelName="Re-enter password" inputID="confirmPassword" fieldValue={formData.confirmPassword} handleChange={(evt: any) => handleChange(evt)}  /> */}
                 <div onClick={handleSignUpButtonClicked} className="forgot-password-button-wrapper">
                     <div className="forgot-password-button">
                         <div className='forgot-password-button-text'>
@@ -315,29 +310,6 @@ export default function SignUp(props: SignUpProps) {
                     </div>
                 </div>
             </form>
-            // <div className='account-info-tab'>
-            // {signUpData['lab'] === "NEW" && <div className="form-outline mb-4">
-            //     <input required type="text" name="newOrgName" autoComplete="off" placeholder='New organization name' id="newOrgName" className="form-control form-control-lg" />
-            // </div>}
-
-            // <div className="form-outline mb-4">
-            //     <input required type="email" name="email" autoComplete="off" placeholder='Email address' id="email" className="form-control form-control-lg" />
-            // </div>
-
-            // <div className="form-outline mb-4">
-            //     <input required type="password" name="password" placeholder='Password' id="password" className="form-control form-control-lg" />
-            // </div>
-
-            // <div className="form-outline mb-4">
-            //     <input required type="password" name="passwordConfirmed" placeholder='Re-enter password' id="reEnterPassword" className="form-control form-control-lg" />
-            // </div>
-
-            //     <div className="d-flex justify-content-center">
-            //         <button type="button" onClick={handleSignUpButtonClicked} className="btn btn-primary">Sign up</button>
-
-            //     </div>
-            // </div>
-
         )
     }
 
@@ -346,27 +318,6 @@ export default function SignUp(props: SignUpProps) {
         <div className='signup-wrapper'>
             {signUpTab === 0 ? yourDetailsTab() : accountInfo()}
         </div>
-        //   <section className="vh-100 bg-grey">
-        //     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@48,400,0,0" />
-        //     <div className="container py-5 h-100">
-        //     {signUpTab === 0 ? yourDetailsTab() : accountInfo()}
-
-        //       {/* <div className="card">
-        //         <div className="card-body p-5">
-        //           <h3><span onClick={props.onLogInClick} className="material-symbols-outlined back-arrow">
-        //             arrow_back
-        //           </span>Sign up</h3>
-
-        //           <div className='sign-up-progress-wrapper'>
-        //             <span><span className='sign-up-progress'><span>1</span></span>Your details</span>
-        //             <span><span className='sign-up-progress'>2</span>Account info</span>
-        //           </div>
-
-
-        //         </div> */}
-        //       {/* </div> */}
-        //     </div>
-        //   </section>
     )
 
 }

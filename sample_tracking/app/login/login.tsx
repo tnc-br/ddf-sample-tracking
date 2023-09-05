@@ -9,15 +9,15 @@ import Image from 'next/image'
 interface LogInProps {
     onSignUpClick: any,
     onForgotPasswordClick: any,
-    // router: any,
 }
 
+/**
+ * Component to handle logging a user in using Firebase auth.
+ * 
+ * If a user signs in for the first time with google and they are not already a member, they will be forwarded to the SelectOrg component. 
+ * They MUST complete that form to be able to be approved by an admin. They will be stuck in limbo until they fill out that form. 
+ */
 export default function Login(props: LogInProps) {
-    const [loginInfo, setLoginInfo] = useState({
-        email: "",
-        password: "",
-    });
-
     const auth = getAuth();
     const router = useRouter()
 

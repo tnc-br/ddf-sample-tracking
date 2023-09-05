@@ -3,6 +3,10 @@
 import { FormEvent, useState } from "react";
 import { getAuth, sendPasswordResetEmail } from "firebase/auth";
 
+/**
+ * Component to handle resetting a user's password. Uses Firebase
+ * auth to send password reset email to the specified email. 
+ */
 function ForgotPassword() {
   const [email, setEmail] = useState('')
   const [emailMessage, setEmailMessage] = useState(false)

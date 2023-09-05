@@ -10,13 +10,15 @@ import { getSamplesFromCollection, getUserData } from '../firebase_utils';
 import { useTranslation } from 'react-i18next';
 import '../i18n/config';
 
+
+/**
+ * Component for the main page of TimberId. Renders all the samples visible to the logged in user using the SamplesTable subcomponent. 
+ * If the user is a site_admin, all samples in the database are fetched, otherwise only the samples linked to the users org are fetched. 
+ */
 export default function Samples() {
 
-    const [data, setData] = useState({});
-    const [selectedSample, setSelectedSample] = useState('');
     const [userData, setUserData] = useState({} as UserData);
     const [samplesState, setSamplesState] = useState([{}]);
-    const [inProgressSamples, setInProgressSamples] = useState([{}]);
     const [allSamples, setAllSamples] = useState({});
 
     const app = initializeAppIfNecessary();
@@ -49,12 +51,10 @@ export default function Samples() {
 
     async function addSamplesToDataList() {
         if (Object.keys(samplesState[0]).length < 1) {
-            let allSamples: any = [{}];
             const trustedSamples = await getSamplesFromCollection(userData, 'trusted_samples');
             const untrustedSamples = await getSamplesFromCollection(userData, 'untrusted_samples');
             const unknownSamples = await getSamplesFromCollection(userData, 'unknown_samples');
             if (trustedSamples.length + untrustedSamples.length + unknownSamples.length < 1) {
-                console.log("returning early")
                 return;
             }
 
@@ -103,12 +103,10 @@ export default function Samples() {
             });
 
             if (inProgressSamples.length > 0 || completedSamples.length > 0) {
-                console.log("samples: " + inProgressSamples)
                 setAllSamples({
                     inProgress: inProgressSamples,
                     completed: completedSamples,
                 })
-                // setSamplesState(allSamples);
             }
         }
     }

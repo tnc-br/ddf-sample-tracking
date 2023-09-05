@@ -19,6 +19,14 @@ import { useSearchParams } from 'next/navigation'
 import { type Sample, type UserData, confirmUserLoggedIn, initializeAppIfNecessary, getDocRefForTrustedValue } from '../utils';
 
 
+/**
+ * Component to handle editing a sample. It uses the SampleDataInput subcomponent to handle data input. 
+ * The sample being edited is passed in using the following search params: 
+ *  - 'id': the 20 character hex string for a specific sample.
+ *  - 'trusted': has a value of either 'trusted', 'untrusted', or 'unknown' to specify the collection to fetch the sample from. 
+ * 
+ * Once the sample is fetched from the correct collection, it's data is passed to SampleDataComponent to pre-fill the input fields. 
+ */
 export default function Edit() {
     const [userData, setUserdata] = useState({} as UserData);
     const [currentTab, setCurrentTab] = useState(1);
@@ -130,13 +138,6 @@ export default function Edit() {
 
     }
 
-    function handleChange(formState: Sample) {
-        setFormData(formState);
-    }
-
-    console.log("form data: " + formData.species);
-
-
     return (
         <div className="add-sample-page-wrapper">
             <p className="title">Edit sample {formData.sample_name}</p>
@@ -178,7 +179,6 @@ export default function Edit() {
             <div className="sample-details-form">
                 <div>
                     <SampleDataInput baseState={formData}
-                        // onStateUpdate={(state) => handleChange(state)}
                         onActionButtonClick={(sampleID: string, updatedFormData: Sample) => onUpdateSampleClick(updatedFormData)}
                         actionButtonTitle="Update sample"
                         sampleId={sampleId}

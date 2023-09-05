@@ -8,6 +8,11 @@ interface ForgotPasswordProps {
     returnToSignInClick: any
 }
 
+
+/**
+ * Component to handle resetting a user's password. Uses Firebase
+ * auth to send password reset email to the specified email. 
+ */
 export default function ForgotPassword(props: ForgotPasswordProps) {
 
     const [emailSent, setEmailSent] = useState(false);

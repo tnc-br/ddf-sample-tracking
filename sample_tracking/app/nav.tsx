@@ -13,11 +13,16 @@ import Link from 'next/link';
 import { useTranslation } from 'react-i18next';
 import './i18n/config';
 
+
+/**
+ * Component for rendering the nav bar on the left of the screen. Depending on what
+ * role a user has (member, admin, site_admin) they are shown slightly different options. 
+ * 
+ * Routing is done using next.js navigation. 
+ */
 export default function Nav() {
     const [role, setRole] = useState('');
     const [showAddSampleMenu, setShowAddSampleMenu] = useState(false);
-    // const [userData, setUserData] = useState({});
-
 
     const app = initializeApp(firebaseConfig);
     const router = useRouter();
@@ -43,25 +48,6 @@ export default function Nav() {
 
     })
 
-
-    // onAuthStateChanged(auth, (user) => {
-    //     if (user) {
-    //         user.getIdTokenResult(true).then((token) => {
-    //             // setIsAdmin(token.claims.role === 'admin');
-    //             setRole(token.claims.role);
-    //         })
-    //     }
-    // });
-
-
-    function onLogOutClick() {
-        signOut(auth).then(() => {
-            router.replace('/login');
-        }).catch((error) => {
-            console.log('Unable to log out: ' + error);
-        });
-    }
-
     function canAddSample() {
         return role === 'admin' || role === 'member' || role === 'site_admin';
     }
@@ -74,11 +60,6 @@ export default function Nav() {
         <div id="nav-wrapper" className='nav-wrapper'>
             <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@48,400,0,0" />
             <ul className="nav flex-column">
-                {/* {canAddSample() && <li className="nav-item">
-                    <Link className="nav-link add-sample-button" href="./add-sample"><span className="material-symbols-outlined">
-                        add
-                    </span> {t('addSample')}</Link>
-                </li>} */}
                 {canAddSample() && <li className="nav-item">
                     <div className="nav-link add-sample-button" onClick={() => setShowAddSampleMenu(!showAddSampleMenu)}><span className="material-symbols-outlined">
                         add
@@ -89,11 +70,6 @@ export default function Nav() {
                         <span className="material-symbols-outlined">cloud_upload</span>
                         {t('importSamples')}</Link>
                 </li>}
-                {/* {canAddSample() && <li className="nav-item">
-                    <Link className="nav-link" href="./my-samples"> <span className="material-symbols-outlined">
-                        labs
-                    </span>{t('mySamples')}</Link>
-                </li>} */}
                 <li className="nav-item">
                     <Link className="nav-link" href="./samples"> <span className="material-symbols-outlined">
                         lab_panel
@@ -113,17 +89,9 @@ export default function Nav() {
 
                 </div>
 
-                {/* <li className="nav-item">
-                    <button className="nav-link" onClick={onLogOutClick}> <span className="material-symbols-outlined">
-                        logout
-                    </span> {t('logOut')}</button>
-                </li> */}
-
                 {showAddSampleMenu && <div className="add-sample-options-wrapper">
                     <Link className="nav-link" href="./add-sample?status=completed">Completed sample</Link>
                     <Link className="nav-link" href="./add-sample?status=incomplete">Incomplete sample</Link>
-                    {/* <div><Link href="./add-sample?status=complete" className='add-sample-option'>Completed sample</Link></div>
-                <div><Link href="./add-sample?status=incomplete" className='add-sample-option'>Uncompleted sample</Link></div> */}
                 </div>}
 
             </ul>
@@ -135,21 +103,6 @@ export default function Nav() {
                 </a>
 
             </div>
-            {/* <nav className="navbar navbar-expand-lg navbar-light bg-light">
-
-                <ul className="navbar-nav mr-auto">
-                    <li className="nav-item active">
-                        <a className="nav-link" href="/add-sample">Add samples <span className="sr-only">(current)</span></a>
-                    </li>
-                    <li className="nav-item">
-                        <a className="nav-link" href="/samples">Samples</a>
-                    </li>
-                </ul>
-                <button className="my-2 my-lg-0 btn btn-outline-primary my-2 my-sm-0" type="submit" onClick={onLogOutClick}>Log out</button>
-            </nav> */}
-
         </div>
-
     )
-
 }

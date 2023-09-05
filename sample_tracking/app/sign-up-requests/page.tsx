@@ -1,16 +1,13 @@
 "use client";
 
 
-import { initializeApp as initializeAdminApp } from 'firebase-admin/app';
 import { getAuth, onAuthStateChanged } from "firebase/auth";
-import { firebaseConfig } from '../firebase_config';
-import { initializeApp } from "firebase/app";
 import { useState, useEffect } from 'react';
 import './styles.css';
 import { useRouter } from 'next/navigation'
 import 'bootstrap/dist/css/bootstrap.css';
 import { getFirestore, getDocs, collection, updateDoc, doc, setDoc, addDoc, getDoc, arrayUnion, arrayRemove, deleteField, query, where, deleteDoc } from "firebase/firestore";
-import { showNavBar, showTopBar, getRanHex } from '../utils';
+import { showNavBar, showTopBar, getRanHex, initializeAppIfNecessary } from '../utils';
 import { getUserData } from '../firebase_utils';
 
 type UserData = {
@@ -22,6 +19,14 @@ interface NestedSchemas {
     [key: string]: NestedSchemas;
 }
 
+/**
+ * Component used by admins to approve new members. If the user is a site_admin all
+ * new uses in the 'new_users' collection will be shown, otherwise if they are normal
+ * organization admins they will only be shown users trying ot join their organization. 
+ * 
+ * Data in the 'new_orgs' document in the 'new_users' collection is fetched by site_admins
+ * to let site admins approve/reject new organizations. 
+ */
 export default function SignUpRequests() {
     const [pendingApprovals, setPendingApprovals] = useState({});
     const [currentUsers, setCurrentUsers] = useState({});
@@ -29,8 +34,7 @@ export default function SignUpRequests() {
     const [prospectiveOrgs, setProspectiveOrgs] = useState({} as NestedSchemas);
     const [userData, setUserData] = useState({} as UserData);
 
-    // const adminApp = initializeAdminApp();
-    const app = initializeApp(firebaseConfig);
+    const app = initializeAppIfNecessary();
     const auth = getAuth();
     const router = useRouter();
     const db = getFirestore();
@@ -75,10 +79,8 @@ export default function SignUpRequests() {
         } else if (userData.role === "site_admin") {
             const pendingOrgs: NestedSchemas = {};
             getDocs(collection(db, "new_users")).then((querySnapshot) => {
-                console.log('made request to get users');
                 querySnapshot.forEach((doc) => {
                     const docData = doc.data();
-                    console.log(docData);
                     if (doc.id === "new_orgs") {
                         Object.keys(docData).forEach((orgName: string) => {
                             pendingOrgs[orgName] = docData[orgName];
@@ -104,14 +106,10 @@ export default function SignUpRequests() {
     }
 
     function handleApproveOrgClick(evt: any) {
-        console.log(evt);
         const orgName = evt.target.parentElement.parentElement.id;
         const adminId = prospectiveOrgs[orgName].admin_id as unknown as string;
         const date = new Date();
         const dateString = `${date.getMonth() + 1} ${date.getDate()} ${date.getFullYear()}`;
-
-        // const adminName =         
-        // addDoc(collection(db, "organizations"), { org_name: orgName });
         const orgId = getRanHex(20);
         const newOrgRef = doc(db, "organizations", orgId);
         setDoc(newOrgRef, {

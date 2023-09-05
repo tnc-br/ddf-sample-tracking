@@ -30,7 +30,13 @@ type OrgData = {
 
 /**
  * Component for showing list of all users to be viewed by admins. 
- * Site admins will be able to view all site users, and organization admins will only be able to view members in their org.
+ * Site admins will be able to view all site users, and organization
+ * admins will only be able to view members in their org.
+ * 
+ * Data is fetched from the 'Users' collection to render. If the user
+ * is a site_admin, all users are fetched, if the user is an org admin the Users collection is 
+ * queried to only return users in the user's org. 
+ * 
  */
 export default function Users() {
     const [userData, setUserData] = useState({} as UserData);

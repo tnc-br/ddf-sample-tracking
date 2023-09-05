@@ -9,7 +9,7 @@ import { useState, useEffect } from 'react';
 import { speciesList } from './species_list';
 import { statesList } from './states_list';
 import { municipalitiesList } from './municipalities_list';
-import { getRanHex, hideNavBar, hideTopBar, verifyLatLonFormat, type UserData } from './utils';
+import { getRanHex, hideNavBar, hideTopBar, verifyLatLonFormat, type UserData, type Sample } from './utils';
 import { useTranslation } from 'react-i18next';
 import { TextField, Autocomplete, MenuItem, InputAdornment } from '@mui/material';
 import { LocalizationProvider, DatePicker } from '@mui/x-date-pickers';
@@ -20,7 +20,7 @@ import './i18n/config';
 type SampleDataInputProps = {
     onActionButtonClick: any,
     onTabChange: any,
-    baseState: {},
+    baseState: Sample,
     actionButtonTitle: string,
     isNewSampleForm: boolean,
     sampleId: string,
@@ -28,6 +28,17 @@ type SampleDataInputProps = {
     currentTab: number,
 }
 
+/**
+ * Component used to input sample data for the AddSample and Edit components. The following data is passed in:
+ * - onActionButtonClick: function to call when the action button is clicked
+ * - onTabChange: function to call when the tab of the input form is changed
+ * - baseState: the initial data for the input form
+ * - actionButtonTitle: the label for the action button
+ * - isNewSampleForm: boolean representing if this is a new sample or represents an already existing sample
+ * - sampleId: 20 character hex ID for the sample
+ * - isCompletedSample: boolean representing if this is a completed or in progress sample
+ * - currentTab: the tab of the sample form that should be shown
+ */
 export default function SampleDataInput(props: SampleDataInputProps) {
     const [currentTab, setCurrentTab] = useState(props.currentTab ? props.currentTab : 1);
     const [formData, setFormData] = useState(props.baseState);
@@ -36,9 +47,6 @@ export default function SampleDataInput(props: SampleDataInputProps) {
 
     const router = useRouter();
     const { t } = useTranslation();
-
-    
-
 
     useEffect(() => {
         hideNavBar();
@@ -53,7 +61,6 @@ export default function SampleDataInput(props: SampleDataInputProps) {
 
 
     function attemptToUpdateCurrentTab(newTab: number) {
-        const currentTabRef = getCurrentTabFormRef();
         if (newTab < currentTab || checkCurrentTabFormValidity()) {
             setCurrentTab(newTab);
             if (props.onTabChange) props.onTabChange(newTab);
@@ -158,13 +165,13 @@ export default function SampleDataInput(props: SampleDataInputProps) {
         props.onActionButtonClick(props.sampleId, formData);
     }
 
-    function getCurrentTabFormRef(): Element {
+    function getCurrentTabFormRef(): HTMLElement {
         if (currentTab === 1) {
-            return document.getElementById('info-tab');
+            return document.getElementById('info-tab')!;
         } else if (currentTab === 2) {
-            return document.getElementById('sample-measurements');
+            return document.getElementById('sample-measurements')!;
         } else {
-            return document.getElementById('results-tab');
+            return document.getElementById('results-tab')!;
         }
     }
 
