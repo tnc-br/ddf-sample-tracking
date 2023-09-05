@@ -110,7 +110,7 @@ describe('Samples', () => {
         const onActionButtonClick = mockSamplesTableFn.mock.calls[0][0].onActionButtonClick;
         const onStateUpdate = mockSamplesTableFn.mock.calls[0][0].onStateUpdate;
         const newFormState = {
-            oxygen: ['12','13'],
+            d18O_wood: ['12','13'],
             species: 'testSpecies',
         }
         act(() => {
@@ -120,6 +120,6 @@ describe('Samples', () => {
         const sampleCreated = updateDoc.mock.calls[0][1];
         expect(sampleCreated.last_updated_by).toBe("Test name");
         expect(sampleCreated.species).toBe('testSpecies')
-        expect(sampleCreated.oxygen).toStrictEqual([12, 13])
+        expect(sampleCreated.d18O_wood).toStrictEqual([12, 13])
     });
 });
