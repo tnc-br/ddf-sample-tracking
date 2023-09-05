@@ -348,6 +348,42 @@ export default function SampleDetails() {
                     <div className='mapbiomas-footer'>Data from MapBiomas, 2021</div>
                 </div>
 
+                {selectedDoc['alerts'] ?
+                    <div className='details'>
+                        <div className='section-title'>
+                            Nearby Deforestation Alerts
+                        </div>
+                        <table className="table">
+                            <thead>
+                                <tr>
+                                    <th scope="col">Latitude</th>
+                                    <th scope="col">Longitude</th>
+                                    <th scope="col">Distance</th>
+                                    <th scope="col">Detected At</th>
+                                    <th scope="col">Before</th>
+                                    <th scope="col">After</th>
+                                    <th scope="col">Details</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {selectedDoc['alerts'].map((alert) => (
+                                    <tr key={alert['alertCode']}>
+                                        <td>{alert['coordinates']['latitude'].toFixed(6)}</td>
+                                        <td>{alert['coordinates']['longitude'].toFixed(6)}</td>
+                                        <td>{alert['distance_to_point'].toFixed(2)} km</td>
+                                        <td>{alert['detectedAt']}</td>
+                                        <td><a target="_blank" href={alert['before']['url']}><img src={alert['before']['url']} alt="Before Deforestation" height="100" width="100" /></a></td>
+                                        <td><a target="_blank" href={alert['after']['url']}><img src={alert['after']['url']} alt="After Deforestation" height="100" width="100" /></a></td>
+                                        <td><a target="_blank" href={alert['url']}><span class="material-symbols-outlined">launch</span></a></td>
+                                    </tr>
+                                ))}
+                                
+                            </tbody>
+                        </table>
+                        <div className='mapbiomas-footer'>Data from MapBiomas Alerta, 2023</div>
+                    </div>
+                : ''}
+
                 <div id='qr-code'>
                     <div className="section-title">
                         Sample QR code
