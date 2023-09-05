@@ -46,6 +46,18 @@ export default function Nav() {
             });
         }
 
+        document.addEventListener("mousedown", (event) => {
+            const popupContainer = document.getElementById("add-sample-popup");
+            const addSampleButton = document.getElementById('add-sample-button');
+            if (addSampleButton?.contains(event.target)) {
+                setShowAddSampleMenu(!showAddSampleMenu)
+                return;
+            }
+            if (!popupContainer?.contains(event.target)) {
+                setShowAddSampleMenu(false)
+            }
+        });
+
     })
 
     function canAddSample() {
@@ -61,7 +73,7 @@ export default function Nav() {
             <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@48,400,0,0" />
             <ul className="nav flex-column">
                 {canAddSample() && <li className="nav-item">
-                    <div className="nav-link add-sample-button" onClick={() => setShowAddSampleMenu(!showAddSampleMenu)}><span className="material-symbols-outlined">
+                    <div id='add-sample-button' className="nav-link add-sample-button"><span className="material-symbols-outlined">
                         add
                     </span> {t('addSample')}</div>
                 </li>}
@@ -88,8 +100,7 @@ export default function Nav() {
                     </li>}
 
                 </div>
-
-                {showAddSampleMenu && <div className="add-sample-options-wrapper">
+                {showAddSampleMenu && <div id='add-sample-popup' className="add-sample-options-wrapper">
                     <Link className="nav-link" href="./add-sample?status=completed">Completed sample</Link>
                     <Link className="nav-link" href="./add-sample?status=incomplete">Incomplete sample</Link>
                 </div>}

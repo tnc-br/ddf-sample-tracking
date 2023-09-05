@@ -11,16 +11,8 @@ import { firebaseConfig } from '../firebase_config';
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { useState, useEffect } from 'react';
 import { speciesList } from '../species_list';
-import { hideNavBar, hideTopBar } from '../utils';
+import { hideNavBar, hideTopBar, type UserData } from '../utils';
 
-type UserData = {
-    name: string,
-    email: string,
-    date_requested: string,
-    uid: string,
-    org: string,
-    org_name: string,
-}
 
 interface OrgsSchemas {
     [key: string]: string;
