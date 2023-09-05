@@ -480,6 +480,7 @@
 .submit-buttons {
     margin: 40px;
 }
+
 .actions-button {
     color: blue !important;
     text-decoration: underline;
@@ -770,3 +771,256 @@
     left: -15px;
     width: 253px;
 }
+
+
+
+
+
+.profile-popup-wrapper {
+    display: flex;
+    padding: 8px 0px;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    border-radius: 8px;
+    background: var(--grey-white, #FFF);
+    width: 255px;
+    height: 238px;
+    top: 45px;
+    right: 30px;
+    position: absolute;
+    z-index: 100;
+
+    box-shadow: 0px 2px 6px 2px rgba(60, 64, 67, 0.15), 0px 1px 2px 0px rgba(60, 64, 67, 0.30);
+
+}
+
+.prifile-wrapper {
+    display: flex;
+    height: 48px;
+    padding: 0px 16px;
+    align-items: center;
+    gap: 10px;
+    align-self: stretch;
+}
+
+.monogram-wrapper {
+    width: 32px;
+    height: 32px;
+}
+
+
+.popup-header-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+
+}
+
+.popup-name-text {
+    color: var(--grey-800, #3C4043);
+
+    font-family: Roboto;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 500;
+    line-height: 20px;
+
+}
+
+.popup-email-text {
+    color: var(--grey-700, #5F6368);
+
+    font-family: Roboto;
+    font-size: 12px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 16px;
+}
+
+.manage-profile-link-wrapper {
+    display: flex;
+    padding: 4px 16px;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+
+}
+
+.manage-profile-chip {
+    display: flex;
+    height: 32px;
+    padding: 0px 16px;
+    align-items: center;
+    gap: 8px;
+    border-radius: 100px;
+    border: 1px solid var(--grey-300, #DADCE0);
+    cursor: pointer;
+}
+
+.manage-profile-text {
+    color: var(--grey-800, #3C4043);
+    text-align: center;
+
+    font-family: Roboto;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 20px;
+    letter-spacing: 0.25px;
+}
+
+.external-link-svg {
+    width: 16px;
+    height: 16px;
+}
+
+.popup-divider-wrapper {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+    align-self: stretch;
+}
+
+.popup-divider {
+    width: 255px;
+    height: 1px;
+    background: #C1C9BE;
+}
+
+.language-toggle-wrapper {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    align-self: stretch;
+}
+
+.language-toggle-slate-layer {
+    display: flex;
+    height: 56px;
+    padding: 8px 24px 8px 16px;
+    align-items: center;
+    gap: 16px;
+    align-self: stretch;
+}
+
+.language-text-wrapper {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+    flex: 1 0 0;
+    align-self: stretch;
+}
+
+.language-text {
+    color: var(--timber-id-sys-light-on-surface, #191C1D);
+
+    font-family: Roboto;
+    font-size: 16px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 24px;
+    align-self: stretch;
+}
+
+.toggle-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+}
+
+.popup-profile-photo {
+    border-radius: 50%;
+    width: 32px;
+    height: 32px;
+}
+
+.popup-letter-profile {
+    background-color: #1A73E8;
+    color: white;
+    padding-top: 6px;
+    text-align: center;
+    cursor: pointer;
+}
+
+img, svg {
+    vertical-align: baseline !important;
+}
+
+.logout-button-container-wrapper {
+    display: flex;
+    padding: 8px 16px;
+    justify-content: center;
+    align-items: center;
+    gap: 14px;
+    align-self: stretch;
+}
+.logout-button-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+}
+.logout-button {
+    display: flex;
+    padding: 8px 24px;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    border-radius: 4px;
+border: 1px solid var(--grey-300, #DADCE0);
+}
+.logout-button-text {
+    color: var(--timber-id-sys-light-primary, #006E2C);
+    text-align: center;
+    
+    /* TimberID/title/small */
+    font-family: Roboto;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 500;
+    line-height: 20px; /* 142.857% */
+}
+
+.page-title-wrapper {  
+    display: flex;
+  width: 1440px;
+  height: 64px;
+  padding: 8px 4px;
+  align-items: center;
+  gap: 4px;
+  flex-shrink: 0;
+  background: var(--timber-id-sys-light-surface, #F8FAFA);
+  }
+
+  .add-sample-close-icon {
+    display: flex !important;
+  width: 48px;
+  height: 48px;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+  color: black;
+  }
+  
+  .close-icon {
+    text-decoration: none;
+  }
+
+  .page-title-text {
+  
+    color: var(--timber-id-sys-light-on-surface, #191C1D);
+  
+  /* TimberID/title/large */
+  font-family: Roboto;
+  font-size: 22px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 28px; /* 127.273% */
+  }
