@@ -356,6 +356,7 @@ export default function SampleDetails() {
                         <table className="table">
                             <thead>
                                 <tr>
+                                    <th scope="col">Area</th>
                                     <th scope="col">Latitude</th>
                                     <th scope="col">Longitude</th>
                                     <th scope="col">Distance</th>
@@ -368,8 +369,9 @@ export default function SampleDetails() {
                             <tbody>
                                 {selectedDoc['alerts'].map((alert) => (
                                     <tr key={alert['alertCode']}>
-                                        <td>{alert['coordinates']['latitude'].toFixed(6)}</td>
-                                        <td>{alert['coordinates']['longitude'].toFixed(6)}</td>
+                                        <td>{alert['areaHa'].toFixed(2)} ha</td>
+                                        <td>{alert['coordinates']['latitude']}</td>
+                                        <td>{alert['coordinates']['longitude']}</td>
                                         <td>{alert['distance_to_point'].toFixed(2)} km</td>
                                         <td>{alert['detectedAt']}</td>
                                         <td><a target="_blank" href={alert['before']['url']}><img src={alert['before']['url']} alt="Before Deforestation" height="100" width="100" /></a></td>
