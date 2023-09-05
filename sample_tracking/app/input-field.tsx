@@ -1,6 +1,6 @@
 
 
-interface SignUpProps {
+interface InputFieldProps {
     labelName: string,
     inputID: string,
     fieldValue: any,
@@ -8,7 +8,10 @@ interface SignUpProps {
     required?: boolean,
 }
 
-export default function InputField(props: SignUpProps) {
+/**
+ * Subcomponent used to render the input fields for forms. 
+ */
+export default function InputField(props: InputFieldProps) {
     return (
         <div className="forgot-password-entry-wrapper">
             <div className="forgot-password-entry">
@@ -41,5 +44,3 @@ export default function InputField(props: SignUpProps) {
         </div>
     )
 }
-
-// props.fieldValue && props.fieldValue.length > 0 && 

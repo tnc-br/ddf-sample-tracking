@@ -147,13 +147,6 @@ export function confirmUserLoggedIn(user: User | null, db: Firestore, router: an
   return {} as UserData;
 }
 
-export function getSearchParam(param: string): string | null {
-  const searchParams = useSearchParams();
-  const queryString = window.location.search;
-  const urlParams = new URLSearchParams(queryString);
-  return urlParams.get(param) ? urlParams.get(param) : searchParams.get(param);
-}
-
 export function getDocRefForTrustedValue(trusted: string, db: Firestore, sampleId: string): DocumentReference {
   let docRef = doc(db, "trusted_samples", sampleId!);
   if (trusted === 'untrusted') {

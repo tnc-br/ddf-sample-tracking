@@ -1,4 +1,3 @@
-
 "use client";
 
 import 'bootstrap/dist/css/bootstrap.css';
@@ -17,6 +16,11 @@ import { green } from '@mui/material/colors';
 import { alpha, styled } from '@mui/material/styles';
 import {type UserData } from './utils'
 
+/**
+ * Component to render the top bar shown on most pages in TimberId. 
+ * Renders website name/icon in top left of screen, and user profile photo
+ * or first initial on top left to let user access profile menu.
+ */
 export default function TopBar() {
     const [userData, setUserData] = useState(null as UserData|null);
     const [showMenu, setShowMenu] = useState(false);
@@ -30,7 +34,6 @@ export default function TopBar() {
     const ref = useRef(null);
 
     useEffect(() => {
-        // if (Object.keys(userData).length < 1) {
         if (!userData) {
             onAuthStateChanged(auth, (user) => {
                 if (!user) {
@@ -60,7 +63,6 @@ export default function TopBar() {
     })
 
     if (!userData) return;
-
 
     function onLogOutClick() {
         signOut(auth).then(() => {

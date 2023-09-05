@@ -23,31 +23,19 @@ type WaterPercentageResults = {
     water_mean_in_10km_buffer: number,
 }
 
-
+/**
+ * Component for rendering the sample details page. The sample being displayed is passed to the component using the following search params: 
+ *  - 'id': the 20 character hex string for a specific sample.
+ *  - 'trusted': has a value of either 'trusted', 'untrusted', or 'unknown' to specify the collection to fetch the sample from. 
+ */
 export default function SampleDetails() {
 
     const [selectedDoc, setDoc] = useState({} as Sample);
     const [hasStartedRequest, setHasStartedRequest] = useState(false);
-    const [tabShown, setTabShown] = useState(0);
 
     function updateStateDoc(data: Sample) {
         setDoc(data);
     }
-    function setHasStartedRequestTrue() {
-        setHasStartedRequest(true);
-    }
-    function updateTabShown(tab: number) {
-        setTabShown(tab);
-    }
-    function updateCurrentStep(newStep: string) {
-        updateStateDoc({ ...selectedDoc, 'current_step': newStep });
-
-    }
-
-
-    const processSteps = ['1. Drying process', '2. Lamination', '3. Chopping & homogenization', '4. Chemical preparation', '5. Weighing', '6. Encapsulation', '7. Mass spectrometer & data return'];
-
-    const router = useRouter();
 
     let sampleId = '12345';
     let trusted = 'trusted';
@@ -65,10 +53,8 @@ export default function SampleDetails() {
     const app = initializeAppIfNecessary();
     const db = getFirestore();
     const { t } = useTranslation();
-
-
     const auth = getAuth();
-
+    const router = useRouter();
 
     useEffect(() => {
         showNavBar();
@@ -89,7 +75,6 @@ export default function SampleDetails() {
         docRef = doc(db, "unknown_samples", sampleId!);
     }
     if (Object.keys(selectedDoc).length < 1 && !hasStartedRequest && docRef) {
-        // setHasStartedRequestTrue();	
         getDoc(docRef).then((docRef) => {
             if (docRef.exists()) {
                 console.log('updated data');
@@ -102,25 +87,7 @@ export default function SampleDetails() {
             console.log(error);
         })
     }
-    function processCompletedButtonPressed() {
-        const nextStep = processSteps[processSteps.indexOf(selectedDoc.current_step) + 1];
-        updateDoc(docRef, {
-            'current_step': nextStep,
-        });
-        updateCurrentStep(nextStep);
-    }
 
-    function showDetails() {
-        updateTabShown(0);
-    }
-
-    function showProcess() {
-        updateTabShown(1);
-    }
-
-    function showResults() {
-        updateTabShown(2);
-    }
 
     function formatAsPercentage(num: number) {
         return new Intl.NumberFormat('default', {
@@ -128,48 +95,6 @@ export default function SampleDetails() {
             minimumFractionDigits: 2,
             maximumFractionDigits: 2,
         }).format(num);
-    }
-
-    function processStep(title: string, stepNumber: number, headingId: string, collapseId: string) {
-        let buttonClassName;
-        let detailsPanelClassName;
-        let processCompletedButtonClassName;
-        if (processSteps.indexOf(selectedDoc.current_step) === stepNumber) {
-            buttonClassName = 'accordion-button';
-            detailsPanelClassName = ' accordion-collapse collapse show';
-            processCompletedButtonClassName = 'btn btn-primary';
-        } else {
-            buttonClassName = 'accordion-button collapsed';
-            detailsPanelClassName = 'accordion-collapse collapse';
-            processCompletedButtonClassName = 'btn btn-primary disabled';
-        }
-        const fullHeadingId = 'panelsStayOpen' + headingId;
-        const fullCollapseId = 'panelsStayOpen' + collapseId;
-        const dataBsTarget = '#' + fullCollapseId;
-
-        return <div className="accordion-item">
-            <h2 className="accordion-header" id={fullHeadingId}>
-                <button className={buttonClassName} type="button" data-bs-toggle="collapse" data-bs-target={dataBsTarget} aria-expanded="false" aria-controls={fullCollapseId}>
-                    {selectedDoc.current_step && processSteps.indexOf(selectedDoc.current_step) > stepNumber ? <span className='process-number completed'><span className="material-symbols-outlined">
-                        done
-                    </span></span> : <span className='process-number incomplete'>{stepNumber + 1}</span>}
-                    {title}
-                </button>
-            </h2>
-            <div id={fullCollapseId} className={detailsPanelClassName} aria-labelledby={fullCollapseId}>
-                <div className="accordion-body">
-                    Placeholder
-                    <div>
-                        <button type="button" className={processCompletedButtonClassName} onClick={processCompletedButtonPressed}>Mark as completed</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    }
-
-    function ResultsTab() {
-        return (<div>Results</div>)
-
     }
 
     function DetailsTab() {
@@ -360,24 +285,13 @@ export default function SampleDetails() {
     }
 
 
-
     return (
-
         <div>
             <div className='sample-details-wrapper'>
                 <p className='title'>{selectedDoc['sample_name'] || "Sample details"}</p>
                 <div>
-                    {/* <ul className="nav nav-tabs" id="myTab" role="tablist">
-                        <li className="nav-item">
-                            <a className={tabShown === 0 ? 'nav-link active' : 'nav-link'} onClick={showDetails} id="details-tab" data-toggle="tab" href="#details" role="tab" aria-controls="details" aria-selected="true">Details</a>
-                        </li>
-                        <li className="nav-item">
-                            <a className={tabShown === 2 ? 'nav-link active' : 'nav-link'} onClick={showResults} id="results-tab" data-toggle="tab" href="#results" role="tab" aria-controls="results" aria-selected="false">Results</a>
-                        </li>
-                    </ul> */}
                     <div className="tab-content" id="myTabContent">
                         <DetailsTab />
-                        {/* <div className={tabShown === 2 ? 'tab-pane fade show active' : 'tab-pane fade'} id="results" role="tabpanel" aria-labelledby="results-tab"><ResultsTab /></div> */}
                     </div>
                 </div>
 

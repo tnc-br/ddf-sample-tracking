@@ -13,11 +13,16 @@ import Link from 'next/link';
 import { useTranslation } from 'react-i18next';
 import './i18n/config';
 
+
+/**
+ * Component for rendering the nav bar on the left of the screen. Depending on what
+ * role a user has (member, admin, site_admin) they are shown slightly different options. 
+ * 
+ * Routing is done using next.js navigation. 
+ */
 export default function Nav() {
     const [role, setRole] = useState('');
     const [showAddSampleMenu, setShowAddSampleMenu] = useState(false);
-    // const [userData, setUserData] = useState({});
-
 
     const app = initializeApp(firebaseConfig);
     const router = useRouter();
@@ -110,7 +115,5 @@ export default function Nav() {
 
             </div>
         </div>
-
     )
-
 }

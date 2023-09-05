@@ -67,5 +67,13 @@
   "profile": "Profile",
   "removeUserConfirmation": "Are you sure you want to remove {{ user }}",
   "makeOrgAdminConfirmation": "Are you sure you want to make {{ user }} an org admin?",
-  "makeSiteAdminConfirmation": "Are you sure you want to make {{ user }} a site admin?"
+  "makeSiteAdminConfirmation": "Are you sure you want to make {{ user }} a site admin?",
+  "print": "Print",
+  "newSampleAdded": "Your new sample has been added!",
+  "addDetails": "Add details",
+  "requiredFields": "* required fields",
+  "qrPrintInstructions": "Print and paste this QR code on the sample to be analyzed",
+  "reviewAndCreate": "Review and create",
+  "addSampleMeasurements": "Add sample measurements",
+  "addNewSample": "Add new sample"
 }

@@ -21,14 +21,22 @@ import { useTranslation } from 'react-i18next';
 import Link from 'next/link';
 import { setSample } from '../firebase_utils';
 
-
+/**
+ * Component to handle adding a complete or incomplet sample. It uses the SampleDataInput
+ * subcomponent to handle the data input. 
+ * The type of sample being added (complete vs incomplete is passed via the search param
+ * 'status' which is either 'completed' or 'in_progress').
+ * 
+ * The user's data is fetched when rendering the component. If the user is not logged in
+ * they are forwarded to the main page, if they are logged in, their data is stored in State
+ * to use when adding the new sample to the Samples collection. 
+ * 
+ * Once the sample data is correctly entered, a new sample is added to the 'Samples' collection. 
+ * 
+ */
 export default function AddSample() {
-    const [user, setUser] = useState({});
-    const [sampleTrust, setSampletrust] = useState('untrusted');
-    // const [isMember, setIsMember] = useState(false);
     const [userData, setUserdata] = useState({} as UserData);
     const [currentTab, setCurrentTab] = useState(1);
-    const [pageTitle, setPageTitle] = useState("Create a new sample");
     const [sampleId, setSampleID] = useState('');
     const [sampleCreationFinished, setSampleCreationFinished] = useState(false);
 
@@ -62,11 +70,6 @@ export default function AddSample() {
     }
 
     useEffect(() => {
-        // if (!userData.role) {
-        //     onAuthStateChanged(auth, (user) => {
-        //         setUserdata(confirmUserLoggedIn(user, db, router));
-        //     });
-        // }
         if (!userData.role || userData.role.length < 1) {
             onAuthStateChanged(auth, (user) => {
                 if (!user) {
@@ -91,23 +94,18 @@ export default function AddSample() {
         }
     });
 
-    function onCancleClick() {
-        router.replace('/samples');
-    }
-
-    function sampleHasRequiredFieldsSet(): boolean {
-        return true;
-    }
-
+    /**
+     * Adds a new sample to the correct collection depending on if the sample is trusted, untrusted or unknown. 
+     * All isotope result values are converted to an array of floats and the lat/lon are converted to floats before the data is added. 
+     * 
+     * @param sampleId The ID of the new sample 
+     * @param formSampleData The data of the sample being added 
+     */
     function onCreateSampleClick(sampleId: string, formSampleData: Sample) {
         console.log("form sample data: " + formSampleData);
         if (!formSampleData) return;
         if (!sampleId) {
             console.log("Error: SampleId not provided when trying to create sample");
-        }
-        if (!sampleHasRequiredFieldsSet()) {
-            alert("Not all required fields are filled out to submit a sample.");
-            return;
         }
         const user = auth.currentUser;
         if (!user) return;
@@ -132,27 +130,9 @@ export default function AddSample() {
             lat: formSampleData.lat ? parseFloat(formSampleData.lat) : '',
             lon: formSampleData.lon ? parseFloat(formSampleData.lon) : '',
         };
-        // if (!formIsValid()) return;
         setSample(sampleData.trusted, sampleId, sampleData);
-        // const sampleTrustValue = formData.trusted;
-        // if (!sampleTrustValue) return;
-        // let docRef;
-        // if (sampleTrustValue === "trusted") {
-        //     docRef = doc(db, "trusted_samples", sampleId);
-        // } else if (sampleTrustValue === "untrusted") {
-        //     docRef = doc(db, "untrusted_samples", sampleId);
-        // } else {
-        //     docRef = doc(db, "unknown_samples", sampleId);
-        // }
-
-        // setDoc(docRef, sampleData);
         setSampleCreationFinished(true);
         setFormData(sampleData);
-
-    }
-
-    function handleChange(formState: {}, currentTab: number) {
-        setFormData(formState);
     }
 
     function handleTabChange(newTab: number) {
@@ -188,16 +168,13 @@ export default function AddSample() {
                     close
                 </span></Link>
                 <div className="page-title-text">
-                    Add new sample
+                    {t('addNewSample')}
                 </div>
             </div>
             <div >
 
-                
-
-                {/* <p className="title">{pageTitle}</p> */}
                 <div className="sample-details-form-wrapper">
-                {formData.status === 'concluded' && !sampleCreationFinished && <div className="add-sample-tab-bar">
+                    {formData.status === 'concluded' && !sampleCreationFinished && <div className="add-sample-tab-bar">
                         <div className='add-sample-add-details-tab'>
                             <div className='add-sample-tab-number-wrapper'>
                                 <div className='leading-divider'>
@@ -209,7 +186,7 @@ export default function AddSample() {
                             </div>
                             <div className='add-sample-tab-text-wrapper'>
                                 <div className={currentTab >= 1 ? "dd-sample-current-tab-text add-sample-tab-text" : "add-sample-tab-text"}>
-                                Add details
+                                    {t('addDetails')}
                                 </div>
                             </div>
                         </div>
@@ -226,7 +203,7 @@ export default function AddSample() {
                             </div>
                             <div className='add-sample-tab-text-wrapper'>
                                 <div className={currentTab >= 2 ? "dd-sample-current-tab-text add-sample-tab-text" : "add-sample-tab-text"}>
-                                Add sample measurements
+                                    {t('addSampleMeasurements')}
                                 </div>
                             </div>
                         </div>
@@ -243,22 +220,22 @@ export default function AddSample() {
                             </div>
                             <div className='add-sample-tab-text-wrapper'>
                                 <div className={currentTab === 3 ? "dd-sample-current-tab-text add-sample-tab-text" : "add-sample-tab-text"}>
-                                Review and create
+                                    {t('reviewAndCreate')}
                                 </div>
                             </div>
                         </div>
 
                     </div>}
                     {!sampleCreationFinished && <div>
-                        {formData.status !== 'concluded' && <p className="sample-details-section-title">Add details</p>}
-                        <p className="sample-details-requirements">* required fields</p>
+                        {formData.status !== 'concluded' && <p className="sample-details-section-title">{t('addDetails')}</p>}
+                        <p className="sample-details-requirements">{t('requiredFields')}</p>
                     </div>}
                     {sampleCreationFinished && <div>
                         <div className='sample-added-title'>
-                            Your new sample has been added!
+                            {t('newSampleAdded')}
                         </div>
                         <div className='qr-instructions'>
-                            Print and paste this QR code on the sample to be analyzed
+                            {t('qrPrintInstructions')}
                         </div>
                         <div className="qr-code" id="qr-code">
                             <QRCodeSVG value={url} />
@@ -269,23 +246,14 @@ export default function AddSample() {
                                 <span className="material-symbols-outlined">
                                     print
                                 </span>
-                                Print
+                                {t('print')}
                             </div>
                         </div>
 
                     </div>}
 
-                    {/* {formData.status === 'concluded' && <div className="tabs">
-                        <div className={currentTab === 1 ? "current_tab" : "unselected_tab"}>{t('basicInfo')}</div>
-                        <div className={currentTab === 2 ? "current_tab" : "unselected_tab"}>{t('sampleMeasurements')}</div>
-                        {formData.status === 'concluded' && <div className={currentTab === 3 ? "current_tab" : "unselected_tab"}>{t('sampleResults')}</div>}
-                        <div className={currentTab === 4 ? "current_tab" : "unselected_tab"}>{t('createSample')}</div>
-                    </div>} */}
-                    
-
                     {userData && !sampleCreationFinished && <div id="sample-form">
                         <SampleDataInput baseState={formData}
-                            // onStateUpdate={(state) => handleChange(state)}
                             onActionButtonClick={(id: string, formSampleData: Sample) => onCreateSampleClick(id, formSampleData)}
                             onTabChange={(tab) => handleTabChange(tab)}
                             actionButtonTitle="Create sample"

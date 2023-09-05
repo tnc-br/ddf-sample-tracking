@@ -18,6 +18,10 @@ interface OrgsSchemas {
     [key: string]: string;
 }
 
+/**
+ * Form to let users who signed up through google to select the organization they are associated with. They must fill out this form to set the 
+ * 'org' and 'org_name' fields in the user's document in the 'new_users' collection. They can't be approved as TimberId members before this happens. 
+ */
 export default function SelectOrg() {
     const [availableOrgs, setAvailableOrgs] = useState({} as OrgsSchemas);
     const [userDocId, setNewUserDocId] = useState('');

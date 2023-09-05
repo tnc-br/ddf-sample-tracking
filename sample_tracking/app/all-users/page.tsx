@@ -30,7 +30,13 @@ type OrgData = {
 
 /**
  * Component for showing list of all users to be viewed by admins. 
- * Site admins will be able to view all site users, and organization admins will only be able to view members in their org.
+ * Site admins will be able to view all site users, and organization
+ * admins will only be able to view members in their org.
+ * 
+ * Data is fetched from the 'Users' collection to render. If the user
+ * is a site_admin, all users are fetched, if the user is an org admin the Users collection is 
+ * queried to only return users in the user's org. 
+ * 
  */
 export default function Users() {
     const [userData, setUserData] = useState({} as UserData);
@@ -72,20 +78,13 @@ export default function Users() {
         }
     })
 
-    console.log("User array: " + userDataArray);
-
-
     if (userDataArray.length < 1) {
         const usersListArray: UserData[] = [];
         if (userData.role === 'site_admin') {
-            console.log("hereee!!!")
 
             getDocs(collection(db, "users")).then((querySnapshot) => {
-                console.log('made request to get users');
-
                 querySnapshot.forEach((doc) => {
                     const docData = doc.data();
-                    console.log(docData);
                     if (docData.org) {
                         usersListArray.push({
                             ...docData,
@@ -95,8 +94,6 @@ export default function Users() {
 
                 });
                 if (usersListArray.length > 0) {
-                    console.log("setting user data array " + usersListArray)
-                    // setUsers(usersList);
                     setUserDataArray(usersListArray)
                 }
             }).catch((error) => {
@@ -113,7 +110,6 @@ export default function Users() {
                     } as UserData);
                 })
                 if (usersListArray.length > 0) {
-                    // setUsers(usersList);
                     setUserDataArray(usersListArray);
                 }
             }).catch((error) => {
@@ -124,7 +120,6 @@ export default function Users() {
 
     if (userData.role === "site_admin" && userDataArray.length > 0 && orgDataArray.length < 1) {
         getDocs(collection(db, "organizations")).then((querySnapshot) => {
-            console.log('made request to get orgs');
             let orgList: OrgData[] = [];
 
             querySnapshot.forEach((doc) => {
@@ -143,8 +138,6 @@ export default function Users() {
             console.log(error);
         });
     }
-
-
 
     const userColumns = useMemo<MRT_ColumnDef<UserData>[]>(
         () => [
@@ -229,8 +222,6 @@ export default function Users() {
             onActionButtonClick: removeUserFunction,
             onCancelButtonClick: cancelDeleteFunction,
         })
-
-        // delete users[removedMemberId];
     }
 
     function handleMakeOrgAdminClick(userData: UserData) {
@@ -262,8 +253,6 @@ export default function Users() {
     }
 
     function handleMakeSiteAdminClick(userData: UserData) {
-
-
         const makeAdminFunction = () => {
             const newSiteAdminId = userData.user_id;
             const userDocRef = doc(db, "users", newSiteAdminId);
@@ -277,7 +266,6 @@ export default function Users() {
             setConfirmationBoxData(null);
         }
         const title = t('makeSiteAdminConfirmation', {user: userData.name});
-        // const title = `Are you sure you want to make ${userData.name} a site admin?`;
         const actionButtonTitle = t('confirm');
         setConfirmationBoxData({
             title: title,
@@ -286,8 +274,6 @@ export default function Users() {
             onCancelButtonClick: cancelFunction,
         })
     }
-
-    console.log("User array end: " + userDataArray.length);
 
     return (<div>
         <div className='all-users-admin-wrapper'>

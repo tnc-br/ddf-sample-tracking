@@ -15,56 +15,26 @@ import Login from './login';
 import SignUp from './signup';
 import ForgotPassword from './forgot-password';
 
-type SignUpData = {
-  firstName: string,
-  lastName: string,
-  lab: string,
-  labName: string,
-}
-
-interface LogInProps {
-  onSignUpClick: any,
-  onForgotPasswordClick: any,
-}
-
-interface SignUpProps {
-  onLogInClick: any,
-}
-
-interface NestedSchemas {
-  [key: string]: NestedSchemas | string;
-}
-
-interface OrgsSchemas {
-  [key: string]: string;
-}
-
-type NewUser = {
-  name: string,
-  email: string,
-  date_requested: string,
-  org: string,
-  uid: string,
-  org_name: string
-}
-
 const LogInScreen = {
   LOG_IN: 'logIn',
   SIGN_UP: 'signUp',
   FORGOT_PASSWORD: 'forgotPassword'
 }
 
+
+/**
+ * Component to handle logging a user in, creating an account, and updating passwords.
+ * All of these features are handled using subcomponents in the same directory. 
+ * It does all of this using Firebase auth. 
+ */
 export default function LogInSignUpPage() {
 
   const router = useRouter()
-
   const app = initializeAppIfNecessary();
   const auth = getAuth();
   onAuthStateChanged(auth, (user) => {
     if (user) {
       router.replace('/samples');
-    } else {
-      console.log('User not logged in');
     }
   });
 
@@ -77,16 +47,11 @@ export default function LogInSignUpPage() {
   })
 
 
-
-
-
   function handleSignUpClick() {
-    console.log('sign up click');
     setSignInScreen(LogInScreen.SIGN_UP)
     setCanSignIn(false);
   }
   function handleSignInClick() {
-    console.log('sign in click');
     setCanSignIn(true);
   }
   function handleForgotPasswordClick() {
@@ -106,11 +71,7 @@ export default function LogInSignUpPage() {
             <Login onSignUpClick={() => handleSignUpClick()} onForgotPasswordClick={() => handleForgotPasswordClick()}  />
             <SignUp onLogInClick={() => handleSignInClick()} />
           </div>
-
-
       }
-
-      {/* {canSignIn ? <Login onSignUpClick={() => handleSignUpClick()} onForgotPasswordClick={() => handleForgotPasswordClick()}/> : <SignUp onLogInClick={() => handleSignInClick()} />} */}
     </div>
 
   )

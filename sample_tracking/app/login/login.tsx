@@ -9,15 +9,15 @@ import Image from 'next/image'
 interface LogInProps {
     onSignUpClick: any,
     onForgotPasswordClick: any,
-    // router: any,
 }
 
+/**
+ * Component to handle logging a user in using Firebase auth.
+ * 
+ * If a user signs in for the first time with google and they are not already a member, they will be forwarded to the SelectOrg component. 
+ * They MUST complete that form to be able to be approved by an admin. They will be stuck in limbo until they fill out that form. 
+ */
 export default function Login(props: LogInProps) {
-    const [loginInfo, setLoginInfo] = useState({
-        email: "",
-        password: "",
-    });
-
     const auth = getAuth();
     const router = useRouter()
 
@@ -37,10 +37,8 @@ export default function Login(props: LogInProps) {
                 const errorMessage = error.message;
                 var errorText = document.getElementById('signin-error-message');
                 console.log(errorMessage);
-                // errorText.innerHTML = errorMessage;
 
             });
-        console.log('DONE');
         const user = auth.currentUser;
     }
 
@@ -84,14 +82,7 @@ export default function Login(props: LogInProps) {
                     }
                 });
             }).catch((error) => {
-                // Handle Errors here.
-                const errorCode = error.code;
-                const errorMessage = error.message;
-                // The email of the user's account used.
-                const email = error.customData.email;
-                // The AuthCredential type that was used.
-                const credential = GoogleAuthProvider.credentialFromError(error);
-                // ...
+                console.log(error);
             });
 
 
@@ -154,8 +145,6 @@ export default function Login(props: LogInProps) {
 
                 </div>
             </div>
-
-
         </div>
     )
 }

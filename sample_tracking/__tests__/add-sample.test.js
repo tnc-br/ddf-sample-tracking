@@ -87,13 +87,26 @@ jest.mock('../app/sample_data_input', () => (props) => {
     mockSamplesTableFn(props);
     return <mock-childComponent />;
 });
+jest.mock('react-i18next', () => ({
+    // this mock makes sure any components using the translate hook can use it without a warning being shown
+    useTranslation: () => {
+        return {
+            t: (str) => str,
+            i18n: {
+                changeLanguage: () => new Promise(() => { }),
+            },
+        };
+    },
+    initReactI18next: {
+        type: '3rdParty',
+        init: () => { },
+    }
+}));
 
 
 describe('Samples', () => {
 
     it('sets up SampleDataInput', async () => {
-        const mockedSignIn = jest.mocked(useTranslation);
-        mockedSignIn.mockResolvedValue(Promise.resolve("Test"));
         act(() => {
             render(<AddSample />)
         });
@@ -101,7 +114,7 @@ describe('Samples', () => {
         const onActionButtonClick = mockSamplesTableFn.mock.calls[0][0].onActionButtonClick;
         const onStateUpdate = mockSamplesTableFn.mock.calls[0][0].onStateUpdate;
         const newFormState = {
-            oxygen: ['12','13'],
+            d18O_wood: ['12','13'],
             species: 'testSpecies',
         }
         act(() => {
@@ -111,6 +124,6 @@ describe('Samples', () => {
         const sampleCreated = setSample.mock.calls[0][2];
         expect(sampleCreated.created_by).toBe(1);
         expect(sampleCreated.code_lab).toBe('12345');
-        expect(sampleCreated.oxygen).toStrictEqual([12, 13])
+        expect(sampleCreated.d18O_wood).toStrictEqual([12, 13])
     });
 });
