@@ -48,7 +48,6 @@ export default function Edit() {
     const searchParams = useSearchParams();
     if (typeof window !== "undefined") {
         const queryString = window.location.search;
-        console.log("Querystring: " + queryString);
         const urlParams = new URLSearchParams(queryString);
         sampleId = urlParams.get('id') ? urlParams.get('id') : searchParams.get('id');
         trusted = urlParams.get('trusted') ? urlParams.get('trusted') : searchParams.get('trusted');
@@ -113,7 +112,6 @@ export default function Edit() {
         const currentDateString = `${date.getMonth() + 1}-${date.getDate()}-${date.getFullYear()}`
         const user = auth.currentUser;
         if (!user) return;
-        console.log("Form data on update: " + formData.species)
         const sampleData = {
             ...updatedFormData,
             d18O_wood: updatedFormData.d18O_wood ? updatedFormData.d18O_wood.map((value: string) => parseFloat(value)) : [],

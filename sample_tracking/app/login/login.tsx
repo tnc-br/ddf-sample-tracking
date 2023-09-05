@@ -37,10 +37,8 @@ export default function Login(props: LogInProps) {
                 const errorMessage = error.message;
                 var errorText = document.getElementById('signin-error-message');
                 console.log(errorMessage);
-                // errorText.innerHTML = errorMessage;
 
             });
-        console.log('DONE');
         const user = auth.currentUser;
     }
 
@@ -84,14 +82,7 @@ export default function Login(props: LogInProps) {
                     }
                 });
             }).catch((error) => {
-                // Handle Errors here.
-                const errorCode = error.code;
-                const errorMessage = error.message;
-                // The email of the user's account used.
-                const email = error.customData.email;
-                // The AuthCredential type that was used.
-                const credential = GoogleAuthProvider.credentialFromError(error);
-                // ...
+                console.log(error);
             });
 
 
@@ -154,8 +145,6 @@ export default function Login(props: LogInProps) {
 
                 </div>
             </div>
-
-
         </div>
     )
 }

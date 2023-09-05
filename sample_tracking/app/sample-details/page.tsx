@@ -32,13 +32,10 @@ export default function SampleDetails() {
 
     const [selectedDoc, setDoc] = useState({} as Sample);
     const [hasStartedRequest, setHasStartedRequest] = useState(false);
-    const [tabShown, setTabShown] = useState(0);
 
     function updateStateDoc(data: Sample) {
         setDoc(data);
     }
-
-    const router = useRouter();
 
     let sampleId = '12345';
     let trusted = 'trusted';
@@ -57,6 +54,7 @@ export default function SampleDetails() {
     const db = getFirestore();
     const { t } = useTranslation();
     const auth = getAuth();
+    const router = useRouter();
 
     useEffect(() => {
         showNavBar();
@@ -287,9 +285,7 @@ export default function SampleDetails() {
     }
 
 
-
     return (
-
         <div>
             <div className='sample-details-wrapper'>
                 <p className='title'>{selectedDoc['sample_name'] || "Sample details"}</p>

@@ -61,5 +61,13 @@
   "makeSiteAdminConfirmation": "Tem certeza de que deseja tornar {{ user }} um administrador do site?",
   "confirmDeleteSample": "Tem certeza de que deseja excluir {{ sample }}?",
   "remove": "Remover",
-  "confirm": "Confirme"
+  "confirm": "Confirme",
+  "Print": "Imprimir",
+  "newSampleAdded": "Sua nova amostra foi adicionada!",
+  "addDetails": "Adicionar detalhes",
+  "requiredFields": "* Os campos obrigatórios",
+  "qrPrintInstructions": "Imprima e cole este código QR na amostra a ser analisada",
+  "reviewAndCreate": "Revise e crie",
+  "addSampleMeasurements": "Adicionar medições de amostra",
+  "addNewSample": "Adicionar nova amostra"
 }

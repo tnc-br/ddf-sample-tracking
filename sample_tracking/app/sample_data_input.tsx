@@ -38,6 +38,8 @@ type SampleDataInputProps = {
  * - sampleId: 20 character hex ID for the sample
  * - isCompletedSample: boolean representing if this is a completed or in progress sample
  * - currentTab: the tab of the sample form that should be shown
+ * 
+ * This is a very large file but at its core its just a form to enter Sample data. 
  */
 export default function SampleDataInput(props: SampleDataInputProps) {
     const [currentTab, setCurrentTab] = useState(props.currentTab ? props.currentTab : 1);
@@ -425,20 +427,6 @@ export default function SampleDataInput(props: SampleDataInputProps) {
                             onChange={handleChange}
                             value={formData.lon}
                         />
-                        {/* <div className="form-group latlon-input" id="inputLatFormGroup">
-                            <label htmlFor="inputLat">{t('latitude')}{originIsKnownOrUncertain() && "*"}</label>
-                            <input onChange={handleChange} value={formData.lat} required={originIsKnownOrUncertain()} name='lat' type="text" className="form-control" id="inputLat" />
-                            <div className="invalid-feedback">
-                                Please provide a latitude.
-                            </div>
-                        </div>
-                        <div className="form-group latlon-input">
-                            <label htmlFor="inputLon">{t('longitude')}{originIsKnownOrUncertain() && "*"}</label>
-                            <input onChange={handleChange} value={formData.lon} required={originIsKnownOrUncertain()} name='lon' type="text" className="form-control" id="inputLon" />
-                            <div className="invalid-feedback">
-                                Please provide a longitude.
-                            </div>
-                        </div> */}
                     </div>}
 
                     {originIsKnownOrUncertain() &&
@@ -539,10 +527,6 @@ export default function SampleDataInput(props: SampleDataInputProps) {
                                 value={formData.measureing_height}
                             />
                         </div>
-                        {/* <div className="form-group half-width-entry">
-                            <label htmlFor="measureing_height">{t('measuringHeight')}</label>
-                            <input onChange={handleChange} value={formData.measureing_height} name='measureing_height' type="text" className="form-control" id="measureing_height" />
-                        </div> */}
 
                         <div className='input-text-field-wrapper half-width'>
                             <TextField
@@ -562,17 +546,6 @@ export default function SampleDataInput(props: SampleDataInputProps) {
                                 ))}
                             </TextField>
                         </div>
-
-
-                        {/* <div className='form-group  half-width-entry'>
-                            <label htmlFor="sample_type" defaultValue={sampleTrust}>{t('sampleType')}*</label>
-                            <select onChange={handleChange} value={formData.sample_type} required name='sample_type' className="form-select" aria-label="Default select example" id="sample_type">
-                                <option value="knonw">Disc</option>
-                                <option value="unkown">Triangular</option>
-                                <option value="uncertain">Chunk</option>
-                                <option value="uncertain">Fiber</option>
-                            </select>
-                        </div> */}
                     </div>
                     <div className='sample-measurements-overview-row'>
                         <div className='input-text-field-wrapper half-width'>
@@ -634,10 +607,6 @@ export default function SampleDataInput(props: SampleDataInputProps) {
                                 value={formData.observations}
                             />
                         </div>
-                        {/* <div className="form-group full-width-entry">
-                            <label htmlFor="observations">{t('observations')}</label>
-                            <input onChange={handleChange} value={formData.observations} name='observations' type="text" className="form-control" id="observations" />
-                        </div> */}
                     </div>
                 </div>
                 <div className="sample-measurements-entry">
@@ -715,18 +684,6 @@ export default function SampleDataInput(props: SampleDataInputProps) {
 
                                         />
                                     </div>
-                                    {/* <div className="form-group">
-                                        <label htmlFor="d18O_wood">d18O_wood</label>
-                                        <input onChange={handleResultChange} value={formData.d18O_wood ? formData.d18O_wood[currentMeasurementsTab] || '' : ''} name='d18O_wood' type="text" className="form-control" id="d18O_wood" />
-                                    </div> */}
-                                    {/* <div className="form-group">
-                                        <label htmlFor="d15N_wood">d15N_wood</label>
-                                        <input onChange={handleResultChange} value={formData.d15N_wood ? formData.d15N_wood[currentMeasurementsTab] || '' : ''} name='d15N_wood' type="text" className="form-control" id="d15N_wood" />
-                                    </div> */}
-                                    {/* <div className="form-group">
-                                        <label htmlFor="n_wood">N_wood</label>
-                                        <input onChange={handleResultChange} value={formData.n_wood ? formData.n_wood[currentMeasurementsTab] || '' : ''} name='n_wood' type="text" className="form-control" id="n_wood" />
-                                    </div> */}
                                 </div>
                                 <div className='measurements-row'>
                                     <div className="quarter-width">
@@ -779,22 +736,6 @@ export default function SampleDataInput(props: SampleDataInputProps) {
                                             }}
                                         />
                                     </div>
-                                    {/* <div className="form-group">
-                                        <label htmlFor="d13C_wood">d13C_wood</label>
-                                        <input onChange={handleResultChange} value={formData.d13C_wood ? formData.d13C_wood[currentMeasurementsTab] || '' : ''} name='d13C_wood' type="text" className="form-control" id="d13C_wood" />
-                                    </div> */}
-                                    {/* <div className="form-group">
-                                        <label htmlFor="d18O_wood">%C_wood</label>
-                                        <input onChange={handleResultChange} value={formData.c_wood ? formData.c_wood[currentMeasurementsTab] || '' : ''} name='c_wood' type="text" className="form-control" id="c_wood" />
-                                    </div> */}
-                                    {/* <div className="form-group">
-                                        <label htmlFor="d13C_cel">d13C_cel</label>
-                                        <input onChange={handleResultChange} value={formData.d13C_cel ? formData.d13C_cel[currentMeasurementsTab] || '' : ''} name='d13C_cel' type="text" className="form-control" id="d13C_cel" />
-                                    </div> */}
-                                    {/* <div className="form-group">
-                                        <label htmlFor="c_cel">%C_cel</label>
-                                        <input onChange={handleResultChange} value={formData.c_cel ? formData.c_cel[currentMeasurementsTab] || '' : ''} name='c_cel' type="text" className="form-control" id="c_cel" />
-                                    </div> */}
                                 </div>
 
                             </div>

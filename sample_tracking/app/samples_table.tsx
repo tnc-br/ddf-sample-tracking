@@ -21,11 +21,10 @@ import './i18n/config';
 import { ConfirmationBox, ConfirmationProps } from './confirmation_box';
 
 interface SampleDataProps {
-    samplesData: any,
+    samplesData: Sample[],
     canDeleteSamples: boolean,
     showValidity: boolean,
     allowExport: boolean,
-    userOrg: string,
 }
 
 type SampleData = {
@@ -33,23 +32,25 @@ type SampleData = {
     hasBeenUpdated: boolean,
 }
 
+/**
+ * Component used to render samples in a table format. The following data is passed in through props:
+ *  - samplesData: the samples to be rendered
+ *  - canDeleteSamples: true if the delete sample functionality should be enabled 
+ *  - showValidity: true if the 'validity' column should be shown in the table
+ *  - allowExport: true if user can export samples from table 
+ */
 export default function SamplesTable(props: SampleDataProps) {
 
     const [sampleData, setSampleData] = useState({
         samples: props.samplesData as Sample[],
         hasBeenUpdated: false,
     });
-    const [showConfirmationBox, setShowConfirmationBox] = useState(false);
     const [confirmationBoxData, setConfirmationBoxData] = useState(null as ConfirmationProps|null)
-    // const [hasDeletedSample, setHasDeletedSample] = useState(false);
 
     const router = useRouter();
     const app = initializeAppIfNecessary();
     const db = getFirestore();
     const { t } = useTranslation();
-
-
-
 
     const tableInstanceRef = useRef<MRT_TableInstance<Sample>>(null);
 
@@ -57,13 +58,6 @@ export default function SamplesTable(props: SampleDataProps) {
         setSampleData({
             samples: props.samplesData,
             hasBeenUpdated: false,
-        });
-    }
-
-    function updateSampleData(newSampleData: Sample[]) {
-        setSampleData({
-            samples: newSampleData,
-            hasBeenUpdated: true,
         });
     }
 
@@ -123,9 +117,6 @@ export default function SamplesTable(props: SampleDataProps) {
                     const row = cell.getValue();
                     return (
                         <div className="action-buttons-wrapper">
-                            {/* <div id={(row as Sample).trusted} onClick={onEditSampleClick} className="actions-button">
-                                <span id={(row as Sample).code_lab}>Edit</span>
-                            </div> */}
                             <div id={(row as Sample).trusted} >
                                 <IconButton onClick={() => onEditSampleClick(row)}>
                                     <Edit />
@@ -138,9 +129,6 @@ export default function SamplesTable(props: SampleDataProps) {
                                         <Delete />
                                     </IconButton>
                                 </div>}
-                            {/* {props.canDeleteSamples && <div id={(row as Sample).trusted} onClick={onDeleteSampleClick} className="actions-button">
-                                <span id={(row as Sample).code_lab}>Delete</span>
-                            </div>} */}
                         </div>
 
                     )

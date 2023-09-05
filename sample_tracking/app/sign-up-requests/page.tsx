@@ -29,7 +29,6 @@ interface NestedSchemas {
  */
 export default function SignUpRequests() {
     const [pendingApprovals, setPendingApprovals] = useState({});
-    const [currentUsers, setCurrentUsers] = useState({});
     const [prospectiveUsers, setProspectiveUsers] = useState({} as NestedSchemas);
     const [prospectiveOrgs, setProspectiveOrgs] = useState({} as NestedSchemas);
     const [userData, setUserData] = useState({} as UserData);
@@ -63,7 +62,7 @@ export default function SignUpRequests() {
     })
 
 
-    if (Object.keys(pendingApprovals).length < 1 && Object.keys(currentUsers).length < 1) {
+    if (Object.keys(pendingApprovals).length < 1) {
         const pendingUsers: NestedSchemas = {};
 
         if (userData.role === 'admin' && userData.org.length > 0) {
@@ -186,7 +185,6 @@ export default function SignUpRequests() {
         updateDoc(orgDocRef, {
             members: arrayUnion(prospectiveUsers[memberId].email),
         })
-        // const deleteDocRef = doc(db, "new_users", memberId);
         deleteMemberFromNewMemberList(memberId);
 
     }
@@ -245,7 +243,6 @@ export default function SignUpRequests() {
 
             </div>
 
-
             <div className='details'>
                 <div className='section-title'>
                     <p className="section-title">Organizations ({Object.keys(prospectiveOrgs).length})</p>
@@ -278,8 +275,6 @@ export default function SignUpRequests() {
                 </table>
 
             </div>
-
-
         </div>
     )
 }

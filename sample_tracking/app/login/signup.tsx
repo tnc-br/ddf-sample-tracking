@@ -45,10 +45,7 @@ type NewUser = {
  */
 export default function SignUp(props: SignUpProps) {
 
-    const router = useRouter()
-
     const [formData, setFormData] = useState({} as NewUser);
-
     const [signUpTab, setSignUpTab] = useState(0);
     const [signUpData, setSignUpData] = useState({
         firstName: '',
@@ -64,6 +61,7 @@ export default function SignUp(props: SignUpProps) {
 
     const auth = getAuth();
     const db = getFirestore();
+    const router = useRouter()
 
     if (Object.keys(availableOrgs).length < 1) {
         const orgs: OrgsSchemas = {};
@@ -75,28 +73,6 @@ export default function SignUp(props: SignUpProps) {
             orgs["Create new organization"] = "NEW";
             setAvailableOrgs(orgs as OrgsSchemas);
         });
-    }
-
-    function finishYourDetailsTab() {
-        console.log('here');
-        const firstName = (document.getElementById('firstName') as HTMLInputElement).value;
-        const lastName = (document.getElementById('lastName') as HTMLInputElement).value;
-        const labName = (document.getElementById('labSelect') as HTMLInputElement).value;
-        const labValue = labName === 'Create new organization' ? "NEW" : availableOrgs[labName];
-        const form = document.getElementById('your-details-tab');
-        if (!form) return;
-        if (!form.checkValidity()) {
-            form.reportValidity();
-            return true;
-        } else {
-            updateSignUpData({
-                firstName: firstName,
-                lastName: lastName,
-                lab: labValue,
-                labName: labName,
-            })
-            setSignUpTab(1);
-        }
     }
 
     async function handleSignUpButtonClicked() {
@@ -150,20 +126,6 @@ export default function SignUp(props: SignUpProps) {
             });
         }
         router.push('/samples');
-    }
-
-
-
-    function addUserToNewUsersCollection(newUserData: NewUser) {
-        addDoc(collection(db, "new_users"), {
-            name: newUserData.name,
-            email: newUserData.email,
-            date_requested: newUserData.date_requested,
-            org: newUserData.org ? newUserData.org : "",
-            uid: newUserData.uid,
-            org_name: newUserData.org_name ? newUserData.org_name : "",
-        });
-
     }
 
     function handleChange(evt: any) {

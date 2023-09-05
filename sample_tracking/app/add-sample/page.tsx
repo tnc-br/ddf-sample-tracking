@@ -35,9 +35,6 @@ import { setSample } from '../firebase_utils';
  * 
  */
 export default function AddSample() {
-    const [user, setUser] = useState({});
-    const [sampleTrust, setSampletrust] = useState('untrusted');
-    // const [isMember, setIsMember] = useState(false);
     const [userData, setUserdata] = useState({} as UserData);
     const [currentTab, setCurrentTab] = useState(1);
     const [sampleId, setSampleID] = useState('');
@@ -97,6 +94,13 @@ export default function AddSample() {
         }
     });
 
+    /**
+     * Adds a new sample to the correct collection depending on if the sample is trusted, untrusted or unknown. 
+     * All isotope result values are converted to an array of floats and the lat/lon are converted to floats before the data is added. 
+     * 
+     * @param sampleId The ID of the new sample 
+     * @param formSampleData The data of the sample being added 
+     */
     function onCreateSampleClick(sampleId: string, formSampleData: Sample) {
         console.log("form sample data: " + formSampleData);
         if (!formSampleData) return;
@@ -129,7 +133,6 @@ export default function AddSample() {
         setSample(sampleData.trusted, sampleId, sampleData);
         setSampleCreationFinished(true);
         setFormData(sampleData);
-
     }
 
     function handleTabChange(newTab: number) {
@@ -165,7 +168,7 @@ export default function AddSample() {
                     close
                 </span></Link>
                 <div className="page-title-text">
-                    Add new sample
+                    {t('addNewSample')}
                 </div>
             </div>
             <div >
@@ -183,7 +186,7 @@ export default function AddSample() {
                             </div>
                             <div className='add-sample-tab-text-wrapper'>
                                 <div className={currentTab >= 1 ? "dd-sample-current-tab-text add-sample-tab-text" : "add-sample-tab-text"}>
-                                    Add details
+                                    {t('addDetails')}
                                 </div>
                             </div>
                         </div>
@@ -200,7 +203,7 @@ export default function AddSample() {
                             </div>
                             <div className='add-sample-tab-text-wrapper'>
                                 <div className={currentTab >= 2 ? "dd-sample-current-tab-text add-sample-tab-text" : "add-sample-tab-text"}>
-                                    Add sample measurements
+                                    {t('addSampleMeasurements')}
                                 </div>
                             </div>
                         </div>
@@ -217,22 +220,22 @@ export default function AddSample() {
                             </div>
                             <div className='add-sample-tab-text-wrapper'>
                                 <div className={currentTab === 3 ? "dd-sample-current-tab-text add-sample-tab-text" : "add-sample-tab-text"}>
-                                    Review and create
+                                    {t('reviewAndCreate')}
                                 </div>
                             </div>
                         </div>
 
                     </div>}
                     {!sampleCreationFinished && <div>
-                        {formData.status !== 'concluded' && <p className="sample-details-section-title">Add details</p>}
-                        <p className="sample-details-requirements">* required fields</p>
+                        {formData.status !== 'concluded' && <p className="sample-details-section-title">{t('addDetails')}</p>}
+                        <p className="sample-details-requirements">{t('requiredFields')}</p>
                     </div>}
                     {sampleCreationFinished && <div>
                         <div className='sample-added-title'>
-                            Your new sample has been added!
+                            {t('newSampleAdded')}
                         </div>
                         <div className='qr-instructions'>
-                            Print and paste this QR code on the sample to be analyzed
+                            {t('qrPrintInstructions')}
                         </div>
                         <div className="qr-code" id="qr-code">
                             <QRCodeSVG value={url} />
@@ -243,7 +246,7 @@ export default function AddSample() {
                                 <span className="material-symbols-outlined">
                                     print
                                 </span>
-                                Print
+                                {t('print')}
                             </div>
                         </div>
 

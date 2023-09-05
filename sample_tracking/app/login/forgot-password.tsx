@@ -72,9 +72,7 @@ export default function ForgotPassword(props: ForgotPasswordProps) {
                             </div>
                         </div>
                     </div>
-                </div>
-            }
-
+                </div>}
         </div>
     )
 }

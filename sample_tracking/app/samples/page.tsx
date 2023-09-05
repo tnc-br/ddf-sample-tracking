@@ -19,7 +19,10 @@ export default function Samples() {
 
     const [userData, setUserData] = useState({} as UserData);
     const [samplesState, setSamplesState] = useState([{}]);
-    const [allSamples, setAllSamples] = useState({});
+    const [allSamples, setAllSamples] = useState({
+        inProgress: null as Sample[] | null,
+        completed: null as Sample[] | null
+    });
 
     const app = initializeAppIfNecessary();
     const router = useRouter();
@@ -50,64 +53,66 @@ export default function Samples() {
     }
 
     async function addSamplesToDataList() {
-        if (Object.keys(samplesState[0]).length < 1) {
-            const trustedSamples = await getSamplesFromCollection(userData, 'trusted_samples');
-            const untrustedSamples = await getSamplesFromCollection(userData, 'untrusted_samples');
-            const unknownSamples = await getSamplesFromCollection(userData, 'unknown_samples');
-            if (trustedSamples.length + untrustedSamples.length + unknownSamples.length < 1) {
-                return;
-            }
+        // We don't want to refetch the data if we already have.
+        if (allSamples.inProgress || allSamples.completed) {
+            return;
+        }
+        const trustedSamples = await getSamplesFromCollection(userData, 'trusted_samples');
+        const untrustedSamples = await getSamplesFromCollection(userData, 'untrusted_samples');
+        const unknownSamples = await getSamplesFromCollection(userData, 'unknown_samples');
+        if (trustedSamples.length + untrustedSamples.length + unknownSamples.length < 1) {
+            return;
+        }
 
-            let inProgressSamples: any = [];
-            let completedSamples: any = [];
-            trustedSamples.forEach((sample: Sample) => {
-                if (sample.status === 'concluded') {
-                    completedSamples.push({
-                        ...sample,
-                        trusted: 'trusted',
-                    })
-                } else {
-                    inProgressSamples.push({
-                        ...sample,
-                        trusted: 'trusted',
-                    })
-                }
-            });
-
-            untrustedSamples.forEach((sample: Sample) => {
-                if (sample.status === 'concluded') {
-                    completedSamples.push({
-                        ...sample,
-                        trusted: 'untrusted',
-                    })
-                } else {
-                    inProgressSamples.push({
-                        ...sample,
-                        trusted: 'untrusted',
-                    })
-                }
-            });
-
-            unknownSamples.forEach((sample: Sample) => {
-                if (sample.status === 'concluded') {
-                    completedSamples.push({
-                        ...sample,
-                        trusted: 'unknown',
-                    })
-                } else {
-                    inProgressSamples.push({
-                        ...sample,
-                        trusted: 'unknown',
-                    })
-                }
-            });
-
-            if (inProgressSamples.length > 0 || completedSamples.length > 0) {
-                setAllSamples({
-                    inProgress: inProgressSamples,
-                    completed: completedSamples,
+        let inProgressSamples: any = [];
+        let completedSamples: any = [];
+        trustedSamples.forEach((sample: Sample) => {
+            if (sample.status === 'concluded') {
+                completedSamples.push({
+                    ...sample,
+                    trusted: 'trusted',
+                })
+            } else {
+                inProgressSamples.push({
+                    ...sample,
+                    trusted: 'trusted',
                 })
             }
+        });
+
+        untrustedSamples.forEach((sample: Sample) => {
+            if (sample.status === 'concluded') {
+                completedSamples.push({
+                    ...sample,
+                    trusted: 'untrusted',
+                })
+            } else {
+                inProgressSamples.push({
+                    ...sample,
+                    trusted: 'untrusted',
+                })
+            }
+        });
+
+        unknownSamples.forEach((sample: Sample) => {
+            if (sample.status === 'concluded') {
+                completedSamples.push({
+                    ...sample,
+                    trusted: 'unknown',
+                })
+            } else {
+                inProgressSamples.push({
+                    ...sample,
+                    trusted: 'unknown',
+                })
+            }
+        });
+
+        if (inProgressSamples.length > 0 || completedSamples.length > 0) {
+            setAllSamples({
+                inProgress: inProgressSamples,
+                completed: completedSamples,
+            })
         }
     }
 

@@ -1,4 +1,3 @@
-
 "use client";
 
 import 'bootstrap/dist/css/bootstrap.css';
@@ -13,6 +12,11 @@ import Link from 'next/link';
 import { useTranslation } from 'react-i18next';
 import './i18n/config';
 
+/**
+ * Component to render the top bar shown on most pages in TimberId. 
+ * Renders website name/icon in top left of screen, and user profile photo
+ * or first initial on top left to let user access profile menu.
+ */
 export default function TopBar() {
     const [userData, setUserData] = useState({});
     const [showMenu, setShowMenu] = useState(false);
@@ -26,7 +30,6 @@ export default function TopBar() {
     const ref = useRef(null);
 
     useEffect(() => {
-        // if (Object.keys(userData).length < 1) {
         if (Object.keys(userData).length < 1) {
             onAuthStateChanged(auth, (user) => {
                 if (!user) {
@@ -49,8 +52,6 @@ export default function TopBar() {
         }
 
     })
-
-
 
     function onLogOutClick() {
         signOut(auth).then(() => {
