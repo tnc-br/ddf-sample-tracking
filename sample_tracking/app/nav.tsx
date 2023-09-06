@@ -12,7 +12,8 @@ import { getFirestore, getDoc, doc } from "firebase/firestore";
 import Link from 'next/link';
 import { useTranslation } from 'react-i18next';
 import './i18n/config';
-import ImportSamples from './import-samples'
+import ImportSamples from './import-samples';
+import {type Sample } from './utils';
 
 
 /**
@@ -69,6 +70,14 @@ export default function Nav() {
         return role === 'admin' || role === 'site_admin';
     }
 
+    function onSuccessfulImport() {
+
+    }
+
+    function onUnsuccessfulImport(samples: Sample[]) {
+
+    }
+
     return (
         <div id="nav-wrapper" className='nav-wrapper'>
             <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@48,400,0,0" />
@@ -82,7 +91,8 @@ export default function Nav() {
                     {/* <Link className="nav-link" href="./import-samples">
                         <span className="material-symbols-outlined">cloud_upload</span>
                         {t('importSamples')}</Link> */}
-                        <div><ImportSamples /></div>
+                        <div className="nav-link"><ImportSamples onSuccessfulImport={onSuccessfulImport} 
+                        onUnsuccessfulImport={(samples: Sample[]) => onUnsuccessfulImport(samples)}/></div>
                 </li>}
                 <li className="nav-item">
                     <Link className="nav-link" href="./samples"> <span className="material-symbols-outlined">

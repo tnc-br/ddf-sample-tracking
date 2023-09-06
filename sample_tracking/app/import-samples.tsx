@@ -16,8 +16,12 @@ import Papa from 'papaparse';
 import { type Sample, type UserData, validateImportedEntry, getRanHex } from './utils';
 import { ExportToCsv } from 'export-to-csv';
 
+interface ImportSampleProps {
+    onSuccessfulImport: Function,
+    onUnsuccessfulImport: Function,
+}
 
-export default function ImportSamples() {
+export default function ImportSamples(props: ImportSampleProps) {
     const [role, setRole] = useState('');
     const [showAddSampleMenu, setShowAddSampleMenu] = useState(false);
     const [userData, setUserData] = useState(null as UserData | null)
@@ -65,9 +69,6 @@ export default function ImportSamples() {
             })
         }
     });
-
-    if (!userData) return;
-
 
     const csvOptions = {
         fieldSeparator: ',',
@@ -136,6 +137,7 @@ export default function ImportSamples() {
                     }
                 });
                 if (foundErrors) {
+                    props.onUnsuccessfulImport(results.data);
                     // csvExporter.generateCsv(results.data);
                     // return;
                 }
@@ -204,22 +206,18 @@ export default function ImportSamples() {
                     router.push(url);
 
                 });
+                props.onSuccessfulImport();
             }
         })
     }
 
     return (
         <div>
-            {/* <input capture onChange={onFileChanged} accept=".csv" className="visibility-hidden" id="fileInput" type="file" /> */}
             <input id="fileInput" type="file" onChange={onFileChanged} accept=".csv" className="visibility-hidden" />
             <label htmlFor="fileInput" >
                 <span className="material-symbols-outlined">cloud_upload</span>
                 {t('importSamples')}
             </label>
-
-
-
-
         </div>
     )
 }

@@ -123,7 +123,67 @@ export default function Samples() {
     return (
         <div className='samples-page-wrapper'>
             <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@48,400,0,0" />
+            <div className="import-success-status-wrapper success-background-color">
+                    <div className='import-status-icon-wrapper'>
+                        <div className='import-status-icon'>
+                            <span className="material-symbols-outlined import-status-icon icon-color-green">
+                                check_circle
+                            </span>
+                        </div>
+                    </div>
+                    <div className='import-status-text-wrapper'>
+                        <div className='import-status-text text-color-green'>
+                            Successfully imported file
+                        </div>
+                    </div>
+                    <div className='import-status-actions-wrapper'>
+                        <div className='import-status-actions'>
+                            <div className="import-success-status-button">
+                                <div className='import-status-button-slate-layer'>
+                                    <div className='import-status-button-text'>
+                                        Great!
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div className="import-success-status-wrapper error-background-color">
+                    <div className='import-status-icon-wrapper'>
+                        <div className='import-status-icon'>
+                            <span className="material-symbols-outlined import-status-icon icon-color-red">
+                                error
+                            </span>
+                        </div>
+                    </div>
+                    <div className='import-status-text-wrapper'>
+                        <div className='import-status-text'>
+                            File not uploaded because we noticed # errors in the spreadsheet. Please download the sheet to see the errors and reupload.
+                        </div>
+                    </div>
+                    <div className='import-status-actions-wrapper'>
+                        <div className='import-status-actions'>
+                            <div className='import-cancel-button'>
+                                <div className='import-status-button-slate-layer'>
+                                    <div className='import-cancel-button-text'>
+                                        Cancel
+                                    </div>
+                                </div>
+                            </div>
+                            <div className='import-error-status-button icon-color-red'>
+                                <div className='import-status-button-slate-layer'>
+                                    <div className='import-status-button-text'>
+                                        Download
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
             {(allSamples.inProgress || allSamples.completed) ? <div id="samplesTable" className='samples-wrapper'>
+                
                 <div className='samples-summary'>
                     {allSamples.inProgress && <div className='samples-summary-box'>
                         <div className='samples-size-label'>{allSamples.inProgress.length}</div>
