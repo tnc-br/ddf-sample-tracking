@@ -282,7 +282,7 @@ export default function ImportSamples() {
 
                     let payload = {
                         ...sample,
-                        status: completed,
+                        status: completed ? 'concluded' : 'in_progress', 
                     };
                     batch.set(docRef, payload);
                 });

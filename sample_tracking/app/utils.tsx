@@ -56,6 +56,7 @@ export type Sample = {
   observations: string,
   created_by_name: string,
   measurements: {},
+  points?: [],
 }
 
 export interface NestedSchemas {
