@@ -34,7 +34,7 @@ export default function ImportSamples() {
 
 
 
-    const [errorSamples, setErrorSamples] = useState(null as Sample[]|null);
+    const [errorSamples, setErrorSamples] = useState(null as Sample[] | null);
 
     type ColumnName = {
         display_name: string,
@@ -107,7 +107,7 @@ export default function ImportSamples() {
             </div>
             <div className='import-status-actions-wrapper'>
                 <div className='import-status-actions'>
-                    <div className="import-success-status-button pointer">
+                    <div onClick={handleCloseBarClick} className="import-success-status-button pointer">
                         <div className='import-status-button-slate-layer'>
                             <div className='import-status-button-text'>
                                 Great!
@@ -121,7 +121,6 @@ export default function ImportSamples() {
 
     function onImportErrorBar() {
         return (
-            // <>
             <div className="import-success-status-wrapper error-background-color">
                 <div className='import-status-icon-wrapper'>
                     <div className='import-status-icon'>
@@ -154,7 +153,6 @@ export default function ImportSamples() {
                     </div>
                 </div>
             </div>
-            // </>
         )
     }
 
@@ -162,7 +160,7 @@ export default function ImportSamples() {
         if (errorSamples) {
             csvExporter.generateCsv(errorSamples);
         }
-        
+
     }
 
 
@@ -209,7 +207,7 @@ export default function ImportSamples() {
                         result.errors = errors;
                         foundErrors = true;
                     }
-                    const code = result.Code;
+                    const code = result.Code ? result.Code : result.code;
                     if (code) {
                         if (codeList[code]) {
                             codeList[code].push(result);
@@ -241,13 +239,13 @@ export default function ImportSamples() {
                     const resultValues = codeList[key];
                     const newSample = {
                         points: codeList[resultValues[0].Code],
-                        lat: resultValues[0].lat,
-                        lon: resultValues[0].lon,
-                        site: resultValues[0].site,
-                        state: resultValues[0].state,
-                        municipality: resultValues[0].municipality,
+                        lat: parseFloat(resultValues[0].lat),
+                        lon: parseFloat(resultValues[0].lon),
+                        site: resultValues[0].site || "",
+                        state: resultValues[0].state || "",
+                        municipality: resultValues[0].municipality || "",
                         trusted: originValues[resultValues[0].origin],
-                        species: resultValues[0].species,
+                        species: resultValues[0].species || "",
                         created_by: user.uid,
                         created_on: formattedDateString,
                         last_updated_by: userData.name,
@@ -271,9 +269,8 @@ export default function ImportSamples() {
 
                 const batch = writeBatch(db);
                 samples.forEach((sample: Sample) => {
-                    const internalCode = getRanHex(20);
                     if (!sample.trusted) return;
-                    const docRef = doc(db, sample.trusted! + "_samples", internalCode);
+                    const docRef = doc(db, sample.trusted! + "_samples", sampleId);
                     const completed =
                         sample.d18O_wood.length > 0 ||
                         sample.d15N_wood.length > 0 ||
@@ -297,9 +294,10 @@ export default function ImportSamples() {
 
                 });
                 await router.push('./samples');
-                const bar = document.getElementById('import-status-bar');
-                if (bar) {
-                    bar.innerHTML = onImportSuccessBar();
+                const statusBarWrapper = document.getElementById('import-status-bar');
+                const errorBar = document.getElementById("import-status-bars")!.lastChild;
+                if (statusBarWrapper && errorBar) {
+                    statusBarWrapper.appendChild(errorBar);
                 }
                 // props.onSuccessfulImport();
             }
