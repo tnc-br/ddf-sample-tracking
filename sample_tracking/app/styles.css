@@ -1029,3 +1029,11 @@ border: 1px solid var(--grey-300, #DADCE0);
   .visibility-hidden {
     visibility: hidden;
   }
+
+  .display-none {
+    display: none;
+  }
+
+  .pointer {
+    cursor: pointer;
+  }

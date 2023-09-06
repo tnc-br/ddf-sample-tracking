@@ -16,12 +16,7 @@ import Papa from 'papaparse';
 import { type Sample, type UserData, validateImportedEntry, getRanHex } from './utils';
 import { ExportToCsv } from 'export-to-csv';
 
-interface ImportSampleProps {
-    onSuccessfulImport: Function,
-    onUnsuccessfulImport: Function,
-}
-
-export default function ImportSamples(props: ImportSampleProps) {
+export default function ImportSamples() {
     const [role, setRole] = useState('');
     const [showAddSampleMenu, setShowAddSampleMenu] = useState(false);
     const [userData, setUserData] = useState(null as UserData | null)
@@ -36,6 +31,10 @@ export default function ImportSamples(props: ImportSampleProps) {
     const [csvValues, setCsvValues] = useState([]);
 
     const [samples, setSamples] = useState([] as Sample[])
+
+
+
+    const [errorSamples, setErrorSamples] = useState(null as Sample[]|null);
 
     type ColumnName = {
         display_name: string,
@@ -92,6 +91,89 @@ export default function ImportSamples(props: ImportSampleProps) {
         uncertain: 'untrusted'
     }
 
+    function onImportSuccessBar() {
+        return (<div className="import-success-status-wrapper success-background-color">
+            <div className='import-status-icon-wrapper'>
+                <div className='import-status-icon'>
+                    <span className="material-symbols-outlined import-status-icon icon-color-green">
+                        check_circle
+                    </span>
+                </div>
+            </div>
+            <div className='import-status-text-wrapper'>
+                <div className='import-status-text text-color-green'>
+                    Successfully imported file
+                </div>
+            </div>
+            <div className='import-status-actions-wrapper'>
+                <div className='import-status-actions'>
+                    <div className="import-success-status-button pointer">
+                        <div className='import-status-button-slate-layer'>
+                            <div className='import-status-button-text'>
+                                Great!
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>)
+    }
+
+    function onImportErrorBar() {
+        return (
+            // <>
+            <div className="import-success-status-wrapper error-background-color">
+                <div className='import-status-icon-wrapper'>
+                    <div className='import-status-icon'>
+                        <span className="material-symbols-outlined import-status-icon icon-color-red">
+                            error
+                        </span>
+                    </div>
+                </div>
+                <div className='import-status-text-wrapper'>
+                    <div className='import-status-text'>
+                        File not uploaded because we noticed errors in the spreadsheet. Please download the sheet to see the errors and reupload.
+                    </div>
+                </div>
+                <div className='import-status-actions-wrapper'>
+                    <div className='import-status-actions'>
+                        <div onClick={handleCloseBarClick} className="import-cancel-button pointer">
+                            <div className='import-status-button-slate-layer'>
+                                <div className='import-cancel-button-text'>
+                                    Cancel
+                                </div>
+                            </div>
+                        </div>
+                        <div onClick={handleDownloadClick} className="import-error-status-button icon-color-red pointer">
+                            <div className='import-status-button-slate-layer'>
+                                <div className='import-status-button-text'>
+                                    Download
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            // </>
+        )
+    }
+
+    function handleDownloadClick() {
+        if (errorSamples) {
+            csvExporter.generateCsv(errorSamples);
+        }
+        
+    }
+
+
+    function handleCloseBarClick() {
+        const statusBarWrapper = document.getElementById('import-status-bar');
+        if (statusBarWrapper && statusBarWrapper.hasChildNodes()) {
+            statusBarWrapper.removeChild(statusBarWrapper.firstChild!)
+        }
+        return;
+    }
+
     function onFileChanged(event: any) {
 
         // TODO - add a check box if there are headers present in the CSV (or assume there are always headers?)
@@ -107,7 +189,7 @@ export default function ImportSamples(props: ImportSampleProps) {
         Papa.parse(event.target.files[0], {
             header: true,
             skipEmptyLines: true,
-            complete: function (results) {
+            complete: async function (results) {
                 const user = auth.currentUser;
                 if (!user || !userData) return;
                 const rowsArray = [];
@@ -137,7 +219,15 @@ export default function ImportSamples(props: ImportSampleProps) {
                     }
                 });
                 if (foundErrors) {
-                    props.onUnsuccessfulImport(results.data);
+                    await router.push('./samples');
+                    setErrorSamples(results.data as Sample[]);
+                    const statusBarWrapper = document.getElementById('import-status-bar');
+                    const errorBar = document.getElementById("import-status-bars")!.firstChild;
+                    if (statusBarWrapper && errorBar) {
+                        statusBarWrapper.appendChild(errorBar);
+                    }
+                    return;
+                    // props.onUnsuccessfulImport(results.data);
                     // csvExporter.generateCsv(results.data);
                     // return;
                 }
@@ -206,7 +296,12 @@ export default function ImportSamples(props: ImportSampleProps) {
                     router.push(url);
 
                 });
-                props.onSuccessfulImport();
+                await router.push('./samples');
+                const bar = document.getElementById('import-status-bar');
+                if (bar) {
+                    bar.innerHTML = onImportSuccessBar();
+                }
+                // props.onSuccessfulImport();
             }
         })
     }
@@ -218,6 +313,10 @@ export default function ImportSamples(props: ImportSampleProps) {
                 <span className="material-symbols-outlined">cloud_upload</span>
                 {t('importSamples')}
             </label>
+            <div id="import-status-bars" className='display-none'>
+                {onImportErrorBar()}
+                {onImportSuccessBar()}
+            </div>
         </div>
     )
 }

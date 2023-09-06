@@ -70,13 +70,6 @@ export default function Nav() {
         return role === 'admin' || role === 'site_admin';
     }
 
-    function onSuccessfulImport() {
-
-    }
-
-    function onUnsuccessfulImport(samples: Sample[]) {
-
-    }
 
     return (
         <div id="nav-wrapper" className='nav-wrapper'>
@@ -91,8 +84,7 @@ export default function Nav() {
                     {/* <Link className="nav-link" href="./import-samples">
                         <span className="material-symbols-outlined">cloud_upload</span>
                         {t('importSamples')}</Link> */}
-                        <div className="nav-link"><ImportSamples onSuccessfulImport={onSuccessfulImport} 
-                        onUnsuccessfulImport={(samples: Sample[]) => onUnsuccessfulImport(samples)}/></div>
+                        <div className="nav-link"><ImportSamples /></div>
                 </li>}
                 <li className="nav-item">
                     <Link className="nav-link" href="./samples"> <span className="material-symbols-outlined">
