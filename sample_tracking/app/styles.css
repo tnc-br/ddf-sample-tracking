@@ -25,6 +25,7 @@
     width: 256px;
     top: 67px;
     margin: 20px;
+    display: block !important;
 }
 
 .add-sample-button {
@@ -95,11 +96,11 @@
 
 .profile-photo {
     border-radius: 50%;
-    position: fixed;
-    right: 20px;
-    top: 10px;
-    width: 32px;
-    height: 32px;
+    /* position: fixed; */
+    /* right: 20px; */
+    /* top: 10px; */
+    /* width: 32px; */
+    /* height: 32px; */
 }
 
 .page-title {
@@ -789,7 +790,7 @@
     background: var(--grey-white, #FFF);
     width: 255px;
     height: 238px;
-    top: 45px;
+    top: 56px;
     right: 30px;
     position: absolute;
     z-index: 100;
@@ -1194,4 +1195,80 @@ svg {
     gap: 10px;
     flex: 1 0 0;
     align-self: stretch;
+}
+
+
+.top-bar-wrapper {
+    width: 100%;
+    height: 64px;
+    flex-shrink: 0;
+    background: var(--timber-id-sys-light-surface, #F8FAFA);
+}
+
+.top-bar-product-wrapper {
+    display: inline-flex;
+    padding: 12px 20px 12px 20px;
+    align-items: center;
+    gap: 12px;
+    justify-content: space-between;    
+    width: 100%;
+}
+
+.top-bar-icon-wrapper {
+    display: flex;
+    width: 40px;
+    height: 40px;
+    justify-content: center;
+    align-items: center;
+}
+
+.top-bar-title-text {
+    color: var(--grey-700, #5F6368);
+
+    /* Headline 5 */
+    font-family: Roboto;
+    font-size: 24px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 24px;
+    /* 100% */
+    letter-spacing: 0.18px;
+}
+
+.top-bar-info-link-wrapper {
+    display: inline-flex;
+    justify-content: flex-end;
+    align-items: center;
+}
+
+.top-bar-info-link-button {
+    display: flex;
+    width: 44px;
+    height: 44px;
+    padding: 10px;
+    justify-content: center;
+    align-items: center;
+}
+
+.top-bar-info-link-icon {
+    width: 24px;
+    height: 24px;
+    flex-shrink: 0;
+}
+
+.top-bar-profile-menu-wrapper {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 10px;
+}
+
+.top-bar-profile-menu {
+    width: 40px;
+    height: 32px;
+}
+
+.display-inline-flex-center {
+    display: inline-flex;
+    align-items: center;
 }
