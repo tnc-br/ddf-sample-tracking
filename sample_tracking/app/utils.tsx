@@ -201,14 +201,10 @@ export function validateImportedEntry(data: {}): string {
   const headers = Object.keys(data);
   headers.forEach((header: string) => {
     if (!Object.keys(resultRanges).includes(header)) return;
-    // const columnElements = document.getElementsByClassName(evt.target.id);
-    // const currentColumnNumber = parseInt(evt.target.id.split('_')[1]);
-    // for (let i = 0; i < columnElements.length; i++) {
       const value = parseFloat(data[header])
       if (value < resultRanges[header].min || value > resultRanges[header].max) {
         errors += `${header} should be within the range ${resultRanges[header].min} and ${resultRanges[header].max}, `;
       }
-    // }
   })
   if (!headers.includes('lat') || !headers.includes('lon')) {
     errors += 'lat and lon are required, '
@@ -222,3 +218,4 @@ export function validateImportedEntry(data: {}): string {
   }
   return errors;
 }
+

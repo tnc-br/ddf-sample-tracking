@@ -146,7 +146,7 @@ export default function ImportSamples() {
                     setUserData(currentUserData);
                 }
             }
-            
+
         }
         return currentUserData;
     }
@@ -168,7 +168,7 @@ export default function ImportSamples() {
                 if (!user || !currentUserData) return;
                 const rowsArray = [];
                 const csvValuesArray = [];
-                
+
                 results.data.map((d) => {
                     rowsArray.push(Object.keys(d));
                     csvValuesArray.push(Object.values(d));
@@ -190,6 +190,7 @@ export default function ImportSamples() {
                         }
                     }
                 });
+                // If there are errors with any single entry in the CSV, show error bar and return early.
                 if (foundErrors) {
                     await router.push('./samples');
                     setErrorSamples(results.data as Sample[]);
@@ -224,6 +225,7 @@ export default function ImportSamples() {
                         created_by_name: currentUserData.name,
                         code_lab: sampleId,
                         visibility: "private",
+                        // Combine result values into single array of floats.
                         d18O_wood: codeList[resultValues[0].Code].filter(data => data.d18O_wood).map((data) => parseFloat(data.d18O_wood)),
                         d15N_wood: codeList[resultValues[0].Code].filter(data => data.d15N_wood).map((data) => parseFloat(data.d15N_wood)),
                         n_wood: codeList[resultValues[0].Code].filter(data => data.n_wood).map((data) => parseFloat(data.n_wood)),
@@ -255,19 +257,19 @@ export default function ImportSamples() {
                     batch.set(docRef, payload);
                 });
 
-                batch.commit().then(() => {
+                batch.commit().then(async () => {
                     const url = `./samples`;
                     router.push(url);
+                    await router.push('./samples');
+                    const statusBarWrapper = document.getElementById('import-status-bar');
+                    const errorBar = document.getElementById("import-status-bars")!.lastChild;
+                    if (statusBarWrapper && errorBar) {
+                        statusBarWrapper.appendChild(errorBar);
+                    }
 
                 }).catch((error) => {
                     console.log(error)
                 });
-                await router.push('./samples');
-                const statusBarWrapper = document.getElementById('import-status-bar');
-                const errorBar = document.getElementById("import-status-bars")!.lastChild;
-                if (statusBarWrapper && errorBar) {
-                    statusBarWrapper.appendChild(errorBar);
-                }
             }
         })
     }
