@@ -2,14 +2,13 @@
 "use client";
 
 import 'bootstrap/dist/css/bootstrap.css';
-import { getAuth, signOut, onAuthStateChanged } from "firebase/auth";
+import { getAuth, onAuthStateChanged, type User } from "firebase/auth";
 import { useRouter } from 'next/navigation';
 import { initializeApp } from "firebase/app";
 import './styles.css';
 import { useState, useEffect } from 'react';
 import { firebaseConfig } from './firebase_config';
 import { getFirestore, getDoc, doc, writeBatch } from "firebase/firestore";
-import Link from 'next/link';
 import { useTranslation } from 'react-i18next';
 import './i18n/config';
 import Papa from 'papaparse';
@@ -17,57 +16,15 @@ import { type Sample, type UserData, validateImportedEntry, getRanHex } from './
 import { ExportToCsv } from 'export-to-csv';
 
 export default function ImportSamples() {
-    const [role, setRole] = useState('');
-    const [showAddSampleMenu, setShowAddSampleMenu] = useState(false);
     const [userData, setUserData] = useState(null as UserData | null)
 
-    // State to store parsed data
-    const [parsedData, setParsedData] = useState([]);
-
-    // State to store table Column name
-    const [tableRows, setTableRows] = useState([]);
-
-    // State to store the values
-    const [csvValues, setCsvValues] = useState([]);
-
-    const [samples, setSamples] = useState([] as Sample[])
-
-
-
     const [errorSamples, setErrorSamples] = useState(null as Sample[] | null);
-
-    type ColumnName = {
-        display_name: string,
-        database_name: string,
-    }
 
     const app = initializeApp(firebaseConfig);
     const router = useRouter();
     const auth = getAuth();
     const db = getFirestore();
     const { t } = useTranslation();
-
-
-    useEffect(() => {
-        if (!userData) {
-            onAuthStateChanged(auth, (user) => {
-                if (!user) {
-                    router.push('/login');
-                } else {
-                    const userDocRef = doc(db, "users", user.uid);
-                    getDoc(userDocRef).then((docRef) => {
-                        if (docRef.exists()) {
-                            const docData = docRef.data();
-                            if (docData.org) {
-                                setUserData(docData as UserData);
-                            }
-                        }
-                    });
-                }
-
-            })
-        }
-    });
 
     const csvOptions = {
         fieldSeparator: ',',
@@ -79,11 +36,6 @@ export default function ImportSamples() {
     };
     const csvExporter = new ExportToCsv(csvOptions);
 
-
-    function handleImportclick() {
-        const inputElement = document.getElementById('fileInput');
-        inputElement?.click();
-    }
 
     const originValues = {
         unknown: 'unknown',
@@ -163,7 +115,6 @@ export default function ImportSamples() {
 
     }
 
-
     function handleCloseBarClick() {
         const statusBarWrapper = document.getElementById('import-status-bar');
         if (statusBarWrapper && statusBarWrapper.hasChildNodes()) {
@@ -172,16 +123,28 @@ export default function ImportSamples() {
         return;
     }
 
+    async function getCurrentUserData(user: User) {
+        let currentUserData = userData;
+        if (!currentUserData) {
+            const userDocRef = doc(db, "users", user.uid);
+            const docRef = await getDoc(userDocRef);
+            if (docRef.exists()) {
+                const docData = docRef.data();
+                if (docData.org) {
+                    currentUserData = docData as UserData;
+                    setUserData(currentUserData);
+                }
+            }
+            
+        }
+        return currentUserData;
+    }
+
     function onFileChanged(event: any) {
 
         // TODO - add a check box if there are headers present in the CSV (or assume there are always headers?)
 
-        if (event.target.files.length === 0) {
-            setParsedData([]);
-            setTableRows([]);
-            setCsvValues([]);
-            return;
-        }
+        if (event.target.files.length === 0) return;
 
         // Passing file data (event.target.files[0]) to parse using Papa.parse
         Papa.parse(event.target.files[0], {
@@ -189,21 +152,26 @@ export default function ImportSamples() {
             skipEmptyLines: true,
             complete: async function (results) {
                 const user = auth.currentUser;
-                if (!user || !userData) return;
+                if (!user) return;
+                let currentUserData = userData;
+
+                if (!currentUserData) {
+                    currentUserData = await getCurrentUserData(user);
+                }
+                if (!user || !currentUserData) return;
                 const rowsArray = [];
                 const csvValuesArray = [];
-
+                
                 // Iterating data to get column name and their values
                 results.data.map((d) => {
                     rowsArray.push(Object.keys(d));
                     csvValuesArray.push(Object.values(d));
                 });
-
                 const codeList = {};
                 let foundErrors = false;
                 results.data.forEach((result) => {
                     const errors = validateImportedEntry(result);
-                    if (errors) {
+                    if (errors.length > 0) {
                         result.errors = errors;
                         foundErrors = true;
                     }
@@ -225,11 +193,7 @@ export default function ImportSamples() {
                         statusBarWrapper.appendChild(errorBar);
                     }
                     return;
-                    // props.onUnsuccessfulImport(results.data);
-                    // csvExporter.generateCsv(results.data);
-                    // return;
                 }
-                console.log(codeList);
                 let samples = [] as Sample[];
                 const date = new Date();
                 //RFC 3339 format
@@ -248,10 +212,10 @@ export default function ImportSamples() {
                         species: resultValues[0].species || "",
                         created_by: user.uid,
                         created_on: formattedDateString,
-                        last_updated_by: userData.name,
-                        org: userData.org,
-                        org_name: userData.org_name ? userData.org_name : '',
-                        created_by_name: userData.name,
+                        last_updated_by: currentUserData.name,
+                        org: currentUserData.org,
+                        org_name: currentUserData.org_name ? currentUserData.org_name : '',
+                        created_by_name: currentUserData.name,
                         code_lab: sampleId,
                         visibility: "private",
                         d18O_wood: codeList[resultValues[0].Code].filter(data => data.d18O_wood).map((data) => parseFloat(data.d18O_wood)),
@@ -264,8 +228,6 @@ export default function ImportSamples() {
                     }
                     samples.push(newSample);
                 });
-
-                console.log(samples)
 
                 const batch = writeBatch(db);
                 samples.forEach((sample: Sample) => {
@@ -282,7 +244,7 @@ export default function ImportSamples() {
 
                     let payload = {
                         ...sample,
-                        status: completed ? 'concluded' : 'in_progress', 
+                        status: completed ? 'concluded' : 'in_progress',
                     };
                     batch.set(docRef, payload);
                 });
@@ -299,7 +261,6 @@ export default function ImportSamples() {
                 if (statusBarWrapper && errorBar) {
                     statusBarWrapper.appendChild(errorBar);
                 }
-                // props.onSuccessfulImport();
             }
         })
     }
