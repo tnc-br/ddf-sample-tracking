@@ -8,28 +8,7 @@ import { act } from 'react-dom/test-utils';
 import { useTranslation } from 'react-i18next';
 import Papa from 'papaparse';
 
-
-const userDataDoc = {
-    data: jest.fn(() => {
-        return {
-            name: 'test name',
-            email: 'testname@gmail.com',
-            org: 'testorg'
-        }
-    })
-}
-
-const orgDataDoc = {
-    data: jest.fn(() => {
-        return {
-            name: 'Google org',
-            admin: 'test admin'
-        }
-    })
-}
-
 jest.mock('react-i18next');
-// jest.mock('../app/firebase_utils');
 jest.mock('next/navigation', () => {
     return {
         useSearchParams: jest.fn(() => {
@@ -66,29 +45,6 @@ jest.mock('../app/firebase_utils', () => {
     }
 });
 
-// jest.mock('../app/utils', () => {
-//     return {
-//         getSearchParam: jest.fn(() => {
-//             return 'completed'
-//         }),
-//         getRanHex: jest.fn(() => {
-//             return '12345';
-//         }),
-//         initializeAppIfNecessary: jest.fn(() => {
-//             return 'test';
-//         }),
-//         hideNavBar: jest.fn(() => {
-//             return 'test';
-//         }),
-//         hideTopBar: jest.fn(() => {
-//             return 'test';
-//         }),
-//         validateImportedEntry: jest.fn(() => {
-//             return '';
-//         })
-//     }
-// });
-
 jest.mock('firebase/auth', () => {
     return {
         getAuth: jest.fn(() => {
@@ -108,9 +64,6 @@ jest.mock('firebase/auth', () => {
     }
 })
 
-
-
-
 jest.mock('react-i18next', () => ({
     // this mock makes sure any components using the translate hook can use it without a warning being shown
     useTranslation: () => {
@@ -125,15 +78,6 @@ jest.mock('react-i18next', () => ({
         type: '3rdParty',
         init: () => { },
     }
-}));
-
-const mockSamplesTableFn = jest.fn();
-
-jest.mock("material-react-table", () => ({
-    MaterialReactTable: (props) => {
-        mockSamplesTableFn(props);
-        return <mock-table data-testid="modal" />;
-    },
 }));
 
 
@@ -149,22 +93,6 @@ jest.mock('papaparse', () => {
         },
     }
 })
-
-jest.mock('react-i18next', () => ({
-    // this mock makes sure any components using the translate hook can use it without a warning being shown
-    useTranslation: () => {
-        return {
-            t: (str) => str,
-            i18n: {
-                changeLanguage: () => new Promise(() => { }),
-            },
-        };
-    },
-    initReactI18next: {
-        type: '3rdParty',
-        init: () => { },
-    }
-}));
 
 
 const samples = {
@@ -187,14 +115,12 @@ const samples = {
             Code: "test2",
             lat: 4,
             lon: 4,
-            // d18O_wood: 24.94,
             origin: "unknown"
         },
         {
             Code: "test2",
             lat: 4,
             lon: 4,
-            // d18O_wood: 25.94,
             origin: "unknown"
         }
     ]
@@ -217,14 +143,6 @@ const samples = {
                         }
                     })
                 })
-            }),
-            getDocs: jest.fn((request) => {
-                if (request === 'users') {
-                    return Promise.resolve([userDataDoc, userDataDoc])
-                } else {
-                    return Promise.resolve([orgDataDoc])
-                }
-
             }),
             getFirestore: jest.fn(),
             setDoc: jest.fn(),

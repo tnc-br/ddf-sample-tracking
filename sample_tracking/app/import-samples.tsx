@@ -2,11 +2,11 @@
 "use client";
 
 import 'bootstrap/dist/css/bootstrap.css';
-import { getAuth, onAuthStateChanged, type User } from "firebase/auth";
+import { getAuth, type User } from "firebase/auth";
 import { useRouter } from 'next/navigation';
 import { initializeApp } from "firebase/app";
 import './styles.css';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { firebaseConfig } from './firebase_config';
 import { getFirestore, getDoc, doc, writeBatch } from "firebase/firestore";
 import { useTranslation } from 'react-i18next';
@@ -15,6 +15,17 @@ import Papa from 'papaparse';
 import { type Sample, type UserData, validateImportedEntry, getRanHex } from './utils';
 import { ExportToCsv } from 'export-to-csv';
 
+/**
+ * Component to handle importing samples from a csv file. 
+ * 
+ * Checks if the data being imported has the required data and the result valuesa are in the correct format.
+ * If format is correct, data is uploaded and a success bar is shown on the main samples page. 
+ * If format is incorrect, error bar is shown on main samples page and gives option to download the same csv
+ * file with an extra column with the errors written out to tell the user how to fix their file to be properly imported.
+ * 
+ * CSV file should be a list of single result values which are linked together with the same 'code' value. These result
+ * values are joined together into a single "Sample" to be uploaded to the corresponding collection in the firestore database. 
+ */
 export default function ImportSamples() {
     const [userData, setUserData] = useState(null as UserData | null)
 
@@ -141,12 +152,8 @@ export default function ImportSamples() {
     }
 
     function onFileChanged(event: any) {
-
-        // TODO - add a check box if there are headers present in the CSV (or assume there are always headers?)
-
         if (event.target.files.length === 0) return;
 
-        // Passing file data (event.target.files[0]) to parse using Papa.parse
         Papa.parse(event.target.files[0], {
             header: true,
             skipEmptyLines: true,
@@ -162,7 +169,6 @@ export default function ImportSamples() {
                 const rowsArray = [];
                 const csvValuesArray = [];
                 
-                // Iterating data to get column name and their values
                 results.data.map((d) => {
                     rowsArray.push(Object.keys(d));
                     csvValuesArray.push(Object.values(d));
@@ -249,11 +255,12 @@ export default function ImportSamples() {
                     batch.set(docRef, payload);
                 });
 
-                // TODO - handle errors.
                 batch.commit().then(() => {
                     const url = `./samples`;
                     router.push(url);
 
+                }).catch((error) => {
+                    console.log(error)
                 });
                 await router.push('./samples');
                 const statusBarWrapper = document.getElementById('import-status-bar');
