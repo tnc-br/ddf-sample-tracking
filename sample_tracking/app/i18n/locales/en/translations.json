@@ -75,5 +75,6 @@
   "qrPrintInstructions": "Print and paste this QR code on the sample to be analyzed",
   "reviewAndCreate": "Review and create",
   "addSampleMeasurements": "Add sample measurements",
-  "addNewSample": "Add new sample"
+  "addNewSample": "Add new sample",
+  "view": "View"
 }

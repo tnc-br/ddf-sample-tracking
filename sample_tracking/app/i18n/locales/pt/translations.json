@@ -74,5 +74,6 @@
   "qrPrintInstructions": "Imprima e cole este código QR na amostra a ser analisada",
   "reviewAndCreate": "Revise e crie",
   "addSampleMeasurements": "Adicionar medições de amostra",
-  "addNewSample": "Adicionar nova amostra"
+  "addNewSample": "Adicionar nova amostra",
+  "view": "Visualizar"
 }
