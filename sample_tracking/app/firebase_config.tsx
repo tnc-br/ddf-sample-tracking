@@ -4,5 +4,5 @@ export const firebaseConfig = {
   projectId: "river-sky-386919",
   storageBucket: "river-sky-386919.appspot.com",
   messagingSenderId: "843836318122",
-  appId: "1:843836318122:web:856d513c850325a32b8bd3",
+  appId: "1:843836318122:web:856d513c850325a32b8bd3"
 };
