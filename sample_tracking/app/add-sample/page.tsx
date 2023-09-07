@@ -256,7 +256,7 @@ export default function AddSample() {
                         <SampleDataInput baseState={formData}
                             onActionButtonClick={(id: string, formSampleData: Sample) => onCreateSampleClick(id, formSampleData)}
                             onTabChange={(tab) => handleTabChange(tab)}
-                            actionButtonTitle="Create sample"
+                            actionButtonTitle={t('addSample')}
                             isNewSampleForm={true}
                             sampleId={sampleId}
                             isCompletedSample={formData.status === 'concluded' ? true : false} />

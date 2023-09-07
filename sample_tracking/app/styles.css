@@ -310,7 +310,7 @@
     gap: 8px;
     flex-shrink: 0;
     border-radius: 100px;
-    background: var(--m-3-sys-light-secondary-container, #E8DEF8);
+    background: var(--timber-id-sys-light-secondary-container, #D4E8D1);
     margin-bottom: 30px;
     cursor: pointer;
 }
@@ -351,7 +351,7 @@
 }
 
 .selected-measurements-tab-wrapper {
-    border-bottom: 2px solid var(--m-3-sys-light-primary, #6750A4);
+    border-bottom: 2px solid var(--m-3-sys-light-primary, #006E2C);
 }
 
 .measurements-tab-state-layer {
@@ -479,6 +479,9 @@
 
 .submit-buttons {
     margin: 40px;
+    display: inline-flex;
+    align-items: flex-start;
+    gap: 740px;
 }
 
 .actions-button {
@@ -947,7 +950,8 @@
     cursor: pointer;
 }
 
-img, svg {
+img,
+svg {
     vertical-align: baseline !important;
 }
 
@@ -959,12 +963,14 @@ img, svg {
     gap: 14px;
     align-self: stretch;
 }
+
 .logout-button-wrapper {
     display: flex;
     justify-content: center;
     align-items: center;
     cursor: pointer;
 }
+
 .logout-button {
     display: flex;
     padding: 8px 24px;
@@ -972,55 +978,220 @@ img, svg {
     align-items: center;
     gap: 8px;
     border-radius: 4px;
-border: 1px solid var(--grey-300, #DADCE0);
+    border: 1px solid var(--grey-300, #DADCE0);
 }
+
 .logout-button-text {
     color: var(--timber-id-sys-light-primary, #006E2C);
     text-align: center;
-    
+
     /* TimberID/title/small */
     font-family: Roboto;
     font-size: 14px;
     font-style: normal;
     font-weight: 500;
-    line-height: 20px; /* 142.857% */
+    line-height: 20px;
+    /* 142.857% */
 }
 
-.page-title-wrapper {  
+.page-title-wrapper {
     display: flex;
-  width: 1440px;
-  height: 64px;
-  padding: 8px 4px;
-  align-items: center;
-  gap: 4px;
-  flex-shrink: 0;
-  background: var(--timber-id-sys-light-surface, #F8FAFA);
-  }
+    width: 1440px;
+    height: 64px;
+    padding: 8px 4px;
+    align-items: center;
+    gap: 4px;
+    flex-shrink: 0;
+    background: var(--timber-id-sys-light-surface, #F8FAFA);
+}
 
-  .add-sample-close-icon {
+.add-sample-close-icon {
     display: flex !important;
-  width: 48px;
-  height: 48px;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  gap: 10px;
-  flex-shrink: 0;
-  color: black;
-  }
-  
-  .close-icon {
-    text-decoration: none;
-  }
+    width: 48px;
+    height: 48px;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    flex-shrink: 0;
+    color: black;
+}
 
-  .page-title-text {
-  
+.close-icon {
+    text-decoration: none;
+}
+
+.page-title-text {
+
     color: var(--timber-id-sys-light-on-surface, #191C1D);
-  
-  /* TimberID/title/large */
-  font-family: Roboto;
-  font-size: 22px;
-  font-style: normal;
-  font-weight: 400;
-  line-height: 28px; /* 127.273% */
-  }
+
+    /* TimberID/title/large */
+    font-family: Roboto;
+    font-size: 22px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 28px;
+    /* 127.273% */
+}
+
+
+.add-sample-button-wrapper {
+    display: flex;
+    height: 40px;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    width: fit-content;
+    white-space: nowrap;
+}
+
+.back-button-wrapper {
+    border-radius: 100px;
+    border: 1px solid var(--timber-id-sys-light-outline, #727970);
+}
+
+.add-sample-slate-layer {
+    display: flex;
+    padding: 10px 24px;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    flex: 1 0 0;
+    align-self: stretch;
+}
+
+.add-sample-button-text {
+    /* color: var(--timber-id-sys-light-primary, #006E2C); */
+    text-align: center;
+
+    /* TimberID/label/large */
+    font-family: Roboto;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 500;
+    line-height: 20px;
+    /* 142.857% */
+}
+
+.green-button-text {
+    color: var(--timber-id-sys-light-primary, #006E2C);
+}
+
+.white-button-text {
+    color: #FFFFFF;
+}
+
+.submit-buttons-right {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 24px;
+}
+
+.next-button-wrapper {
+    border-radius: 100px;
+    background: var(--timber-id-sys-light-primary, #006E2C);
+}
+
+.latlon-entry {
+    margin-right: 2px;
+}
+
+.collected-by-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+}
+
+.collected-by-text-wrapper {
+    display: flex;
+    padding-right: 0px;
+    align-items: flex-start;
+}
+
+.collected-by-text {
+    color: #000;
+
+    /* M3/title/small */
+    font-family: Roboto;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 500;
+    line-height: 20px;
+    /* 142.857% */
+    letter-spacing: 0.1px;
+    width: 177px;
+    height: 24px;
+}
+
+.collected-by-button-wrapper {
+    display: flex;
+    width: 207px;
+    height: 48px;
+    justify-content: center;
+    align-items: center;
+    gap: -1px;
+    cursor: pointer;
+}
+
+.supplier-button-wrapper {
+    display: flex;
+    height: 48px;
+    padding: 4px 0px;
+    justify-content: center;
+    align-items: center;
+    flex: 1 0 0;
+}
+
+.supplier-button-container {
+    /* display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    flex: 1 0 0;
+    align-self: stretch; */
+    border-radius: 100px 0px 0px 100px;
+    border: 1px solid var(--timber-id-sys-light-outline, #727970);
+    /* background: var(--timber-id-sys-light-secondary-container, #D4E8D1); */
+}
+
+.org-button-container {
+    border-radius: 0px 100px 100px 0px;
+    border: 1px solid var(--timber-id-sys-light-outline, #727970);
+}
+
+.supplier-button-slate-layer {
+    display: flex;
+    padding: 10px 12px;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    flex: 1 0 0;
+    align-self: stretch;
+}
+
+.supplier-button-text {
+    color: var(--timber-id-sys-light-on-secondary-container, #0F1F11);
+    text-align: center;
+
+    /* TimberID/label/large */
+    font-family: Roboto;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 500;
+    line-height: 20px;
+    /* 142.857% */
+}
+
+.collected-by-button-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    flex: 1 0 0;
+    align-self: stretch;
+}

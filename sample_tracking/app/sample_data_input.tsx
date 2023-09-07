@@ -330,21 +330,23 @@ export default function SampleDataInput(props: SampleDataInputProps) {
 
     }
 
+    const style = {
+        "& .MuiOutlinedInput-root": {
+            "&.Mui-focused fieldset": {
+                borderColor: "green"
+            }
+        }
+    }
+
 
     function basicInfoTab() {
         return (
             <form id='info-tab' className='grid-columns'>
                 <div className='column-one'>
-                    <p>{t('visibility')}</p>
-                    <div className="visibility_buttons">
-                        <div onClick={handleSelectPublicVisibility}
-                            className={formData.visibility === 'public' ? "button_select public_button selected" : "button_select public_button"}>{t('public')}</div>
-                        <div onClick={handleSelectPrivateVisibility}
-                            className={formData.visibility === 'private' ? "button_select private_button selected" : "button_select private_button"}>{t('private')}</div>
-                    </div>
                     <div className='input-text-field-wrapper'>
                         <TextField
                             required
+                            sx={style}
                             size='small'
                             fullWidth
                             id="sampleName"
@@ -358,6 +360,7 @@ export default function SampleDataInput(props: SampleDataInputProps) {
                     <div className='input-text-field-wrapper'>
                         <Autocomplete
                             disablePortal
+                            sx={style}
                             size='small'
                             fullWidth
                             id="species"
@@ -378,6 +381,7 @@ export default function SampleDataInput(props: SampleDataInputProps) {
                         <TextField
                             id="origin"
                             size='small'
+                            sx={style}
                             fullWidth
                             select
                             required
@@ -399,6 +403,7 @@ export default function SampleDataInput(props: SampleDataInputProps) {
                                 required
                                 size='small'
                                 fullWidth
+                                sx={style}
                                 id="collectionSite"
                                 name="site"
                                 label={t('collectionSite')}
@@ -407,21 +412,27 @@ export default function SampleDataInput(props: SampleDataInputProps) {
                             />
                         </div>}
                     {originIsKnownOrUncertain() && <div className="form-row">
-                        <TextField
-                            required
-                            size='small'
-                            fullWidth
-                            id="inputLat"
-                            name="lat"
-                            label={t('latitude')}
-                            onChange={handleChange}
-                            value={formData.lat}
-                        />
+                        <div className='latlon-entry'>
+                            <TextField
+                                required
+                                size='small'
+                                fullWidth
+                                sx={style}
+                                id="inputLat"
+                                name="lat"
+                                label={t('latitude')}
+                                onChange={handleChange}
+                                value={formData.lat}
+
+
+                            />
+                        </div>
                         <TextField
                             required
                             size='small'
                             fullWidth
                             id="inputLon"
+                            sx={style}
                             name="lon"
                             label={t('longitude')}
                             onChange={handleChange}
@@ -436,6 +447,7 @@ export default function SampleDataInput(props: SampleDataInputProps) {
                                 size='small'
                                 fullWidth
                                 id="state"
+                                sx={style}
                                 options={getStatesList()}
                                 sx={{ width: 300 }}
                                 renderInput={(params) => <TextField {...params} label={t('state')} />}
@@ -449,6 +461,7 @@ export default function SampleDataInput(props: SampleDataInputProps) {
                             <Autocomplete
                                 disablePortal
                                 size='small'
+                                sx={style}
                                 fullWidth
                                 id="municipality"
                                 options={getMunicipalitiesList()}
@@ -463,6 +476,7 @@ export default function SampleDataInput(props: SampleDataInputProps) {
                         <LocalizationProvider dateAdapter={AdapterDayjs}>
                             <DatePicker
                                 label={t('dateCollected')}
+                                sx={style}
                                 value={dayjs(formData.date_collected)}
                                 slotProps={{ textField: { size: 'small' } }}
                                 onChange={handleChange} />
@@ -471,7 +485,7 @@ export default function SampleDataInput(props: SampleDataInputProps) {
                 </div>
                 <div className='column_two'>
 
-                    <div>
+                    {/* <div>
                         <p>{t('collectedBy')}</p>
                         <div className="visibility_buttons">
                             <div onClick={handleSelectSupplier}
@@ -479,11 +493,39 @@ export default function SampleDataInput(props: SampleDataInputProps) {
                             <div onClick={handleSelectMyOrg}
                                 className={formData.collected_by === 'my_org' ? "button_select private_button selected" : "button_select private_button"}>{t('myOrg')}</div>
                         </div>
+                    </div> */}
+
+                    <div className='collected-by-wrapper'>
+                        <div className='collected-by-text-wrapper'>
+                            <div className='collected-by-text'>{t('collectedBy')}</div>
+                        </div>
+                        <div className='collected-by-button-wrapper'>
+                            <div onClick={handleSelectSupplier} className='supplier-button-wrapper'>
+                                <div
+                                    className={formData.collected_by === 'supplier' ? "supplier-button-container collected-by-button-container selected" : 
+                                    "supplier-button-container collected-by-button-container"}>
+                                    <div className='supplier-button-slate-layer'>
+                                        <div className='supplier-button-text'>{t('supplier')}</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div onClick={handleSelectMyOrg} className='supplier-button-wrapper'>
+                                <div 
+                                className={formData.collected_by === 'my_org' ? "org-button-container collected-by-button-container selected" : 
+                                "org-button-container collected-by-button-container"}>
+                                    <div className='supplier-button-slate-layer'>
+                                        <div className='supplier-button-text'>{t('myOrg')}</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
                     </div>
                     {formData.collected_by === "supplier" &&
                         <div className='input-text-field-wrapper'>
                             <TextField
                                 size='small'
+                                sx={style}
                                 fullWidth
                                 id="supplier"
                                 name="supplier"
@@ -496,6 +538,7 @@ export default function SampleDataInput(props: SampleDataInputProps) {
                     <div className='input-text-field-wrapper'>
                         <TextField
                             size='small'
+                            sx={style}
                             fullWidth
                             id="city"
                             name="city"
@@ -523,6 +566,7 @@ export default function SampleDataInput(props: SampleDataInputProps) {
                                 id="supplier"
                                 name="measureing_height"
                                 label={t('measuringHeight')}
+                                sx={style}
                                 onChange={handleChange}
                                 value={formData.measureing_height}
                             />
@@ -533,6 +577,7 @@ export default function SampleDataInput(props: SampleDataInputProps) {
                                 id="sample_type"
                                 size='small'
                                 fullWidth
+                                sx={style}
                                 select
                                 name="sample_type"
                                 label={t('sampleType')}
@@ -557,6 +602,7 @@ export default function SampleDataInput(props: SampleDataInputProps) {
                                 label={t('diameter')}
                                 onChange={handleChange}
                                 value={formData.diameter}
+                                sx={style}
                             />
                         </div>
                         <div className='input-text-field-wrapper half-width'>
@@ -564,6 +610,7 @@ export default function SampleDataInput(props: SampleDataInputProps) {
                                 size='small'
                                 fullWidth
                                 id="avp"
+                                sx={style}
                                 name="avp"
                                 label="AVP"
                                 onChange={handleChange}
@@ -577,6 +624,7 @@ export default function SampleDataInput(props: SampleDataInputProps) {
                                 size='small'
                                 fullWidth
                                 id="mean_annual_temperature"
+                                sx={style}
                                 name="mean_annual_temperature"
                                 label={t('meanAnnualTemperature')}
                                 onChange={handleChange}
@@ -590,6 +638,7 @@ export default function SampleDataInput(props: SampleDataInputProps) {
                                 id="mean_annual_precipitation"
                                 name="mean_annual_precipitation"
                                 label={t('meanAnnualPrecipitation')}
+                                sx={style}
                                 onChange={handleChange}
                                 value={formData.mean_annual_precipitation}
                             />
@@ -603,6 +652,7 @@ export default function SampleDataInput(props: SampleDataInputProps) {
                                 id="supplier"
                                 name="observations"
                                 label={t('observations')}
+                                sx={style}
                                 onChange={handleChange}
                                 value={formData.observations}
                             />
@@ -642,6 +692,7 @@ export default function SampleDataInput(props: SampleDataInputProps) {
                                     <div className="quarter-width">
                                         <TextField
                                             size='small'
+                                            sx={style}
                                             fullWidth
                                             id="d18O_cel"
                                             name="d18O_cel"
@@ -653,6 +704,7 @@ export default function SampleDataInput(props: SampleDataInputProps) {
                                     <div className="quarter-width">
                                         <TextField
                                             size='small'
+                                            sx={style}
                                             fullWidth
                                             id="d18O_wood"
                                             name="d18O_wood"
@@ -666,6 +718,7 @@ export default function SampleDataInput(props: SampleDataInputProps) {
                                             size='small'
                                             fullWidth
                                             id="d15N_wood"
+                                            sx={style}
                                             name="d15N_wood"
                                             label="d15N_wood"
                                             onChange={handleResultChange}
@@ -677,6 +730,7 @@ export default function SampleDataInput(props: SampleDataInputProps) {
                                             size='small'
                                             fullWidth
                                             id="n_wood"
+                                            sx={style}
                                             name="n_wood"
                                             label="N_wood"
                                             onChange={handleResultChange}
@@ -690,6 +744,7 @@ export default function SampleDataInput(props: SampleDataInputProps) {
                                         <TextField
                                             size='small'
                                             fullWidth
+                                            sx={style}
                                             id="d13C_wood"
                                             name="d13C_wood"
                                             label="d13C_wood"
@@ -704,6 +759,7 @@ export default function SampleDataInput(props: SampleDataInputProps) {
                                             id="c_wood"
                                             name="c_wood"
                                             label="%C_wood"
+                                            sx={style}
                                             onChange={handleResultChange}
                                             value={formData.c_wood ? formData.c_wood[currentMeasurementsTab] || '' : ''}
                                             InputProps={{
@@ -715,6 +771,7 @@ export default function SampleDataInput(props: SampleDataInputProps) {
                                         <TextField
                                             size='small'
                                             fullWidth
+                                            sx={style}
                                             id="d13C_cel"
                                             name="d13C_cel"
                                             label="d13C_cel"
@@ -726,6 +783,7 @@ export default function SampleDataInput(props: SampleDataInputProps) {
                                         <TextField
                                             size='small'
                                             fullWidth
+                                            sx={style}
                                             id="c_cel"
                                             name="c_cel"
                                             label="%C_cel"
@@ -820,7 +878,6 @@ export default function SampleDataInput(props: SampleDataInputProps) {
                                                     Measurement {index + 1}
                                                 </div>
                                             </div>
-                                            {currentMeasurementsTab === 0 && <div className='measurements-tab-indicator'></div>}
                                         </div>
                                     </div>
                                 </div>
@@ -954,8 +1011,48 @@ export default function SampleDataInput(props: SampleDataInputProps) {
         router.push('/samples')
     }
 
+    function backButton() {
+        return (
+            <div onClick={() => attemptToUpdateCurrentTab(currentTab - 1)} className='back-button-wrapper add-sample-button-wrapper'>
+                <div className='add-sample-slate-layer'>
+                    <div className='add-sample-button-text green-button-text'>{t('back')}</div>
+                </div>
+            </div>
+        )
+    }
 
-    
+    function cancelButton() {
+        return (
+            <div onClick={onCancleClick} className='add-sample-button-wrapper'>
+                <div className='add-sample-slate-layer'>
+                    <div className='add-sample-button-text green-button-text'>{t('cancel')}</div>
+                </div>
+            </div>
+        )
+    }
+
+    function nextButton() {
+        return (
+            <div onClick={() => attemptToUpdateCurrentTab(currentTab + 1)} className='add-sample-button-wrapper next-button-wrapper'>
+                <div className='add-sample-slate-layer'>
+                    <div className='add-sample-button-text white-button-text'>{t('next')}</div>
+                </div>
+            </div>
+        )
+    }
+
+    function actionButton() {
+        return (
+            <div onClick={onActionButtonClick} className='add-sample-button-wrapper next-button-wrapper'>
+                <div className='add-sample-slate-layer'>
+                    <div className='add-sample-button-text white-button-text'>{props.actionButtonTitle}</div>
+                </div>
+            </div>
+        )
+    }
+
+
+
     return (
         <div className="add-sample-page-wrapper">
             <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@48,400,0,0&display=optional" />
@@ -969,13 +1066,17 @@ export default function SampleDataInput(props: SampleDataInputProps) {
                         {/* {currentTab === 4 && createSampleTab()} */}
                     </div>
                 </div>
-                <div className='submit-buttons'>
-                    {shouldShowCancelButton() && <button type="button" onClick={onCancleClick} className="btn btn-outline-primary">Cancel</button>}
-                    {shouldShowBackButton() && <button type="button" id="samples-data-back-button" onClick={() => attemptToUpdateCurrentTab(currentTab - 1)} className="btn btn-primary">Back</button>}
-                    {shouldShowNextButton() && <button type="button" id="samples-data-next-button" onClick={() => attemptToUpdateCurrentTab(currentTab + 1)} className="btn btn-primary next-button">Next</button>}
-                    {shouldShowActionItemButton() && <button id="action-button" type="button" onClick={onActionButtonClick} className="btn btn-primary">{props.actionButtonTitle}</button>}
+            </div>
+            <div className='submit-buttons'>
+                <div>
+                    {shouldShowCancelButton() &&
+                        cancelButton()}
+                </div>
+                <div className='submit-buttons-right'>
+                    {shouldShowBackButton() && backButton()}
+                    {shouldShowNextButton() && nextButton()}
+                    {shouldShowActionItemButton() && actionButton()}
                     {userIsOnLastTab() && <button type="button" onClick={handleReturnToDashboard} className="btn btn-primary">Return to dashboard</button>}
-
                 </div>
             </div>
         </div>

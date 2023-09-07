@@ -67,6 +67,7 @@
 .form-row {
   display: flex;
   justify-content: space-between;
+  margin-top: 32px;
 }
 
 label {
@@ -179,7 +180,7 @@ label {
 }
 
 .selected {
-  background-color: #E8DEF8;
+  background: var(--timber-id-sys-light-secondary-container, #D4E8D1);
   overflow: hidden;
 }
 
