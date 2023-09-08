@@ -189,11 +189,6 @@ export default function SampleDataInput(props: SampleDataInputProps) {
                     alert("Please select an origin value");
                     return false;
                 }
-                if ((document.getElementById('inputLat') && !verifyLatLonFormat(document.getElementById('inputLat').value)) ||
-                    (document.getElementById('inputLon') && !verifyLatLonFormat(document.getElementById('inputLon').value))) {
-                    alert("Latitude and longitude should be in the format xx.xxxx");
-                    return false;
-                }
             } else {
                 return true;
             }

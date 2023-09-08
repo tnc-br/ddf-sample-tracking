@@ -55,6 +55,7 @@ export type Sample = {
   diameter: string,
   observations: string,
   created_by_name: string,
+  last_updated_by_photo: string,
 }
 
 export interface NestedSchemas {

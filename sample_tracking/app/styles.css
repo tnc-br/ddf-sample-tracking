@@ -42,7 +42,7 @@
 
     border-radius: 16px;
     background: #D4E8D1;
-    
+
 
     /* M3/Elevation Light/3 */
     box-shadow: 0px 1px 3px 0px rgba(0, 0, 0, 0.30), 0px 4px 8px 3px rgba(0, 0, 0, 0.15);
@@ -120,7 +120,7 @@
 
 .letter-profile {
     border-radius: 50%;
-    background-color: #1A73E8;
+    background-color: #006E2C;
     color: white;
     padding-top: 6px;
     text-align: center;
@@ -1211,7 +1211,7 @@ svg {
     padding: 12px 20px 12px 20px;
     align-items: center;
     gap: 12px;
-    justify-content: space-between;    
+    justify-content: space-between;
     width: 100%;
 }
 
@@ -1272,4 +1272,53 @@ svg {
 .display-inline-flex-center {
     display: inline-flex;
     align-items: center;
+}
+
+
+.user-chip-wrapper {
+    display: flex;
+    height: 32px;
+    justify-content: center;
+    align-items: center;
+    border-radius: 30px;
+    border: 1px solid var(--timber-id-sys-light-outline, #727970);
+    width: fit-content;
+}
+
+.user-chip-slate-layer {
+    display: flex;
+    padding: 4px 12px 4px 4px;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+}
+
+.user-chip-photo {
+    /* fill: var(--timber-id-sys-light-on-surface-variant, #424940); */
+    width: 24px;
+    height: 24px;
+}
+
+.user-chip-name {
+    color: var(--timber-id-sys-light-on-surface-variant, #424940);
+    text-align: center;
+
+    /* TimberID/label/large */
+    font-family: Roboto;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 500;
+    line-height: 20px;
+    /* 142.857% */
+}
+
+.table-letter-profile {
+    border-radius: 50%;
+    background-color: #424940;
+    color: white;
+    text-align: center;
+    cursor: pointer;
+    width: 24px;
+    height: 24px;
+    padding-top: 2px;
 }
