@@ -1028,7 +1028,7 @@ export default function SampleDataInput(props: SampleDataInputProps) {
 
     function nextButton() {
         return (
-            <div onClick={() => attemptToUpdateCurrentTab(currentTab + 1)} className='add-sample-button-wrapper next-button-wrapper'>
+            <div id="next-button-wrapper" onClick={() => attemptToUpdateCurrentTab(currentTab + 1)} className='add-sample-button-wrapper next-button-wrapper'>
                 <div className='add-sample-slate-layer'>
                     <div className='add-sample-button-text white-button-text'>{t('next')}</div>
                 </div>
@@ -1038,7 +1038,7 @@ export default function SampleDataInput(props: SampleDataInputProps) {
 
     function actionButton() {
         return (
-            <div onClick={onActionButtonClick} className='add-sample-button-wrapper next-button-wrapper'>
+            <div id="action-button" onClick={onActionButtonClick} className='add-sample-button-wrapper next-button-wrapper'>
                 <div className='add-sample-slate-layer'>
                     <div className='add-sample-button-text white-button-text'>{props.actionButtonTitle}</div>
                 </div>
