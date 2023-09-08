@@ -863,6 +863,10 @@
     cursor: pointer;
 }
 
+.manage-profile-chip:hover {
+    background-color: #D4E8D1;
+}
+
 .manage-profile-text {
     color: var(--grey-800, #3C4043);
     text-align: center;
@@ -971,6 +975,10 @@ svg {
     justify-content: center;
     align-items: center;
     cursor: pointer;
+}
+
+.logout-button-wrapper:hover {
+    background-color: #D4E8D1 !important;
 }
 
 .logout-button {
