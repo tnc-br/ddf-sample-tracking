@@ -206,7 +206,6 @@ export function getDocRefForTrustedValue(trusted: string, db: Firestore, sampleI
 
 
 export function validateImportedEntry(data: {}, errorMessages: ErrorMessages): string {
-  // const { t } = useTranslation();
   let errors = '';
   const headers = Object.keys(data);
   headers.forEach((header: string) => {
