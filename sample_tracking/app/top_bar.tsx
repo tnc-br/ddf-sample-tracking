@@ -163,7 +163,7 @@ export default function TopBar() {
     }
 
     return (
-        <div className='top-bar-wrapper'>
+        <div id="top-bar-wrapper" className='top-bar-wrapper'>
             <div className='top-bar-product-wrapper'>
                 <div className='display-inline-flex-center'>
                     <div className='top-bar-icon-wrapper'></div>

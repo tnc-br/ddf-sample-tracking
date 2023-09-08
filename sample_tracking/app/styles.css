@@ -25,7 +25,7 @@
     width: 256px;
     top: 67px;
     margin: 20px;
-    display: block !important;
+    display: block;
 }
 
 .add-sample-button {

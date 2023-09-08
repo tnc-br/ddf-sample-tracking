@@ -141,6 +141,16 @@ export default function Samples() {
         )
     }
 
+    function samplesTableHeader() {
+        return (
+            <div className='samples-header-wrapper'>
+                <div className='samples-header'>In progress</div>
+                <div className='samples-subheader'>Your tasks currently in progress</div>
+            </div>
+        )
+
+    }
+
     return (
         <div className='samples-page-wrapper'>
             <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@48,400,0,0" />
@@ -160,12 +170,20 @@ export default function Samples() {
                 </div>
 
                 <div id={IN_PROGRESS_SAMPLES} className="samples-sample-table">
-                    <p className='samples-header'>{t('inProgress')}</p>
+                    {/* <p className='samples-header'>{t('inProgress')}</p> */}
+                    <div className='samples-header-wrapper'>
+                        <div className='samples-header'>In progress ({allSamples.inProgress.length})</div>
+                        <div className='samples-subheader'>Your tasks currently in progress</div>
+                    </div>
                     {allSamples.inProgress && <SamplesTable samplesData={allSamples.inProgress as Sample[]} canDeleteSamples={isAdmin()} showValidity={false} allowExport={false} />}
                 </div>
 
                 <div id={COMPLETED_SAMPLES} className="samples-sample-table">
-                    <p className='samples-header'>{t('completed')}</p>
+                    {/* <p className='samples-header'>{t('completed')}</p> */}
+                    <div className='samples-header-wrapper'>
+                        <div className='samples-header'>Completed ({allSamples.completed.length})</div>
+                        <div className='samples-subheader'>Your completed tasks</div>
+                    </div>
                     {allSamples.completed && <SamplesTable samplesData={allSamples.completed as Sample[]} canDeleteSamples={isAdmin()} showValidity={true} allowExport={true} />}
                 </div>
                 {!allSamples.inProgress && !allSamples.completed && <div>No samples to show. Wait to be accepted to an organization to view samples.</div>}

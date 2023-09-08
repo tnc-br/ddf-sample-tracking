@@ -85,20 +85,20 @@ export function initializeAppIfNecessary() {
 export function showNavBar() {
   const navBar = document.getElementById('nav-wrapper');
   if (navBar) {
-    navBar.style.display = "inline";
+    navBar.style.display = "block";
   }
 }
 
 export function showTopBar() {
-  const navBar = document.getElementById('top-bar');
+  const navBar = document.getElementById('top-bar-wrapper');
   if (navBar) {
-    navBar.style.display = "inline";
+    navBar.style.display = "block";
   }
 
 }
 
 export function hideTopBar() {
-  const navBar = document.getElementById('top-bar');
+  const navBar = document.getElementById('top-bar-wrapper');
   if (navBar) {
     navBar.style.display = "none";
   }
