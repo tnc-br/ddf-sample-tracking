@@ -86,12 +86,6 @@ export default function SamplesTable(props: SampleDataProps) {
                 accessorKey: 'trusted',
                 header: t('origin'),
                 size: 100,
-
-            },
-            {
-                accessorKey: 'trusted',
-                header: t('origin'),
-                size: 100,
             },
             {
                 accessorFn: (row) => row,
