@@ -12,7 +12,7 @@ import { getFirestore, getDoc, doc, writeBatch } from "firebase/firestore";
 import { useTranslation } from 'react-i18next';
 import './i18n/config';
 import Papa from 'papaparse';
-import { type Sample, type UserData, validateImportedEntry, getRanHex } from './utils';
+import { type Sample, type UserData, type ErrorMessages, validateImportedEntry, getRanHex } from './utils';
 import { ExportToCsv } from 'export-to-csv';
 
 /**
@@ -54,6 +54,14 @@ export default function ImportSamples() {
         uncertain: 'untrusted'
     }
 
+    const errorMessages: ErrorMessages = {
+        originValueError: t('originValueError'),
+        originValueRequired: t('originValueRequired'),
+        latLonRequired: t('latLonRequired'),
+        shouldBeWithinTheRange: t('shouldBeWithinTheRange'),
+        and: t('and')
+    }
+
     function onImportSuccessBar() {
         return (<div className="import-success-status-wrapper success-background-color">
             <div className='import-status-icon-wrapper'>
@@ -65,7 +73,7 @@ export default function ImportSamples() {
             </div>
             <div className='import-status-text-wrapper'>
                 <div className='import-status-text text-color-green'>
-                    Successfully imported file
+                    {t('successfullyImportedFile')}
                 </div>
             </div>
             <div className='import-status-actions-wrapper'>
@@ -73,7 +81,7 @@ export default function ImportSamples() {
                     <div onClick={handleCloseBarClick} className="import-success-status-button pointer">
                         <div className='import-status-button-slate-layer'>
                             <div className='import-status-button-text'>
-                                Great!
+                                {t('great')}
                             </div>
                         </div>
                     </div>
@@ -94,7 +102,7 @@ export default function ImportSamples() {
                 </div>
                 <div className='import-status-text-wrapper'>
                     <div className='import-status-text'>
-                        File not uploaded because we noticed errors in the spreadsheet. Please download the sheet to see the errors and reupload.
+                        {t('fileNotUploadedErrors')}
                     </div>
                 </div>
                 <div className='import-status-actions-wrapper'>
@@ -102,14 +110,14 @@ export default function ImportSamples() {
                         <div onClick={handleCloseBarClick} className="import-cancel-button pointer">
                             <div className='import-status-button-slate-layer'>
                                 <div className='import-cancel-button-text'>
-                                    Cancel
+                                    {t('cancel')}
                                 </div>
                             </div>
                         </div>
                         <div onClick={handleDownloadClick} className="import-error-status-button icon-color-red pointer">
                             <div className='import-status-button-slate-layer'>
                                 <div className='import-status-button-text'>
-                                    Download
+                                    {t('download')}
                                 </div>
                             </div>
                         </div>
@@ -176,7 +184,7 @@ export default function ImportSamples() {
                 const codeList = {};
                 let foundErrors = false;
                 results.data.forEach((result) => {
-                    const errors = validateImportedEntry(result);
+                    const errors = validateImportedEntry(result, errorMessages);
                     if (errors.length > 0) {
                         result.errors = errors;
                         foundErrors = true;

@@ -59,6 +59,15 @@ export type Sample = {
   points?: [],
 }
 
+export type ErrorMessages = {
+  originValueError: string,
+  originValueRequired: string,
+  latLonRequired: string,
+  ShouldBeWithinRange: string,
+  shouldBeWithinTheRange: string,
+  and: string
+}
+
 export interface NestedSchemas {
   [key: string]: NestedSchemas;
 }
@@ -196,24 +205,25 @@ export function getDocRefForTrustedValue(trusted: string, db: Firestore, sampleI
 }
 
 
-export function validateImportedEntry(data: {}): string {
+export function validateImportedEntry(data: {}, errorMessages: ErrorMessages): string {
+  // const { t } = useTranslation();
   let errors = '';
   const headers = Object.keys(data);
   headers.forEach((header: string) => {
     if (!Object.keys(resultRanges).includes(header)) return;
       const value = parseFloat(data[header])
       if (value < resultRanges[header].min || value > resultRanges[header].max) {
-        errors += `${header} should be within the range ${resultRanges[header].min} and ${resultRanges[header].max}, `;
+        errors += `${header} ${errorMessages.ShouldBeWithinRange} ${resultRanges[header].min} ${errorMessages.and} ${resultRanges[header].max}, `;
       }
   })
   if (!headers.includes('lat') || !headers.includes('lon')) {
-    errors += 'lat and lon are required, '
+    errors += errorMessages.latLonRequired
   }
   if (!headers.includes('origin')) {
-    errors += 'origin value is required, '
+    errors += errorMessages.originValueRequired
   } else {
     if (!['known', 'unknown', 'uncertain'].includes(data.origin)) {
-      errors += 'origin value should be one of the following: known, uncertain, or unknown'
+      errors += errorMessages.originValueError
     }
   }
   return errors;
