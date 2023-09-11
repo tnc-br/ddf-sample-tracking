@@ -75,7 +75,7 @@
   "reviewAndCreate": "Revise e crie",
   "addSampleMeasurements": "Adicionar medições de amostra",
   "addNewSample": "Adicionar nova amostra",
-  "view": "Visualizar"
+  "view": "Visualizar",
   "fileNotUploadedErrors": "Arquivo não enviado porque notamos erros na planilha. Faça download da planilha para ver os erros e reenviar.",
   "download": "Download",
   "successfullyImportedFile": "Arquivo importado com sucesso",
