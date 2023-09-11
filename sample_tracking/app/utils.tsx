@@ -56,10 +56,57 @@ export type Sample = {
   observations: string,
   created_by_name: string,
   last_updated_by_photo: string,
+  measurements: {},
+  points?: [],
+}
+
+export type ErrorMessages = {
+  originValueError: string,
+  originValueRequired: string,
+  latLonRequired: string,
+  ShouldBeWithinRange: string,
+  shouldBeWithinTheRange: string,
+  and: string
 }
 
 export interface NestedSchemas {
   [key: string]: NestedSchemas;
+}
+
+const resultRanges = {
+  'd18O_cel': {
+    'min': 20,
+    'max': 32
+  },
+  'd18O_wood': {
+    'min': 20,
+    'max': 32
+  },
+  'd15N_wood': {
+    'min': -5,
+    'max': 15
+  },
+  'n_wood': {
+    'min': 0,
+    'max': 1
+  },
+  'd13C_wood': {
+    'min': -38,
+    'max': 20
+  },
+  'c_wood': {
+    'min': 40,
+    'max': 60
+  },
+  'd13C_cel': {
+    'min': -35,
+    'max': -20
+  },
+  'c_cel': {
+    'min': 40,
+    'max': 60
+  },
+
 }
 
 
@@ -157,3 +204,28 @@ export function getDocRefForTrustedValue(trusted: string, db: Firestore, sampleI
   }
   return docRef;
 }
+
+
+export function validateImportedEntry(data: {}, errorMessages: ErrorMessages): string {
+  let errors = '';
+  const headers = Object.keys(data);
+  headers.forEach((header: string) => {
+    if (!Object.keys(resultRanges).includes(header)) return;
+      const value = parseFloat(data[header])
+      if (value < resultRanges[header].min || value > resultRanges[header].max) {
+        errors += `${header} ${errorMessages.ShouldBeWithinRange} ${resultRanges[header].min} ${errorMessages.and} ${resultRanges[header].max}, `;
+      }
+  })
+  if (!headers.includes('lat') || !headers.includes('lon')) {
+    errors += errorMessages.latLonRequired
+  }
+  if (!headers.includes('origin')) {
+    errors += errorMessages.originValueRequired
+  } else {
+    if (!['known', 'unknown', 'uncertain'].includes(data.origin)) {
+      errors += errorMessages.originValueError
+    }
+  }
+  return errors;
+}
+

@@ -1034,7 +1034,6 @@ svg {
 .page-title-text {
 
     color: var(--timber-id-sys-light-on-surface, #191C1D);
-
     /* TimberID/title/large */
     font-family: Roboto;
     font-size: 22px;
@@ -1330,3 +1329,15 @@ svg {
     height: 24px;
     padding-top: 2px;
 }
+
+  .visibility-hidden {
+    visibility: hidden;
+  }
+
+  .display-none {
+    display: none;
+  }
+
+  .pointer {
+    cursor: pointer;
+  }

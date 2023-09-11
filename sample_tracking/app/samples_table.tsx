@@ -204,11 +204,32 @@ export default function SamplesTable(props: SampleDataProps) {
     }
 
     function handleDownloadAllData() {
-        csvExporter.generateCsv(sampleData.samples);
+        csvExporter.generateCsv(getExportDataFromSampleList(sampleData.samples));
     }
 
     function onDowloadClick(rows: MRT_Row<Sample>[]) {
-        csvExporter.generateCsv(rows.map((row) => row.original));
+        const sampleData = rows.map((row) => row.original);
+        csvExporter.generateCsv(getExportDataFromSampleList(sampleData));
+    }
+
+    function getExportDataFromSampleList(samples: Sample[]): Sample[] {
+        let exportData: Sample[] = [];
+        samples.forEach((sample: Sample) => {
+            const sampleCopy = structuredClone(sample);
+            if (sample.points && sample.points.length > 0) {
+                delete sampleCopy.points;
+                sample.points.forEach((point: {}) => {
+                    exportData.push({
+                        ...sampleCopy,
+                        ...point
+                    });
+                });
+            } else {
+                exportData.push(sample);
+            }
+        });
+        return exportData;
+
     }
 
     return (

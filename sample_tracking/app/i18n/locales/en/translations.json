@@ -77,4 +77,13 @@
   "addSampleMeasurements": "Add sample measurements",
   "addNewSample": "Add new sample",
   "view": "View"
+  "fileNotUploadedErrors": "File not uploaded because we noticed errors in the spreadsheet. Please download the sheet to see the errors and reupload.",
+  "download": "Download",
+  "successfullyImportedFile" : "Successfully imported file",
+  "great": "Great!",
+  "originValueError": "origin value should be one of the following: known, uncertain, or unknown",
+  "originValueRequired": "origin value is required, ",
+  "latLonRequired": "lat and lon are required, ",
+  "shouldBeWithinTheRange": "should be within the range",
+  "and": "and"
 }
