@@ -363,7 +363,7 @@ export default function SampleDataInput(props: SampleDataInputProps) {
                             onChange={handleChange}
                             value={formData.species}
                             options={getSpeciesNames()}
-                            sx={{ width: 300 }}
+                            // sx={{ width: 300 }}
                             renderInput={(params) =>
                                 <TextField
                                     {...params}
@@ -444,7 +444,7 @@ export default function SampleDataInput(props: SampleDataInputProps) {
                                 id="state"
                                 sx={style}
                                 options={getStatesList()}
-                                sx={{ width: 300 }}
+                                // sx={{ width: 300 }}
                                 renderInput={(params) => <TextField {...params} label={t('state')} />}
                                 onChange={handleChange}
                                 value={formData.state}
@@ -460,7 +460,7 @@ export default function SampleDataInput(props: SampleDataInputProps) {
                                 fullWidth
                                 id="municipality"
                                 options={getMunicipalitiesList()}
-                                sx={{ width: 300 }}
+                                // sx={{ width: 300 }}
                                 renderInput={(params) => <TextField {...params} label={t('municipality')} />}
                                 onChange={handleChange}
                                 value={formData.municipality}
