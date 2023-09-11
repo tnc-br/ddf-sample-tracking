@@ -1024,3 +1024,16 @@ border: 1px solid var(--grey-300, #DADCE0);
   font-weight: 400;
   line-height: 28px; /* 127.273% */
   }
+
+
+  .visibility-hidden {
+    visibility: hidden;
+  }
+
+  .display-none {
+    display: none;
+  }
+
+  .pointer {
+    cursor: pointer;
+  }

@@ -74,5 +74,14 @@
   "qrPrintInstructions": "Imprima e cole este código QR na amostra a ser analisada",
   "reviewAndCreate": "Revise e crie",
   "addSampleMeasurements": "Adicionar medições de amostra",
-  "addNewSample": "Adicionar nova amostra"
+  "addNewSample": "Adicionar nova amostra",
+  "fileNotUploadedErrors": "Arquivo não enviado porque notamos erros na planilha. Faça download da planilha para ver os erros e reenviar.",
+  "download": "Download",
+  "successfullyImportedFile": "Arquivo importado com sucesso",
+  "great": "Ótimo!",
+  "originValueError": "o valor de origem deve ser um dos seguintes: conhecido, incerto ou desconhecido",
+  "originValueRequired": "o valor de origem é obrigatório, ",
+  "latLonRequired": "lat e lon são obrigatórios,",
+  "shouldBeWithinTheRange": "deve estar dentro do intervalo",
+  "and": "e"
 }
