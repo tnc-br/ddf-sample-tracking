@@ -92,7 +92,7 @@ export default function AddSample() {
                 }
             })
         }
-    });
+    }, []);
 
     /**
      * Adds a new sample to the correct collection depending on if the sample is trusted, untrusted or unknown. 
@@ -174,7 +174,7 @@ export default function AddSample() {
             <div >
 
                 <div className="sample-details-form-wrapper">
-                    {formData.status === 'concluded' && !sampleCreationFinished && <div className="add-sample-tab-bar">
+                    {/* {formData.status === 'concluded' && !sampleCreationFinished && <div className="add-sample-tab-bar">
                         <div className='add-sample-add-details-tab'>
                             <div className='add-sample-tab-number-wrapper'>
                                 <div className='leading-divider'>
@@ -225,7 +225,7 @@ export default function AddSample() {
                             </div>
                         </div>
 
-                    </div>}
+                    </div>} */}
                     {!sampleCreationFinished && <div>
                         {formData.status !== 'concluded' && <p className="sample-details-section-title">{t('addDetails')}</p>}
                         <p className="sample-details-requirements">{t('requiredFields')}</p>

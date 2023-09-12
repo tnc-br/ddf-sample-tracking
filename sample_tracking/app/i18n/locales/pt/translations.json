@@ -88,5 +88,6 @@
   "passwordsDontMatch": "As senhas que você digitou não coincidem.",
   "incorrectLogin": "O nome de usuário ou senha inseridos estão incorretos.",
   "invalidEmail": "Por favor digite um email válido",
-  "emailAlreadyInUse": "Já existe uma conta com este e-mail."
+  "emailAlreadyInUse": "Já existe uma conta com este e-mail.",
+  "editSample": "Editar amostra"
 }

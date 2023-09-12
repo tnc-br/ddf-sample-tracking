@@ -89,6 +89,7 @@
   "passwordsDontMatch": "The passwords you entered don't match.",
   "incorrectLogin": "The username or password entered is incorrect.",
   "invalidEmail": "Please enter a valid email",
-  "emailAlreadyInUse": "There is already an account with this email."
+  "emailAlreadyInUse": "There is already an account with this email.",
+  "editSample": "Edit sample"
   
 }
