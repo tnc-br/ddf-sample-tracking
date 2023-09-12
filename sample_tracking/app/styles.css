@@ -98,6 +98,9 @@
 
 .profile-photo {
     border-radius: 50%;
+}
+
+.size-32 {
     width: 32px;
     height: 32px;
 }

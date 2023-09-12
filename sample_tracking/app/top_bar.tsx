@@ -186,7 +186,7 @@ export default function TopBar() {
                     <div className='top-bar-profile-menu-wrapper'>
                         <div className='top-bar-profile-menu'>
                             {userData.photoUrl && <img id="profile-photo" className="profile-photo" src={userData.photoUrl} width="32" height="32" />}
-                            {!userData.photoUrl && <div id="profile-photo" className="letter-profile profile-photo">{userData.name ? userData.name.charAt(0) : ''}</div>}
+                            {!userData.photoUrl && <div id="profile-photo" className="letter-profile profile-photo size-32">{userData.name ? userData.name.charAt(0) : ''}</div>}
                             {showMenu && profilePopup()}
                         </div>
                     </div>
