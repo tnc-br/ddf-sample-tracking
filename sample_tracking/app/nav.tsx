@@ -80,12 +80,6 @@ export default function Nav() {
                         add
                     </span> {t('addSample')}</div>
                 </li>}
-                {canAddSample() && <li className="nav-item">
-                    {/* <Link className="nav-link" href="./import-samples">
-                        <span className="material-symbols-outlined">cloud_upload</span>
-                        {t('importSamples')}</Link> */}
-                        <div className="nav-link"><ImportSamples /></div>
-                </li>}
                 <li className="nav-item">
                     <Link className="nav-link" href="./samples"> <span className="material-symbols-outlined">
                         lab_panel
