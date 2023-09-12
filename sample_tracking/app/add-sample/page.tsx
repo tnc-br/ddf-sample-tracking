@@ -41,10 +41,10 @@ export default function AddSample() {
     const [sampleCreationFinished, setSampleCreationFinished] = useState(false);
 
     const [formData, setFormData] = useState({
-        visibility: 'public',
+        visibility: 'private',
         collected_by: 'supplier',
         trusted: 'unknown',
-    });
+    } as Sample);
 
     const router = useRouter();
     const app = initializeAppIfNecessary();
@@ -52,16 +52,17 @@ export default function AddSample() {
     const db = getFirestore();
     const { t } = useTranslation();
 
-    let status = "completed";
+    // let request: string|null = "singleReference";
     const searchParams = useSearchParams();
-    if (typeof window !== "undefined" && !formData.status) {
+    if (typeof window !== "undefined" && !formData.request) {
         const queryString = window.location.search;
         console.log("Querystring: " + queryString);
         const urlParams = new URLSearchParams(queryString);
-        status = urlParams.get('status') ? urlParams.get('status') : searchParams.get('status');
+        const requestParam = urlParams.get('request') ? urlParams.get('request') : searchParams.get('status');
+        const request = requestParam ? requestParam : 'singleReference'; 
         setFormData({
             ...formData,
-            status: status === 'completed' ? 'concluded' : 'in_progress',
+            request: request,
         });
     }
 
@@ -175,7 +176,7 @@ export default function AddSample() {
             <div >
 
                 <div className="sample-details-form-wrapper">
-                    {formData.status === 'concluded' && !sampleCreationFinished && <div className="add-sample-tab-bar">
+                    {!sampleCreationFinished && <div className="add-sample-tab-bar">
                         <div className='add-sample-add-details-tab'>
                             <div className='add-sample-tab-number-wrapper'>
                                 <div className='leading-divider'>
@@ -227,10 +228,10 @@ export default function AddSample() {
                         </div>
 
                     </div>}
-                    {!sampleCreationFinished && <div>
+                    {/* {!sampleCreationFinished && <div>
                         {formData.status !== 'concluded' && <p className="sample-details-section-title">{t('addDetails')}</p>}
                         <p className="sample-details-requirements">{t('requiredFields')}</p>
-                    </div>}
+                    </div>} */}
                     {sampleCreationFinished && <div>
                         <div className='sample-added-title'>
                             {t('newSampleAdded')}
@@ -259,8 +260,8 @@ export default function AddSample() {
                             onTabChange={(tab) => handleTabChange(tab)}
                             actionButtonTitle={t('addSample')}
                             isNewSampleForm={true}
-                            sampleId={sampleId}
-                            isCompletedSample={formData.status === 'concluded' ? true : false} />
+                            sampleId={sampleId}/>
+                            {/* isCompletedSample={formData.status === 'concluded' ? true : false}  */}
                     </div>}
                 </div>
             </div>

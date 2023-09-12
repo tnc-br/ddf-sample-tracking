@@ -181,11 +181,7 @@
     /* border: 1px solid black; */
     border-radius: 10px;
     padding: 10px;
-    background: var(--m-3-sys-light-surface-container-high, #ECE6F0);
-
-    color: var(--grey-800, #3C4043);
-
-    color: var(--m-3-sys-light-on-surface, #1D1B20);
+    background: #F8FAFA;
 
     /* M3/label/large */
     font-family: Roboto;
@@ -195,18 +191,25 @@
     line-height: 20px;
     /* 142.857% */
     letter-spacing: 0.1px;
-    width: 80%;
-    color: black;
-    height: 100px;
+    width: 100%;
+    height: 140px;
     box-shadow: 0px 1px 3px 0px rgba(0, 0, 0, 0.30), 0px 4px 8px 3px rgba(0, 0, 0, 0.15);
-    top: 50px;
+    top: 0px;
+    left: -5px;
     position: absolute;
 }
 
 .add-sample-option {
-    color: black;
+    color: var(--timber-id-sys-light-on-surface, #191C1D);
+font-family: Roboto;
+font-size: 16px;
+font-style: normal;
+font-weight: 400;
+line-height: 24px; /* 150% */
+
+    /* color: black;
     text-decoration: none;
-    margin: 15px;
+    margin: 15px; */
 }
 
 .nav-item {
@@ -1332,6 +1335,10 @@ svg {
 
   .visibility-hidden {
     visibility: hidden;
+    position: absolute;
+    bottom: -375px;
+    left: -20px;
+    width: 1px;
   }
 
   .display-none {
@@ -1340,4 +1347,9 @@ svg {
 
   .pointer {
     cursor: pointer;
+  }
+
+  .import-option {
+    /* top: -33px; */
+    /* position: relative; */
   }

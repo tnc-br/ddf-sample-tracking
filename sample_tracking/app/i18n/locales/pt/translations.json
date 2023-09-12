@@ -84,5 +84,7 @@
   "originValueRequired": "o valor de origem é obrigatório, ",
   "latLonRequired": "lat e lon são obrigatórios,",
   "shouldBeWithinTheRange": "deve estar dentro do intervalo",
-  "and": "e"
+  "and": "e",
+  "originVerification": "Verificação de origem",
+  "singleReferenceSample": "Amostra de referência única"
 }

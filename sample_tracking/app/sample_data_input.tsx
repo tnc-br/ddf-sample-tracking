@@ -24,7 +24,7 @@ type SampleDataInputProps = {
     actionButtonTitle: string,
     isNewSampleForm: boolean,
     sampleId: string,
-    isCompletedSample: boolean,
+    // isCompletedSample: boolean,
     currentTab: number,
 }
 
@@ -322,7 +322,13 @@ export default function SampleDataInput(props: SampleDataInputProps) {
         Triangular: 'triangular',
         Chunk: 'chunk',
         Fiber: 'fiber'
+    }
 
+    const statusValues = {
+        'In transit': 'in_transit',
+        'Not started': 'not_started',
+        'In progress': 'in_progress',
+        'Completed': 'concluded'
     }
 
     const style = {
@@ -350,6 +356,27 @@ export default function SampleDataInput(props: SampleDataInputProps) {
                             onChange={handleChange}
                             value={formData.sample_name ? formData.sample_name : ''}
                         />
+                    </div>
+
+                    <div className='input-text-field-wrapper'>
+                    <TextField
+                            id="status"
+                            size='small'
+                            sx={style}
+                            fullWidth
+                            select
+                            required
+                            name="status"
+                            label={t('status')}
+                            onChange={handleChange}
+                            value={formData.status ? formData.status : "concluded"}
+                        >
+                            {Object.keys(statusValues).map((statusLabel: string) => (
+                                <MenuItem key={statusLabel} value={statusValues[statusLabel]}>
+                                    {statusLabel}
+                                </MenuItem>
+                            ))}
+                        </TextField>
                     </div>
 
                     <div className='input-text-field-wrapper'>
@@ -987,7 +1014,7 @@ export default function SampleDataInput(props: SampleDataInputProps) {
         return currentTab === 4;
     }
     function shouldShowNextButton(): boolean {
-        if (!props.isCompletedSample) return false;
+        // if (!props.isCompletedSample) return false;
         return currentTab < 3;
     }
 
@@ -999,8 +1026,8 @@ export default function SampleDataInput(props: SampleDataInputProps) {
         return !userIsOnLastTab();
     }
     function shouldShowActionItemButton(): boolean {
-        const isTabBeforeCreateSample = (props.isCompletedSample && currentTab === 3) || (!props.isCompletedSample && currentTab === 1);
-        return isTabBeforeCreateSample || !props.isNewSampleForm;
+        // const isTabBeforeCreateSample = currentTab === 1;
+        return currentTab === 3 || !props.isNewSampleForm;
     }
     function handleReturnToDashboard() {
         router.push('/samples')

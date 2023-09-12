@@ -58,6 +58,7 @@ export type Sample = {
   last_updated_by_photo: string,
   measurements: {},
   points?: [],
+  request: string
 }
 
 export type ErrorMessages = {

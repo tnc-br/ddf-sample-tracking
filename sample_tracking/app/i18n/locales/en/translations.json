@@ -85,5 +85,7 @@
   "originValueRequired": "origin value is required, ",
   "latLonRequired": "lat and lon are required, ",
   "shouldBeWithinTheRange": "should be within the range",
-  "and": "and"
+  "and": "and",
+  "originVerification": "Origin verification",
+  "singleReferenceSample": "Single reference sample"
 }
