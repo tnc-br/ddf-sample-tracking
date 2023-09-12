@@ -525,6 +525,9 @@ export default function SampleDataInput(props: SampleDataInputProps) {
                                 label={t('measuringHeight')}
                                 onChange={handleChange}
                                 value={formData.measureing_height}
+                                InputProps={{
+                                    endAdornment: <InputAdornment position="end">cm</InputAdornment>
+                                }}
                             />
                         </div>
 
@@ -557,6 +560,9 @@ export default function SampleDataInput(props: SampleDataInputProps) {
                                 label={t('diameter')}
                                 onChange={handleChange}
                                 value={formData.diameter}
+                                InputProps={{
+                                    endAdornment: <InputAdornment position="end">cm</InputAdornment>
+                                }}
                             />
                         </div>
                         <div className='input-text-field-wrapper half-width'>
