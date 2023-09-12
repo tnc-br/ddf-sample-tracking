@@ -113,11 +113,19 @@ export default function SignUp(props: SignUpProps) {
                         ...errorText,
                         password: error.message.substring(error.message.indexOf(':') + 2, error.message.indexOf('('))
                     })
+                    return;
                 case 'auth/email-already-exists':
                     setErrorText({
                         ...errorText,
                         email: error.message.substring(error.message.indexOf(':') + 2, error.message.indexOf('('))
                     })
+                    return;
+                case 'auth/email-already-in-use':
+                    setErrorText({
+                        ...errorText,
+                        email: t('emailAlreadyInUse')
+                    })
+                    return;
                 default:
                     const cancelFunction = () => {
                         setConfirmationBoxData(null);

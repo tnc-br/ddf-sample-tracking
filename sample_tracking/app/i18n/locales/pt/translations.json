@@ -83,5 +83,10 @@
   "originValueRequired": "o valor de origem é obrigatório, ",
   "latLonRequired": "lat e lon são obrigatórios,",
   "shouldBeWithinTheRange": "deve estar dentro do intervalo",
-  "and": "e"
+  "and": "e",
+  "errorCreatingAccount": "Houve um erro ao criar a sua conta.",
+  "passwordsDontMatch": "As senhas que você digitou não coincidem.",
+  "incorrectLogin": "O nome de usuário ou senha inseridos estão incorretos.",
+  "invalidEmail": "Por favor digite um email válido",
+  "emailAlreadyInUse": "Já existe uma conta com este e-mail."
 }

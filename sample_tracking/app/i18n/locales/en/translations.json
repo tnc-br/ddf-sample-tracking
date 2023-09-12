@@ -88,6 +88,7 @@
   "errorCreatingAccount": "There was an error creating your account.",
   "passwordsDontMatch": "The passwords you entered don't match.",
   "incorrectLogin": "The username or password entered is incorrect.",
-  "invalidEmail": "Please enter a valid email"
+  "invalidEmail": "Please enter a valid email",
+  "emailAlreadyInUse": "There is already an account with this email."
   
 }
