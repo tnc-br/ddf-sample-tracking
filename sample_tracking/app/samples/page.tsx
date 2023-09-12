@@ -46,7 +46,7 @@ export default function Samples() {
                 }
             })
         }
-    })
+    }, [])
 
     if (!allSamples.inProgress && !allSamples.completed) {
         addSamplesToDataList();

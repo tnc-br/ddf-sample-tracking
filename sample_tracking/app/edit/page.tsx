@@ -76,7 +76,7 @@ export default function Edit() {
                 }
             })
         }
-    });
+    }, []);
 
     let docRef = doc(db, "trusted_samples", sampleId!);
     if (trusted === 'untrusted') {
