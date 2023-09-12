@@ -119,16 +119,31 @@ export default function SamplesTable(props: SampleDataProps) {
                     return (
                         <div className="action-buttons-wrapper">
                             <div id={(row as Sample).trusted} >
-                                <IconButton onClick={() => onEditSampleClick(row)}>
+                                {/* <IconButton onClick={() => onEditSampleClick(row)}>
                                     <Edit />
-                                </IconButton>
+                                </IconButton> */}
+                                <div className='edit-sample-button-wrapper' onClick={() => onEditSampleClick(row)}>
+                                    <div className='edit-sample-button'>
+                                        <div className='edit-sample-icon'>
+                                            <span className="material-symbols-outlined">
+                                                check_small
+                                            </span>
+                                        </div>
+                                        <div className='edit-sample-text'>
+                                            Edit
+                                        </div>
+                                    </div>
+
+                                </div>
                             </div>
 
                             {props.canDeleteSamples &&
                                 <div id={(row as Sample).trusted}>
-                                    <IconButton color="error" onClick={() => onDeleteSampleClick(row)}>
+                                    {/* <IconButton color="error" onClick={() => onDeleteSampleClick(row)}>
                                         <Delete />
-                                    </IconButton>
+                                    </IconButton> */}
+                                    
+                                    
                                 </div>}
                         </div>
 
