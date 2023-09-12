@@ -1014,7 +1014,6 @@ export default function SampleDataInput(props: SampleDataInputProps) {
         return currentTab === 4;
     }
     function shouldShowNextButton(): boolean {
-        // if (!props.isCompletedSample) return false;
         return currentTab < 3;
     }
 
@@ -1026,7 +1025,6 @@ export default function SampleDataInput(props: SampleDataInputProps) {
         return !userIsOnLastTab();
     }
     function shouldShowActionItemButton(): boolean {
-        // const isTabBeforeCreateSample = currentTab === 1;
         return currentTab === 3 || !props.isNewSampleForm;
     }
     function handleReturnToDashboard() {
