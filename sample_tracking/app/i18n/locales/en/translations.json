@@ -84,6 +84,10 @@
   "originValueRequired": "origin value is required, ",
   "latLonRequired": "lat and lon are required, ",
   "shouldBeWithinTheRange": "should be within the range",
-  "and": "and"
+  "and": "and",
+  "errorCreatingAccount": "There was an error creating your account.",
+  "passwordsDontMatch": "The passwords you entered don't match.",
+  "incorrectLogin": "The username or password entered is incorrect.",
+  "invalidEmail": "Please enter a valid email"
   
 }

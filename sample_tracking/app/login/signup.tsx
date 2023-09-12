@@ -4,6 +4,8 @@ import { useRouter } from 'next/navigation'
 import { getAuth, createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
 import { doc, getDocs, collection, getFirestore, updateDoc, addDoc, setDoc } from "firebase/firestore";
 import { TextField, Autocomplete, MenuItem, InputAdornment } from '@mui/material';
+import {ConfirmationBox, ConfirmationProps} from '../confirmation_box';
+import { useTranslation } from 'react-i18next';
 
 
 interface SignUpProps {
@@ -54,6 +56,8 @@ export default function SignUp(props: SignUpProps) {
         labName: ''
     });
     const [availableOrgs, setAvailableOrgs] = useState({} as OrgsSchemas);
+    const [errorText, setErrorText] = useState({} as NewUser)
+    const [confirmationBoxData, setConfirmationBoxData] = useState(null as ConfirmationProps | null);
 
     function updateSignUpData(signUpData: SignUpData) {
         setSignUpData(signUpData);
@@ -62,6 +66,7 @@ export default function SignUp(props: SignUpProps) {
     const auth = getAuth();
     const db = getFirestore();
     const router = useRouter()
+    const { t } = useTranslation();
 
     if (Object.keys(availableOrgs).length < 1) {
         const orgs: OrgsSchemas = {};
@@ -77,6 +82,8 @@ export default function SignUp(props: SignUpProps) {
 
     async function handleSignUpButtonClicked() {
 
+        setErrorText({} as NewUser)
+
         const accountInfo = document.getElementById('account-info');
         if (!accountInfo.checkValidity()) {
             accountInfo.reportValidity();
@@ -86,7 +93,10 @@ export default function SignUp(props: SignUpProps) {
             return;
         }
         if (formData.password !== formData.confirmPassword) {
-            alert("The passwords you entered don't match.");
+            setErrorText({
+                ...errorText,
+                confirmPassword: t('passwordsDontMatch')
+            })
             return;
         }
 
@@ -95,7 +105,33 @@ export default function SignUp(props: SignUpProps) {
         const name = `${formData.firstName} ${formData.lastName}`;
         const labValue = orgName ? availableOrgs[orgName] : '';
 
-        await createUserWithEmailAndPassword(auth, formData.email, formData.password);
+        await createUserWithEmailAndPassword(auth, formData.email, formData.password).catch((error) => {
+            console.log(error);
+            switch (error.code) {
+                case 'auth/weak-password':
+                    setErrorText({
+                        ...errorText,
+                        password: error.message.substring(error.message.indexOf(':') + 2, error.message.indexOf('('))
+                    })
+                case 'auth/email-already-exists':
+                    setErrorText({
+                        ...errorText,
+                        email: error.message.substring(error.message.indexOf(':') + 2, error.message.indexOf('('))
+                    })
+                default:
+                    const cancelFunction = () => {
+                        setConfirmationBoxData(null);
+                    }
+                    const title = `${t('errorCreatingAccount')} + ${error.message}`;
+                    const actionButtonTitle = t('confirm');
+                    setConfirmationBoxData({
+                        title: title,
+                        actionButtonTitle: actionButtonTitle,
+                        onCancelButtonClick: cancelFunction,
+                    })
+            }
+            return;
+        })
         const user = auth.currentUser;
         if (!user) return;
         await updateProfile(auth.currentUser, {
@@ -151,7 +187,9 @@ export default function SignUp(props: SignUpProps) {
 
     function yourDetailsTab() {
         return (
-            <form id="details-tab">
+            <form
+                autoComplete="off"
+                id="details-tab">
                 <p className="forgot-password-header">Sign up</p>
                 <div className="login-input-wrapper">
                     <TextField
@@ -178,24 +216,24 @@ export default function SignUp(props: SignUpProps) {
                     />
                 </div>
                 <div className='input-text-field-wrapper'>
-                        <TextField
-                            id="orgName"
-                            size='small'
-                            fullWidth
-                            select
-                            required
-                            name="orgName"
-                            label="Organization"
-                            onChange={(evt: any) => handleChange(evt)}
-                            // value={formData.trusted ? formData.trusted : "unknown"}
-                        >
-                            {Object.keys(availableOrgs).map((orgValue: string) => (
-                                <MenuItem key={orgValue} value={orgValue}>
-                                    {orgValue}
-                                </MenuItem>
-                            ))}
-                        </TextField>
-                    </div>
+                    <TextField
+                        id="orgName"
+                        size='small'
+                        fullWidth
+                        select
+                        required
+                        name="orgName"
+                        label="Organization"
+                        onChange={(evt: any) => handleChange(evt)}
+                    // value={formData.trusted ? formData.trusted : "unknown"}
+                    >
+                        {Object.keys(availableOrgs).map((orgValue: string) => (
+                            <MenuItem key={orgValue} value={orgValue}>
+                                {orgValue}
+                            </MenuItem>
+                        ))}
+                    </TextField>
+                </div>
                 <div onClick={handleNextClick} className="forgot-password-button-wrapper">
                     <div className="forgot-password-button">
                         <div className='forgot-password-button-text'>
@@ -209,24 +247,26 @@ export default function SignUp(props: SignUpProps) {
 
     function accountInfo() {
         return (
-            <form id="account-info">
+            <form 
+            autoComplete="off"
+            id="account-info">
                 <p className="forgot-password-header">
                     <span onClick={() => setSignUpTab(0)} className="material-symbols-outlined back-arrow">
                         arrow_back
                     </span>Sign up</p>
-                {formData['orgName'] === "NEW" && 
-                <div className="login-input-wrapper">
-                <TextField
-                    size='small'
-                    fullWidth
-                    required
-                    id="newOrgName"
-                    name="newOrgName"
-                    label="New org name"
-                    value={formData.newOrgName}
-                    onChange={(evt: any) => handleChange(evt)}
-                />
-            </div>
+                {formData['orgName'] === "NEW" &&
+                    <div className="login-input-wrapper">
+                        <TextField
+                            size='small'
+                            fullWidth
+                            required
+                            id="newOrgName"
+                            name="newOrgName"
+                            label="New org name"
+                            value={formData.newOrgName}
+                            onChange={(evt: any) => handleChange(evt)}
+                        />
+                    </div>
                 }
                 <div className="login-input-wrapper">
                     <TextField
@@ -236,6 +276,7 @@ export default function SignUp(props: SignUpProps) {
                         id="email"
                         name="email"
                         label="Email"
+                        helperText={errorText.email}
                         value={formData.email}
                         onChange={(evt: any) => handleChange(evt)}
                     />
@@ -247,6 +288,7 @@ export default function SignUp(props: SignUpProps) {
                         required
                         type="password"
                         id="password"
+                        helperText={errorText.password}
                         name="password"
                         label="Password"
                         onChange={(evt: any) => handleChange(evt)}
@@ -259,6 +301,7 @@ export default function SignUp(props: SignUpProps) {
                         required
                         type="password"
                         id="confirmPassword"
+                        helperText={errorText.confirmPassword}
                         name="confirmPassword"
                         label="Confirm password"
                         onChange={(evt: any) => handleChange(evt)}
@@ -279,6 +322,7 @@ export default function SignUp(props: SignUpProps) {
     return (
         <div className='signup-wrapper'>
             {signUpTab === 0 ? yourDetailsTab() : accountInfo()}
+            {confirmationBoxData && <ConfirmationBox {...confirmationBoxData} />}
         </div>
     )
 
