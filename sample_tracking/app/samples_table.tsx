@@ -139,9 +139,9 @@ export default function SamplesTable(props: SampleDataProps) {
 
                             {props.canDeleteSamples &&
                                 <div id={(row as Sample).trusted}>
-                                    {/* <IconButton color="error" onClick={() => onDeleteSampleClick(row)}>
+                                    <IconButton color="error" onClick={() => onDeleteSampleClick(row)}>
                                         <Delete />
-                                    </IconButton> */}
+                                    </IconButton>
                                     
                                     
                                 </div>}
