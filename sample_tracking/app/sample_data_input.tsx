@@ -24,7 +24,6 @@ type SampleDataInputProps = {
     actionButtonTitle: string,
     isNewSampleForm: boolean,
     sampleId: string,
-    // isCompletedSample: boolean,
     currentTab: number,
 }
 
@@ -36,7 +35,6 @@ type SampleDataInputProps = {
  * - actionButtonTitle: the label for the action button
  * - isNewSampleForm: boolean representing if this is a new sample or represents an already existing sample
  * - sampleId: 20 character hex ID for the sample
- * - isCompletedSample: boolean representing if this is a completed or in progress sample
  * - currentTab: the tab of the sample form that should be shown
  * 
  * This is a very large file but at its core its just a form to enter Sample data. 
@@ -506,17 +504,6 @@ export default function SampleDataInput(props: SampleDataInputProps) {
                     </div>
                 </div>
                 <div className='column_two'>
-
-                    {/* <div>
-                        <p>{t('collectedBy')}</p>
-                        <div className="visibility_buttons">
-                            <div onClick={handleSelectSupplier}
-                                className={formData.collected_by === 'supplier' ? "button_select public_button selected" : "button_select public_button"}>{t('supplier')}</div>
-                            <div onClick={handleSelectMyOrg}
-                                className={formData.collected_by === 'my_org' ? "button_select private_button selected" : "button_select private_button"}>{t('myOrg')}</div>
-                        </div>
-                    </div> */}
-
                     <div className='collected-by-wrapper'>
                         <div className='collected-by-text-wrapper'>
                             <div className='collected-by-text'>{t('collectedBy')}</div>

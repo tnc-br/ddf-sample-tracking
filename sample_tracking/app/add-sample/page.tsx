@@ -52,7 +52,6 @@ export default function AddSample() {
     const db = getFirestore();
     const { t } = useTranslation();
 
-    // let request: string|null = "singleReference";
     const searchParams = useSearchParams();
     if (typeof window !== "undefined" && !formData.request) {
         const queryString = window.location.search;
@@ -228,10 +227,10 @@ export default function AddSample() {
                         </div>
 
                     </div>}
-                    {/* {!sampleCreationFinished && <div>
+                    {!sampleCreationFinished && <div>
                         {formData.status !== 'concluded' && <p className="sample-details-section-title">{t('addDetails')}</p>}
                         <p className="sample-details-requirements">{t('requiredFields')}</p>
-                    </div>} */}
+                    </div>}
                     {sampleCreationFinished && <div>
                         <div className='sample-added-title'>
                             {t('newSampleAdded')}
@@ -261,7 +260,6 @@ export default function AddSample() {
                             actionButtonTitle={t('addSample')}
                             isNewSampleForm={true}
                             sampleId={sampleId}/>
-                            {/* isCompletedSample={formData.status === 'concluded' ? true : false}  */}
                     </div>}
                 </div>
             </div>
