@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import { doc, collection, getFirestore, addDoc, getDoc } from "firebase/firestore";
 import { TextField, Autocomplete, MenuItem, InputAdornment } from '@mui/material';
 import Image from 'next/image'
+import { useTranslation } from 'react-i18next';
 
 interface LogInProps {
     onSignUpClick: any,
@@ -21,7 +22,14 @@ export default function Login(props: LogInProps) {
     const auth = getAuth();
     const router = useRouter()
 
+    const [submitIsLoading, setSubmitIsLoading] = useState(false);
+    const [errorText, setErrorText] = useState({email: '', password: ''});
+
+    const { t } = useTranslation();
+
     function attemptSignIn() {
+        setErrorText({email: '', password: ''})
+        setSubmitIsLoading(true);
         const email = (document.getElementById('email') as HTMLInputElement).value;
         const password = (document.getElementById('password') as HTMLInputElement).value;
         console.log('username: ' + email + ' password: ' + password);
@@ -33,6 +41,13 @@ export default function Login(props: LogInProps) {
                 router.push('/samples');
             })
             .catch((error) => {
+                if (error.code === 'auth/invalid-email') {
+                    setErrorText({email: t('invalidEmail'), password: ''})
+                } else {
+                    setErrorText({password: t('incorrectLogin'), email: ''})
+                }
+                
+                setSubmitIsLoading(false);
                 const errorCode = error.code;
                 const errorMessage = error.message;
                 var errorText = document.getElementById('signin-error-message');
@@ -100,6 +115,7 @@ export default function Login(props: LogInProps) {
                         id="email"
                         name="email"
                         label="Email address"
+                        helperText={errorText.email}
                     />
                 </div>
 
@@ -112,6 +128,7 @@ export default function Login(props: LogInProps) {
                         id="password"
                         name="password"
                         label="Password"
+                        helperText={errorText.password}
                     />
 
                 </div>

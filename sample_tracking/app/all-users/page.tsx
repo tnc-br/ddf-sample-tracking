@@ -76,7 +76,7 @@ export default function Users() {
                 }
             });
         }
-    })
+    }, [])
 
     if (userDataArray.length < 1) {
         const usersListArray: UserData[] = [];
