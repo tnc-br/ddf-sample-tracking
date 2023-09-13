@@ -5,7 +5,7 @@ import { getAuth, onAuthStateChanged, type Auth, type User } from "firebase/auth
 import { useRouter } from 'next/navigation'
 import { getDoc, doc, type Firestore, type DocumentReference } from "firebase/firestore";
 import { useSearchParams } from 'next/navigation'
-import { getAnalytics } from "firebase/analytics";
+import { getAnalytics, isSupported } from "firebase/analytics";
 
 export type UserData = {
   name: string,
@@ -126,7 +126,11 @@ export function initializeAppIfNecessary() {
     getApp();
   } catch (any) {
     const app = initializeApp(firebaseConfig);
-    const analytics = getAnalytics(app);
+    isSupported().then((isSupported: boolean) => {
+      if (isSupported) {
+        const analytics = getAnalytics(app);
+      }
+    });
   }
 }
 
