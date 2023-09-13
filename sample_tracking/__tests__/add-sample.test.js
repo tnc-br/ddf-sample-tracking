@@ -63,6 +63,9 @@ jest.mock('../app/utils', () => {
         hideTopBar: jest.fn(() => {
             return 'test';
         }),
+        getPointsArrayFromSampleResults: jest.fn(() => {
+            return ['1', '2'];
+        })
     }
 });
 
@@ -125,5 +128,6 @@ describe('Samples', () => {
         expect(sampleCreated.created_by).toBe(1);
         expect(sampleCreated.code_lab).toBe('12345');
         expect(sampleCreated.d18O_wood).toStrictEqual([12, 13])
+        expect(sampleCreated.points.length).toStrictEqual(2)
     });
 });

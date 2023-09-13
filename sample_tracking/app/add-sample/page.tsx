@@ -15,7 +15,7 @@ import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
 import { statesList } from '../states_list';
 import { municipalitiesList } from '../municipalities_list';
 import SampleDataInput from '../sample_data_input';
-import { initializeAppIfNecessary, getRanHex, confirmUserLoggedIn, type UserData, Sample } from '../utils';
+import { initializeAppIfNecessary, getRanHex, getPointsArrayFromSampleResults, type UserData, Sample } from '../utils';
 import { useSearchParams } from 'next/navigation'
 import { useTranslation } from 'react-i18next';
 import Link from 'next/link';
@@ -41,10 +41,10 @@ export default function AddSample() {
     const [sampleCreationFinished, setSampleCreationFinished] = useState(false);
 
     const [formData, setFormData] = useState({
-        visibility: 'private',
+        visibility: 'public',
         collected_by: 'supplier',
         trusted: 'unknown',
-    } as Sample);
+    });
 
     const router = useRouter();
     const app = initializeAppIfNecessary();
@@ -52,16 +52,16 @@ export default function AddSample() {
     const db = getFirestore();
     const { t } = useTranslation();
 
+    let status = "completed";
     const searchParams = useSearchParams();
-    if (typeof window !== "undefined" && !formData.request) {
+    if (typeof window !== "undefined" && !formData.status) {
         const queryString = window.location.search;
         console.log("Querystring: " + queryString);
         const urlParams = new URLSearchParams(queryString);
-        const requestParam = urlParams.get('request') ? urlParams.get('request') : searchParams.get('status');
-        const request = requestParam ? requestParam : 'singleReference'; 
+        status = urlParams.get('status') ? urlParams.get('status') : searchParams.get('status');
         setFormData({
             ...formData,
-            request: request,
+            status: status === 'completed' ? 'concluded' : 'in_progress',
         });
     }
 
@@ -111,12 +111,12 @@ export default function AddSample() {
         if (!user) return;
         const date = new Date();
         const currentDateString = `${date.getMonth() + 1}-${date.getDate()}-${date.getFullYear()}`
+
         const sampleData = {
             ...formSampleData,
             created_by: auth.currentUser!.uid,
             created_on: currentDateString,
             last_updated_by: userData.name,
-            last_updated_by_photo: user.photoURL,
             org: userData.org,
             org_name: userData.org_name ? userData.org_name : '',
             created_by_name: userData.name,
@@ -130,6 +130,7 @@ export default function AddSample() {
             d13C_cel: formSampleData.d13C_cel ? formSampleData.d13C_cel.map((value: string) => parseFloat(value)) : [],
             lat: formSampleData.lat ? parseFloat(formSampleData.lat) : '',
             lon: formSampleData.lon ? parseFloat(formSampleData.lon) : '',
+            points: getPointsArrayFromSampleResults(formSampleData)
         };
         setSample(sampleData.trusted, sampleId, sampleData);
         setSampleCreationFinished(true);
@@ -205,9 +206,10 @@ export default function AddSample() {
                         <SampleDataInput baseState={formData}
                             onActionButtonClick={(id: string, formSampleData: Sample) => onCreateSampleClick(id, formSampleData)}
                             onTabChange={(tab) => handleTabChange(tab)}
-                            actionButtonTitle={t('addSample')}
+                            actionButtonTitle="Create sample"
                             isNewSampleForm={true}
-                            sampleId={sampleId}/>
+                            sampleId={sampleId}
+                            isCompletedSample={formData.status === 'concluded' ? true : false} />
                     </div>}
                 </div>
             </div>

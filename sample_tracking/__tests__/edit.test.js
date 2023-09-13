@@ -72,6 +72,9 @@ jest.mock('../app/utils', () => {
         hideTopBar: jest.fn(() => {
             return 'test';
         }),
+        getPointsArrayFromSampleResults: jest.fn(() => {
+            return 'test';
+        })
     }
 });
 
