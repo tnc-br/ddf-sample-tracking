@@ -16,7 +16,7 @@ import { statesList } from '../states_list';
 import { municipalitiesList } from '../municipalities_list';
 import SampleDataInput from '../sample_data_input';
 import { useSearchParams } from 'next/navigation'
-import { type Sample, type UserData, confirmUserLoggedIn, initializeAppIfNecessary, getDocRefForTrustedValue } from '../utils';
+import { type Sample, type UserData, confirmUserLoggedIn, initializeAppIfNecessary, getDocRefForTrustedValue, getPointsArrayFromSampleResults } from '../utils';
 
 
 /**
@@ -123,6 +123,7 @@ export default function Edit() {
             d13C_cel: updatedFormData.d13C_cel ? updatedFormData.d13C_cel.map((value: string) => parseFloat(value)) : [],
             lat: updatedFormData.lat ? parseFloat(updatedFormData.lat) : '',
             lon: updatedFormData.lon ? parseFloat(updatedFormData.lon) : '',
+            points: getPointsArrayFromSampleResults(updatedFormData)
         }
         const docData = {
             ...sampleData,

@@ -694,7 +694,7 @@ export default function SampleDataInput(props: SampleDataInputProps) {
                                             name="d13C_wood"
                                             label="d13C_wood"
                                             onChange={handleResultChange}
-                                            value={formData.d13C_wood ? formData.c_cel[currentMeasurementsTab] || '' : ''}
+                                            value={formData.d13C_wood ? formData.d13C_wood[currentMeasurementsTab] || '' : ''}
                                         />
                                     </div>
                                     <div className="quarter-width">

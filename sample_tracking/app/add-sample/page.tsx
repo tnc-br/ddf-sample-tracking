@@ -15,7 +15,7 @@ import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
 import { statesList } from '../states_list';
 import { municipalitiesList } from '../municipalities_list';
 import SampleDataInput from '../sample_data_input';
-import { initializeAppIfNecessary, getRanHex, confirmUserLoggedIn, type UserData, Sample } from '../utils';
+import { initializeAppIfNecessary, getRanHex, getPointsArrayFromSampleResults, type UserData, Sample } from '../utils';
 import { useSearchParams } from 'next/navigation'
 import { useTranslation } from 'react-i18next';
 import Link from 'next/link';
@@ -141,31 +141,6 @@ export default function AddSample() {
 
     function handleTabChange(newTab: number) {
         setCurrentTab(newTab);
-    }
-
-    function getMaxLength(formSampleData: Sample): number {
-        let maxValue = 0;
-        resultValues.forEach((resultValue: string) => {
-            if (formSampleData[resultValue]) {
-                if (formSampleData[resultValue].length > maxValue) maxValue = formSampleData[resultValue].length;
-            }
-        });
-        return maxValue;
-    }
-
-    function getPointsArrayFromSampleResults(formSampleData: Sample): Sample[] {
-        const maxValue = getMaxLength(formSampleData);
-        let pointsArray: Sample[] = [];
-        for (let i = 0; i < maxValue; i ++) {
-            const currPoint = {} as Sample;
-            resultValues.forEach((value: string) => {
-                if (formSampleData[value] && formSampleData[value][i]) {
-                    currPoint[value] = formSampleData[value][i];
-                }
-            })
-            pointsArray.push(currPoint);
-        }
-        return pointsArray;
     }
 
     function handlePrint() {
