@@ -76,6 +76,7 @@
   "reviewAndCreate": "Review and create",
   "addSampleMeasurements": "Add sample measurements",
   "addNewSample": "Add new sample",
+  "view": "View",
   "fileNotUploadedErrors": "File not uploaded because we noticed errors in the spreadsheet. Please download the sheet to see the errors and reupload.",
   "download": "Download",
   "successfullyImportedFile" : "Successfully imported file",
@@ -92,6 +93,7 @@
   "emailAlreadyInUse": "There is already an account with this email.",
   "editSample": "Edit sample",
   "municipality": "Municipality",
-  "weakPassword": "Password should be at least 6 characters long."
-  
+  "weakPassword": "Password should be at least 6 characters long.",
+  "originVerification": "Origin verification",
+  "singleReferenceSample": "Single reference sample"
 }

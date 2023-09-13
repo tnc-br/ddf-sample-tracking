@@ -45,7 +45,7 @@ export default function SamplesTable(props: SampleDataProps) {
         samples: props.samplesData as Sample[],
         hasBeenUpdated: false,
     });
-    const [confirmationBoxData, setConfirmationBoxData] = useState(null as ConfirmationProps|null)
+    const [confirmationBoxData, setConfirmationBoxData] = useState(null as ConfirmationProps | null)
 
     const router = useRouter();
     const app = initializeAppIfNecessary();
@@ -70,16 +70,11 @@ export default function SamplesTable(props: SampleDataProps) {
                 Cell: ({ cell, row, renderedCellValue }) => {
                     return (
 
-                        <div id={row.original.trusted} onClick={() => onSampleClick(row)} className="actions-button sample-link">
+                        <div id={row.original.trusted} onClick={() => onSampleClick(row)} className="actions-button sample-link link">
                             <span id={row.original.code_lab}>{renderedCellValue}</span>
                         </div>
                     )
                 },
-            },
-            {
-                accessorFn: (row) => (row as Sample).sample_name ?? '',
-                header: t('name'),
-                size: 150,
             },
             {
                 accessorKey: 'validity',
@@ -88,26 +83,32 @@ export default function SamplesTable(props: SampleDataProps) {
                 enableColumnFilter: false, // Consider a range filter if we have ~complete data.
             },
             {
-                accessorKey: 'created_by_name',
-                header: t('createdBy'),
-                size: 100,
-            },
-
-            {
-                accessorKey: 'org',
-                header: t('organization'),
-                size: 100,
-            },
-            {
                 accessorKey: 'trusted',
                 header: t('origin'),
                 size: 100,
             },
             {
-                accessorFn: (row) => (row as Sample).last_updated_by ?? '',
+                accessorFn: (row) => row,
                 header: t('lastUpdatedBy'),
                 size: 150,
                 filterVariant: 'select',
+                Cell: ({ cell }) => {
+                    const row = cell.getValue() as Sample;
+                    const photo = (row as Sample).last_updated_by_photo;
+                    return (
+                        <div className='user-chip-wrapper'>
+                            <div className='user-chip-slate-layer'>
+                                <div className='user-chip-photo'>
+                                    {photo && <img id="profile-photo" className="profile-photo" src={photo} width="24" height="24" />}
+                                    {!photo && <div id="profile-photo" className="table-letter-profile profile-photo">{row.last_updated_by ? row.last_updated_by.charAt(0) : ''}</div>}
+                                </div>
+                                <div className='user-chip-name'>{row.last_updated_by}</div>
+                            </div>
+
+                        </div>
+
+                    )
+                },
             },
             {
                 accessorFn: (row) => row,
@@ -118,9 +119,22 @@ export default function SamplesTable(props: SampleDataProps) {
                     return (
                         <div className="action-buttons-wrapper">
                             <div id={(row as Sample).trusted} >
-                                <IconButton onClick={() => onEditSampleClick(row)}>
+                                {/* <IconButton onClick={() => onEditSampleClick(row)}>
                                     <Edit />
-                                </IconButton>
+                                </IconButton> */}
+                                <div className='edit-sample-button-wrapper' onClick={() => onEditSampleClick(row)}>
+                                    <div className='edit-sample-button'>
+                                        <div className='edit-sample-icon'>
+                                            <span className="material-symbols-outlined">
+                                                check_small
+                                            </span>
+                                        </div>
+                                        <div className='edit-sample-text'>
+                                            Edit
+                                        </div>
+                                    </div>
+
+                                </div>
                             </div>
 
                             {props.canDeleteSamples &&
@@ -128,6 +142,8 @@ export default function SamplesTable(props: SampleDataProps) {
                                     <IconButton color="error" onClick={() => onDeleteSampleClick(row)}>
                                         <Delete />
                                     </IconButton>
+                                    
+                                    
                                 </div>}
                         </div>
 
@@ -179,7 +195,7 @@ export default function SamplesTable(props: SampleDataProps) {
             const cancelDeleteFunction = () => {
                 setConfirmationBoxData(null);
             }
-            const title = t('confirmDeleteSample', {sample: row.code_lab});
+            const title = t('confirmDeleteSample', { sample: row.code_lab });
             const actionButtonTitle = t('delete');
             setConfirmationBoxData({
                 title: title,

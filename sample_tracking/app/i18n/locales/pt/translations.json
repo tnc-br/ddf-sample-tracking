@@ -75,6 +75,7 @@
   "reviewAndCreate": "Revise e crie",
   "addSampleMeasurements": "Adicionar medições de amostra",
   "addNewSample": "Adicionar nova amostra",
+  "view": "Visualizar",
   "fileNotUploadedErrors": "Arquivo não enviado porque notamos erros na planilha. Faça download da planilha para ver os erros e reenviar.",
   "download": "Download",
   "successfullyImportedFile": "Arquivo importado com sucesso",
@@ -91,5 +92,7 @@
   "emailAlreadyInUse": "Já existe uma conta com este e-mail.",
   "editSample": "Editar amostra",
   "municipality": "Município",
-  "weakPassword": "A senha deve ter pelo menos 6 caracteres."
+  "weakPassword": "A senha deve ter pelo menos 6 caracteres.",
+  "originVerification": "Verificação de origem",
+  "singleReferenceSample": "Amostra de referência única"
 }

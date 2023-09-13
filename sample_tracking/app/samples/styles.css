@@ -29,15 +29,6 @@
     top: 67px;
 }
 
-.samples-header {
-    font-family: Google Sans;
-    font-size: 28px;
-    font-weight: 400;
-    line-height: 36px;
-    letter-spacing: 0px;
-    text-align: left;
-}
-
 .samples-table {
     width: 100%;
 }
@@ -78,6 +69,7 @@
 
 .samples-sample-table {
     margin-top: 50px;
+    margin-bottom: 100px;
 }
 
 .samples-summary-box {
@@ -123,6 +115,35 @@
     opacity: .5 !important;
 }
 
+.filter-chip {
+    display: inline-flex;
+    height: 32px;
+    justify-content: center;
+    align-items: center;
+    flex-shrink: 0;
+    border-radius: 8px;
+    border: 1px solid var(--timber-id-sys-light-outline, #727970);
+    margin-left: 400px;
+    margin-top: 12px;
+    cursor: pointer;
+}
+
+.filter-chip-slate-layer {
+    display: flex;
+    height: 32px;
+    padding: 6px 16px 6px 8px;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+}
+
+.filter-chip-icon-wrapper {
+    display: flex;
+    width: 18px;
+    height: 18px;
+    justify-content: center;
+    align-items: center;
+}
 
 
 .import-success-status-wrapper {
@@ -156,6 +177,20 @@
     align-items: center;
 }
 
+.filter-chip-icon {
+    display: flex;
+    width: 18px;
+    height: 18px;
+    flex-direction: column;
+    justify-content: center;
+    flex-shrink: 0;
+    color: var(--m-3-sys-light-primary, #005FAF);
+    text-align: center;
+    font-family: Google Symbols;
+    font-size: 22px;
+}
+
+
 .import-status-icon {
     display: flex;
     width: 24px;
@@ -171,6 +206,48 @@
     font-weight: 400;
     line-height: 50px;
     /* 208.333% */
+}
+
+.filter-chip-text {
+    color: var(--timber-id-sys-light-on-surface-variant, #424940);
+text-align: center;
+
+/* TimberID/label/large */
+font-family: Roboto;
+font-size: 14px;
+font-style: normal;
+font-weight: 500;
+line-height: 20px; /* 142.857% */
+}
+
+.samples-header-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    margin-bottom: 30px;
+}
+.samples-header {
+    color: var(--grey-900, #202124);
+
+    /* M3/title/medium */
+    font-family: Roboto;
+    font-size: 16px;
+    font-style: normal;
+    font-weight: 500;
+    line-height: 24px; /* 150% */
+    letter-spacing: 0.15px;
+    width: 600px;
+}
+.samples-subheader {
+    color: var(--grey-700, #5F6368);
+
+    /* M3/body/small */
+    font-family: Roboto;
+    font-size: 12px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 16px; /* 133.333% */
+    width: 600px;
 }
 
 .icon-color-green {

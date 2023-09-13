@@ -10,6 +10,9 @@ import { getSamplesFromCollection, getUserData } from '../firebase_utils';
 import { useTranslation } from 'react-i18next';
 import '../i18n/config';
 
+const COMPLETED_SAMPLES = 'completed_samples';
+const IN_PROGRESS_SAMPLES = 'in_progress_samples'
+
 
 /**
  * Component for the main page of TimberId. Renders all the samples visible to the logged in user using the SamplesTable subcomponent. 
@@ -120,6 +123,34 @@ export default function Samples() {
         return userData.role === 'admin' || userData.role === 'site_admin';
     }
 
+    function viewTab(scrollToElementId: string) {
+        return (
+            <div onClick={() => document.getElementById(scrollToElementId)?.scrollIntoView()} className='filter-chip'>
+                <div className='filter-chip-slate-layer'>
+                    <div className='filter-chip-icon-wrapper'>
+                        <div className='filter-chip-icon'>
+                            <span className="material-symbols-outlined">
+                                visibility
+                            </span>
+                        </div>
+                    </div>
+                    <div className='filter-chip-text'>{t('view')}
+                    </div>
+                </div>
+            </div>
+        )
+    }
+
+    function samplesTableHeader() {
+        return (
+            <div className='samples-header-wrapper'>
+                <div className='samples-header'>In progress</div>
+                <div className='samples-subheader'>Your tasks currently in progress</div>
+            </div>
+        )
+
+    }
+
     return (
         <div className='samples-page-wrapper'>
             <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@48,400,0,0" />
@@ -131,21 +162,31 @@ export default function Samples() {
                     {allSamples.inProgress && <div className='samples-summary-box'>
                         <div className='samples-size-label'>{allSamples.inProgress.length}</div>
                         <span className="samples-badge samples-in-progress">{t('inProgress')}</span>
+                        {viewTab(IN_PROGRESS_SAMPLES)}
                     </div>}
 
                     {allSamples.completed && <div className='samples-summary-box'>
                         <div className='samples-size-label'>{allSamples.completed.length}</div>
                         <span className="samples-badge samples-completed">{t('completed')}</span>
+                        {viewTab(COMPLETED_SAMPLES)}
                     </div>}
                 </div>
 
-                <div className="samples-sample-table">
-                    <p className='samples-header'>{t('inProgress')}</p>
+                <div id={IN_PROGRESS_SAMPLES} className="samples-sample-table">
+                    {/* <p className='samples-header'>{t('inProgress')}</p> */}
+                    <div className='samples-header-wrapper'>
+                        <div className='samples-header'>In progress ({allSamples.inProgress.length})</div>
+                        <div className='samples-subheader'>Your tasks currently in progress</div>
+                    </div>
                     {allSamples.inProgress && <SamplesTable samplesData={allSamples.inProgress as Sample[]} canDeleteSamples={isAdmin()} showValidity={false} allowExport={false} />}
                 </div>
 
-                <div className="samples-sample-table">
-                    <p className='samples-header'>{t('completed')}</p>
+                <div id={COMPLETED_SAMPLES} className="samples-sample-table">
+                    {/* <p className='samples-header'>{t('completed')}</p> */}
+                    <div className='samples-header-wrapper'>
+                        <div className='samples-header'>Completed ({allSamples.completed.length})</div>
+                        <div className='samples-subheader'>Your completed tasks</div>
+                    </div>
                     {allSamples.completed && <SamplesTable samplesData={allSamples.completed as Sample[]} canDeleteSamples={isAdmin()} showValidity={true} allowExport={true} />}
                 </div>
                 {!allSamples.inProgress && !allSamples.completed && <div>No samples to show. Wait to be accepted to an organization to view samples.</div>}
