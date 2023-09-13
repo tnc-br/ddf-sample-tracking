@@ -5,6 +5,7 @@ import { getAuth, onAuthStateChanged, type Auth, type User } from "firebase/auth
 import { useRouter } from 'next/navigation'
 import { getDoc, doc, type Firestore, type DocumentReference } from "firebase/firestore";
 import { useSearchParams } from 'next/navigation'
+import { getAnalytics } from "firebase/analytics";
 
 export type UserData = {
   name: string,
@@ -122,9 +123,10 @@ export function getRanHex(size: number): string {
 
 export function initializeAppIfNecessary() {
   try {
-    return getApp();
+    getApp();
   } catch (any) {
-    return initializeApp(firebaseConfig);
+    const app = initializeApp(firebaseConfig);
+    const analytics = getAnalytics(app);
   }
 }
 

@@ -50,7 +50,7 @@ export default function SampleDetails() {
     }
 
 
-    const app = initializeAppIfNecessary();
+    initializeAppIfNecessary();
     const db = getFirestore();
     const { t } = useTranslation();
     const auth = getAuth();
@@ -66,7 +66,7 @@ export default function SampleDetails() {
 
             }
         })
-    });
+    }, []);
 
     let docRef = doc(db, "trusted_samples", sampleId!);
     if (trusted === 'untrusted') {

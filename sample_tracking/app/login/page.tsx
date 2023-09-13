@@ -30,7 +30,7 @@ const LogInScreen = {
 export default function LogInSignUpPage() {
 
   const router = useRouter()
-  const app = initializeAppIfNecessary();
+  initializeAppIfNecessary();
   const auth = getAuth();
   onAuthStateChanged(auth, (user) => {
     if (user) {

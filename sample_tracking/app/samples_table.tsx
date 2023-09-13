@@ -48,7 +48,7 @@ export default function SamplesTable(props: SampleDataProps) {
     const [confirmationBoxData, setConfirmationBoxData] = useState(null as ConfirmationProps|null)
 
     const router = useRouter();
-    const app = initializeAppIfNecessary();
+    initializeAppIfNecessary();
     const db = getFirestore();
     const { t } = useTranslation();
 

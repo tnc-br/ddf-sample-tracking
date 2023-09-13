@@ -14,7 +14,7 @@ import './i18n/config';
 import Switch from '@mui/material/Switch';
 import { green } from '@mui/material/colors';
 import { alpha, styled } from '@mui/material/styles';
-import {type UserData } from './utils'
+import {type UserData, initializeAppIfNecessary } from './utils'
 
 /**
  * Component to render the top bar shown on most pages in TimberId. 
@@ -26,7 +26,7 @@ export default function TopBar() {
     const [showMenu, setShowMenu] = useState(false);
 
 
-    const app = initializeApp(firebaseConfig);
+    initializeAppIfNecessary();
     const router = useRouter();
     const auth = getAuth();
     const db = getFirestore();
