@@ -72,6 +72,9 @@ jest.mock('../app/utils', () => {
         hideTopBar: jest.fn(() => {
             return 'test';
         }),
+        getPointsArrayFromSampleResults: jest.fn(() => {
+            return 'test';
+        })
     }
 });
 
@@ -97,12 +100,26 @@ jest.mock('../app/sample_data_input', () => (props) => {
     return <mock-childComponent />;
 });
 
+jest.mock('react-i18next', () => ({
+    // this mock makes sure any components using the translate hook can use it without a warning being shown
+    useTranslation: () => {
+        return {
+            t: (str) => str,
+            i18n: {
+                changeLanguage: () => new Promise(() => { }),
+            },
+        };
+    },
+    initReactI18next: {
+        type: '3rdParty',
+        init: () => { },
+    }
+}));
+
 
 describe('Samples', () => {
 
     it('sets up SampleDataInput', async () => {
-        const mockedSignIn = jest.mocked(useTranslation);
-        mockedSignIn.mockResolvedValue(Promise.resolve("Test"));
         act(() => {
             render(<Edit />)
         });

@@ -56,8 +56,10 @@ export type Sample = {
   diameter: string,
   observations: string,
   created_by_name: string,
+  last_updated_by_photo: string,
   measurements: {},
   points?: [],
+  request: string
 }
 
 export type ErrorMessages = {
@@ -106,8 +108,9 @@ const resultRanges = {
     'min': 40,
     'max': 60
   },
-
 }
+
+export const resultValues = ['d18O_wood', 'd15N_wood', 'n_wood', 'd13C_wood', 'c_wood', 'c_cel', 'd13C_cel']
 
 
 export function getRanHex(size: number): string {
@@ -138,20 +141,20 @@ export function initializeAppIfNecessary() {
 export function showNavBar() {
   const navBar = document.getElementById('nav-wrapper');
   if (navBar) {
-    navBar.style.display = "inline";
+    navBar.style.display = "block";
   }
 }
 
 export function showTopBar() {
-  const navBar = document.getElementById('top-bar');
+  const navBar = document.getElementById('top-bar-wrapper');
   if (navBar) {
-    navBar.style.display = "inline";
+    navBar.style.display = "block";
   }
 
 }
 
 export function hideTopBar() {
-  const navBar = document.getElementById('top-bar');
+  const navBar = document.getElementById('top-bar-wrapper');
   if (navBar) {
     navBar.style.display = "none";
   }
@@ -234,3 +237,27 @@ export function validateImportedEntry(data: {}, errorMessages: ErrorMessages): s
   return errors;
 }
 
+export function getMaxLength(formSampleData: Sample): number {
+  let maxValue = 0;
+  resultValues.forEach((resultValue: string) => {
+      if (formSampleData[resultValue]) {
+          if (formSampleData[resultValue].length > maxValue) maxValue = formSampleData[resultValue].length;
+      }
+  });
+  return maxValue;
+}
+
+export function getPointsArrayFromSampleResults(formSampleData: Sample): Sample[] {
+  const maxValue = getMaxLength(formSampleData);
+  let pointsArray: Sample[] = [];
+  for (let i = 0; i < maxValue; i ++) {
+      const currPoint = {} as Sample;
+      resultValues.forEach((value: string) => {
+          if (formSampleData[value] && formSampleData[value][i]) {
+              currPoint[value] = formSampleData[value][i];
+          }
+      })
+      pointsArray.push(currPoint);
+  }
+  return pointsArray;
+}
