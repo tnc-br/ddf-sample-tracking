@@ -41,10 +41,10 @@ export default function AddSample() {
     const [sampleCreationFinished, setSampleCreationFinished] = useState(false);
 
     const [formData, setFormData] = useState({
-        visibility: 'private',
+        visibility: 'public',
         collected_by: 'supplier',
         trusted: 'unknown',
-    } as Sample);
+    });
 
     const router = useRouter();
     const app = initializeAppIfNecessary();
@@ -52,16 +52,16 @@ export default function AddSample() {
     const db = getFirestore();
     const { t } = useTranslation();
 
+    let status = "completed";
     const searchParams = useSearchParams();
-    if (typeof window !== "undefined" && !formData.request) {
+    if (typeof window !== "undefined" && !formData.status) {
         const queryString = window.location.search;
         console.log("Querystring: " + queryString);
         const urlParams = new URLSearchParams(queryString);
-        const requestParam = urlParams.get('request') ? urlParams.get('request') : searchParams.get('status');
-        const request = requestParam ? requestParam : 'singleReference'; 
+        status = urlParams.get('status') ? urlParams.get('status') : searchParams.get('status');
         setFormData({
             ...formData,
-            request: request,
+            status: status === 'completed' ? 'concluded' : 'in_progress',
         });
     }
 
@@ -94,8 +94,6 @@ export default function AddSample() {
         }
     });
 
-    const resultValues = ['d18O_wood', 'd15N_wood', 'n_wood', 'd13C_wood', 'c_wood', 'c_cel', 'd13C_cel']
-
     /**
      * Adds a new sample to the correct collection depending on if the sample is trusted, untrusted or unknown. 
      * All isotope result values are converted to an array of floats and the lat/lon are converted to floats before the data is added. 
@@ -119,7 +117,6 @@ export default function AddSample() {
             created_by: auth.currentUser!.uid,
             created_on: currentDateString,
             last_updated_by: userData.name,
-            last_updated_by_photo: user.photoURL,
             org: userData.org,
             org_name: userData.org_name ? userData.org_name : '',
             created_by_name: userData.name,
@@ -177,7 +174,60 @@ export default function AddSample() {
                 </div>
             </div>
             <div >
+
                 <div className="sample-details-form-wrapper">
+                {!sampleCreationFinished && <div className="add-sample-tab-bar">
+                        <div className='add-sample-add-details-tab'>
+                            <div className='add-sample-tab-number-wrapper'>
+                                <div className='leading-divider'>
+                                </div>
+                                <div className={currentTab >= 1 ? "add-sample-current-tab-number add-sample-tab-number" : "add-sample-tab-number"}>
+                                    1
+                                </div>
+                                <div className='trailing-divider'></div>
+                            </div>
+                            <div className='add-sample-tab-text-wrapper'>
+                                <div className={currentTab >= 1 ? "dd-sample-current-tab-text add-sample-tab-text" : "add-sample-tab-text"}>
+                                    {t('addDetails')}
+                                </div>
+                            </div>
+                        </div>
+                        <div className='divider-wrapper'><div className='divider'></div></div>
+
+                        <div className='add-sample-add-details-tab'>
+                            <div className='add-sample-tab-number-wrapper'>
+                                <div className='leading-divider'>
+                                </div>
+                                <div className={currentTab >= 2 ? "add-sample-current-tab-number add-sample-tab-number" : "add-sample-tab-number"}>
+                                    2
+                                </div>
+                                <div className='trailing-divider'></div>
+                            </div>
+                            <div className='add-sample-tab-text-wrapper'>
+                                <div className={currentTab >= 2 ? "dd-sample-current-tab-text add-sample-tab-text" : "add-sample-tab-text"}>
+                                    {t('addSampleMeasurements')}
+                                </div>
+                            </div>
+                        </div>
+                        <div className='divider-wrapper'><div className='divider'></div></div>
+
+                        <div className='add-sample-add-details-tab'>
+                            <div className='add-sample-tab-number-wrapper'>
+                                <div className='leading-divider'>
+                                </div>
+                                <div className={currentTab === 3 ? "add-sample-current-tab-number add-sample-tab-number" : "add-sample-tab-number"}>
+                                    3
+                                </div>
+                                <div className='trailing-divider'></div>
+                            </div>
+                            <div className='add-sample-tab-text-wrapper'>
+                                <div className={currentTab === 3 ? "dd-sample-current-tab-text add-sample-tab-text" : "add-sample-tab-text"}>
+                                    {t('reviewAndCreate')}
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>}
                     {!sampleCreationFinished && <div>
                         {formData.status !== 'concluded' && <p className="sample-details-section-title">{t('addDetails')}</p>}
                         <p className="sample-details-requirements">{t('requiredFields')}</p>
@@ -208,9 +258,10 @@ export default function AddSample() {
                         <SampleDataInput baseState={formData}
                             onActionButtonClick={(id: string, formSampleData: Sample) => onCreateSampleClick(id, formSampleData)}
                             onTabChange={(tab) => handleTabChange(tab)}
-                            actionButtonTitle={t('addSample')}
+                            actionButtonTitle="Create sample"
                             isNewSampleForm={true}
-                            sampleId={sampleId}/>
+                            sampleId={sampleId}
+                            isCompletedSample={formData.status === 'concluded' ? true : false} />
                     </div>}
                 </div>
             </div>
