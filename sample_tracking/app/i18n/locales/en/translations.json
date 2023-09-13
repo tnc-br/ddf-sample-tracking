@@ -76,6 +76,7 @@
   "reviewAndCreate": "Review and create",
   "addSampleMeasurements": "Add sample measurements",
   "addNewSample": "Add new sample",
+  "view": "View",
   "fileNotUploadedErrors": "File not uploaded because we noticed errors in the spreadsheet. Please download the sheet to see the errors and reupload.",
   "download": "Download",
   "successfullyImportedFile" : "Successfully imported file",
@@ -84,6 +85,15 @@
   "originValueRequired": "origin value is required, ",
   "latLonRequired": "lat and lon are required, ",
   "shouldBeWithinTheRange": "should be within the range",
-  "and": "and"
-  
+  "and": "and",
+  "errorCreatingAccount": "There was an error creating your account.",
+  "passwordsDontMatch": "The passwords you entered don't match.",
+  "incorrectLogin": "The username or password entered is incorrect.",
+  "invalidEmail": "Please enter a valid email",
+  "emailAlreadyInUse": "There is already an account with this email.",
+  "editSample": "Edit sample",
+  "municipality": "Municipality",
+  "weakPassword": "Password should be at least 6 characters long.",
+  "originVerification": "Origin verification",
+  "singleReferenceSample": "Single reference sample"
 }

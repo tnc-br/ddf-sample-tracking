@@ -80,12 +80,6 @@ export default function Nav() {
                         add
                     </span> {t('addSample')}</div>
                 </li>}
-                {canAddSample() && <li className="nav-item">
-                    {/* <Link className="nav-link" href="./import-samples">
-                        <span className="material-symbols-outlined">cloud_upload</span>
-                        {t('importSamples')}</Link> */}
-                        <div className="nav-link"><ImportSamples /></div>
-                </li>}
                 <li className="nav-item">
                     <Link className="nav-link" href="./samples"> <span className="material-symbols-outlined">
                         lab_panel
@@ -105,8 +99,10 @@ export default function Nav() {
 
                 </div>
                 {showAddSampleMenu && <div id='add-sample-popup' className="add-sample-options-wrapper">
-                    <Link className="nav-link" href="./add-sample?status=completed">Completed sample</Link>
-                    <Link className="nav-link" href="./add-sample?status=incomplete">Incomplete sample</Link>
+                    <Link className="nav-link add-sample-option" href="./add-sample?status=originVerification">{t('originVerification')}</Link>
+                    <Link className="nav-link add-sample-option" href="./add-sample?status=singleReference">{t('singleReferenceSample')}</Link>
+                    <div className="nav-link add-sample-option import-option"><ImportSamples /></div>
+                    {/* <Link className="nav-link" href="./add-sample?status=incomplete">{t('uploadMultipleSamples')}</Link> */}
                 </div>}
 
             </ul>
