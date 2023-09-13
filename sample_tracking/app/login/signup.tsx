@@ -111,13 +111,13 @@ export default function SignUp(props: SignUpProps) {
                 case 'auth/weak-password':
                     setErrorText({
                         ...errorText,
-                        password: error.message.substring(error.message.indexOf(':') + 2, error.message.indexOf('('))
+                        password: t('weakPassword')
                     })
                     return;
                 case 'auth/email-already-exists':
                     setErrorText({
                         ...errorText,
-                        email: error.message.substring(error.message.indexOf(':') + 2, error.message.indexOf('('))
+                        email: t('emailAlreadyInUse')
                     })
                     return;
                 case 'auth/email-already-in-use':

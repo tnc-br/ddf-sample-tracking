@@ -91,6 +91,7 @@
   "invalidEmail": "Please enter a valid email",
   "emailAlreadyInUse": "There is already an account with this email.",
   "editSample": "Edit sample",
-  "municipality": "Municipality"
+  "municipality": "Municipality",
+  "weakPassword": "Password should be at least 6 characters long."
   
 }

@@ -90,5 +90,6 @@
   "invalidEmail": "Por favor digite um email válido",
   "emailAlreadyInUse": "Já existe uma conta com este e-mail.",
   "editSample": "Editar amostra",
-  "municipality": "Município"
+  "municipality": "Município",
+  "weakPassword": "A senha deve ter pelo menos 6 caracteres."
 }
