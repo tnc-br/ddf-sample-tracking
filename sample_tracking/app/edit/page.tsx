@@ -128,6 +128,7 @@ export default function Edit() {
         const docData = {
             ...sampleData,
             last_updated_by: user.displayName,
+            last_updated_by_photo: user.photoURL,
             last_updated_on: currentDateString,
         }
         updateDoc(docRef, docData).then(() => {

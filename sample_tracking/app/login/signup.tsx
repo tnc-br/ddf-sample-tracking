@@ -1,5 +1,5 @@
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation'
 import { getAuth, createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
 import { doc, getDocs, collection, getFirestore, updateDoc, addDoc, setDoc } from "firebase/firestore";
@@ -74,6 +74,19 @@ export default function SignUp(props: SignUpProps) {
             setAvailableOrgs(orgs as OrgsSchemas);
         });
     }
+
+    useEffect(() => {
+        if (signUpTab === 1) {
+            const signupEmail = document.getElementById('signupEmail');
+            if (signupEmail && !formData.email) {
+                signupEmail.value = null;
+            }
+            const newOrgName = document.getElementById('newOrgName');
+            if (newOrgName && !formData.newOrgName) {
+                newOrgName.value = null;
+            }
+        }
+    })
 
     async function handleSignUpButtonClicked() {
 
@@ -187,7 +200,6 @@ export default function SignUp(props: SignUpProps) {
                             name="orgName"
                             label="Organization"
                             onChange={(evt: any) => handleChange(evt)}
-                            // value={formData.trusted ? formData.trusted : "unknown"}
                         >
                             {Object.keys(availableOrgs).map((orgValue: string) => (
                                 <MenuItem key={orgValue} value={orgValue}>
@@ -233,7 +245,7 @@ export default function SignUp(props: SignUpProps) {
                         size='small'
                         fullWidth
                         required
-                        id="email"
+                        id="signupEmail"
                         name="email"
                         label="Email"
                         value={formData.email}

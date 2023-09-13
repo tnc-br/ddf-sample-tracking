@@ -286,7 +286,7 @@ export default function ImportSamples() {
         <div>
             <input id="fileInput" type="file" onChange={onFileChanged} accept=".csv" className="visibility-hidden" />
             <label htmlFor="fileInput" >
-                <span className="material-symbols-outlined">cloud_upload</span>
+                {/* <span className="material-symbols-outlined">cloud_upload</span> */}
                 {t('importSamples')}
             </label>
             <div id="import-status-bars" className='display-none'>

@@ -41,7 +41,7 @@ describe('Samples', () => {
         console.log("here")
         const infoTab = document.getElementById('info-tab');
         expect(infoTab).toBeTruthy();
-        const nextButton = document.getElementById('samples-data-next-button');
+        const nextButton = document.getElementById('next-button-wrapper');
         expect(nextButton).toBeTruthy();
         fireEvent(
             nextButton,

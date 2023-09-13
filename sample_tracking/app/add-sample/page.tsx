@@ -41,10 +41,10 @@ export default function AddSample() {
     const [sampleCreationFinished, setSampleCreationFinished] = useState(false);
 
     const [formData, setFormData] = useState({
-        visibility: 'public',
+        visibility: 'private',
         collected_by: 'supplier',
         trusted: 'unknown',
-    });
+    } as Sample);
 
     const router = useRouter();
     const app = initializeAppIfNecessary();
@@ -52,16 +52,16 @@ export default function AddSample() {
     const db = getFirestore();
     const { t } = useTranslation();
 
-    let status = "completed";
     const searchParams = useSearchParams();
-    if (typeof window !== "undefined" && !formData.status) {
+    if (typeof window !== "undefined" && !formData.request) {
         const queryString = window.location.search;
         console.log("Querystring: " + queryString);
         const urlParams = new URLSearchParams(queryString);
-        status = urlParams.get('status') ? urlParams.get('status') : searchParams.get('status');
+        const requestParam = urlParams.get('request') ? urlParams.get('request') : searchParams.get('status');
+        const request = requestParam ? requestParam : 'singleReference'; 
         setFormData({
             ...formData,
-            status: status === 'completed' ? 'concluded' : 'in_progress',
+            request: request,
         });
     }
 
@@ -119,6 +119,7 @@ export default function AddSample() {
             created_by: auth.currentUser!.uid,
             created_on: currentDateString,
             last_updated_by: userData.name,
+            last_updated_by_photo: user.photoURL,
             org: userData.org,
             org_name: userData.org_name ? userData.org_name : '',
             created_by_name: userData.name,
@@ -176,7 +177,6 @@ export default function AddSample() {
                 </div>
             </div>
             <div >
-
                 <div className="sample-details-form-wrapper">
                     {!sampleCreationFinished && <div>
                         {formData.status !== 'concluded' && <p className="sample-details-section-title">{t('addDetails')}</p>}
@@ -208,10 +208,9 @@ export default function AddSample() {
                         <SampleDataInput baseState={formData}
                             onActionButtonClick={(id: string, formSampleData: Sample) => onCreateSampleClick(id, formSampleData)}
                             onTabChange={(tab) => handleTabChange(tab)}
-                            actionButtonTitle="Create sample"
+                            actionButtonTitle={t('addSample')}
                             isNewSampleForm={true}
-                            sampleId={sampleId}
-                            isCompletedSample={formData.status === 'concluded' ? true : false} />
+                            sampleId={sampleId}/>
                     </div>}
                 </div>
             </div>

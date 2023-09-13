@@ -75,6 +75,7 @@
   "reviewAndCreate": "Revise e crie",
   "addSampleMeasurements": "Adicionar medições de amostra",
   "addNewSample": "Adicionar nova amostra",
+  "view": "Visualizar",
   "fileNotUploadedErrors": "Arquivo não enviado porque notamos erros na planilha. Faça download da planilha para ver os erros e reenviar.",
   "download": "Download",
   "successfullyImportedFile": "Arquivo importado com sucesso",
@@ -83,5 +84,7 @@
   "originValueRequired": "o valor de origem é obrigatório, ",
   "latLonRequired": "lat e lon são obrigatórios,",
   "shouldBeWithinTheRange": "deve estar dentro do intervalo",
-  "and": "e"
+  "and": "e",
+  "originVerification": "Verificação de origem",
+  "singleReferenceSample": "Amostra de referência única"
 }
