@@ -92,7 +92,7 @@ export default function AddSample() {
                 }
             })
         }
-    });
+    }, []);
 
     /**
      * Adds a new sample to the correct collection depending on if the sample is trusted, untrusted or unknown. 
@@ -176,58 +176,6 @@ export default function AddSample() {
             <div >
 
                 <div className="sample-details-form-wrapper">
-                {!sampleCreationFinished && <div className="add-sample-tab-bar">
-                        <div className='add-sample-add-details-tab'>
-                            <div className='add-sample-tab-number-wrapper'>
-                                <div className='leading-divider'>
-                                </div>
-                                <div className={currentTab >= 1 ? "add-sample-current-tab-number add-sample-tab-number" : "add-sample-tab-number"}>
-                                    1
-                                </div>
-                                <div className='trailing-divider'></div>
-                            </div>
-                            <div className='add-sample-tab-text-wrapper'>
-                                <div className={currentTab >= 1 ? "dd-sample-current-tab-text add-sample-tab-text" : "add-sample-tab-text"}>
-                                    {t('addDetails')}
-                                </div>
-                            </div>
-                        </div>
-                        <div className='divider-wrapper'><div className='divider'></div></div>
-
-                        <div className='add-sample-add-details-tab'>
-                            <div className='add-sample-tab-number-wrapper'>
-                                <div className='leading-divider'>
-                                </div>
-                                <div className={currentTab >= 2 ? "add-sample-current-tab-number add-sample-tab-number" : "add-sample-tab-number"}>
-                                    2
-                                </div>
-                                <div className='trailing-divider'></div>
-                            </div>
-                            <div className='add-sample-tab-text-wrapper'>
-                                <div className={currentTab >= 2 ? "dd-sample-current-tab-text add-sample-tab-text" : "add-sample-tab-text"}>
-                                    {t('addSampleMeasurements')}
-                                </div>
-                            </div>
-                        </div>
-                        <div className='divider-wrapper'><div className='divider'></div></div>
-
-                        <div className='add-sample-add-details-tab'>
-                            <div className='add-sample-tab-number-wrapper'>
-                                <div className='leading-divider'>
-                                </div>
-                                <div className={currentTab === 3 ? "add-sample-current-tab-number add-sample-tab-number" : "add-sample-tab-number"}>
-                                    3
-                                </div>
-                                <div className='trailing-divider'></div>
-                            </div>
-                            <div className='add-sample-tab-text-wrapper'>
-                                <div className={currentTab === 3 ? "dd-sample-current-tab-text add-sample-tab-text" : "add-sample-tab-text"}>
-                                    {t('reviewAndCreate')}
-                                </div>
-                            </div>
-                        </div>
-
-                    </div>}
                     {!sampleCreationFinished && <div>
                         {formData.status !== 'concluded' && <p className="sample-details-section-title">{t('addDetails')}</p>}
                         <p className="sample-details-requirements">{t('requiredFields')}</p>

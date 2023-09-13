@@ -1,6 +1,7 @@
 "use client";
 
-import './styles.css';
+// import './styles.css';
+import '../add-sample/styles.css'
 import 'bootstrap/dist/css/bootstrap.css';
 var QRCode = require('qrcode');
 import { QRCodeSVG } from "qrcode.react";
@@ -17,7 +18,8 @@ import { municipalitiesList } from '../municipalities_list';
 import SampleDataInput from '../sample_data_input';
 import { useSearchParams } from 'next/navigation'
 import { type Sample, type UserData, confirmUserLoggedIn, initializeAppIfNecessary, getDocRefForTrustedValue, getPointsArrayFromSampleResults } from '../utils';
-
+import Link from 'next/link';
+import { useTranslation } from 'react-i18next';
 
 /**
  * Component to handle editing a sample. It uses the SampleDataInput subcomponent to handle data input. 
@@ -41,6 +43,7 @@ export default function Edit() {
     const app = initializeAppIfNecessary();
     const auth = getAuth();
     const db = getFirestore();
+    const { t } = useTranslation();
 
     let sampleId = '12345';
     let trusted = 'trusted';
@@ -76,7 +79,7 @@ export default function Edit() {
                 }
             })
         }
-    });
+    }, []);
 
     let docRef = doc(db, "trusted_samples", sampleId!);
     if (trusted === 'untrusted') {
@@ -139,54 +142,31 @@ export default function Edit() {
     }
 
     return (
-        <div className="add-sample-page-wrapper">
-            <p className="title">Edit sample {formData.sample_name}</p>
+        <div>
+            <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@48,400,0,0&display=optional" />
+            <div className="page-title-wrapper">
+                <Link href="./samples" className="close-icon"><span className="material-symbols-outlined add-sample-close-icon">
+                    close
+                </span></Link>
+                <div className="page-title-text">
+                    {t('editSample')}
+                </div>
+            </div>
+            <div >
 
-
-            <div className="edit-tabs-wrapper">
-                <div className="edit-tab-group">
-                    <div onClick={() => setCurrentTab(1)} className={currentTab === 1 ? "edit-tab-wrapper edit-current-tab" : "edit-tab-wrapper"}>
-                        <div className="edit-slate-layer">
-                            <div className="edit-tab-content">
-                                <div className='edit-tab-text'>
-                                    Basic info
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div onClick={() => setCurrentTab(2)} className={currentTab === 2 ? "edit-tab-wrapper edit-current-tab" : "edit-tab-wrapper"}>
-                        <div className="edit-slate-layer">
-                            <div className="edit-tab-content">
-                                <div className='edit-tab-text'>
-                                    Sample measurements
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div onClick={() => setCurrentTab(3)} className={currentTab === 3 ? "edit-tab-wrapper edit-current-tab" : "edit-tab-wrapper"}>
-                        <div className="edit-slate-layer">
-                            <div className="edit-tab-content">
-                                <div className='edit-tab-text'>
-                                    Review
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                <div className="sample-details-form-wrapper">
+                    {userData && <div id="sample-form">
+                        <SampleDataInput baseState={formData}
+                            onActionButtonClick={(sampleID: string, updatedFormData: Sample) => onUpdateSampleClick(updatedFormData)}
+                            actionButtonTitle="Update sample"
+                            sampleId={sampleId}
+                            isCompletedSample={true}
+                            currentTab={currentTab}
+                            onTabChange={(tab) => setCurrentTab(tab)} />
+                    </div>}
                 </div>
             </div>
 
-
-            <div className="sample-details-form">
-                <div>
-                    <SampleDataInput baseState={formData}
-                        onActionButtonClick={(sampleID: string, updatedFormData: Sample) => onUpdateSampleClick(updatedFormData)}
-                        actionButtonTitle="Update sample"
-                        sampleId={sampleId}
-                        isCompletedSample={true}
-                        currentTab={currentTab}
-                        onTabChange={(tab) => setCurrentTab(tab)} />
-                </div>
-            </div>
         </div>
     )
 }

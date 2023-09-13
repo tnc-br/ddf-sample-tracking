@@ -39,7 +39,7 @@ svg {
 
 .login-wrapper {
     width: 312px;
-    height: 500px;
+    height: fit-content;
     flex-shrink: 0;
     border-radius: 24px;
     border: 1px solid var(--timber-id-sys-light-outline, #757780);

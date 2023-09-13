@@ -86,6 +86,14 @@
   "latLonRequired": "lat and lon are required, ",
   "shouldBeWithinTheRange": "should be within the range",
   "and": "and",
+  "errorCreatingAccount": "There was an error creating your account.",
+  "passwordsDontMatch": "The passwords you entered don't match.",
+  "incorrectLogin": "The username or password entered is incorrect.",
+  "invalidEmail": "Please enter a valid email",
+  "emailAlreadyInUse": "There is already an account with this email.",
+  "editSample": "Edit sample",
+  "municipality": "Municipality",
+  "weakPassword": "Password should be at least 6 characters long.",
   "originVerification": "Origin verification",
   "singleReferenceSample": "Single reference sample"
 }
