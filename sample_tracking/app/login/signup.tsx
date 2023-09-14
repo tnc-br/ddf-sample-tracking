@@ -107,13 +107,18 @@ export default function SignUp(props: SignUpProps) {
         }
         if (formData.password !== formData.confirmPassword) {
             setErrorText({
-                ...errorText,
                 confirmPassword: t('passwordsDontMatch')
-            })
+            } as NewUser)
             return;
         }
 
         const newOrgName = formData.newOrgName ? formData.newOrgName : null;
+        if (newOrgName && Object.keys(availableOrgs).includes(newOrgName)) {
+            setErrorText({
+                newOrgName: t('orgNameExists')
+            } as NewUser)
+            return;
+        }
         const orgName = formData.orgName;
         const name = `${formData.firstName} ${formData.lastName}`;
         const labValue = orgName ? availableOrgs[orgName] : '';
@@ -284,6 +289,7 @@ export default function SignUp(props: SignUpProps) {
                             name="newOrgName"
                             label="New org name"
                             value={formData.newOrgName}
+                            helperText={errorText.newOrgName}
                             onChange={(evt: any) => handleChange(evt)}
                         />
                     </div>
