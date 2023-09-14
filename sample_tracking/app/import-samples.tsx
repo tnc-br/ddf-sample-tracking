@@ -142,10 +142,10 @@ export default function ImportSamples() {
     }
 
     function handleDownloadClick() {
-        console.log("got here 1: " + errorSamples);
         if (errorSamples) {
-            console.log("got here 2");
             csvExporter.generateCsv(errorSamples);
+        } else {
+            alert(t('unableToDownlaodCsv'))
         }
         handleCloseBarClick();
     }

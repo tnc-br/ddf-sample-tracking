@@ -94,5 +94,6 @@
   "municipality": "Município",
   "weakPassword": "A senha deve ter pelo menos 6 caracteres.",
   "originVerification": "Verificação de origem",
-  "singleReferenceSample": "Amostra de referência única"
+  "singleReferenceSample": "Amostra de referência única",
+  "unableToDownlaodCsv": "Não foi possível baixar o arquivo CSV."
 }
