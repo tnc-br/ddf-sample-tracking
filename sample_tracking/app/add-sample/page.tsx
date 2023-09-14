@@ -41,7 +41,7 @@ export default function AddSample() {
     const [sampleCreationFinished, setSampleCreationFinished] = useState(false);
 
     const [formData, setFormData] = useState({
-        visibility: 'public',
+        visibility: 'private',
         collected_by: 'supplier',
         trusted: 'unknown',
     });
@@ -121,6 +121,7 @@ export default function AddSample() {
             org_name: userData.org_name ? userData.org_name : '',
             created_by_name: userData.name,
             code_lab: sampleId,
+            visibility: 'private',
             d18O_wood: formSampleData.d18O_wood ? formSampleData.d18O_wood.map((value: string) => parseFloat(value)) : [],
             d15N_wood: formSampleData.d15N_wood ? formSampleData.d15N_wood.map((value: string) => parseFloat(value)) : [],
             n_wood: formSampleData.n_wood ? formSampleData.n_wood.map((value: string) => parseFloat(value)) : [],
