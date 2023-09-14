@@ -8,6 +8,8 @@ import { act } from 'react-dom/test-utils';
 import { useTranslation } from 'react-i18next';
 import Papa from 'papaparse';
 
+import { shallow, configure } from "enzyme";
+
 jest.mock('react-i18next');
 jest.mock('next/navigation', () => {
     return {
@@ -92,6 +94,17 @@ jest.mock('papaparse', () => {
             mockParse(file, options)
         },
     }
+});
+
+const mockDownload = jest.fn();
+jest.mock('export-to-csv', () => {
+    return {
+        ExportToCsv: jest.fn().mockImplementation(() => {
+            return {
+                generateCsv: () => { console.log("testinggg") }
+            }
+        }),
+    }
 })
 
 
@@ -127,43 +140,43 @@ const samples = {
 }
 
 // beforeAll(() => {
-    const batchSet = jest.fn();
-    const batchCommit = jest.fn(() => Promise.resolve('test'));
-    jest.mock('firebase/firestore', () => {
-        return {
-            getDoc: jest.fn((docRef) => {
-                return Promise.resolve({
-                    exists: jest.fn(() => true),
-                    data: jest.fn(() => {
-                        return {
-                            role: 'site_admin',
-                            org: '12345',
-                            name: 'Test Name',
-                            org_name: 'Test org'
-                        }
-                    })
+const batchSet = jest.fn();
+const batchCommit = jest.fn(() => Promise.resolve('test'));
+jest.mock('firebase/firestore', () => {
+    return {
+        getDoc: jest.fn((docRef) => {
+            return Promise.resolve({
+                exists: jest.fn(() => true),
+                data: jest.fn(() => {
+                    return {
+                        role: 'site_admin',
+                        org: '12345',
+                        name: 'Test Name',
+                        org_name: 'Test org'
+                    }
                 })
-            }),
-            getFirestore: jest.fn(),
-            setDoc: jest.fn(),
-            doc: jest.fn(),
-            collection: jest.fn((db, collection) => {
-                return collection;
-            }),
-            writeBatch: jest.fn((docRef) => {
-                return {
-                    set: batchSet,
-                    commit: batchCommit,
-                }
-            }),
-        }
-    })
+            })
+        }),
+        getFirestore: jest.fn(),
+        setDoc: jest.fn(),
+        doc: jest.fn(),
+        collection: jest.fn((db, collection) => {
+            return collection;
+        }),
+        writeBatch: jest.fn((docRef) => {
+            return {
+                set: batchSet,
+                commit: batchCommit,
+            }
+        }),
+    }
+})
 // });
 
 
 describe('Import', () => {
 
-    
+
 
 
     it('uploads data correctly', async () => {
@@ -275,8 +288,9 @@ describe('Import', () => {
             }
         });
         const file = new File(["(⌐□_□)"], "chucknorris.png", { type: "image/png" });
+        let component;
         act(() => {
-            render(<ImportSamples />)
+            component = render(<ImportSamples />)
         });
         const uploader = document.getElementById('fileInput');
         expect(uploader).toBeTruthy();
@@ -294,5 +308,19 @@ describe('Import', () => {
         })
         await waitFor(() => expect(batchSet).toHaveBeenCalledTimes(2));
         expect(batchCommit).toHaveBeenCalledTimes(1);
+
+        const downloadButton = document.getElementById('import-error-download');
+        expect(downloadButton).toBeTruthy();
+        component.
+        act(() => {
+            fireEvent(
+                downloadButton,
+                new MouseEvent('click', {
+                    bubbles: true,
+                    cancelable: true,
+                }),
+            )
+        });
+        // expect(mockDownload).toHaveBeenCalledTimes(1);
     });
 });
