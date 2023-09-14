@@ -8,10 +8,8 @@ jobs:
     if: '${{ github.event.pull_request.head.repo.full_name == github.repository }}'
     runs-on: ubuntu-latest
     steps:
-      - name: Install dependencies
-        run:  ls -la && cd sample_tracking && yarn install
       - uses: actions/checkout@v3
-      - run: ls -la && npm run build
+      - run: cd sample_tracking && npm install && ls -la && npm run build
       - uses: FirebaseExtended/action-hosting-deploy@v0
         with:
           repoToken: '${{ secrets.GITHUB_TOKEN }}'
