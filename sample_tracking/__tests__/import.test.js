@@ -8,8 +8,6 @@ import { act } from 'react-dom/test-utils';
 import { useTranslation } from 'react-i18next';
 import Papa from 'papaparse';
 
-import { shallow, configure } from "enzyme";
-
 jest.mock('react-i18next');
 jest.mock('next/navigation', () => {
     return {
@@ -311,16 +309,5 @@ describe('Import', () => {
 
         const downloadButton = document.getElementById('import-error-download');
         expect(downloadButton).toBeTruthy();
-        component.
-        act(() => {
-            fireEvent(
-                downloadButton,
-                new MouseEvent('click', {
-                    bubbles: true,
-                    cancelable: true,
-                }),
-            )
-        });
-        // expect(mockDownload).toHaveBeenCalledTimes(1);
     });
 });
