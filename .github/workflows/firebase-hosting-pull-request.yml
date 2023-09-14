@@ -9,9 +9,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Install dependencies
-        run: yarn install
+        run:  cd sample_tracking && yarn install
       - uses: actions/checkout@v3
-      - run: cd sample_tracking && ls -la && npm run build
+      - run: ls -la && npm run build
       - uses: FirebaseExtended/action-hosting-deploy@v0
         with:
           repoToken: '${{ secrets.GITHUB_TOKEN }}'
