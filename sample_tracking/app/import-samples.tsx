@@ -59,7 +59,8 @@ export default function ImportSamples() {
         originValueRequired: t('originValueRequired'),
         latLonRequired: t('latLonRequired'),
         shouldBeWithinTheRange: t('shouldBeWithinTheRange'),
-        and: t('and')
+        and: t('and'),
+        isRequired: t('isRequired')
     }
 
     function onImportSuccessBar() {
@@ -184,7 +185,7 @@ export default function ImportSamples() {
                 const codeList = {};
                 let foundErrors = false;
                 results.data.forEach((result) => {
-                    const errors = validateImportedEntry(result, errorMessages);
+                    const errors = validateImportedEntry(result as Sample, errorMessages);
                     if (errors.length > 0) {
                         result.errors = errors;
                         foundErrors = true;
@@ -223,7 +224,7 @@ export default function ImportSamples() {
                         site: resultValues[0].site || "",
                         state: resultValues[0].state || "",
                         municipality: resultValues[0].municipality || "",
-                        trusted: originValues[resultValues[0].origin],
+                        trusted: resultValues[0].trusted,
                         species: resultValues[0].species || "",
                         created_by: user.uid,
                         created_on: formattedDateString,

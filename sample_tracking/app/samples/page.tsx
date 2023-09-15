@@ -64,7 +64,7 @@ export default function Samples() {
         const untrustedSamples = await getSamplesFromCollection(userData, 'untrusted_samples');
         const unknownSamples = await getSamplesFromCollection(userData, 'unknown_samples');
         if (trustedSamples.length + untrustedSamples.length + unknownSamples.length < 1) {
-            return;
+            setAllSamples({inProgress: [], completed: []});
         }
 
         let inProgressSamples: any = [];

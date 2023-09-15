@@ -9,7 +9,7 @@ import { useState, useEffect } from 'react';
 import { speciesList } from './species_list';
 import { statesList } from './states_list';
 import { municipalitiesList } from './municipalities_list';
-import { getRanHex, hideNavBar, hideTopBar, verifyLatLonFormat, type UserData, type Sample } from './utils';
+import { getRanHex, hideNavBar, hideTopBar, verifyLatLonFormat, validateSample, type UserData, Sample, SampleError, ErrorMessages } from './utils';
 import { useTranslation } from 'react-i18next';
 import { TextField, Autocomplete, MenuItem, InputAdornment } from '@mui/material';
 import { LocalizationProvider, DatePicker } from '@mui/x-date-pickers';
@@ -44,9 +44,19 @@ export default function SampleDataInput(props: SampleDataInputProps) {
     const [formData, setFormData] = useState(props.baseState);
     const [numMeasurements, setNumMeasurements] = useState(2);
     const [currentMeasurementsTab, setCurentMeasurementsTab] = useState(0);
+    const [errorText, setErrorText] = useState({} as Sample);
 
     const router = useRouter();
     const { t } = useTranslation();
+
+    const errorMessages: ErrorMessages = {
+        originValueError: t('originValueError'),
+        originValueRequired: t('originValueRequired'),
+        latLonRequired: t('latLonRequired'),
+        shouldBeWithinTheRange: t('shouldBeWithinTheRange'),
+        and: t('and'),
+        isRequired: t('isRequired')
+    }
 
     useEffect(() => {
         hideNavBar();
@@ -64,6 +74,7 @@ export default function SampleDataInput(props: SampleDataInputProps) {
         if (newTab < currentTab || checkCurrentTabFormValidity()) {
             setCurrentTab(newTab);
             if (props.onTabChange) props.onTabChange(newTab);
+            setErrorText({});
         }
     }
 
@@ -179,126 +190,29 @@ export default function SampleDataInput(props: SampleDataInputProps) {
         if (currentTab === 3) return true;
 
         const currentTabRef = getCurrentTabFormRef();
-        if (currentTab === 2 && !validateSampleResultsTab()) return false;
+        // if (currentTab === 2 && !validateSampleResultsTab()) return false;
+
+
         if (currentTabRef.checkValidity()) {
-            // Form is valid, forward to calling component handling.
-            if (currentTab === 1) {
-                if (!formData.trusted) {
-                    alert("Please select an origin value");
-                    return false;
-                }
-            } else {
-                return true;
+            const possibleErrors = validateSample(formData, [currentTab], errorMessages);
+            let tempErrorText = {} as Sample;
+            if (possibleErrors.length > 0) {
+                possibleErrors.forEach((error: SampleError) => {
+                    tempErrorText[error.fieldWithError] = error.errorString;
+                })
+                setErrorText(tempErrorText);
+                return false;
             }
+            return true;
 
         } else {
             currentTabRef.reportValidity();
             return false;
         }
-        return true;
     }
 
     function originIsKnownOrUncertain(): boolean {
         return formData.trusted === 'trusted' || formData.trusted === 'untrusted';
-    }
-
-    function validateSampleResultsTab(): boolean {
-        if (!currentTab === 2) {
-            return true;
-        }
-        const d18O_cel = formData.d18O_cel ? formData.d18O_cel.map((value: string) => parseFloat(value)) : [];
-        const d18O_wood = formData.d18O_wood ? formData.d18O_wood.map((value: string) => parseFloat(value)) : [];
-        const d15N_wood = formData.d15N_wood ? formData.d15N_wood.map((value: string) => parseFloat(value)) : [];
-        const n_wood = formData.n_wood ? formData.n_wood.map((value: string) => parseFloat(value)) : [];
-        const d13C_wood = formData.d13C_wood ? formData.d13C_wood.map((value: string) => parseFloat(value)) : [];
-        const c_wood = formData.c_wood ? formData.c_wood.map((value: string) => parseFloat(value)) : [];
-        const d13C_cel = formData.d13C_cel ? formData.d13C_cel.map((value: string) => parseFloat(value)) : [];
-        const c_cel = formData.c_cel ? formData.c_cel.map((value: string) => parseFloat(value)) : [];
-
-        let alertMessage = "";
-        if (d18O_cel) {
-            d18O_cel.forEach((value: number) => {
-                if (value < 20 || value > 32) {
-                    alertMessage = "d18O_cel should be within the range of 20-32";
-                    alert(alertMessage);
-                }
-            })
-        }
-        if (d18O_wood) {
-            d18O_wood.forEach((value: number) => {
-                if (value < 20 || value > 32) {
-                    alertMessage = "d180_wood should be within the range of 20-32";
-                    alert(alertMessage);
-                }
-            })
-        }
-        if (d15N_wood) {
-            d15N_wood.forEach((value: number) => {
-                if (value < -5 || value > 15) {
-                    alertMessage = "d15N_wood should be within the range of -5-15";
-                    alert(alertMessage);
-                }
-            })
-        }
-        if (n_wood) {
-            n_wood.forEach((value: number) => {
-                if (value < 0 || value > 1) {
-                    alertMessage = "%N_wood should be within the range of 0-1";
-                    alert(alertMessage);
-                }
-            })
-        }
-        if (d13C_wood) {
-            d13C_wood.forEach((value: number) => {
-                if (value < -38 || value > -20) {
-                    alertMessage = "d13C_wood should be within the range of -38- -20";
-                    alert(alertMessage);
-                }
-            })
-        }
-        if (c_wood) {
-            c_wood.forEach((value: number) => {
-                if (value < 40 || value > 60) {
-                    alertMessage = "%C_wood should be within the range of 40-60";
-                    alert(alertMessage);
-                }
-            })
-        }
-        if (d13C_cel) {
-            d13C_cel.forEach((value: number) => {
-                if (value < -35 || value > -20) {
-                    alertMessage = "d13C_cel should be within the range of -35 - -20";
-                    alert(alertMessage);
-                }
-            })
-        }
-        if (c_cel) {
-            c_cel.forEach((value: number) => {
-                if (value < 40 || value > 60) {
-                    alertMessage = "%C_cel should be within the range of 40-60";
-                    alert(alertMessage);
-                }
-            })
-        }
-        return alertMessage.length < 1;
-    }
-
-    function handlePrint(elem) {
-        const mywindow = window.open('', 'PRINT', 'height=400,width=600');
-        if (!mywindow) return;
-        mywindow.document.write('<html><head><title>' + document.title + '</title>');
-        mywindow.document.write('</head><body >');
-        mywindow.document.write('<h1>' + document.title + '</h1>');
-        mywindow.document.write(document.getElementById('qr-code').innerHTML);
-        mywindow.document.write('</body></html>');
-
-        mywindow.document.close(); // necessary for IE >= 10
-        mywindow.focus(); // necessary for IE >= 10*/
-
-        mywindow.print();
-        mywindow.close();
-
-        return true;
     }
 
     function handleMeasurementsTabClick(evt: any) {
@@ -357,7 +271,7 @@ export default function SampleDataInput(props: SampleDataInputProps) {
                     </div>
 
                     <div className='input-text-field-wrapper'>
-                    <TextField
+                        <TextField
                             id="status"
                             size='small'
                             sx={style}
@@ -407,6 +321,7 @@ export default function SampleDataInput(props: SampleDataInputProps) {
                             required
                             name="trusted"
                             label={t('origin')}
+                            helperText={errorText.trusted}
                             onChange={handleChange}
                             value={formData.trusted ? formData.trusted : "unknown"}
                         >
@@ -440,6 +355,7 @@ export default function SampleDataInput(props: SampleDataInputProps) {
                                 sx={style}
                                 id="inputLat"
                                 name="lat"
+                                helperText={errorText.lat}
                                 label={t('latitude')}
                                 onChange={handleChange}
                                 value={formData.lat}
@@ -454,6 +370,7 @@ export default function SampleDataInput(props: SampleDataInputProps) {
                             id="inputLon"
                             sx={style}
                             name="lon"
+                            helperText={errorText.lon}
                             label={t('longitude')}
                             onChange={handleChange}
                             value={formData.lon}
@@ -511,17 +428,17 @@ export default function SampleDataInput(props: SampleDataInputProps) {
                         <div className='collected-by-button-wrapper'>
                             <div onClick={handleSelectSupplier} className='supplier-button-wrapper'>
                                 <div
-                                    className={formData.collected_by === 'supplier' ? "supplier-button-container collected-by-button-container selected" : 
-                                    "supplier-button-container collected-by-button-container"}>
+                                    className={formData.collected_by === 'supplier' ? "supplier-button-container collected-by-button-container selected" :
+                                        "supplier-button-container collected-by-button-container"}>
                                     <div className='supplier-button-slate-layer'>
                                         <div className='supplier-button-text'>{t('supplier')}</div>
                                     </div>
                                 </div>
                             </div>
                             <div onClick={handleSelectMyOrg} className='supplier-button-wrapper'>
-                                <div 
-                                className={formData.collected_by === 'my_org' ? "org-button-container collected-by-button-container selected" : 
-                                "org-button-container collected-by-button-container"}>
+                                <div
+                                    className={formData.collected_by === 'my_org' ? "org-button-container collected-by-button-container selected" :
+                                        "org-button-container collected-by-button-container"}>
                                     <div className='supplier-button-slate-layer'>
                                         <div className='supplier-button-text'>{t('myOrg')}</div>
                                     </div>
@@ -712,6 +629,7 @@ export default function SampleDataInput(props: SampleDataInputProps) {
                                             id="d18O_cel"
                                             name="d18O_cel"
                                             label={t('d18O_cel')}
+                                            helperText={errorText.d18O_cel}
                                             onChange={handleResultChange}
                                             value={formData.d18O_cel ? formData.d18O_cel[currentMeasurementsTab] || '' : ''}
                                         />
@@ -724,6 +642,7 @@ export default function SampleDataInput(props: SampleDataInputProps) {
                                             id="d18O_wood"
                                             name="d18O_wood"
                                             label="d18O_wood"
+                                            helperText={errorText.d18O_wood}
                                             onChange={handleResultChange}
                                             value={formData.d18O_wood ? formData.d18O_wood[currentMeasurementsTab] || '' : ''}
                                         />
@@ -735,6 +654,7 @@ export default function SampleDataInput(props: SampleDataInputProps) {
                                             id="d15N_wood"
                                             sx={style}
                                             name="d15N_wood"
+                                            helperText={errorText.d15N_wood}
                                             label="d15N_wood"
                                             onChange={handleResultChange}
                                             value={formData.d15N_wood ? formData.d15N_wood[currentMeasurementsTab] || '' : ''}
@@ -747,6 +667,7 @@ export default function SampleDataInput(props: SampleDataInputProps) {
                                             id="n_wood"
                                             sx={style}
                                             name="n_wood"
+                                            helperText={errorText.n_wood}
                                             label="N_wood"
                                             onChange={handleResultChange}
                                             value={formData.n_wood ? formData.n_wood[currentMeasurementsTab] || '' : ''}
@@ -761,6 +682,7 @@ export default function SampleDataInput(props: SampleDataInputProps) {
                                             fullWidth
                                             sx={style}
                                             id="d13C_wood"
+                                            helperText={errorText.d13C_wood}
                                             name="d13C_wood"
                                             label="d13C_wood"
                                             onChange={handleResultChange}
@@ -774,6 +696,7 @@ export default function SampleDataInput(props: SampleDataInputProps) {
                                             id="c_wood"
                                             name="c_wood"
                                             label="%C_wood"
+                                            helperText={errorText.c_wood}
                                             sx={style}
                                             onChange={handleResultChange}
                                             value={formData.c_wood ? formData.c_wood[currentMeasurementsTab] || '' : ''}
@@ -790,6 +713,7 @@ export default function SampleDataInput(props: SampleDataInputProps) {
                                             id="d13C_cel"
                                             name="d13C_cel"
                                             label="d13C_cel"
+                                            helperText={errorText.d13C_cel}
                                             onChange={handleResultChange}
                                             value={formData.d13C_cel ? formData.d13C_cel[currentMeasurementsTab] || '' : ''}
                                         />
@@ -802,6 +726,7 @@ export default function SampleDataInput(props: SampleDataInputProps) {
                                             id="c_cel"
                                             name="c_cel"
                                             label="%C_cel"
+                                            helperText={errorText.c_cel}
                                             onChange={handleResultChange}
                                             value={formData.c_cel ? formData.c_cel[currentMeasurementsTab] || '' : ''}
                                             InputProps={{
@@ -956,52 +881,7 @@ export default function SampleDataInput(props: SampleDataInputProps) {
         )
     }
 
-    function createSampleTab() {
-        const sampleId = props.sampleId;
-        const today = new Date();
-        const currentDateString = today.toLocaleDateString();
-        const url = `timberid.org/sample-details?trusted=${formData.trusted}&id=${sampleId}`;
 
-        return (<div>
-            <p>Summary</p>
-            <table className="table table-borderless sample-info-table">
-                <tbody>
-                    <tr>
-                        <td className="sample-info">Id</td>
-                        <td>{sampleId}</td>
-                    </tr>
-                    <tr>
-                        <td className='sample-info'>{t('species')}</td>
-                        <td>{formData.species}</td>
-                    </tr>
-                    <tr>
-                        <td className='sample-info'>{t('dateCreated')}</td>
-                        <td>{currentDateString}</td>
-                    </tr>
-                    <tr>
-                        <td className='sample-info'>{t('collectedIn')}</td>
-                        <td>{formData.state}</td>
-                    </tr>
-                    <tr>
-                        <td className='sample-info'>{t('collectedOn')}</td>
-                        <td>{formData.date_collected}</td>
-                    </tr>
-                </tbody>
-
-            </table>
-            <div>
-                <p className='qr-title'>Sample QR code</p>
-                <p className='qr-subtitle'>Print and paste this QR code on the sample to be analayzed</p>
-                <div id='qr-code'>
-                    <QRCodeSVG value={url} />
-                </div>
-
-                <button onClick={handlePrint} id="print-button" type="button" className="btn btn-primary print-button">Print</button>
-
-            </div>
-
-        </div>)
-    }
 
     function userIsOnLastTab(): boolean {
         return currentTab === 4;
@@ -1071,7 +951,7 @@ export default function SampleDataInput(props: SampleDataInputProps) {
             <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@48,400,0,0&display=optional" />
             <div>
                 <div id='sample-form'>
-                {<div className="add-sample-tab-bar">
+                    {<div className="add-sample-tab-bar">
                         <div className='add-sample-add-details-tab'>
                             <div className='add-sample-tab-number-wrapper'>
                                 <div className='leading-divider'>

@@ -521,7 +521,7 @@
 
 .input-text-field-wrapper {
     margin-top: 32px;
-    /* margin-bottom: 32px; */
+    margin-bottom: 32px;
 }
 
 .half-width {
@@ -1110,7 +1110,8 @@ svg {
 }
 
 .latlon-entry {
-    margin-right: 2px;
+    margin-right: 5px;
+    width: 95%;
 }
 
 .collected-by-wrapper {
