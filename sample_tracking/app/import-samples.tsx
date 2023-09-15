@@ -6,7 +6,7 @@ import { getAuth, type User } from "firebase/auth";
 import { useRouter } from 'next/navigation';
 import { initializeApp } from "firebase/app";
 import './styles.css';
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { firebaseConfig } from './firebase_config';
 import { getFirestore, getDoc, doc, writeBatch } from "firebase/firestore";
 import { useTranslation } from 'react-i18next';
@@ -29,7 +29,9 @@ import { ExportToCsv } from 'export-to-csv';
 export default function ImportSamples() {
     const [userData, setUserData] = useState(null as UserData | null)
 
-    const [errorSamples, setErrorSamples] = useState(null as Sample[] | null);
+    const [errorSamples, setErrorSamples] = useState([] as Sample[]);
+    const errorSampleRef = useRef({});
+    errorSampleRef.current = errorSamples;
 
     initializeAppIfNecessary();
     const router = useRouter();
@@ -142,8 +144,8 @@ export default function ImportSamples() {
     }
 
     function handleDownloadClick() {
-        if (errorSamples) {
-            csvExporter.generateCsv(errorSamples);
+        if (errorSampleRef.current) {
+            csvExporter.generateCsv(errorSampleRef.current);
         } else {
             alert(t('unableToDownlaodCsv'))
         }
@@ -306,7 +308,7 @@ export default function ImportSamples() {
                 {t('importSamples')}
             </label>
             <div id="import-status-bars" className='display-none'>
-                {onImportErrorBar()}                
+                {onImportErrorBar()}
                 {onImportSuccessBar()}
             </div>
         </div>
