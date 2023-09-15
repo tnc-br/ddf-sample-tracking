@@ -95,5 +95,8 @@
   "municipality": "Municipality",
   "weakPassword": "Password should be at least 6 characters long.",
   "originVerification": "Origin verification",
-  "singleReferenceSample": "Single reference sample"
+  "singleReferenceSample": "Single reference sample",
+  "unableToDownlaodCsv": "Unable to download CSV file.",
+  "orgNameExists": "An organization with that name already exists",
+  "isRequired": "is required"
 }

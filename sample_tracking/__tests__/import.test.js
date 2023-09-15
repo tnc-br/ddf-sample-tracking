@@ -110,29 +110,29 @@ const samples = {
     data: [
         {
             Code: "test1",
-            lat: 1,
-            lon: 1,
+            lat: "1",
+            lon: "1",
             d18O_wood: 24.94,
-            origin: "known"
+            trusted: "trusted"
         },
         {
             Code: "test1",
-            lat: 1,
-            lon: 1,
+            lat: "1",
+            lon: "1",
             d18O_wood: 25.94,
-            origin: "known"
+            trusted: "trusted"
         },
         {
             Code: "test2",
-            lat: 4,
-            lon: 4,
-            origin: "unknown"
+            lat: "4",
+            lon: "4",
+            trusted: "unknown"
         },
         {
             Code: "test2",
-            lat: 4,
-            lon: 4,
-            origin: "unknown"
+            lat: "4",
+            lon: "4",
+            trusted: "unknown"
         }
     ]
 }
@@ -173,10 +173,6 @@ jest.mock('firebase/firestore', () => {
 
 
 describe('Import', () => {
-
-
-
-
     it('uploads data correctly', async () => {
         jest.mock('../app/utils', () => {
             return {
@@ -196,7 +192,7 @@ describe('Import', () => {
                     return 'test';
                 }),
                 validateImportedEntry: jest.fn(() => {
-                    return '';
+                    return [];
                 })
             }
         });
@@ -219,6 +215,7 @@ describe('Import', () => {
             completeFunction(samples);
         })
         await waitFor(() => expect(batchSet).toHaveBeenCalledTimes(2));
+        console.log("done calling first round")
         expect(batchCommit).toHaveBeenCalledTimes(1);
         expect(batchSet.mock.calls[0][1].points.length).toBe(2);
         expect(batchSet.mock.calls[0][1].lat).toBe(1);
@@ -239,26 +236,26 @@ describe('Import', () => {
         const badSamples = {
             data: [
                 {
-                    Code: "test1",
+                    Code: "test4",
                     d18O_wood: 24.94,
-                    origin: "known"
+                    trusted: "trusted"
                 },
                 {
-                    Code: "test1",
+                    Code: "test4",
                     d18O_wood: 25.94,
-                    origin: "known"
+                    trusted: "trusted"
                 },
                 {
-                    Code: "test2",
+                    Code: "test5",
                     lat: 4,
                     lon: 4,
-                    origin: "unknown"
+                    trusted: "unknown"
                 },
                 {
-                    Code: "test2",
+                    Code: "test5",
                     lat: 4,
                     lon: 4,
-                    origin: "unknown"
+                    trusted: "unknown"
                 }
             ]
         }
@@ -281,7 +278,7 @@ describe('Import', () => {
                     return 'test';
                 }),
                 validateImportedEntry: jest.fn(() => {
-                    return '';
+                    return [];
                 })
             }
         });
