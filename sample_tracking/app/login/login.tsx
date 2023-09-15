@@ -2,7 +2,7 @@
 import { getAuth, signInWithEmailAndPassword, signInWithPopup, GoogleAuthProvider } from "firebase/auth";
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation'
-import { doc, collection, getFirestore, addDoc, getDoc } from "firebase/firestore";
+import { doc, collection, getFirestore, addDoc, getDoc, setDoc } from "firebase/firestore";
 import { TextField, Autocomplete, MenuItem, InputAdornment } from '@mui/material';
 import Image from 'next/image'
 import { useTranslation } from 'react-i18next';
@@ -87,7 +87,8 @@ export default function Login(props: LogInProps) {
                         const date = new Date();
                         const dateString = `${date.getMonth() + 1} ${date.getDate()} ${date.getFullYear()}`;
                         // This is a new user. 
-                        addDoc(collection(db, "new_users"), {
+                        const newUserDocRef = doc(db, "new_users", user.uid);
+                        setDoc(newUserDocRef, {
                             name: user.displayName,
                             email: user.email,
                             date_requested: dateString,
