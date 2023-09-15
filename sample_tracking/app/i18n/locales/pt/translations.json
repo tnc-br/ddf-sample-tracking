@@ -95,5 +95,6 @@
   "weakPassword": "A senha deve ter pelo menos 6 caracteres.",
   "originVerification": "Verificação de origem",
   "singleReferenceSample": "Amostra de referência única",
-  "orgNameExists": "Já existe uma organização com esse nome"
+  "orgNameExists": "Já existe uma organização com esse nome",
+  "isRequired": "é necessário"
 }

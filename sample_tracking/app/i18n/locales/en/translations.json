@@ -97,5 +97,6 @@
   "originVerification": "Origin verification",
   "singleReferenceSample": "Single reference sample",
   "unableToDownlaodCsv": "Unable to download CSV file.",
-  "orgNameExists": "An organization with that name already exists"
+  "orgNameExists": "An organization with that name already exists",
+  "isRequired": "is required"
 }
