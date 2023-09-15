@@ -43,7 +43,6 @@ export default function AddSample() {
     const [formData, setFormData] = useState({
         visibility: 'private',
         collected_by: 'supplier',
-        trusted: 'unknown',
     });
 
     const router = useRouter();
@@ -54,14 +53,14 @@ export default function AddSample() {
 
     let status = "completed";
     const searchParams = useSearchParams();
-    if (typeof window !== "undefined" && !formData.status) {
+    if (typeof window !== "undefined" && !formData.trusted) {
         const queryString = window.location.search;
         console.log("Querystring: " + queryString);
         const urlParams = new URLSearchParams(queryString);
         status = urlParams.get('status') ? urlParams.get('status') : searchParams.get('status');
         setFormData({
             ...formData,
-            status: status === 'completed' ? 'concluded' : 'in_progress',
+            trusted: status === 'originVerification' ? 'untrusted' : 'trusted',
         });
     }
 
