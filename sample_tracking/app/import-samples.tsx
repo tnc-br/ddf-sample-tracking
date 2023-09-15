@@ -230,8 +230,8 @@ export default function ImportSamples() {
                 const date = new Date();
                 //RFC 3339 format
                 const formattedDateString = date.toISOString();
-                const sampleId = getRanHex(20);
                 Object.keys(codeList).forEach((key: string) => {
+                    const sampleId = getRanHex(20);
                     const resultValues = codeList[key];
                     const newSample = {
                         points: codeList[resultValues[0].Code],
@@ -265,7 +265,7 @@ export default function ImportSamples() {
                 const batch = writeBatch(db);
                 samples.forEach((sample: Sample) => {
                     if (!sample.trusted) return;
-                    const docRef = doc(db, sample.trusted! + "_samples", sampleId);
+                    const docRef = doc(db, sample.trusted! + "_samples", sample.code_lab);
                     const completed =
                         sample.d18O_wood.length > 0 ||
                         sample.d15N_wood.length > 0 ||
