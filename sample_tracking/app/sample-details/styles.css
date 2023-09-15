@@ -202,6 +202,15 @@ gap: 16px;
   display: flex;
 }
 
+.iframe-wrapper {
+  width: 100%;
+  border-radius: 15px;
+  transform: translateY(0px);
+  display: block;
+  overflow: hidden;
+  height: 300px;
+}
+
 /* Override when printing to hide the sidebar and top bar */
 @media print {
   .details {

@@ -100,7 +100,7 @@ export default function SampleDetails() {
     function DetailsTab() {
 
         const url = `timberid.org/sample-details?trusted=${trusted}&id=${sampleId}`;
-        const mapUrl = `https://storage.googleapis.com/timberid-maps/${sampleId}`;
+        const mapUrl = `https://storage.googleapis.com/timberid-public-to-internet/timberid-maps/${sampleId}`;
 
         return (
             <div>
@@ -215,7 +215,10 @@ export default function SampleDetails() {
 
                 <div className='details'>
                     <div className='section-title'>
-                        Water details
+                        Water and land use details
+                    </div>
+                    <div className='iframe-wrapper'>
+                        <iframe src={mapUrl}  frameborder="0" height="300px" width="100%" marginwidth="0" marginheight="0"></iframe>
                     </div>
                     <div className="detail-row">
                         <div className='detail'>
@@ -231,14 +234,6 @@ export default function SampleDetails() {
                             <span className='detail-value'>{selectedDoc['water_pct'] ? formatAsPercentage(selectedDoc['water_pct']['water_mean_in_10km_buffer']) : "unknown"}</span>
                         </div>
                     </div>
-                    <div className='mapbiomas-footer'>Data from MapBiomas, 2021</div>
-                </div>
-
-                <div className='details'>
-                    <div className='section-title'>
-                        Land use details in a 10km buffer radius zone
-                    </div>
-                    {selectedDoc['validity'] ? <iframe src={mapUrl} frameborder="0" height="300px" width="100%"></iframe> : ''}
                     <table className="table">
                         <thead>
                             <tr>
