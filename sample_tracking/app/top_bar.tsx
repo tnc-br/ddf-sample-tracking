@@ -6,7 +6,6 @@ import { useRouter } from 'next/navigation';
 import { initializeApp } from "firebase/app";
 import './styles.css';
 import { useState, useEffect, useRef } from 'react';
-import { firebaseConfig } from './firebase_config';
 import { getFirestore, getDoc, doc } from "firebase/firestore";
 import Link from 'next/link';
 import { useTranslation } from 'react-i18next';
@@ -14,7 +13,7 @@ import './i18n/config';
 import Switch from '@mui/material/Switch';
 import { green } from '@mui/material/colors';
 import { alpha, styled } from '@mui/material/styles';
-import { type UserData } from './utils'
+import {type UserData, initializeAppIfNecessary } from './utils'
 
 /**
  * Component to render the top bar shown on most pages in TimberId. 
@@ -26,7 +25,7 @@ export default function TopBar() {
     const [showMenu, setShowMenu] = useState(false);
 
 
-    const app = initializeApp(firebaseConfig);
+    initializeAppIfNecessary();
     const router = useRouter();
     const auth = getAuth();
     const db = getFirestore();

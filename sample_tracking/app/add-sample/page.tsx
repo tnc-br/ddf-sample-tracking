@@ -47,7 +47,7 @@ export default function AddSample() {
     });
 
     const router = useRouter();
-    const app = initializeAppIfNecessary();
+    initializeAppIfNecessary();
     const auth = getAuth();
     const db = getFirestore();
     const { t } = useTranslation();

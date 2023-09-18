@@ -6,7 +6,6 @@ import { useState, useEffect } from 'react';
 
 import { getAuth, signInWithEmailAndPassword, signInWithPopup, createUserWithEmailAndPassword, onAuthStateChanged, GoogleAuthProvider, FacebookAuthProvider, updateProfile } from "firebase/auth";
 import { useRouter } from 'next/navigation'
-import { firebaseConfig } from '../firebase_config';
 import { doc, setDoc, getDocs, collection, getFirestore, updateDoc, arrayUnion, addDoc, getDoc } from "firebase/firestore";
 import './styles.css';
 import { initializeAppIfNecessary, hideNavBar, hideTopBar } from '../utils';
@@ -30,7 +29,7 @@ const LogInScreen = {
 export default function LogInSignUpPage() {
 
   const router = useRouter()
-  const app = initializeAppIfNecessary();
+  initializeAppIfNecessary();
   const auth = getAuth();
   onAuthStateChanged(auth, (user) => {
     if (user) {
