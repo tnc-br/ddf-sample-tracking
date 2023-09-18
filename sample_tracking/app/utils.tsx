@@ -17,6 +17,13 @@ export type UserData = {
   photoUrl: string,
 }
 
+export enum ValidityStatus {
+  Possible = 'Possible',
+  Trusted = 'Trusted',
+  Undetermined = 'Undetermined',
+  // TODO: add "impossible" or equivalent
+}
+
 export type Sample = {
   code_lab: string,
   visibility: string,

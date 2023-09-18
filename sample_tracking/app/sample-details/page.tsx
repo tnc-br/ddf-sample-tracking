@@ -7,7 +7,7 @@ import { firebaseConfig } from '../firebase_config';
 import { useSearchParams, usePathname } from 'next/navigation'
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { useState, useEffect } from 'react';
-import { type UserData, type Sample, showNavBar, showTopBar, confirmUserLoggedIn, initializeAppIfNecessary } from '../utils';
+import { type UserData, type Sample, ValidityStatus, showNavBar, showTopBar, confirmUserLoggedIn, initializeAppIfNecessary } from '../utils';
 import 'jquery';
 import 'popper.js';
 // import 'bootstrap/dist/js/bootstrap.bundle.min';
@@ -112,7 +112,7 @@ export default function SampleDetails() {
                 <div className="tab-content" id="myTabContent">
                     <div>
                         <div className='header-validity'>
-                            <ValidityTag validity='Possible' city={selectedDoc['city']} lat={selectedDoc['lat']} lon={selectedDoc['lon']}/>
+                            <ValidityTag isTrusted={trusted === 'trusted'} city={selectedDoc['city']} lat={selectedDoc['lat']} lon={selectedDoc['lon']}/>
                         </div>
                         <div>
                             {trusted != 'trusted' ? <ValiditySection selectedDoc={selectedDoc || {}} /> : ''}

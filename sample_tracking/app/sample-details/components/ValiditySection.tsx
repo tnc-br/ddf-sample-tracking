@@ -11,7 +11,7 @@ const ValiditySection: React.FC<Props> = ({ selectedDoc }) => {
         <div className='details'>
         <div className='section-title'>Validity</div>
         <div>
-            <ValidityTag validity='Possible' city={selectedDoc['city']} lat={selectedDoc['lat']} lon={selectedDoc['lon']} />
+            <ValidityTag isTrusted={false} city={selectedDoc['city']} lat={selectedDoc['lat']} lon={selectedDoc['lon']} />
             <div className='samples-origin-pct'>
             95% of the time similar samples come from their stated origin.
             </div>
