@@ -130,7 +130,7 @@ export function initializeAppIfNecessary() {
   } catch (any) {
     const app = initializeApp(firebaseConfig);
     isSupported().then((isSupported: boolean) => {
-      if (isSupported) {
+      if (isSupported && isProd()) {
         const analytics = getAnalytics(app);
       }
     });
@@ -260,4 +260,12 @@ export function getPointsArrayFromSampleResults(formSampleData: Sample): Sample[
       pointsArray.push(currPoint);
   }
   return pointsArray;
+}
+
+function isProd(): boolean {
+  if (window) {
+    const href = window.location.href;
+    return href.includes('timberid.org') && !href.includes('testing');
+  }
+  return false;
 }
