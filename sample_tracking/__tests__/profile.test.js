@@ -168,8 +168,9 @@ describe('Profile', () => {
                 cancelable: true,
             }),
         );
+        await waitFor(() => expect(deleteDoc).toHaveBeenCalledTimes(1));
         expect(confirmMethod).toHaveBeenCalledTimes(1);
         expect(deleteUser).toHaveBeenCalledTimes(1);
-        await waitFor(() => expect(deleteDoc).toHaveBeenCalledTimes(1));
+        
     });
 });

@@ -67,6 +67,7 @@ export default function Samples() {
             setAllSamples({inProgress: [], completed: []});
         }
 
+
         let inProgressSamples: any = [];
         let completedSamples: any = [];
         trustedSamples.forEach((sample: Sample) => {
@@ -154,7 +155,7 @@ export default function Samples() {
     return (
         <div className='samples-page-wrapper'>
             <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@48,400,0,0" />
-            
+
 
             {(allSamples.inProgress || allSamples.completed) ? <div id="samplesTable" className='samples-wrapper'>
                 <div id="import-status-bar"></div>

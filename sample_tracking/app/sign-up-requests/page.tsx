@@ -111,8 +111,10 @@ export default function SignUpRequests() {
         const dateString = `${date.getMonth() + 1} ${date.getDate()} ${date.getFullYear()}`;
         const orgId = getRanHex(20);
         const newOrgRef = doc(db, "organizations", orgId);
+        const orgEmail = `${orgName}@timberid.org`;
         setDoc(newOrgRef, {
             org_name: orgName,
+            org_email: orgEmail,
             admins: [{
                 name: prospectiveOrgs[orgName].admin_name,
                 email: prospectiveOrgs[orgName].email,
