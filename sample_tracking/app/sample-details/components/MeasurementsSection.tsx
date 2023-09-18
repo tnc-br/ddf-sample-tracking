@@ -18,11 +18,11 @@ const MeasurementsSection: React.FC<Props> = ({ selectedDoc }) => {
                 <thead>
                     <tr>
                         <th>Point</th>
-                        <th>δ<sup>13</sup>C Wood</th>
-                        <th>δ<sup>13</sup>C Cel</th>
-                        <th>δ<sup>18</sup>O Wood</th>
-                        <th>δ<sup>18</sup>O Cel</th>
-                        <th>δ<sup>15</sup>N Wood</th>
+                        <th>δ<sup>13</sup>C {t('wood')}</th>
+                        <th>δ<sup>13</sup>C {t('cel')}</th>
+                        <th>δ<sup>18</sup>O {t('wood')}</th>
+                        <th>δ<sup>18</sup>O {t('cel')}</th>
+                        <th>δ<sup>15</sup>N {t('wood')}</th>
                     </tr>
                 </thead>
                 <tbody>

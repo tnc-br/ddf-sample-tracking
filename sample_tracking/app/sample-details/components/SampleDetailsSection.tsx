@@ -13,11 +13,11 @@ const SampleDetailsSection: React.FC<Props> = ({ selectedDoc, sampleId }) => {
     return (
         <div className="details">
             <div className='section-title'>
-                Details
+                {t('details')}
             </div>
             <div className="detail-row">
                 <div className='detail'>
-                    <span className="detail-name">Sample ID</span>
+                    <span className="detail-name">{t('sampleId')}</span>
                     <span className='detail-value' suppressHydrationWarning={true}>{sampleId}</span>
                 </div>
                 <div className='detail'>

@@ -297,10 +297,20 @@
 
 .validity-tag {
   padding: 5px;
-  background-color: #D4E8D1;
-  color: #516351;
+  background-color: #e9e9e9;
+  color: #575757;
   border-radius: 5px;
   margin-right: 0.5em;
+}
+
+.validity-tag.possible {
+  background-color: #D4E8D1;
+  color: #516351;
+}
+
+.validity-tag.not-likely {
+  background-color: #e6b0b0;
+  color: #3f3d3d;
 }
 
 .validity-location-subtitle {
@@ -321,6 +331,17 @@
 
 .validity-location-subtitle .material-symbols-outlined {
   margin-right: 5px;
+}
+
+/* Page Legend */
+/* =========== */
+
+.details.page-legend {
+  border: none;
+}
+
+.details .page-legend-content {
+  font-size: 14px;
 }
 
 /* Override when printing to hide the sidebar and top bar */

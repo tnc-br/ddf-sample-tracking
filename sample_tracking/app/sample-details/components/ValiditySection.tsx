@@ -67,19 +67,19 @@ const ValiditySection: React.FC<Props> = ({ selectedDoc }) => {
                     is used to compare the measured distribution of isotope ratios with
                     the reference distribution at the claimed location to produce a
                     p-value. If the p-value is below a target threshold, it is
-                    considered ‘not likely’ to have come from the claimed location. The
+                    considered 'not likely' to have come from the claimed location. The
                     threshold is chosen to achieve a precision of at least 95%.
                 </p>
                 <p>
                     The reference distribution of d18O is obtained from a geographical
-                    mapping of isotopic measurements (i.e. an ‘isoscape’) and their
-                    variability over Brazil’s geography.  This isoscape is built using a
+                    mapping of isotopic measurements (i.e. an 'isoscape') and their
+                    variability over Brazil's geography. This isoscape is built using a
                     variational neural network trained using the isotope measurements
                     from collected reference wood samples, their precise harvest
                     location, and various climatic factors such as temperature,
                     precipitation, vapor pressure, etc.
                 </p>
-                <p>Please see the glossary for further information and explanation of terms.</p>
+                <p>Please see the <a target='_blank' href='https://timberid.gitbook.io/timberid/user-guide/glossary'>glossary</a> for further information and explanation of terms.</p>
             </div>
         </div>
     </div>

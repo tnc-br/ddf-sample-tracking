@@ -121,10 +121,21 @@ export default function SampleDetails() {
                             <MeasurementsSection selectedDoc={selectedDoc || {}} />
                             {trusted != 'trusted' ? <LandUseDetailsSection selectedDoc={selectedDoc || {}} sampleId={sampleId} /> : ''}
                             {trusted != 'trusted' ? <DeforestationAlertsSection selectedDoc={selectedDoc || {}}  /> : ''}
+                            <div className='details page-legend'>
+                                <div className='section-title'>{t('legend')}:</div>
+                                <div className='page-legend-content'>
+                                    <p>{t('legendP1')}</p>
+                                    <p>{t('legendP2')}</p>
+                                    <p>{t('legendP3')}</p>
+                                    <p>{t('legendP4')}</p>
+                                    <p>{t('legendP5')}</p>
+                                    <p>{t('legendP6')}</p>
+                                </div>
+                            </div>
                         </div>
                         <div id='qr-code'>
                             <div className="section-title">
-                                Sample QR code
+                                {t('sampleQrCode')}
                             </div>
                             <QRCodeSVG value={url} />
                         </div>

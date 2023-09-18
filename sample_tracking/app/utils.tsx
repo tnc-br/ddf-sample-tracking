@@ -19,9 +19,9 @@ export type UserData = {
 
 export enum ValidityStatus {
   Possible = 'Possible',
+  NotLikely = 'Not Likely',
   Trusted = 'Trusted',
   Undetermined = 'Undetermined',
-  // TODO: add "impossible" or equivalent
 }
 
 export type Sample = {

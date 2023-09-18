@@ -1,6 +1,7 @@
 import React from 'react';
 import { type Sample } from '../../utils';
 import { useTranslation } from 'react-i18next';
+import { Trans } from 'react-i18next';
 
 type Props = {
     selectedDoc: Sample;
@@ -14,19 +15,19 @@ const LandUseDetailsSection: React.FC<Props> = ({ selectedDoc }) => {
             {selectedDoc['alerts'] ?
                 <div className='details'>
                     <div className='section-title'>
-                        Nearby Deforestation Alerts
+                        {t('nearbyDeforestationAlerts')}
                     </div>
                     <table className="table table-alerts">
                         <thead>
                             <tr>
-                                <th scope="col">Area</th>
-                                <th scope="col">Latitude</th>
-                                <th scope="col">Longitude</th>
-                                <th scope="col">Distance</th>
-                                <th scope="col">Detected At</th>
-                                <th scope="col">Before</th>
-                                <th scope="col">After</th>
-                                <th scope="col">Details</th>
+                                <th scope='col'>{t('area')}</th>
+                                <th scope='col'>{t('latitude')}</th>
+                                <th scope='col'>{t('longitude')}</th>
+                                <th scope='col'>{t('distance')}</th>
+                                <th scope='col'>{t('detectedAt')}</th>
+                                <th scope='col'>{t('before')}</th>
+                                <th scope='col'>{t('after')}</th>
+                                <th scope='col'>{t('details')}</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -39,13 +40,17 @@ const LandUseDetailsSection: React.FC<Props> = ({ selectedDoc }) => {
                                     <td>{alert['detectedAt']}</td>
                                     <td><a target="_blank" href={alert['before']['url']}><img src={alert['before']['url']} alt="Before Deforestation" height="60" width="60" /></a></td>
                                     <td><a target="_blank" href={alert['after']['url']}><img src={alert['after']['url']} alt="After Deforestation" height="60" width="60" /></a></td>
-                                    <td><a target="_blank" href={alert['url']}>More info</a></td>
+                                    <td><a target="_blank" href={alert['url']}>{t('moreInfo')}</a></td>
                                 </tr>
                             ))}
                             
                         </tbody>
                     </table>
-                    <div className='alerts-source-footer'>Deforestation alerts are provided by <a href='https://alerta.mapbiomas.org/'>MapBiomas Alerta</a></div>
+                    <div className='alerts-source-footer'>
+                        <Trans i18nKey="nearbyDeforestationAlertsSource" t={t}>
+                            Deforestation alerts are provided by <a target='_blank' href='https://alerta.mapbiomas.org/'>MapBiomas Alerta</a>
+                        </Trans>
+                    </div>
                 </div>
             : ''}
         </div>

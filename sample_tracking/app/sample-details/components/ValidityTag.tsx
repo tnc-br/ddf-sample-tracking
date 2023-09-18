@@ -13,27 +13,35 @@ const ValidityTag: React.FC<Props> = ({ city, lat, lon, isTrusted }) => {
     if (isTrusted) {
         validity = ValidityStatus.Trusted;
     }
-    // TODO: Input validity through props
+    // TODO: Input validity through props once it's being written to Firestore
 
     var validityText = "";
+    var validityClass = "";
     switch (validity) {
         case ValidityStatus.Possible:
-          validityText = "It's possible your sample comes from the following region";
-          break;
+            validityText = "It's possible your sample comes from the following region";
+            validityClass = "possible";
+            break;
+        case ValidityStatus.NotLikely:
+            validityText = "It's not likely your sample comes from the following region";
+            validityClass = "not-likely";
+            break;
         case ValidityStatus.Trusted:
-          validityText = "Trusted Sample"; // Show an empty string if the sample is trusted
-          break;
+            validityText = "Trusted Sample"; // Show an empty string if the sample is trusted
+            break;
         case ValidityStatus.Undetermined:
-          validityText = ""; // Show an empty string if the sample is undetermined
-          break;
+            validityText = ""; // Show an empty string if the sample is undetermined
+            break;
         default:
-          break;
+            break;
     }
+
+    const tagClassName = ['validity-tag', validityClass].join(' ')
     
     return (
         <div>
             <div className='validity-title'>
-                <span className='validity-tag'>{validity}</span>
+                <span className={tagClassName}>{validity}</span>
                 <span>
                     {validityText}
                 </span>
