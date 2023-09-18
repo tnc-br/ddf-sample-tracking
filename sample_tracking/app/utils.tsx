@@ -128,7 +128,7 @@ const resultRanges = {
   }
 }
 
-export const resultValues = ['d18O_wood', 'd15N_wood', 'n_wood', 'd13C_wood', 'c_wood', 'c_cel', 'd13C_cel']
+export const resultValues = ['d18O_wood', 'd15N_wood', 'n_wood', 'd13C_wood', 'c_wood', 'c_cel', 'd13C_cel', 'd18O_cel']
 
 
 export function getRanHex(size: number): string {
