@@ -26,6 +26,7 @@ export default function Samples() {
         inProgress: null as Sample[] | null,
         completed: null as Sample[] | null
     });
+    const [didFetch, setDidFetch] = useState(false);
 
     const app = initializeAppIfNecessary();
     const router = useRouter();
@@ -41,7 +42,12 @@ export default function Samples() {
                     router.push('/login');
                 } else {
                     getUserData(user.uid).then((userData: UserData) => {
-                        setUserData(userData);
+                        if (userData.org) {
+                            setUserData(userData);
+                        } else {
+                            setUserData({name: "no_user"} as UserData)
+                        }
+                        
                     })
                 }
                 if (!user) {
@@ -57,16 +63,22 @@ export default function Samples() {
 
     async function addSamplesToDataList() {
         // We don't want to refetch the data if we already have.
-        if (allSamples.inProgress || allSamples.completed) {
+        if (didFetch || !userData.name) {
             return;
         }
-        if (!userData.org) return;
-        const trustedSamples = await getSamplesFromCollection(userData, 'trusted_samples');
-        const untrustedSamples = await getSamplesFromCollection(userData, 'untrusted_samples');
-        const unknownSamples = await getSamplesFromCollection(userData, 'unknown_samples');
-        if (trustedSamples.length + untrustedSamples.length + unknownSamples.length < 1) {
-            setAllSamples({inProgress: [], completed: []});
+        let trustedSamples = [];
+        let untrustedSamples = [];
+        let unknownSamples = [];
+        if (userData.org) {
+            trustedSamples = await getSamplesFromCollection(userData, 'trusted_samples');
+            untrustedSamples = await getSamplesFromCollection(userData, 'untrusted_samples');
+            unknownSamples = await getSamplesFromCollection(userData, 'unknown_samples');
         }
+
+        if (trustedSamples.length + untrustedSamples.length + unknownSamples.length < 1) {
+            setAllSamples({ inProgress: [], completed: [] });
+        }
+        setDidFetch(true);
 
         let inProgressSamples: any = [];
         let completedSamples: any = [];
@@ -155,7 +167,7 @@ export default function Samples() {
     return (
         <div className='samples-page-wrapper'>
             <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@48,400,0,0" />
-            
+
 
             {(allSamples.inProgress || allSamples.completed) ? <div id="samplesTable" className='samples-wrapper'>
                 <div id="import-status-bar"></div>
