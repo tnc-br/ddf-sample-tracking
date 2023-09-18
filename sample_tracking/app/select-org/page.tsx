@@ -7,11 +7,10 @@ import { QRCodeSVG } from "qrcode.react";
 import { useRouter } from 'next/navigation'
 import { doc, setDoc, getFirestore, getDoc, getDocs, collection, query, where, updateDoc } from "firebase/firestore";
 import { initializeApp } from "firebase/app";
-import { firebaseConfig } from '../firebase_config';
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { useState, useEffect } from 'react';
 import { speciesList } from '../species_list';
-import { hideNavBar, hideTopBar, type UserData } from '../utils';
+import { hideNavBar, hideTopBar, initializeAppIfNecessary, type UserData } from '../utils';
 
 
 interface OrgsSchemas {
@@ -28,7 +27,7 @@ export default function SelectOrg() {
 
 
     const router = useRouter();
-    const app = initializeApp(firebaseConfig);
+    const app = initializeAppIfNecessary();
     const auth = getAuth();
     const db = getFirestore();
 

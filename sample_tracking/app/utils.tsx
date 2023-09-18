@@ -128,7 +128,7 @@ export function initializeAppIfNecessary() {
   try {
     getApp();
   } catch (any) {
-    const app = initializeApp(firebaseConfig);
+    const app = initializeApp(getFirebaseConfig());
     isSupported().then((isSupported: boolean) => {
       if (isSupported && isProd()) {
         const analytics = getAnalytics(app);
@@ -262,6 +262,29 @@ export function getPointsArrayFromSampleResults(formSampleData: Sample): Sample[
   return pointsArray;
 }
 
+function getFirebaseConfig() {
+  if (isProd()) {
+    return {
+      apiKey: "AIzaSyCL4GG0mZY4BJsYnl5wCsyIVGWi5ktPeoc",
+      authDomain: "timberid-prd.firebaseapp.com",
+      projectId: "timberid-prd",
+      storageBucket: "timberid-prd.appspot.com",
+      messagingSenderId: "307233236699",
+      appId: "1:307233236699:web:0b57cf72749fd233714efe",
+      measurementId: "G-Q6QNTJ98R2"
+    };
+  } else {
+    return {
+      apiKey: "AIzaSyCgLUyR-rGuT2qbHgPsJ8l0mG_u6S7keHg",
+      authDomain: "river-sky-386919.firebaseapp.com",
+      projectId: "river-sky-386919",
+      storageBucket: "river-sky-386919.appspot.com",
+      messagingSenderId: "843836318122",
+      appId: "1:843836318122:web:856d513c850325a32b8bd3"
+    };
+  }
+}
+
 function isProd(): boolean {
   if (window) {
     const href = window.location.href;
@@ -269,3 +292,5 @@ function isProd(): boolean {
   }
   return false;
 }
+
+

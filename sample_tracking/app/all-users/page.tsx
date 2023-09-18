@@ -1,9 +1,6 @@
 "use client";
 
-
-import { initializeApp as initializeAdminApp } from 'firebase-admin/app';
 import { getAuth, onAuthStateChanged } from "firebase/auth";
-import { firebaseConfig } from '../firebase_config';
 import { initializeApp } from "firebase/app";
 import { useState, useEffect, useMemo, useRef } from 'react';
 import './styles.css';

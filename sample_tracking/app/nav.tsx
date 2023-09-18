@@ -7,7 +7,6 @@ import { useRouter } from 'next/navigation';
 import { initializeApp } from "firebase/app";
 import './styles.css';
 import { useState, useEffect } from 'react';
-import { firebaseConfig } from './firebase_config';
 import { getFirestore, getDoc, doc } from "firebase/firestore";
 import Link from 'next/link';
 import { useTranslation } from 'react-i18next';
