@@ -128,6 +128,7 @@ export default function AddSample() {
             c_wood: formSampleData.c_wood ? formSampleData.c_wood.map((value: string) => parseFloat(value)) : [],
             c_cel: formSampleData.c_cel ? formSampleData.c_cel.map((value: string) => parseFloat(value)) : [],
             d13C_cel: formSampleData.d13C_cel ? formSampleData.d13C_cel.map((value: string) => parseFloat(value)) : [],
+            d18O_cel: formSampleData.d18O_cel ? formSampleData.d18O_cel.map((value: string) => parseFloat(value)) : [],
             lat: formSampleData.lat ? parseFloat(formSampleData.lat) : '',
             lon: formSampleData.lon ? parseFloat(formSampleData.lon) : '',
             points: getPointsArrayFromSampleResults(formSampleData)
