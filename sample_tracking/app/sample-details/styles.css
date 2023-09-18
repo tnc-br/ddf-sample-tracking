@@ -8,9 +8,23 @@
 }
 
 .sample-details-wrapper {
+  font-family: Roboto;
   position: absolute;
   left: 304px;
   top:100px;
+}
+
+.sample-details-wrapper a {
+  color: #006E2C;
+}
+
+.print-button {
+  position: absolute;
+  right: 0;
+  top: 0;
+  margin: 1rem;
+  border: none;
+  background-color: transparent;
 }
 
 .column {
@@ -97,14 +111,14 @@
 .detail-value {
   color: #202124;
 
-/* M3/body/large */
-font-family: Roboto;
-font-size: 16px;
-font-style: normal;
-font-weight: 400;
-line-height: 24px; /* 150% */
-letter-spacing: 0.5px;
-width: 200px;
+  /* M3/body/large */
+  font-family: Roboto;
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 24px; /* 150% */
+  letter-spacing: 0.5px;
+  width: 200px;
 }
 
 .detail-row {
@@ -125,21 +139,27 @@ width: 200px;
 
 .legend {
   display: inline-block;
-  height: 0.8em;
-  width: 0.8em;
-  border-radius: 100%;
-  border: 1px solid black;
+  height: 20px;
+  width: 33px;
+  margin-right: 2px;
+  /* border: 1px solid black; */
+  vertical-align: middle;
 }
 
 .legend.anthropic            { background-color: #fffbc2; }
 .legend.primary-vegetation   { background-color: #09611f; }
 .legend.secondary-vegetation { background-color: #4ea376; }
 
-.mapbiomas-footer {
-  margin-left: auto;
-  font-style: italic;
-  color: #5F6368;
+.alerts-source-footer {
+  font-size: 12px;
+  color: #727970;
 }
+
+.land-use-source-footer {
+  font-size: 12px;
+}
+
+/* Integration Point #4. Add any required styles for your section to the css. */
 
 .sample-details {
   border-radius: 8px;
@@ -167,9 +187,9 @@ width: 200px;
 
 .detail {
   display: flex;
-width: 332.318px;
-align-items: flex-start;
-gap: 16px;
+  width: 332.318px;
+  align-items: flex-start;
+  gap: 16px;
 }
 
 .detail-name {
@@ -200,6 +220,130 @@ gap: 16px;
 
 .detail-row {
   display: flex;
+}
+
+.iframe-wrapper {
+  width: 100%;
+  border-radius: 15px;
+  transform: translateY(0px);
+  display: block;
+  overflow: hidden;
+  height: 300px;
+}
+
+.samples-origin-pct {
+  font-weight: 500;
+  margin-bottom: 1rem;
+}
+
+.likelihood-details {
+  max-width: 816px;
+  margin-top: 1rem;
+}
+
+.methodology {
+  font-size: 14px;
+  max-width: 816px;
+}
+
+.methodology-title {
+  font-weight: 500;
+}
+
+.header-validity {
+  margin-top: 40px;
+  margin-bottom: 50px;
+}
+
+.water-land-use-details {
+  margin-bottom: 1rem;
+  width: 100%;
+}
+
+.water-land-use-details .table-title-land-use {
+  margin-bottom: 1rem;
+}
+
+.table {
+  font-size: 14px;
+}
+
+.table-title-land-use.table-title-land-use {
+  padding-left: 46px;
+  width: 100%;
+}
+
+.table thead th, .table-title-land-use {
+  background-color: #F8FAFA;
+  color: #424940;
+  font-weight: 400;
+  padding: 1rem 0.5rem;
+  font-size: 14px;
+}
+
+.table-alerts tbody th, .table-alerts tbody td {
+  vertical-align: bottom;
+}
+
+/* ValidityTag */
+/* =========== */
+
+.validity-title {
+  font-size: 26px;
+  margin-bottom: 10px;
+}
+
+.details .validity-title {
+  font-size: 22px;
+}
+
+.validity-tag {
+  padding: 5px;
+  background-color: #e9e9e9;
+  color: #575757;
+  border-radius: 5px;
+  margin-right: 0.5em;
+}
+
+.validity-tag.possible {
+  background-color: #D4E8D1;
+  color: #516351;
+}
+
+.validity-tag.not-likely {
+  background-color: #e6b0b0;
+  color: #3f3d3d;
+}
+
+.validity-location-subtitle {
+  font-size: 20px;
+}
+
+.details .validity-location-subtitle {
+  font-size: 14px;
+}
+
+.validity-location-subtitle {
+  margin-bottom: 1rem;
+}
+
+.validity-location-subtitle span {
+  vertical-align: middle;
+}
+
+.validity-location-subtitle .material-symbols-outlined {
+  margin-right: 5px;
+}
+
+/* Page Legend */
+/* =========== */
+
+.details.page-legend {
+  border: none;
+}
+
+.details .page-legend-content {
+  font-size: 14px;
 }
 
 /* Override when printing to hide the sidebar and top bar */

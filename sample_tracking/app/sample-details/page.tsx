@@ -7,7 +7,7 @@ import { firebaseConfig } from '../firebase_config';
 import { useSearchParams, usePathname } from 'next/navigation'
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { useState, useEffect } from 'react';
-import { type UserData, type Sample, showNavBar, showTopBar, confirmUserLoggedIn, initializeAppIfNecessary } from '../utils';
+import { type UserData, type Sample, ValidityStatus, showNavBar, showTopBar, confirmUserLoggedIn, initializeAppIfNecessary } from '../utils';
 import 'jquery';
 import 'popper.js';
 // import 'bootstrap/dist/js/bootstrap.bundle.min';
@@ -15,6 +15,15 @@ import { useRouter } from 'next/navigation'
 var QRCode = require('qrcode');
 import { QRCodeSVG } from "qrcode.react";
 import { useTranslation } from 'react-i18next';
+
+import ValidityTag from "./components/ValidityTag";
+import ValiditySection from './components/ValiditySection';
+import SampleOverviewSection from './components/SampleOverviewSection';
+import SampleDetailsSection from './components/SampleDetailsSection';
+import MeasurementsSection from './components/MeasurementsSection';
+import LandUseDetailsSection from './components/LandUseDetailsSection';
+import DeforestationAlertsSection from './components/DeforestationAlertsSection';
+/* Integration Point #2. Import your typescript section component. */
 
 
 type WaterPercentageResults = {
@@ -88,251 +97,57 @@ export default function SampleDetails() {
         })
     }
 
+    const handlePrint = () => {
+        window.print();
+    };
 
-    function formatAsPercentage(num: number) {
-        return new Intl.NumberFormat('default', {
-            style: 'percent',
-            minimumFractionDigits: 2,
-            maximumFractionDigits: 2,
-        }).format(num);
-    }
-
-    function DetailsTab() {
-
-        const url = `timberid.org/sample-details?trusted=${trusted}&id=${sampleId}`;
-        const mapUrl = `https://storage.googleapis.com/timberid-maps/${sampleId}`;
-
-        return (
-            <div>
-                <div className="details">
-                    <div className='section-title'>
-                        Details
-                    </div>
-                    <div className="detail-row">
-                        <div className='detail'>
-                            <span className="detail-name">{t('visibility')}</span>
-                            <span className='detail-value'>{selectedDoc['visibility'] || "unknown"}</span>
-                        </div>
-                        <div className='detail'>
-                            <span className="detail-name">{t('collectionSite')}</span>
-                            <span className='detail-value'>{selectedDoc['site'] || "unknown"}</span>
-                        </div>
-                        <div className='detail'>
-                            <span className="detail-name">{t('supplierName')}</span>
-                            <span className='detail-value'>{selectedDoc['supplier'] || "unknown"}</span>
-                        </div>
-                    </div>
-
-                    <div className="detail-row">
-                        <div className='detail'>
-                            <span className="detail-name">{t('sampleName')}</span>
-                            <span className='detail-value'>{selectedDoc['sample_name'] || "unknown"}</span>
-                        </div>
-                        <div className='detail'>
-                            <span className="detail-name">{t('latitude')}</span>
-                            <span className='detail-value'>{selectedDoc['lat'] || "unknown"}</span>
-                        </div>
-                        <div className='detail'>
-                            <span className="detail-name">{t('city')}</span>
-                            <span className='detail-value'>{selectedDoc['city'] || "unknown"}</span>
-                        </div>
-                    </div>
-
-                    <div className="detail-row">
-                        <div className='detail'>
-                            <span className="detail-name">{t('treeSpecies')}</span>
-                            <span className='detail-value'>{selectedDoc['species'] || "unknown"}</span>
-                        </div>
-                        <div className='detail'>
-                            <span className="detail-name">{t('longitude')}</span>
-                            <span className='detail-value'>{selectedDoc['lon'] || "unknown"}</span>
-                        </div>
-                        <div className='detail'>
-                            <span className="detail-name">{t('collectedBy')}</span>
-                            <span className='detail-value'>{selectedDoc['collected_by']}</span>
-                        </div>
-                    </div>
-
-                    <div className="detail-row">
-                        <div className='detail'>
-                            <span className="detail-name">{t('origin')}</span>
-                            <span className='detail-value'>{selectedDoc['trusted']}</span>
-                        </div>
-                        <div className='detail'>
-                            <span className="detail-name">{t('validity')}</span>
-                            <span className='detail-value'>{selectedDoc['validity']}</span>
-                        </div>
-                    </div>
-                </div>
-
-
-                <div className='details'>
-                    <div className='section-title'>
-                        Result values
-                    </div>
-                    <div className="detail-row">
-                        <div className='detail'>
-                            <span className="detail-name">d18O_cel</span>
-                            <span className='detail-value'>{selectedDoc['d18O_cel'] ? selectedDoc['d18O_cel'].toString() : "unknown"}</span>
-                        </div>
-                        <div className='detail'>
-                            <span className="detail-name">d18O_wood</span>
-                            <span className='detail-value'>{selectedDoc['oxygen'] ? selectedDoc['oxygen'].toString() : "unknown"}</span>
-                        </div>
-                        <div className='detail'>
-                            <span className="detail-name">d15N_wood</span>
-                            <span className='detail-value'>{selectedDoc['nitrogen'] ? selectedDoc['nitrogen'].toString() : "unknown"}</span>
-                        </div>
-                    </div>
-
-                    <div className="detail-row">
-                        <div className='detail'>
-                            <span className="detail-name">%N_wood</span>
-                            <span className='detail-value'>{selectedDoc['n_wood'] ? selectedDoc['n_wood'].toString() : "unknown"}</span>
-                        </div>
-                        <div className='detail'>
-                            <span className="detail-name">d13C_wood</span>
-                            <span className='detail-value'>{selectedDoc['carbon'] ? selectedDoc['carbon'].toString() : "unknown"}</span>
-                        </div>
-                        <div className='detail'>
-                            <span className="detail-name">%C_wood</span>
-                            <span className='detail-value'>{selectedDoc['c_wood'] ? selectedDoc['c_wood'].toString() : "unknown"}</span>
-                        </div>
-                    </div>
-
-                    <div className="detail-row">
-                        <div className='detail'>
-                            <span className="detail-name">d13C_cel</span>
-                            <span className='detail-value'>{selectedDoc['d13C_cel'] ? selectedDoc['d13C_cel'].toString() : "unknown"}</span>
-                        </div>
-                        <div className='detail'>
-                            <span className="detail-name">%C_cel</span>
-                            <span className='detail-value'>{selectedDoc['c_cel'] ? selectedDoc['c_cel'].toString() : "unknown"}</span>
-                        </div>
-                    </div>
-
-                </div>
-
-                <div className='details'>
-                    <div className='section-title'>
-                        Water details
-                    </div>
-                    <div className="detail-row">
-                        <div className='detail'>
-                            <span className="detail-name">Is lat/lon in water?</span>
-                            <span className='detail-value'>{selectedDoc['water_pct'] ? (selectedDoc['water_pct']['is_point_water'] ? "YES" : "NO") : "unknown"}</span>
-                        </div>
-                        <div className='detail'>
-                            <span className="detail-name">Percentage of water in a 1km buffer zone</span>
-                            <span className='detail-value'>{selectedDoc['water_pct'] ? formatAsPercentage(selectedDoc['water_pct']['water_mean_in_1km_buffer']) : "unknown"}</span>
-                        </div>
-                        <div className='detail'>
-                            <span className="detail-name">Percentage of water in a 10km buffer zone</span>
-                            <span className='detail-value'>{selectedDoc['water_pct'] ? formatAsPercentage(selectedDoc['water_pct']['water_mean_in_10km_buffer']) : "unknown"}</span>
-                        </div>
-                    </div>
-                    <div className='mapbiomas-footer'>Data from MapBiomas, 2021</div>
-                </div>
-
-                <div className='details'>
-                    <div className='section-title'>
-                        Land use details in a 10km buffer radius zone
-                    </div>
-                    {selectedDoc['validity'] ? <iframe src={mapUrl} frameborder="0" height="300px" width="100%"></iframe> : ''}
-                    <table className="table">
-                        <thead>
-                            <tr>
-                                {/* TODO: read the keys in the Record instead of creating an array */}
-                                <th scope="col">Type</th>
-                                {Array.from({ length: 11 }, (_, index) => (
-                                    <th scope="col" key={index}>{2011 + index}</th>
-                                ))}
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <th scope="row"><div className='anthropic legend'></div> Anthropic Use (Urban, agriculture, etc)</th>
-                                {Array.from({ length: 11 }, (_, index) => (
-                                    <td key={index}>{selectedDoc['land_use_anthropic_pct'] ? formatAsPercentage(selectedDoc['land_use_anthropic_pct']["" + (2011 + index)]) : "unknown"}</td>
-                                ))}
-                            </tr>
-                            <tr>
-                                <th scope="row"><div className='primary-vegetation legend'></div> Primary Vegetation</th>
-                                {Array.from({ length: 11 }, (_, index) => (
-                                    <td key={index}>{selectedDoc['land_use_primary_vegetation_pct'] ? formatAsPercentage(selectedDoc['land_use_primary_vegetation_pct']["" + (2011 + index)]) : "unknown"}</td>
-                                ))}
-                            </tr>
-                            <tr>
-                                <th scope="row"><div className='secondary-vegetation legend'></div> Secondary Vegetation and regrowth</th>
-                                {Array.from({ length: 11 }, (_, index) => (
-                                    <td key={index}>{selectedDoc['land_use_secondary_vegetation_or_regrowth_pct'] ? formatAsPercentage(selectedDoc['land_use_secondary_vegetation_or_regrowth_pct']["" + (2011 + index)]) : "unknown"}</td>
-                                ))}
-                            </tr>
-                        </tbody>
-                    </table>
-                    <div className='mapbiomas-footer'>Data from MapBiomas, 2021</div>
-                </div>
-
-                {selectedDoc['alerts'] ?
-                    <div className='details'>
-                        <div className='section-title'>
-                            Nearby Deforestation Alerts
-                        </div>
-                        <table className="table">
-                            <thead>
-                                <tr>
-                                    <th scope="col">Area</th>
-                                    <th scope="col">Latitude</th>
-                                    <th scope="col">Longitude</th>
-                                    <th scope="col">Distance</th>
-                                    <th scope="col">Detected At</th>
-                                    <th scope="col">Before</th>
-                                    <th scope="col">After</th>
-                                    <th scope="col">Details</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {selectedDoc['alerts'].map((alert) => (
-                                    <tr key={alert['alertCode']}>
-                                        <td>{alert['areaHa'].toFixed(2)} ha</td>
-                                        <td>{alert['coordinates']['latitude']}</td>
-                                        <td>{alert['coordinates']['longitude']}</td>
-                                        <td>{alert['distance_to_point'].toFixed(2)} km</td>
-                                        <td>{alert['detectedAt']}</td>
-                                        <td><a target="_blank" href={alert['before']['url']}><img src={alert['before']['url']} alt="Before Deforestation" height="100" width="100" /></a></td>
-                                        <td><a target="_blank" href={alert['after']['url']}><img src={alert['after']['url']} alt="After Deforestation" height="100" width="100" /></a></td>
-                                        <td><a target="_blank" href={alert['url']}><span class="material-symbols-outlined">launch</span></a></td>
-                                    </tr>
-                                ))}
-                                
-                            </tbody>
-                        </table>
-                        <div className='mapbiomas-footer'>Data from MapBiomas Alerta, 2023</div>
-                    </div>
-                : ''}
-
-                <div id='qr-code'>
-                    <div className="section-title">
-                        Sample QR code
-                    </div>
-                    <QRCodeSVG value={url} />
-                </div>
-
-            </div>
-        )
-    }
-
+    const url = `timberid.org/sample-details?trusted=${trusted}&id=${sampleId}`;
 
     return (
         <div>
-            <div className='sample-details-wrapper'>
-                <p className='title'>{selectedDoc['sample_name'] || "Sample details"}</p>
-                <div>
-                    <div className="tab-content" id="myTabContent">
-                        <DetailsTab />
+        <div className='sample-details-wrapper'>
+            <button onClick={handlePrint} className='print-button'>
+                <span className="material-symbols-outlined">print</span>
+            </button>
+            <p className='title'>{selectedDoc['sample_name'] || "Sample details"}</p>
+            <div>
+                <div className="tab-content" id="myTabContent">
+                    <div>
+                        <div className='header-validity'>
+                            <ValidityTag isTrusted={trusted === 'trusted'} city={selectedDoc['city']} lat={selectedDoc['lat']} lon={selectedDoc['lon']}/>
+                        </div>
+                        <div>
+                            {trusted != 'trusted' ? <ValiditySection selectedDoc={selectedDoc || {}} /> : ''}
+                            <SampleOverviewSection selectedDoc={selectedDoc || {}} />
+                            <SampleDetailsSection selectedDoc={selectedDoc || {}} sampleId={sampleId} />
+                            <MeasurementsSection selectedDoc={selectedDoc || {}} />
+                            {trusted != 'trusted' ? <LandUseDetailsSection selectedDoc={selectedDoc || {}} sampleId={sampleId} /> : ''}
+                            {trusted != 'trusted' ? <DeforestationAlertsSection selectedDoc={selectedDoc || {}}  /> : ''}
+
+                            {/* Integration Point #3. Display your new section component in the desired order with respect to other snippets. */}
+                            
+                            <div className='details page-legend'>
+                                <div className='section-title'>{t('legend')}:</div>
+                                <div className='page-legend-content'>
+                                    <p>{t('legendP1')}</p>
+                                    <p>{t('legendP2')}</p>
+                                    <p>{t('legendP3')}</p>
+                                    <p>{t('legendP4')}</p>
+                                    <p>{t('legendP5')}</p>
+                                    <p>{t('legendP6')}</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div id='qr-code'>
+                            <div className="section-title">
+                                {t('sampleQrCode')}
+                            </div>
+                            <QRCodeSVG value={url} />
+                        </div>
                     </div>
                 </div>
-
             </div>
-        </div>)
+        </div>
+        </div>
+    )
 }
