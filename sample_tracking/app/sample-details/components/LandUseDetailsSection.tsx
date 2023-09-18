@@ -8,6 +8,10 @@ type Props = {
     sampleId: string;
 };
 
+/**
+ * Component that displays the land use details for the given lat,lon.
+ * Data from MapBiomas (https://mapbiomas.org/)
+ */
 const LandUseDetailsSection: React.FC<Props> = ({ selectedDoc, sampleId }) => {
     const { t } = useTranslation();
     const mapUrl = `https://storage.googleapis.com/timberid-public-to-internet/timberid-maps/${sampleId}`;

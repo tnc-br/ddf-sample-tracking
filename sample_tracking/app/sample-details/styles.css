@@ -159,6 +159,8 @@
   font-size: 12px;
 }
 
+/* Integration Point #4. Add any required styles for your section to the css. */
+
 .sample-details {
   border-radius: 8px;
   border: 1px solid var(--m-3-ref-neutral-neutral-80, #CAC5CD);

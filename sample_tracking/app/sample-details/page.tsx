@@ -23,6 +23,8 @@ import SampleDetailsSection from './components/SampleDetailsSection';
 import MeasurementsSection from './components/MeasurementsSection';
 import LandUseDetailsSection from './components/LandUseDetailsSection';
 import DeforestationAlertsSection from './components/DeforestationAlertsSection';
+/* Integration Point #2. Import your typescript section component. */
+
 
 type WaterPercentageResults = {
     is_point_water: boolean,
@@ -121,6 +123,9 @@ export default function SampleDetails() {
                             <MeasurementsSection selectedDoc={selectedDoc || {}} />
                             {trusted != 'trusted' ? <LandUseDetailsSection selectedDoc={selectedDoc || {}} sampleId={sampleId} /> : ''}
                             {trusted != 'trusted' ? <DeforestationAlertsSection selectedDoc={selectedDoc || {}}  /> : ''}
+
+                            {/* Integration Point #3. Display your new section component in the desired order with respect to other snippets. */}
+                            
                             <div className='details page-legend'>
                                 <div className='section-title'>{t('legend')}:</div>
                                 <div className='page-legend-content'>

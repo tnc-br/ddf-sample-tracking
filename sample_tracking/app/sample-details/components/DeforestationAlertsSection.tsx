@@ -7,7 +7,11 @@ type Props = {
     selectedDoc: Sample;
 };
 
-const LandUseDetailsSection: React.FC<Props> = ({ selectedDoc }) => {
+/**
+ * Component that displays a table of deforestation alerts near a selected lat,lon.
+ * Data from MapBiomas Alerta (https://alerta.mapbiomas.org/)
+ */
+const DeforestationAlertsSection: React.FC<Props> = ({ selectedDoc }) => {
     const { t } = useTranslation();
     
     return (
@@ -57,4 +61,4 @@ const LandUseDetailsSection: React.FC<Props> = ({ selectedDoc }) => {
     );
 };
 
-export default LandUseDetailsSection;
+export default DeforestationAlertsSection;
