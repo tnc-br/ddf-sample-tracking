@@ -60,6 +60,7 @@ export default function Samples() {
         if (allSamples.inProgress || allSamples.completed) {
             return;
         }
+        if (!userData.org) return;
         const trustedSamples = await getSamplesFromCollection(userData, 'trusted_samples');
         const untrustedSamples = await getSamplesFromCollection(userData, 'untrusted_samples');
         const unknownSamples = await getSamplesFromCollection(userData, 'unknown_samples');

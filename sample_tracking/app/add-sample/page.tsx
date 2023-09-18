@@ -43,6 +43,7 @@ export default function AddSample() {
     const [formData, setFormData] = useState({
         visibility: 'private',
         collected_by: 'supplier',
+        status: 'concluded'
     });
 
     const router = useRouter();

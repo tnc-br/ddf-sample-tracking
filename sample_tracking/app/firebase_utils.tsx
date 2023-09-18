@@ -23,24 +23,8 @@ export async function getSamplesFromCollection(userData: utils.UserData, collect
         }
 
         return samplesStateArray;
-    } else if (userData.role == "admin") {
-        samplesQuery = query(verifiedSamplesRef, where("visibility", "==", "public"));
-        samplesQuery = query(verifiedSamplesRef,
-            or(
-                where("visibility", "==", "public"),
-                where("visibility", "==", "logged_in"),
-                where("org", "==", userData.org)
-            ));
     } else if (userData.org != null) {
-        samplesQuery = query(verifiedSamplesRef,
-            or(
-                where("created_by", "==", userData.user_id),
-                where("visibility", "==", "public"),
-                where("visibility", "==", "logged_in"),
-                and(
-                    where("visibility", "==", "organization"),
-                    where("org", "==", userData.org)),
-            ))
+        samplesQuery = query(verifiedSamplesRef, where("org", "==", userData.org));
     } else {
         samplesQuery = query(verifiedSamplesRef, where("visibility", "==", "public"));
     }
