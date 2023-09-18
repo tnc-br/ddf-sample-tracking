@@ -37,18 +37,11 @@ export default function Samples() {
         showTopBar();
         if (!userData.role || userData.role.length < 1) {
             onAuthStateChanged(auth, (user) => {
-                console.log("got here")
                 if (!user) {
                     router.push('/login');
                 } else {
                     getUserData(user.uid).then((userData: UserData) => {
-                        if (userData.org) {
-                            console.log("got here!!! 1")
-                            setUserData(userData);
-                        } else {
-                            setUserData({name: "no_user"} as UserData)
-                        }
-                        
+                        setUserData(userData);
                     })
                 }
                 if (!user) {
