@@ -127,7 +127,7 @@
   "before": "Antes",
   "after": "Depois",
   "moreInfo": "Mais informações",
-  "nearbyDeforestationAlertsSource": "Os alertas de desmatamento são fornecidos por <1>MapBiomas Alerta<1>"
+  "nearbyDeforestationAlertsSource": "Os alertas de desmatamento são fornecidos por <1>MapBiomas Alerta<1>",
   "unableToDownlaodCsv": "Não foi possível baixar o arquivo CSV.",
   "orgNameExists": "Já existe uma organização com esse nome",
   "isRequired": "é necessário"
