@@ -27,7 +27,7 @@ export default function Samples() {
         completed: null as Sample[] | null
     });
 
-    const app = initializeAppIfNecessary();
+    initializeAppIfNecessary();
     const router = useRouter();
     const auth = getAuth();
     const { t } = useTranslation();

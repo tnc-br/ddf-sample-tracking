@@ -33,7 +33,7 @@ export default function SignUpRequests() {
     const [prospectiveOrgs, setProspectiveOrgs] = useState({} as NestedSchemas);
     const [userData, setUserData] = useState({} as UserData);
 
-    const app = initializeAppIfNecessary();
+    initializeAppIfNecessary();
     const auth = getAuth();
     const router = useRouter();
     const db = getFirestore();

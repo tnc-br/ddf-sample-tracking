@@ -20,7 +20,8 @@ jest.mock('../app/firebase_utils', () => {
                 org: '12345',
                 user_id: '12345',
             }
-        })
+        }),
+        initializeAppIfNecessary: jest.fn()
     }
 
 });

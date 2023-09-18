@@ -7,13 +7,12 @@ import { useRouter } from 'next/navigation';
 import { initializeApp } from "firebase/app";
 import './styles.css';
 import { useState, useEffect } from 'react';
-import { firebaseConfig } from './firebase_config';
 import { getFirestore, getDoc, doc } from "firebase/firestore";
 import Link from 'next/link';
 import { useTranslation } from 'react-i18next';
 import './i18n/config';
 import ImportSamples from './import-samples';
-import {type Sample } from './utils';
+import {type Sample, initializeAppIfNecessary } from './utils';
 
 
 /**
@@ -26,7 +25,7 @@ export default function Nav() {
     const [role, setRole] = useState('');
     const [showAddSampleMenu, setShowAddSampleMenu] = useState(false);
 
-    const app = initializeApp(firebaseConfig);
+    initializeAppIfNecessary();
     const router = useRouter();
     const auth = getAuth();
     const db = getFirestore();

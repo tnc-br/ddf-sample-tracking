@@ -1,16 +1,13 @@
 "use client";
 
-
-import { initializeApp as initializeAdminApp } from 'firebase-admin/app';
 import { getAuth, onAuthStateChanged } from "firebase/auth";
-import { firebaseConfig } from '../firebase_config';
 import { initializeApp } from "firebase/app";
 import { useState, useEffect, useMemo, useRef } from 'react';
 import './styles.css';
 import { useRouter } from 'next/navigation'
 import 'bootstrap/dist/css/bootstrap.css';
 import { getFirestore, getDocs, collection, updateDoc, doc, setDoc, query, where, arrayRemove, getDoc, deleteDoc } from "firebase/firestore";
-import { type UserData } from '../utils';
+import { type UserData, initializeAppIfNecessary } from '../utils';
 
 import { MaterialReactTable, type MRT_ColumnDef, type MRT_Row, type MRT_TableInstance, type MRT_SortingState, type MRT_PaginationState } from 'material-react-table';
 import { useTranslation } from 'react-i18next';
@@ -46,7 +43,7 @@ export default function Users() {
     const [orgDataArray, setOrgDataArray] = useState([] as OrgData[])
     const [confirmationBoxData, setConfirmationBoxData] = useState(null as ConfirmationProps | null);
 
-    const app = initializeApp(firebaseConfig);
+    initializeAppIfNecessary();
     const auth = getAuth();
     const router = useRouter();
     const db = getFirestore();
