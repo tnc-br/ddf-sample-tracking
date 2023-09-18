@@ -26,7 +26,6 @@ export default function Samples() {
         inProgress: null as Sample[] | null,
         completed: null as Sample[] | null
     });
-    const [didFetch, setDidFetch] = useState(false);
 
     const app = initializeAppIfNecessary();
     const router = useRouter();
@@ -38,11 +37,13 @@ export default function Samples() {
         showTopBar();
         if (!userData.role || userData.role.length < 1) {
             onAuthStateChanged(auth, (user) => {
+                console.log("got here")
                 if (!user) {
                     router.push('/login');
                 } else {
                     getUserData(user.uid).then((userData: UserData) => {
                         if (userData.org) {
+                            console.log("got here!!! 1")
                             setUserData(userData);
                         } else {
                             setUserData({name: "no_user"} as UserData)
@@ -63,22 +64,16 @@ export default function Samples() {
 
     async function addSamplesToDataList() {
         // We don't want to refetch the data if we already have.
-        if (didFetch || !userData.name) {
+        if (allSamples.inProgress || allSamples.completed) {
             return;
         }
-        let trustedSamples = [];
-        let untrustedSamples = [];
-        let unknownSamples = [];
-        if (userData.org) {
-            trustedSamples = await getSamplesFromCollection(userData, 'trusted_samples');
-            untrustedSamples = await getSamplesFromCollection(userData, 'untrusted_samples');
-            unknownSamples = await getSamplesFromCollection(userData, 'unknown_samples');
+        const trustedSamples = await getSamplesFromCollection(userData, 'trusted_samples');
+        const untrustedSamples = await getSamplesFromCollection(userData, 'untrusted_samples');
+        const unknownSamples = await getSamplesFromCollection(userData, 'unknown_samples');
+        if (trustedSamples.length + untrustedSamples.length + unknownSamples.length < 1) {
+            setAllSamples({inProgress: [], completed: []});
         }
 
-        if (trustedSamples.length + untrustedSamples.length + unknownSamples.length < 1) {
-            setAllSamples({ inProgress: [], completed: [] });
-        }
-        setDidFetch(true);
 
         let inProgressSamples: any = [];
         let completedSamples: any = [];
