@@ -129,4 +129,7 @@
   "after": "After",
   "moreInfo": "More info",
   "nearbyDeforestationAlertsSource": "Deforestation alerts are provided by <1>MapBiomas Alerta<1>"
+  "unableToDownlaodCsv": "Unable to download CSV file.",
+  "orgNameExists": "An organization with that name already exists",
+  "isRequired": "is required"
 }

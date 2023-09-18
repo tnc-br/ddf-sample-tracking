@@ -72,13 +72,24 @@ export type ErrorMessages = {
   originValueError: string,
   originValueRequired: string,
   latLonRequired: string,
-  ShouldBeWithinRange: string,
   shouldBeWithinTheRange: string,
-  and: string
+  and: string,
+  isRequired: string
 }
 
 export interface NestedSchemas {
   [key: string]: NestedSchemas;
+}
+
+export const SampleErrorType = {
+  'IS_REQUIRED': 'isRequired',
+  'IS_OUT_OF_RANGE': 'isOutOfRange'
+}
+
+export type SampleError = {
+  errorType: string, // SampleErrorType,
+  fieldWithError: string,
+  errorString: string,
 }
 
 const resultRanges = {
@@ -114,9 +125,17 @@ const resultRanges = {
     'min': 40,
     'max': 60
   },
+  'lat': {
+    'min': -90,
+    'max': 90
+  },
+  'lon': {
+    'min': -180,
+    'max': 180
+  }
 }
 
-export const resultValues = ['d18O_wood', 'd15N_wood', 'n_wood', 'd13C_wood', 'c_wood', 'c_cel', 'd13C_cel']
+export const resultValues = ['d18O_wood', 'd15N_wood', 'n_wood', 'd13C_wood', 'c_wood', 'c_cel', 'd13C_cel', 'd18O_cel']
 
 
 export function getRanHex(size: number): string {
@@ -215,35 +234,93 @@ export function getDocRefForTrustedValue(trusted: string, db: Firestore, sampleI
 }
 
 
-export function validateImportedEntry(data: {}, errorMessages: ErrorMessages): string {
-  let errors = '';
+export function validateImportedEntry(data: Sample, errorMessages: ErrorMessages): string {
+  let errorString = '';
+  const errors = validateSample(data, [1, 2], errorMessages);
+  errors.forEach((error: SampleError) => {
+    errorString += error.errorString;
+  })
+  return errorString
+}
+
+
+export function validateSample(data: Sample, categories: number[], errorMessages: ErrorMessages): SampleError[] {
+  let errors: SampleError[] = [];
   const headers = Object.keys(data);
-  headers.forEach((header: string) => {
-    if (!Object.keys(resultRanges).includes(header)) return;
+
+  if (categories.includes(2)) {  
+    headers.forEach((header: string) => {
+      if (!Object.keys(resultRanges).includes(header)) return;
       const value = parseFloat(data[header])
       if (value < resultRanges[header].min || value > resultRanges[header].max) {
-        errors += `${header} ${errorMessages.ShouldBeWithinRange} ${resultRanges[header].min} ${errorMessages.and} ${resultRanges[header].max}, `;
+        errors.push({
+          errorType: SampleErrorType.IS_OUT_OF_RANGE,
+          fieldWithError: header,
+          errorString: `${header} ${errorMessages.shouldBeWithinTheRange} ${resultRanges[header].min} ${errorMessages.and} ${resultRanges[header].max}`
+        });
       }
-  })
-  if (!headers.includes('lat') || !headers.includes('lon')) {
-    errors += errorMessages.latLonRequired
+    })
   }
-  if (!headers.includes('origin')) {
-    errors += errorMessages.originValueRequired
-  } else {
-    if (!['known', 'unknown', 'uncertain'].includes(data.origin)) {
-      errors += errorMessages.originValueError
+
+  if (categories.includes(1)) {
+    if (!headers.includes('trusted')) {
+      errors.push({
+        errorType: SampleErrorType.IS_REQUIRED,
+        fieldWithError: 'origin',
+        errorString: `origin ${errorMessages.isRequired}`
+      });
+    } else {
+      if (!['trusted', 'unknown', 'untrusted'].includes(data.trusted)) {
+        errors.push({
+          errorType: SampleErrorType.IS_OUT_OF_RANGE,
+          fieldWithError: 'origin',
+          errorString: errorMessages.originValueError
+        });
+      }
+    }
+    if (headers.includes('trusted') && data.trusted !== 'unknown') {
+      if (!headers.includes('lat')) {
+        errors.push({
+          errorType: SampleErrorType.IS_REQUIRED,
+          fieldWithError: 'lat',
+          errorString:  `lat ${errorMessages.isRequired}`
+        });
+      }
+      if (!headers.includes('lon')) {
+        errors.push({
+          errorType: SampleErrorType.IS_REQUIRED,
+          fieldWithError: 'lon',
+          errorString:  `lon ${errorMessages.isRequired}`
+        });
+      }
+      const lat = data['lat'];
+      const lon = data['lon'];
+      if (lat && (lat < -90 || lat > 90)) {
+        errors.push({
+          errorType: SampleErrorType.IS_OUT_OF_RANGE,
+          fieldWithError: 'lat',
+          errorString: `lat ${errorMessages.shouldBeWithinTheRange} ${resultRanges['lat'].min} ${errorMessages.and} ${resultRanges['lat'].max}`
+        });
+      }
+      if (lon && (lon < -180 || lon > 180)) {
+        errors.push({
+          errorType: SampleErrorType.IS_OUT_OF_RANGE,
+          fieldWithError: 'lon',
+          errorString: `lon ${errorMessages.shouldBeWithinTheRange} ${resultRanges['lon'].min} ${errorMessages.and} ${resultRanges['lon'].max}`
+        });
+      }
     }
   }
+
   return errors;
 }
 
 export function getMaxLength(formSampleData: Sample): number {
   let maxValue = 0;
   resultValues.forEach((resultValue: string) => {
-      if (formSampleData[resultValue]) {
-          if (formSampleData[resultValue].length > maxValue) maxValue = formSampleData[resultValue].length;
-      }
+    if (formSampleData[resultValue]) {
+      if (formSampleData[resultValue].length > maxValue) maxValue = formSampleData[resultValue].length;
+    }
   });
   return maxValue;
 }
@@ -251,14 +328,14 @@ export function getMaxLength(formSampleData: Sample): number {
 export function getPointsArrayFromSampleResults(formSampleData: Sample): Sample[] {
   const maxValue = getMaxLength(formSampleData);
   let pointsArray: Sample[] = [];
-  for (let i = 0; i < maxValue; i ++) {
-      const currPoint = {} as Sample;
-      resultValues.forEach((value: string) => {
-          if (formSampleData[value] && formSampleData[value][i]) {
-              currPoint[value] = formSampleData[value][i];
-          }
-      })
-      pointsArray.push(currPoint);
+  for (let i = 0; i < maxValue; i++) {
+    const currPoint = {} as Sample;
+    resultValues.forEach((value: string) => {
+      if (formSampleData[value] && formSampleData[value][i]) {
+        currPoint[value] = formSampleData[value][i];
+      }
+    })
+    pointsArray.push(currPoint);
   }
   return pointsArray;
 }

@@ -92,6 +92,17 @@ jest.mock('papaparse', () => {
             mockParse(file, options)
         },
     }
+});
+
+const mockDownload = jest.fn();
+jest.mock('export-to-csv', () => {
+    return {
+        ExportToCsv: jest.fn().mockImplementation(() => {
+            return {
+                generateCsv: () => { console.log("testinggg") }
+            }
+        }),
+    }
 })
 
 
@@ -99,73 +110,69 @@ const samples = {
     data: [
         {
             Code: "test1",
-            lat: 1,
-            lon: 1,
+            lat: "1",
+            lon: "1",
             d18O_wood: 24.94,
-            origin: "known"
+            trusted: "trusted"
         },
         {
             Code: "test1",
-            lat: 1,
-            lon: 1,
+            lat: "1",
+            lon: "1",
             d18O_wood: 25.94,
-            origin: "known"
+            trusted: "trusted"
         },
         {
             Code: "test2",
-            lat: 4,
-            lon: 4,
-            origin: "unknown"
+            lat: "4",
+            lon: "4",
+            trusted: "unknown"
         },
         {
             Code: "test2",
-            lat: 4,
-            lon: 4,
-            origin: "unknown"
+            lat: "4",
+            lon: "4",
+            trusted: "unknown"
         }
     ]
 }
 
 // beforeAll(() => {
-    const batchSet = jest.fn();
-    const batchCommit = jest.fn(() => Promise.resolve('test'));
-    jest.mock('firebase/firestore', () => {
-        return {
-            getDoc: jest.fn((docRef) => {
-                return Promise.resolve({
-                    exists: jest.fn(() => true),
-                    data: jest.fn(() => {
-                        return {
-                            role: 'site_admin',
-                            org: '12345',
-                            name: 'Test Name',
-                            org_name: 'Test org'
-                        }
-                    })
+const batchSet = jest.fn();
+const batchCommit = jest.fn(() => Promise.resolve('test'));
+jest.mock('firebase/firestore', () => {
+    return {
+        getDoc: jest.fn((docRef) => {
+            return Promise.resolve({
+                exists: jest.fn(() => true),
+                data: jest.fn(() => {
+                    return {
+                        role: 'site_admin',
+                        org: '12345',
+                        name: 'Test Name',
+                        org_name: 'Test org'
+                    }
                 })
-            }),
-            getFirestore: jest.fn(),
-            setDoc: jest.fn(),
-            doc: jest.fn(),
-            collection: jest.fn((db, collection) => {
-                return collection;
-            }),
-            writeBatch: jest.fn((docRef) => {
-                return {
-                    set: batchSet,
-                    commit: batchCommit,
-                }
-            }),
-        }
-    })
+            })
+        }),
+        getFirestore: jest.fn(),
+        setDoc: jest.fn(),
+        doc: jest.fn(),
+        collection: jest.fn((db, collection) => {
+            return collection;
+        }),
+        writeBatch: jest.fn((docRef) => {
+            return {
+                set: batchSet,
+                commit: batchCommit,
+            }
+        }),
+    }
+})
 // });
 
 
 describe('Import', () => {
-
-    
-
-
     it('uploads data correctly', async () => {
         jest.mock('../app/utils', () => {
             return {
@@ -185,7 +192,7 @@ describe('Import', () => {
                     return 'test';
                 }),
                 validateImportedEntry: jest.fn(() => {
-                    return '';
+                    return [];
                 })
             }
         });
@@ -208,6 +215,7 @@ describe('Import', () => {
             completeFunction(samples);
         })
         await waitFor(() => expect(batchSet).toHaveBeenCalledTimes(2));
+        console.log("done calling first round")
         expect(batchCommit).toHaveBeenCalledTimes(1);
         expect(batchSet.mock.calls[0][1].points.length).toBe(2);
         expect(batchSet.mock.calls[0][1].lat).toBe(1);
@@ -228,26 +236,26 @@ describe('Import', () => {
         const badSamples = {
             data: [
                 {
-                    Code: "test1",
+                    Code: "test4",
                     d18O_wood: 24.94,
-                    origin: "known"
+                    trusted: "trusted"
                 },
                 {
-                    Code: "test1",
+                    Code: "test4",
                     d18O_wood: 25.94,
-                    origin: "known"
+                    trusted: "trusted"
                 },
                 {
-                    Code: "test2",
+                    Code: "test5",
                     lat: 4,
                     lon: 4,
-                    origin: "unknown"
+                    trusted: "unknown"
                 },
                 {
-                    Code: "test2",
+                    Code: "test5",
                     lat: 4,
                     lon: 4,
-                    origin: "unknown"
+                    trusted: "unknown"
                 }
             ]
         }
@@ -270,13 +278,14 @@ describe('Import', () => {
                     return 'test';
                 }),
                 validateImportedEntry: jest.fn(() => {
-                    return '';
+                    return [];
                 })
             }
         });
         const file = new File(["(⌐□_□)"], "chucknorris.png", { type: "image/png" });
+        let component;
         act(() => {
-            render(<ImportSamples />)
+            component = render(<ImportSamples />)
         });
         const uploader = document.getElementById('fileInput');
         expect(uploader).toBeTruthy();
@@ -294,5 +303,8 @@ describe('Import', () => {
         })
         await waitFor(() => expect(batchSet).toHaveBeenCalledTimes(2));
         expect(batchCommit).toHaveBeenCalledTimes(1);
+
+        const downloadButton = document.getElementById('import-error-download');
+        expect(downloadButton).toBeTruthy();
     });
 });

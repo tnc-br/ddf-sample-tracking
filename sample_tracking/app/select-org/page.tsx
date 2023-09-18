@@ -85,7 +85,9 @@ export default function SelectOrg() {
         updateDoc(newUserDocRef, {
             org: orgId,
             org_name: orgName,
-        });
+        }).catch((error) => {
+            console.log(error)
+        })
 
         router.push('/samples');
     }

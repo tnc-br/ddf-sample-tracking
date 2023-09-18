@@ -41,9 +41,8 @@ export default function AddSample() {
     const [sampleCreationFinished, setSampleCreationFinished] = useState(false);
 
     const [formData, setFormData] = useState({
-        visibility: 'public',
+        visibility: 'private',
         collected_by: 'supplier',
-        trusted: 'unknown',
     });
 
     const router = useRouter();
@@ -54,14 +53,14 @@ export default function AddSample() {
 
     let status = "completed";
     const searchParams = useSearchParams();
-    if (typeof window !== "undefined" && !formData.status) {
+    if (typeof window !== "undefined" && !formData.trusted) {
         const queryString = window.location.search;
         console.log("Querystring: " + queryString);
         const urlParams = new URLSearchParams(queryString);
         status = urlParams.get('status') ? urlParams.get('status') : searchParams.get('status');
         setFormData({
             ...formData,
-            status: status === 'completed' ? 'concluded' : 'in_progress',
+            trusted: status === 'originVerification' ? 'untrusted' : 'trusted',
         });
     }
 
@@ -121,6 +120,7 @@ export default function AddSample() {
             org_name: userData.org_name ? userData.org_name : '',
             created_by_name: userData.name,
             code_lab: sampleId,
+            visibility: 'private',
             d18O_wood: formSampleData.d18O_wood ? formSampleData.d18O_wood.map((value: string) => parseFloat(value)) : [],
             d15N_wood: formSampleData.d15N_wood ? formSampleData.d15N_wood.map((value: string) => parseFloat(value)) : [],
             n_wood: formSampleData.n_wood ? formSampleData.n_wood.map((value: string) => parseFloat(value)) : [],
@@ -128,6 +128,7 @@ export default function AddSample() {
             c_wood: formSampleData.c_wood ? formSampleData.c_wood.map((value: string) => parseFloat(value)) : [],
             c_cel: formSampleData.c_cel ? formSampleData.c_cel.map((value: string) => parseFloat(value)) : [],
             d13C_cel: formSampleData.d13C_cel ? formSampleData.d13C_cel.map((value: string) => parseFloat(value)) : [],
+            d18O_cel: formSampleData.d18O_cel ? formSampleData.d18O_cel.map((value: string) => parseFloat(value)) : [],
             lat: formSampleData.lat ? parseFloat(formSampleData.lat) : '',
             lon: formSampleData.lon ? parseFloat(formSampleData.lon) : '',
             points: getPointsArrayFromSampleResults(formSampleData)

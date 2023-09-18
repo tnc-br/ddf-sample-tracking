@@ -6,13 +6,13 @@ import { getAuth, type User } from "firebase/auth";
 import { useRouter } from 'next/navigation';
 import { initializeApp } from "firebase/app";
 import './styles.css';
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { firebaseConfig } from './firebase_config';
 import { getFirestore, getDoc, doc, writeBatch } from "firebase/firestore";
 import { useTranslation } from 'react-i18next';
 import './i18n/config';
 import Papa from 'papaparse';
-import { type Sample, type UserData, type ErrorMessages, validateImportedEntry, getRanHex } from './utils';
+import { type Sample, type UserData, type ErrorMessages, validateImportedEntry, getRanHex, initializeAppIfNecessary } from './utils';
 import { ExportToCsv } from 'export-to-csv';
 
 /**
@@ -29,13 +29,29 @@ import { ExportToCsv } from 'export-to-csv';
 export default function ImportSamples() {
     const [userData, setUserData] = useState(null as UserData | null)
 
-    const [errorSamples, setErrorSamples] = useState(null as Sample[] | null);
+    const [errorSamples, setErrorSamples] = useState([] as Sample[]);
+    const errorSampleRef = useRef({});
+    errorSampleRef.current = errorSamples;
 
-    const app = initializeApp(firebaseConfig);
+    initializeAppIfNecessary();
     const router = useRouter();
     const auth = getAuth();
     const db = getFirestore();
     const { t } = useTranslation();
+
+    document.addEventListener("click", (event) => {
+        const downloadContainer = document.getElementById("import-error-download");
+        const cancelContainer = document.getElementById('import-error-cancel');
+        const greatContainer = document.getElementById('import-success-great');
+        if (downloadContainer?.contains(event.target)) {
+            handleDownloadClick();
+            return;
+        }
+        if (cancelContainer?.contains(event.target) || greatContainer?.contains(event.target)) {
+            handleCloseBarClick();
+            return;
+        }
+    });
 
     const csvOptions = {
         fieldSeparator: ',',
@@ -59,7 +75,8 @@ export default function ImportSamples() {
         originValueRequired: t('originValueRequired'),
         latLonRequired: t('latLonRequired'),
         shouldBeWithinTheRange: t('shouldBeWithinTheRange'),
-        and: t('and')
+        and: t('and'),
+        isRequired: t('isRequired')
     }
 
     function onImportSuccessBar() {
@@ -78,7 +95,7 @@ export default function ImportSamples() {
             </div>
             <div className='import-status-actions-wrapper'>
                 <div className='import-status-actions'>
-                    <div onClick={handleCloseBarClick} className="import-success-status-button pointer">
+                    <div id="import-success-great" className="import-success-status-button pointer">
                         <div className='import-status-button-slate-layer'>
                             <div className='import-status-button-text'>
                                 {t('great')}
@@ -92,7 +109,7 @@ export default function ImportSamples() {
 
     function onImportErrorBar() {
         return (
-            <div className="import-success-status-wrapper error-background-color">
+            <div id="import-error-bar" className="import-success-status-wrapper error-background-color">
                 <div className='import-status-icon-wrapper'>
                     <div className='import-status-icon'>
                         <span className="material-symbols-outlined import-status-icon icon-color-red">
@@ -107,14 +124,14 @@ export default function ImportSamples() {
                 </div>
                 <div className='import-status-actions-wrapper'>
                     <div className='import-status-actions'>
-                        <div onClick={handleCloseBarClick} className="import-cancel-button pointer">
+                        <div id="import-error-cancel" className="import-cancel-button pointer">
                             <div className='import-status-button-slate-layer'>
                                 <div className='import-cancel-button-text'>
                                     {t('cancel')}
                                 </div>
                             </div>
                         </div>
-                        <div onClick={handleDownloadClick} className="import-error-status-button icon-color-red pointer">
+                        <div id="import-error-download" className="import-error-status-button icon-color-red pointer">
                             <div className='import-status-button-slate-layer'>
                                 <div className='import-status-button-text'>
                                     {t('download')}
@@ -128,10 +145,12 @@ export default function ImportSamples() {
     }
 
     function handleDownloadClick() {
-        if (errorSamples) {
-            csvExporter.generateCsv(errorSamples);
+        if (errorSampleRef.current) {
+            csvExporter.generateCsv(errorSampleRef.current);
+        } else {
+            alert(t('unableToDownlaodCsv'))
         }
-
+        handleCloseBarClick();
     }
 
     function handleCloseBarClick() {
@@ -184,7 +203,7 @@ export default function ImportSamples() {
                 const codeList = {};
                 let foundErrors = false;
                 results.data.forEach((result) => {
-                    const errors = validateImportedEntry(result, errorMessages);
+                    const errors = validateImportedEntry(result as Sample, errorMessages);
                     if (errors.length > 0) {
                         result.errors = errors;
                         foundErrors = true;
@@ -201,6 +220,7 @@ export default function ImportSamples() {
                 // If there are errors with any single entry in the CSV, show error bar and return early.
                 if (foundErrors) {
                     await router.push('./samples');
+                    console.log("setting error samples: " + results.data);
                     setErrorSamples(results.data as Sample[]);
                     const statusBarWrapper = document.getElementById('import-status-bar');
                     const errorBar = document.getElementById("import-status-bars")!.firstChild;
@@ -213,8 +233,8 @@ export default function ImportSamples() {
                 const date = new Date();
                 //RFC 3339 format
                 const formattedDateString = date.toISOString();
-                const sampleId = getRanHex(20);
                 Object.keys(codeList).forEach((key: string) => {
+                    const sampleId = getRanHex(20);
                     const resultValues = codeList[key];
                     const newSample = {
                         points: codeList[resultValues[0].Code],
@@ -223,7 +243,7 @@ export default function ImportSamples() {
                         site: resultValues[0].site || "",
                         state: resultValues[0].state || "",
                         municipality: resultValues[0].municipality || "",
-                        trusted: originValues[resultValues[0].origin],
+                        trusted: resultValues[0].trusted,
                         species: resultValues[0].species || "",
                         created_by: user.uid,
                         created_on: formattedDateString,
@@ -248,7 +268,7 @@ export default function ImportSamples() {
                 const batch = writeBatch(db);
                 samples.forEach((sample: Sample) => {
                     if (!sample.trusted) return;
-                    const docRef = doc(db, sample.trusted! + "_samples", sampleId);
+                    const docRef = doc(db, sample.trusted! + "_samples", sample.code_lab);
                     const completed =
                         sample.d18O_wood.length > 0 ||
                         sample.d15N_wood.length > 0 ||
@@ -286,7 +306,6 @@ export default function ImportSamples() {
         <div>
             <input id="fileInput" type="file" onChange={onFileChanged} accept=".csv" className="visibility-hidden" />
             <label htmlFor="fileInput" >
-                {/* <span className="material-symbols-outlined">cloud_upload</span> */}
                 {t('importSamples')}
             </label>
             <div id="import-status-bars" className='display-none'>
