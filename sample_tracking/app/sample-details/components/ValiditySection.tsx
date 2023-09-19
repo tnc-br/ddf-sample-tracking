@@ -15,6 +15,13 @@ const ValiditySection: React.FC<Props> = ({ selectedDoc }) => {
     var dateOfSampleProcessed = "9-Jun-2023";
     var referenceIsoscapeName = "USP-isoscape-oxygen--2023-09-11";
     var referenceIsotopeCreationDate = "10-Jun-2023";
+
+    var d18OCelSampleMean = 23.55
+    var d18OCelSampleVariance = 2.4
+    var d18OCelReferenceMean = 23.55
+    var d18OCelReferenceVariance = 2.2
+    var pValue = 0.0161;
+    var threshold = 0.0500;
     
     return (
         <div className='details'>
@@ -32,7 +39,7 @@ const ValiditySection: React.FC<Props> = ({ selectedDoc }) => {
                         δ<sup>18</sup>O Cel sample mean
                     </Trans>
                 </span>
-                <span className='detail-value'>23.55</span>
+                <span className='detail-value'>{d18OCelSampleMean}</span>
             </div>
             <div className='detail'>
                 <span className='detail-name'>
@@ -40,7 +47,7 @@ const ValiditySection: React.FC<Props> = ({ selectedDoc }) => {
                         δ<sup>18</sup>O Cel sample variance
                     </Trans>
                 </span>
-                <span className='detail-value'>2.4</span>
+                <span className='detail-value'>{d18OCelSampleVariance}</span>
             </div>
         </div>
         <div className='detail-row'>
@@ -50,7 +57,7 @@ const ValiditySection: React.FC<Props> = ({ selectedDoc }) => {
                         δ<sup>18</sup>O Cel reference mean
                     </Trans>
                 </span>
-                <span className='detail-value'>23.55</span>
+                <span className='detail-value'>{d18OCelReferenceMean}</span>
             </div>
             <div className='detail'>
                 <span className='detail-name'>
@@ -58,19 +65,19 @@ const ValiditySection: React.FC<Props> = ({ selectedDoc }) => {
                         δ<sup>18</sup>O Cel reference variance
                     </Trans>
                 </span>
-                <span className='detail-value'>2.2</span>
+                <span className='detail-value'>{d18OCelReferenceVariance}</span>
             </div>
         </div>
         <div className='detail-row'>
             <div className='detail'>
                 <span className='detail-name'>{t('pValue')}</span>
-                <span className='detail-value'>0.0161</span>
+                <span className='detail-value'>{pValue}</span>
             </div>
         </div>
         <div className='detail-row'>
             <div className='detail'>
                 <span className='detail-name'>{t('threshold')}</span>
-                <span className='detail-value'>0.0500</span>
+                <span className='detail-value'>{threshold}</span>
             </div>
         </div>
         <div>
@@ -81,7 +88,7 @@ const ValiditySection: React.FC<Props> = ({ selectedDoc }) => {
                 {t('sampleProcessingDetailsParagraph', { "date": dateOfSampleProcessed, "isoscapeName": referenceIsoscapeName, "isotopeDate": referenceIsotopeCreationDate })}
             </p>
             <div className='methodology'>
-                <div className='methodology-title'>Methodology</div>
+                <div className='methodology-title'>{t('methodology')}</div>
                 <p>{t('methodologyP1')}</p>
                 <p>{t('methodologyP2')}</p>
                 <p>
