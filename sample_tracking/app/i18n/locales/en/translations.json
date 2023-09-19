@@ -139,7 +139,7 @@
   "d18OCelReferenceVariance": "δ<1>18</1>O Cel reference variance",
   "pValue": "p-value",
   "threshold": "Threshold",
-  "likelihoodDetailsParagraph": "There is a {{pct}}% likelihood that the measured d<sup>18</sup>O isotope values come from the same distribution as found in the claimed location. This is based on a reference isotope landscape that achieves 95% precision with a recall rate of 34% and a Root Mean Squared Error (RMSE) of 1.2.",
+  "likelihoodDetailsParagraph": "There is a {{pct}}% likelihood that the measured δ18O isotope values come from the same distribution as found in the claimed location. This is based on a reference isotope landscape that achieves 95% precision with a recall rate of 34% and a Root Mean Squared Error (RMSE) of 1.2.",
   "sampleProcessingDetailsParagraph": "This sample was last processed on {{date}} using a reference isoscape, \"{{isoscapeName}}\" which was created on {{isotopeDate}}.",
   "methodology": "Methodology",
   "methodologyP1": "To test the claimed location of a new wood sample, a hypothesis test is used to compare the measured distribution of isotope ratios with the reference distribution at the claimed location to produce a p-value. If the p-value is below a target threshold, it is considered 'not likely' to have come from the claimed location. The threshold is chosen to achieve a precision of at least 95%.",
