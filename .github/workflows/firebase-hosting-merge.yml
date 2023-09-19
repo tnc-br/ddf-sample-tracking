@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - run: cd sample_tracking && ls -la && npm run build
+      - run: cd sample_tracking && npm run build && firebase use prod
       - uses: FirebaseExtended/action-hosting-deploy@v0
         with:
           repoToken: '${{ secrets.GITHUB_TOKEN }}'
@@ -27,7 +27,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - run: cd sample_tracking && ls -la && npm run build
+      - run: cd sample_tracking && npm run build && firebase use staging
       - uses: FirebaseExtended/action-hosting-deploy@v0
         with:
           entrypoint: ./sample_tracking

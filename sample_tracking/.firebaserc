@@ -1,7 +1,7 @@
 {
   "projects": {
-    "default": "timberid-prd",
-    "testing": "river-sky-386919"
+    "default": "river-sky-386919",
+    "prod": "timberid-prd"
   },
   "targets": {},
   "etags": {}
