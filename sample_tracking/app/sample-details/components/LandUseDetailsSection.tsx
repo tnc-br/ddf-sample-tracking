@@ -81,7 +81,7 @@ const LandUseDetailsSection: React.FC<Props> = ({ selectedDoc, sampleId }) => {
                 </tbody>
             </table>
             <div className='land-use-source-footer'>
-                <b>Source</b>
+                <b>{t('source')}</b>
                 <p>
                     <Trans i18nKey="landUseSourceFooterP1" t={t}>
                         Data from <a target='_blank' href='http://mapbiomas.org'>MapBiomas</a> showing

@@ -17,7 +17,7 @@ const MeasurementsSection: React.FC<Props> = ({ selectedDoc }) => {
             <table className="table">
                 <thead>
                     <tr>
-                        <th>Point</th>
+                        <th>{t('point')}</th>
                         <th>δ<sup>13</sup>C {t('wood')}</th>
                         <th>δ<sup>13</sup>C {t('cel')}</th>
                         <th>δ<sup>18</sup>O {t('wood')}</th>
