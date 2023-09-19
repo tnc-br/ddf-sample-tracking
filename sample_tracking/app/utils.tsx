@@ -19,10 +19,10 @@ export type UserData = {
 }
 
 export enum ValidityStatus {
-  Possible = 'Possible', // Indicates that the sample is possibly from the specified location.
-  NotLikely = 'Not Likely', // Indicates that the sample is unlikely to be from the specified location.
-  Trusted = 'Trusted', // Indicates that the sample is trusted to be from the specified location.
-  Undetermined = 'Undetermined', // Default value for untrusted sample if the sample's validity has not been determined (e.g. if the cloud function failed to run)
+  Possible = 'possibleLabel', // Indicates that the sample is possibly from the specified location.
+  NotLikely = 'notLikelyLabel', // Indicates that the sample is unlikely to be from the specified location.
+  Trusted = 'trustedLabel', // Indicates that the sample is trusted to be from the specified location.
+  Undetermined = 'undeterminedLabel', // Default value for untrusted sample if the sample's validity has not been determined (e.g. if the cloud function failed to run)
 }
 
 export type Sample = {
