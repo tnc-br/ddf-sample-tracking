@@ -134,7 +134,7 @@
   "unableToDownlaodCsv": "Unable to download CSV file.",
   "orgNameExists": "An organization with that name already exists",
   "isRequired": "is required",
-  "pctSimilarSamplesStatedOrigin": "{{pct}}% of the time similar samples come from their stated origin.",
+  "pctSimilarSamplesStatedOrigin": "{{pct}}% of the time similar samples did not come from the stated origin.",
   "d18OCelSampleMean": "δ<1>18</1>O Cel sample mean",
   "d18OCelSampleVariance": "δ<1>18</1>O Cel sample variance",
   "d18OCelReferenceMean": "δ<1>18</1>O Cel reference variance",
