@@ -19,10 +19,10 @@ export type UserData = {
 }
 
 export enum ValidityStatus {
-  Possible = 'Possible', // Indicates that the sample is possibly from the specified location.
-  NotLikely = 'Not Likely', // Indicates that the sample is unlikely to be from the specified location.
-  Trusted = 'Trusted', // Indicates that the sample is trusted to be from the specified location.
-  Undetermined = 'Undetermined', // Default value for untrusted sample if the sample's validity has not been determined (e.g. if the cloud function failed to run)
+  Possible = 'possibleLabel', // Indicates that the sample is possibly from the specified location.
+  NotLikely = 'notLikelyLabel', // Indicates that the sample is unlikely to be from the specified location.
+  Trusted = 'trustedLabel', // Indicates that the sample is trusted to be from the specified location.
+  Undetermined = 'undeterminedLabel', // Default value for untrusted sample if the sample's validity has not been determined (e.g. if the cloud function failed to run)
 }
 
 export type Sample = {
@@ -43,7 +43,7 @@ export type Sample = {
   last_updated_by: string,
   org: string,
   org_name: string,
-  validity: number,
+  validity?: string,
   header: string,
   doc_id: string,
   updated_state: boolean,
@@ -66,7 +66,21 @@ export type Sample = {
   last_updated_by_photo: string,
   measurements: {},
   points?: [],
-  request: string
+  request: string,
+  validity_details?: ValidityDetails,
+}
+
+export type ValidityDetails = {
+  p_value: number,
+  p_value_threshold: number,
+  d18O_cel_sample_mean: number,
+  d18O_cel_sample_variance: number,
+  d18O_cel_reference_mean: number,
+  d18O_cel_reference_variance: number,
+  reference_oxygen_isoscape_creation_date: string,
+  reference_oxygen_isoscape_name: string,
+  reference_oxygen_isoscape_precision: string,
+  reference_oxygen_isoscape_recall: string
 }
 
 export type ErrorMessages = {
