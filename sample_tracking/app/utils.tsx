@@ -287,7 +287,7 @@ export function validateSample(data: Sample, categories: number[], errorMessages
       errors.push({
         errorType: SampleErrorType.IS_REQUIRED,
         fieldWithError: 'origin',
-        errorString: `origin ${errorMessages.isRequired}`
+        errorString: `trusted ${errorMessages.isRequired}`
       });
     } else {
       if (!['trusted', 'unknown', 'untrusted'].includes(data.trusted)) {
