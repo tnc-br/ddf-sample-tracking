@@ -229,7 +229,7 @@ export default function SignUpRequests() {
                                 return (
                                     <tr key={i} id={key}>
                                         <td>{prospectiveUsers[key].name as unknown as string}</td>
-                                        <td>{prospectiveUsers[key].org as unknown as string}</td>
+                                        <td>{prospectiveUsers[key].org_name as unknown as string}</td>
                                         <td>{prospectiveUsers[key].email as unknown as string}</td>
                                         <td>{prospectiveUsers[key].date_requested as unknown as string}</td>
                                         <td className="approve-reject-wrapper"><button onClick={handleRejectMemberClick} type="button" className="btn btn-outline-danger reject-button">Decline</button>

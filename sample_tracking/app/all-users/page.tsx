@@ -149,7 +149,7 @@ export default function Users() {
                 size: 100,
             },
             {
-                accessorKey: 'org',
+                accessorKey: 'org_name',
                 header: t('organization'),
                 size: 100,
             },
