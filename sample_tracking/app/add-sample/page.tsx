@@ -43,10 +43,11 @@ export default function AddSample() {
     const [formData, setFormData] = useState({
         visibility: 'private',
         collected_by: 'supplier',
+        status: 'concluded'
     });
 
     const router = useRouter();
-    const app = initializeAppIfNecessary();
+    initializeAppIfNecessary();
     const auth = getAuth();
     const db = getFirestore();
     const { t } = useTranslation();

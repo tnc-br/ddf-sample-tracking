@@ -40,7 +40,7 @@ export default function Edit() {
     });
 
     const router = useRouter();
-    const app = initializeAppIfNecessary();
+    initializeAppIfNecessary();
     const auth = getAuth();
     const db = getFirestore();
     const { t } = useTranslation();

@@ -119,6 +119,12 @@ export default function SignUp(props: SignUpProps) {
             } as NewUser)
             return;
         }
+        if (newOrgName && newOrgName.includes(' ')) {
+            setErrorText({
+                newOrgName: t('orgNameMustBeOneWord')
+            } as NewUser)
+            return;
+        }
         const orgName = formData.orgName;
         const name = `${formData.firstName} ${formData.lastName}`;
         const labValue = orgName ? availableOrgs[orgName] : '';

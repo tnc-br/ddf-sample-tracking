@@ -33,7 +33,7 @@ export default function SignUpRequests() {
     const [prospectiveOrgs, setProspectiveOrgs] = useState({} as NestedSchemas);
     const [userData, setUserData] = useState({} as UserData);
 
-    const app = initializeAppIfNecessary();
+    initializeAppIfNecessary();
     const auth = getAuth();
     const router = useRouter();
     const db = getFirestore();
@@ -111,8 +111,10 @@ export default function SignUpRequests() {
         const dateString = `${date.getMonth() + 1} ${date.getDate()} ${date.getFullYear()}`;
         const orgId = getRanHex(20);
         const newOrgRef = doc(db, "organizations", orgId);
+        const orgEmail = `${orgName}@timberid.org`;
         setDoc(newOrgRef, {
             org_name: orgName,
+            org_email: orgEmail,
             admins: [{
                 name: prospectiveOrgs[orgName].admin_name,
                 email: prospectiveOrgs[orgName].email,
@@ -227,7 +229,7 @@ export default function SignUpRequests() {
                                 return (
                                     <tr key={i} id={key}>
                                         <td>{prospectiveUsers[key].name as unknown as string}</td>
-                                        <td>{prospectiveUsers[key].org as unknown as string}</td>
+                                        <td>{prospectiveUsers[key].org_name as unknown as string}</td>
                                         <td>{prospectiveUsers[key].email as unknown as string}</td>
                                         <td>{prospectiveUsers[key].date_requested as unknown as string}</td>
                                         <td className="approve-reject-wrapper"><button onClick={handleRejectMemberClick} type="button" className="btn btn-outline-danger reject-button">Decline</button>

@@ -14,11 +14,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - run: cd sample_tracking && ls -la && npm run build
+      - run: cd sample_tracking && npm run build && firebase use prod
       - uses: FirebaseExtended/action-hosting-deploy@v0
         with:
-          entrypoint: ./sample_tracking
-          repoToken: '${{ secrets.GITHUB_TOKEN_PRD }}'
-          firebaseServiceAccount: '${{ secrets.FIREBASE_SERVICE_ACCOUNT_PRD }}'
+          repoToken: '${{ secrets.GITHUB_TOKEN }}'
+          firebaseServiceAccount: '${{ secrets.FIREBASE_SERVICE_ACCOUNT_TIMBERID_PRD }}'
           channelId: live
           projectId: timberid-prd

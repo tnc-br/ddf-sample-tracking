@@ -22,7 +22,7 @@ export default function Profile() {
 
 
     const router = useRouter();
-    const app = initializeAppIfNecessary();
+    initializeAppIfNecessary();
     const auth = getAuth();
     const db = getFirestore();
     const { t } = useTranslation();
@@ -38,7 +38,10 @@ export default function Profile() {
                     const userDocRef = doc(db, "users", user.uid);
                     getDoc(userDocRef).then((docRef) => {
                         if (docRef.exists()) {
-                            setUserData(docRef.data() as UserData);
+                            setUserData({
+                                ...docRef.data(), 
+                                user_id: docRef.id,
+                            }as UserData);
                         }
                     });
                 }
@@ -48,13 +51,13 @@ export default function Profile() {
 
     if (!userData) return;
 
-    function handleDeleteButton() {
+    async function handleDeleteButton() {
         const user = auth.currentUser;
         if (!user) return;
         if (confirm(t('deleteActConfirmation'))) {
-            deleteUser(user).then(async () => {
-                const deletedUserDoc = doc(db, 'users', userData!.user_id);
-                await deleteDoc(deletedUserDoc);
+            const deletedUserDoc = doc(db, 'users', userData!.user_id);
+            await deleteDoc(deletedUserDoc);
+            deleteUser(user).then(() => {
                 router.push('./login');
             }).catch((error) => {
                 console.log("Error: unable to delete act: " + userData?.user_id);
