@@ -136,7 +136,7 @@
   "unableToDownlaodCsv": "Não foi possível baixar o arquivo CSV.",
   "orgNameExists": "Já existe uma organização com esse nome",
   "isRequired": "é necessário",
-  "pctLikelihoodSimilarSamples": "{{pct}}% das vezes amostras semelhantes vêm de sua origem declarada.",
+  "pctSimilarSamplesStatedOrigin": "{{pct}}% das vezes amostras semelhantes vêm de sua origem declarada.",
   "d18OCelSampleMean": "Média da amostra de δ<1>18</1>O Cel",
   "d18OCelSampleVariance": "Variância da amostra de δ<1>18</1>O Cel",
   "d18OCelReferenceMean": "Média de referência de δ<1>18</1>O Cel",

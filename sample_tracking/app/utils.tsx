@@ -43,7 +43,7 @@ export type Sample = {
   last_updated_by: string,
   org: string,
   org_name: string,
-  validity: number,
+  validity?: string,
   header: string,
   doc_id: string,
   updated_state: boolean,
@@ -66,7 +66,17 @@ export type Sample = {
   last_updated_by_photo: string,
   measurements: {},
   points?: [],
-  request: string
+  request: string,
+  d18O_cel_sample_mean?: number,
+  d18O_cel_sample_variance?: number,
+  d18O_cel_reference_mean?: number,
+  d18O_cel_reference_variance?: number,
+  reference_oxygen_isoscape_creation_date?: string,
+  reference_oxygen_isoscape_name?: string,
+  reference_oxygen_isoscape_precision?: string,
+  validity_details?: string,
+  p_value?: number,
+  p_value_threshold?: number,
 }
 
 export type ErrorMessages = {

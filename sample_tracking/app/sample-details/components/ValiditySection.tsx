@@ -10,26 +10,39 @@ type Props = {
 const ValiditySection: React.FC<Props> = ({ selectedDoc }) => {
     const { t } = useTranslation();
 
-    var samplesOriginLikelihoodPct = 91;
-    var likelihoodSameDistributionsPct = 1.61;
-    var dateOfSampleProcessed = "9-Jun-2023";
-    var referenceIsoscapeName = "USP-isoscape-oxygen--2023-09-11";
-    var referenceIsotopeCreationDate = "10-Jun-2023";
+    // Isoscape Metadata
+    var referenceIsoscapeName = selectedDoc['reference_oxygen_isoscape_name'];
+    var referenceIsotopeCreationDate = selectedDoc['reference_oxygen_isoscape_creation_date'];
+    if (referenceIsotopeCreationDate) {
+        const dateObj = new Date(referenceIsotopeCreationDate);
+        referenceIsotopeCreationDate = dateObj.toISOString().split('T')[0]
+    }
+    var referenceIsotopePrecision = selectedDoc['reference_oxygen_isoscape_precision'];
+    var referenceIsotopePrecisionPctString = t("unknown");
+    if (referenceIsotopePrecision) {
+        referenceIsotopePrecisionPctString = referenceIsotopePrecision ? (referenceIsotopePrecision * 100).toFixed(2) : t("unknown");
+    }
 
-    var d18OCelSampleMean = 23.55
-    var d18OCelSampleVariance = 2.4
-    var d18OCelReferenceMean = 23.55
-    var d18OCelReferenceVariance = 2.2
-    var pValue = 0.0161;
-    var threshold = 0.0500;
+    // Sample Processing Metadata
+    var dateOfSampleProcessed = selectedDoc['created_on'];
+
+    // T-Test Results
+    var validityLabel = selectedDoc['validity'];
+    var d18OCelSampleMean = selectedDoc['d18O_cel_sample_mean']?.toFixed(5);
+    var d18OCelSampleVariance = selectedDoc['d18O_cel_sample_variance']?.toFixed(5);
+    var d18OCelReferenceMean = selectedDoc['d18O_cel_reference_mean']?.toFixed(5);
+    var d18OCelReferenceVariance = selectedDoc['d18O_cel_reference_variance']?.toFixed(5);
+    var pValue = selectedDoc['p_value']?.toFixed(10);
+    var threshold = selectedDoc['p_value_threshold']?.toFixed(10);
+    var likelihoodSameDistributionsPct = selectedDoc['p_value'] ? (selectedDoc['p_value'] * 100).toFixed(2) : t("unknown");
     
     return (
         <div className='details'>
         <div className='section-title'>{t('validity')}</div>
         <div>
-            <ValidityTag isTrusted={false} city={selectedDoc['city']} lat={selectedDoc['lat']} lon={selectedDoc['lon']} />
+            <ValidityTag validityLabel={validityLabel} isTrusted={false} city={selectedDoc['city']} lat={selectedDoc['lat']} lon={selectedDoc['lon']} />
             <div className='samples-origin-pct'>
-                {t('pctLikelihoodSimilarSamples', { "pct": samplesOriginLikelihoodPct })}
+                {t('pctSimilarSamplesStatedOrigin', { "pct": referenceIsotopePrecisionPctString })}
             </div>
         </div>
         <div className='detail-row'>

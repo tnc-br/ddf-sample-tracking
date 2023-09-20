@@ -3,18 +3,23 @@ import {ValidityStatus} from '../../utils';
 import { useTranslation, Trans } from 'react-i18next';
 
 type Props = {
+    validityLabel: string;
     city: string;
     lat: string;
     lon: string;
     isTrusted: boolean;
 };
 
-const ValidityTag: React.FC<Props> = ({ city, lat, lon, isTrusted }) => {
+const ValidityTag: React.FC<Props> = ({ validityLabel, city, lat, lon, isTrusted }) => {
     const { t } = useTranslation();
 
     var validity = ValidityStatus.Undetermined;
     if (isTrusted) {
         validity = ValidityStatus.Trusted;
+    } else if (validityLabel == "Possible") {
+        validity = ValidityStatus.Possible;
+    } else if (validityLabel == "Not Likely") {
+        validity = ValidityStatus.NotLikely;
     }
     // TODO: Input validity through props once it's being written to Firestore
 
