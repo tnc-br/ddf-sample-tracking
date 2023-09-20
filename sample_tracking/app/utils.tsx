@@ -386,7 +386,7 @@ function getFirebaseConfig() {
 function isProd(): boolean {
   if (typeof window !== "undefined") {
     const href = window.location.href;
-    return href.includes('timberid.org') && !href.includes('testing');
+    return href.includes('timberid.org') && !href.includes('test');
   }
   return false;
 }
