@@ -10,31 +10,55 @@ type Props = {
 const ValiditySection: React.FC<Props> = ({ selectedDoc }) => {
     const { t } = useTranslation();
 
-    // Isoscape Metadata
-    var referenceIsoscapeName = selectedDoc['reference_oxygen_isoscape_name'];
-    var referenceIsotopeCreationDate = selectedDoc['reference_oxygen_isoscape_creation_date'];
-    if (referenceIsotopeCreationDate) {
-        const dateObj = new Date(referenceIsotopeCreationDate);
-        referenceIsotopeCreationDate = dateObj.toISOString().split('T')[0]
-    }
-    var referenceIsotopePrecision = selectedDoc['reference_oxygen_isoscape_precision'];
-    var referenceIsotopePrecisionPctString = t("unknown");
-    if (referenceIsotopePrecision) {
-        referenceIsotopePrecisionPctString = referenceIsotopePrecision ? (referenceIsotopePrecision * 100).toFixed(2) : t("unknown");
+    function parsePercentageFromString(value: string) {
+        const floatValue = parseFloat(value);
+        if (isNaN(floatValue)) return t("unknown");
+        return (floatValue * 100).toFixed(2);
     }
 
     // Sample Processing Metadata
     var dateOfSampleProcessed = selectedDoc['created_on'];
 
+    // Isoscape Metadata
+    var referenceIsoscapeName = t("unknown");
+    var referenceIsotopeCreationDate = t("unknown");
+    referenceIsotopeCreationDate = t("unknown");
+    var referenceIsotopePrecision = t("unknown");
+    var referenceIsotopeRecall = t("unknown");
+    var validityLabel = t("unknown");
+
     // T-Test Results
-    var validityLabel = selectedDoc['validity'];
-    var d18OCelSampleMean = selectedDoc['d18O_cel_sample_mean']?.toFixed(5);
-    var d18OCelSampleVariance = selectedDoc['d18O_cel_sample_variance']?.toFixed(5);
-    var d18OCelReferenceMean = selectedDoc['d18O_cel_reference_mean']?.toFixed(5);
-    var d18OCelReferenceVariance = selectedDoc['d18O_cel_reference_variance']?.toFixed(5);
-    var pValue = selectedDoc['p_value']?.toFixed(10);
-    var threshold = selectedDoc['p_value_threshold']?.toFixed(10);
-    var likelihoodSameDistributionsPct = selectedDoc['p_value'] ? (selectedDoc['p_value'] * 100).toFixed(2) : t("unknown");
+    var d18OCelSampleMean = t("unknown");
+    var d18OCelSampleVariance = t("unknown");
+    var d18OCelReferenceMean = t("unknown");
+    var d18OCelReferenceVariance = t("unknown");
+    var pValue = t("unknown");
+    var threshold = t("unknown");
+    var likelihoodSameDistributionsPct = t("unknown");
+
+    var validityDetails = selectedDoc['validity_details'];
+    if (validityDetails) {
+        // Isoscape Metadata
+        referenceIsoscapeName = validityDetails['reference_oxygen_isoscape_name'];
+        referenceIsotopeCreationDate = validityDetails['reference_oxygen_isoscape_creation_date'];
+        if (referenceIsotopeCreationDate) {
+            const dateObj = new Date(referenceIsotopeCreationDate);
+            referenceIsotopeCreationDate = dateObj.toISOString().split('T')[0]
+        }
+        var referenceIsotopePrecision = parsePercentageFromString(validityDetails['reference_oxygen_isoscape_precision']);
+        var referenceIsotopeRecall = parsePercentageFromString(validityDetails['reference_oxygen_isoscape_recall']);
+
+
+        // T-Test Results
+        validityLabel = selectedDoc['validity'] || t("unknown");
+        d18OCelSampleMean = validityDetails['d18O_cel_sample_mean']?.toFixed(5);
+        d18OCelSampleVariance = validityDetails['d18O_cel_sample_variance']?.toFixed(5);
+        d18OCelReferenceMean = validityDetails['d18O_cel_reference_mean']?.toFixed(5);
+        d18OCelReferenceVariance = validityDetails['d18O_cel_reference_variance']?.toFixed(5);
+        pValue = validityDetails['p_value']?.toFixed(10);
+        threshold = validityDetails['p_value_threshold']?.toFixed(10);
+        likelihoodSameDistributionsPct = (validityDetails['p_value'] * 100).toFixed(2);
+    }
     
     return (
         <div className='details'>
@@ -42,7 +66,7 @@ const ValiditySection: React.FC<Props> = ({ selectedDoc }) => {
         <div>
             <ValidityTag validityLabel={validityLabel} isTrusted={false} city={selectedDoc['city']} lat={selectedDoc['lat']} lon={selectedDoc['lon']} />
             <div className='samples-origin-pct'>
-                {t('pctSimilarSamplesStatedOrigin', { "pct": referenceIsotopePrecisionPctString })}
+                {t('pctSimilarSamplesStatedOrigin', { "pct": referenceIsotopePrecision })}
             </div>
         </div>
         <div className='detail-row'>
@@ -95,10 +119,10 @@ const ValiditySection: React.FC<Props> = ({ selectedDoc }) => {
         </div>
         <div>
             <p className='likelihood-details'>
-                {t('likelihoodDetailsParagraph', { "pct": likelihoodSameDistributionsPct })}
+                {t('likelihoodDetailsParagraph', { "pct": likelihoodSameDistributionsPct, "isotopePrecision": referenceIsotopePrecision, "isotopeRecall": referenceIsotopeRecall })}
             </p>
             <p>
-                {t('sampleProcessingDetailsParagraph', { "date": dateOfSampleProcessed, "isoscapeName": referenceIsoscapeName, "isotopeDate": referenceIsotopeCreationDate })}
+                {t('sampleProcessingDetailsParagraph', { "date": dateOfSampleProcessed, "isoscapeName": referenceIsoscapeName, "isotopeDate": referenceIsotopeCreationDate})}
             </p>
             <div className='methodology'>
                 <div className='methodology-title'>{t('methodology')}</div>

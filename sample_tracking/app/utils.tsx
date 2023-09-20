@@ -67,16 +67,20 @@ export type Sample = {
   measurements: {},
   points?: [],
   request: string,
-  d18O_cel_sample_mean?: number,
-  d18O_cel_sample_variance?: number,
-  d18O_cel_reference_mean?: number,
-  d18O_cel_reference_variance?: number,
-  reference_oxygen_isoscape_creation_date?: string,
-  reference_oxygen_isoscape_name?: string,
-  reference_oxygen_isoscape_precision?: string,
-  validity_details?: string,
-  p_value?: number,
-  p_value_threshold?: number,
+  validity_details?: ValidityDetails,
+}
+
+export type ValidityDetails = {
+  p_value: number,
+  p_value_threshold: number,
+  d18O_cel_sample_mean: number,
+  d18O_cel_sample_variance: number,
+  d18O_cel_reference_mean: number,
+  d18O_cel_reference_variance: number,
+  reference_oxygen_isoscape_creation_date: string,
+  reference_oxygen_isoscape_name: string,
+  reference_oxygen_isoscape_precision: string,
+  reference_oxygen_isoscape_recall: string
 }
 
 export type ErrorMessages = {
