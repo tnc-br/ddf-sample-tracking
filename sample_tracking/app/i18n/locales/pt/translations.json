@@ -83,7 +83,7 @@
   "download": "Download",
   "successfullyImportedFile": "Arquivo importado com sucesso",
   "great": "Ótimo!",
-  "originValueError": "O valor de origem deve ser um dos seguintes: conhecido, incerto ou desconhecido",
+  "originValueError": "trusted o valor deve ser um dos seguintes: conhecido, incerto ou desconhecido",
   "originValueRequired": "o valor de origem é obrigatório, ",
   "latLonRequired": "lat e lon são obrigatórios,",
   "shouldBeWithinTheRange": "deve estar dentro do intervalo",
