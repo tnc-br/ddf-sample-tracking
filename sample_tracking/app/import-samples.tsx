@@ -234,7 +234,7 @@ export default function ImportSamples() {
                 //RFC 3339 format
                 const formattedDateString = date.toISOString();
                 Object.keys(codeList).forEach((key: string) => {
-                    const sampleId = getRanHex(20);
+                    const sampleId = key;
                     const resultValues = codeList[key];
                     const newSample = {
                         points: codeList[resultValues[0].Code],
