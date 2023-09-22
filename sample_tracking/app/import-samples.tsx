@@ -63,13 +63,6 @@ export default function ImportSamples() {
     };
     const csvExporter = new ExportToCsv(csvOptions);
 
-
-    const originValues = {
-        unknown: 'unknown',
-        known: 'trusted',
-        uncertain: 'untrusted'
-    }
-
     const errorMessages: ErrorMessages = {
         originValueError: t('originValueError'),
         originValueRequired: t('originValueRequired'),
@@ -283,6 +276,7 @@ export default function ImportSamples() {
                         status: completed ? 'concluded' : 'in_progress',
                     };
                     batch.set(docRef, payload);
+                    console.log("New id added: " + sample.code_lab)
                 });
 
                 batch.commit().then(async () => {
