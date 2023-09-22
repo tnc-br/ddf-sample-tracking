@@ -227,7 +227,7 @@ export default function ImportSamples() {
                 //RFC 3339 format
                 const formattedDateString = date.toISOString();
                 Object.keys(codeList).forEach((key: string) => {
-                    const sampleId = getRanHex(20);
+                    const sampleId = key;
                     const resultValues = codeList[key];
                     const newSample = {
                         points: codeList[resultValues[0].Code],
@@ -244,6 +244,7 @@ export default function ImportSamples() {
                         org: currentUserData.org,
                         org_name: currentUserData.org_name ? currentUserData.org_name : '',
                         created_by_name: currentUserData.name,
+                        // code_lab value is equal to the code value for the given sample. 
                         code_lab: sampleId,
                         visibility: "private",
                         // Combine result values into single array of floats.
