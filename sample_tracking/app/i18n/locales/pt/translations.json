@@ -84,7 +84,7 @@
   "successfullyImportedFile": "Arquivo importado com sucesso",
   "great": "Ótimo!",
   "originValueError": "trusted o valor deve ser um dos seguintes: conhecido, incerto ou desconhecido",
-  "originValueRequired": "o valor de origem é obrigatório, ",
+  "originValueRequired": "trusted é necessário, ",
   "latLonRequired": "lat e lon são obrigatórios,",
   "shouldBeWithinTheRange": "deve estar dentro do intervalo",
   "and": "e",

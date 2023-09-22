@@ -244,6 +244,7 @@ export default function ImportSamples() {
                         org: currentUserData.org,
                         org_name: currentUserData.org_name ? currentUserData.org_name : '',
                         created_by_name: currentUserData.name,
+                        // code_lab value is equal to the code value for the given sample. 
                         code_lab: sampleId,
                         visibility: "private",
                         // Combine result values into single array of floats.

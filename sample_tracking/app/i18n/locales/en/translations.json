@@ -82,7 +82,7 @@
   "successfullyImportedFile" : "Successfully imported file",
   "great": "Great!",
   "originValueError": "trusted value should be one of the following: known, uncertain, or unknown",
-  "originValueRequired": "origin value is required, ",
+  "originValueRequired": "trusted value is required, ",
   "latLonRequired": "lat and lon are required, ",
   "shouldBeWithinTheRange": "should be within the range",
   "and": "and",
