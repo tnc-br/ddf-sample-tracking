@@ -42,7 +42,7 @@ export default function LogInSignUpPage() {
 
   useEffect(() => {
     hideNavBar();
-    hideTopBar();
+    // hideTopBar();
   })
 
 
