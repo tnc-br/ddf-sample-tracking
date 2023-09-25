@@ -138,8 +138,16 @@ export default function ImportSamples() {
     }
 
     function handleDownloadClick() {
-        if (errorSampleRef.current) {
-            csvExporter.generateCsv(errorSampleRef.current);
+        let errorSamples = errorSampleRef.current
+        if (errorSamples) {
+            // If there is no error data in the first row, the errors column won't be
+            // picked up by the csvExporter and no errors will be exported. We need to 
+            // artifically add an empty errors string to the first row if there isn't 
+            // an error there already. 
+            if (!errorSamples[0].errors) {
+                errorSamples[0].errors = '';
+            }
+            csvExporter.generateCsv(errorSamples);
         } else {
             alert(t('unableToDownlaodCsv'))
         }
