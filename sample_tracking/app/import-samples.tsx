@@ -238,7 +238,7 @@ export default function ImportSamples() {
                     const sampleId = key;
                     const resultValues = codeList[key];
                     const newSample = {
-                        points: codeList[resultValues[0].Code],
+                        points: codeList[resultValues[0].code],
                         lat: parseFloat(resultValues[0].lat),
                         lon: parseFloat(resultValues[0].lon),
                         site: resultValues[0].site || "",
@@ -256,13 +256,13 @@ export default function ImportSamples() {
                         code_lab: sampleId,
                         visibility: "private",
                         // Combine result values into single array of floats.
-                        d18O_wood: codeList[resultValues[0].Code].filter(data => data.d18O_wood).map((data) => parseFloat(data.d18O_wood)),
-                        d15N_wood: codeList[resultValues[0].Code].filter(data => data.d15N_wood).map((data) => parseFloat(data.d15N_wood)),
-                        n_wood: codeList[resultValues[0].Code].filter(data => data.n_wood).map((data) => parseFloat(data.n_wood)),
-                        d13C_wood: codeList[resultValues[0].Code].filter(data => data.d13C_wood).map((data) => parseFloat(data.d13C_wood)),
-                        c_wood: codeList[resultValues[0].Code].filter(data => data.c_wood).map((data) => parseFloat(data.c_wood)),
-                        c_cel: codeList[resultValues[0].Code].filter(data => data.c_cel).map((data) => parseFloat(data.c_cel)),
-                        d13C_cel: codeList[resultValues[0].Code].filter(data => data.d13C_cel).map((data) => parseFloat(data.d13C_cel)),
+                        d18O_wood: codeList[resultValues[0].code].filter(data => data.d18O_wood).map((data) => parseFloat(data.d18O_wood)),
+                        d15N_wood: codeList[resultValues[0].code].filter(data => data.d15N_wood).map((data) => parseFloat(data.d15N_wood)),
+                        n_wood: codeList[resultValues[0].code].filter(data => data.n_wood).map((data) => parseFloat(data.n_wood)),
+                        d13C_wood: codeList[resultValues[0].code].filter(data => data.d13C_wood).map((data) => parseFloat(data.d13C_wood)),
+                        c_wood: codeList[resultValues[0].code].filter(data => data.c_wood).map((data) => parseFloat(data.c_wood)),
+                        c_cel: codeList[resultValues[0].code].filter(data => data.c_cel).map((data) => parseFloat(data.c_cel)),
+                        d13C_cel: codeList[resultValues[0].code].filter(data => data.d13C_cel).map((data) => parseFloat(data.d13C_cel)),
                     }
                     samples.push(newSample);
                 });
