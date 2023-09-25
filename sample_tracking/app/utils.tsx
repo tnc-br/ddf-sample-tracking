@@ -284,7 +284,7 @@ export function validateSample(data: Sample, categories: number[], errorMessages
 
   if (categories.length > 1) {
     // Only imported samples are testing more than one category at a time. 
-    if (!headers.includes('code') && !headers.includes('Code')) {
+    if (!headers.includes('code')) {
       errors.push({
         errorType: SampleErrorType.IS_REQUIRED,
         fieldWithError: 'code',
