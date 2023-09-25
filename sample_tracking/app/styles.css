@@ -1247,6 +1247,7 @@ svg {
     line-height: 24px;
     /* 100% */
     letter-spacing: 0.18px;
+    cursor: pointer;
 }
 
 .top-bar-info-link-wrapper {

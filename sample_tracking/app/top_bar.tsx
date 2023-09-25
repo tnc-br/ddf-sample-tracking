@@ -14,6 +14,8 @@ import Switch from '@mui/material/Switch';
 import { green } from '@mui/material/colors';
 import { alpha, styled } from '@mui/material/styles';
 import {type UserData, initializeAppIfNecessary } from './utils'
+import { TextField, Autocomplete, MenuItem, InputAdornment } from '@mui/material';
+import Image from 'next/image'
 
 /**
  * Component to render the top bar shown on most pages in TimberId. 
@@ -165,8 +167,10 @@ export default function TopBar() {
         <div id="top-bar-wrapper" className='top-bar-wrapper'>
             <div className='top-bar-product-wrapper'>
                 <div className='display-inline-flex-center'>
-                    <div className='top-bar-icon-wrapper'></div>
-                    <div onClick={() => router.push('/samples')} className='top-bar-title-text'>Timber ID</div>
+                    {/* <div className='top-bar-icon-wrapper'></div> */}
+                    <div onClick={() => router.push('/samples')} className='top-bar-title-text'>
+                        <Image src="/ddf-header.svg" alt="google" width="300" height="50" />
+                    </div>
                 </div>
 
                 <div className='display-inline-flex-center'>
