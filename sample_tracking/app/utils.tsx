@@ -393,7 +393,7 @@ function getFirebaseConfig() {
   }
 }
 
-function isProd(): boolean {
+export function isProd(): boolean {
   if (typeof window !== "undefined") {
     const href = window.location.href;
     return href.includes('timberid.org') && !href.includes('test');

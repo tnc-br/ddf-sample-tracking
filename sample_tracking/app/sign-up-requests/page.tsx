@@ -7,7 +7,7 @@ import './styles.css';
 import { useRouter } from 'next/navigation'
 import 'bootstrap/dist/css/bootstrap.css';
 import { getFirestore, getDocs, collection, updateDoc, doc, setDoc, addDoc, getDoc, arrayUnion, arrayRemove, deleteField, query, where, deleteDoc } from "firebase/firestore";
-import { showNavBar, showTopBar, getRanHex, initializeAppIfNecessary } from '../utils';
+import { showNavBar, showTopBar, getRanHex, initializeAppIfNecessary, isProd } from '../utils';
 import { getUserData } from '../firebase_utils';
 
 type UserData = {
@@ -111,7 +111,7 @@ export default function SignUpRequests() {
         const dateString = `${date.getMonth() + 1} ${date.getDate()} ${date.getFullYear()}`;
         const orgId = getRanHex(20);
         const newOrgRef = doc(db, "organizations", orgId);
-        const orgEmail = `${orgName}@timberid.org`;
+        const orgEmail = isProd() ? `${orgName}@timberid.org` : `${orgName}-test@timberid.org`;
         setDoc(newOrgRef, {
             org_name: orgName,
             org_email: orgEmail,

@@ -153,5 +153,6 @@
   "undeterminedLabel": "Undetermined",
   "possibleDescription": "It's possible your sample comes from the following region",
   "notLikelyDescription": "It's not likely your sample comes from the following region",
-  "trustedDescription": "Trusted Sample"
+  "trustedDescription": "Trusted Sample",
+  "orgNameMustBeOneWord": "Organization name must be one word"
 }
