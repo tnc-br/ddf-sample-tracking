@@ -155,5 +155,6 @@
   "undeterminedLabel": "Indeterminado",
   "possibleDescription": "É possível que sua amostra venha da seguinte região",
   "notLikelyDescription": "É improvável que sua amostra venha da seguinte região",
-  "trustedDescription": "Amostra confiável"
+  "trustedDescription": "Amostra confiável",
+  "orgNameMustBeOneWord": "O nome da organização precisa ser uma palavra"
 }
