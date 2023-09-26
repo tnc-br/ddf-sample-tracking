@@ -63,8 +63,6 @@ export default function TopBar() {
 
     }, [])
 
-    // if (!userData) return;
-
     function onLogOutClick() {
         signOut(auth).then(() => {
             router.replace('/login');
