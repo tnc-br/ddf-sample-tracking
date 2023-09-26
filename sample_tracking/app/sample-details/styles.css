@@ -349,12 +349,17 @@
 /* Override when printing to hide the sidebar and top bar */
 @media print {
   .details {
-    width: 1080px;
+    width: 1024px;
+  }
+
+  .top-bar-wrapper, .print-button {
+    display: none;
   }
 
   .sample-details-wrapper {
     left: 0;
     top: 0;
+    position: relative;
     background-color: white;
   }
 }
