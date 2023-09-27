@@ -318,3 +318,12 @@ svg {
     margin-top: 30px;
     margin-bottom: 30px;
 }
+
+.login-doc-link {
+    text-align: center;
+    color: #000;
+    font-family: Roboto;
+    font-style: normal;
+    line-height: 32px;
+    margin-bottom: 50px;
+}

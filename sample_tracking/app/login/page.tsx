@@ -65,9 +65,14 @@ export default function LogInSignUpPage() {
       {
         signInScreen === LogInScreen.FORGOT_PASSWORD ?
           <ForgotPassword returnToSignInClick={() => handleReturnToSignInClick()} /> :
-          <div className='login-page-wrapper'>
-            <Login onSignUpClick={() => handleSignUpClick()} onForgotPasswordClick={() => handleForgotPasswordClick()}  />
-            <SignUp onLogInClick={() => handleSignInClick()} />
+          <div>
+            <div className='login-page-wrapper'>
+              <Login onSignUpClick={() => handleSignUpClick()} onForgotPasswordClick={() => handleForgotPasswordClick()} />
+              <SignUp onLogInClick={() => handleSignInClick()} />
+            </div>
+            <div className="login-doc-link">
+              <a href="https://timberid.gitbook.io/timberid/">Learn More</a> in our user guide and documentation.
+            </div>
           </div>
       }
     </div>
