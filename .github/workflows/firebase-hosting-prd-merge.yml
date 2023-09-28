@@ -13,7 +13,7 @@ jobs:
       - uses: actions/checkout@v3
       - run: cd sample_tracking && npm install && npm run build
       - uses: FirebaseExtended/action-hosting-deploy@v0
-       with:
+        with:
           entrypoint: ./sample_tracking
           repoToken: '${{ secrets.GITHUB_TOKEN }}'
           firebaseServiceAccount: '${{ secrets.FIREBASE_SERVICE_ACCOUNT_TIMBERID_PRD }}'
