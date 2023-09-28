@@ -12,7 +12,6 @@ import { initializeAppIfNecessary, type Sample } from './utils';
 import { Box, Button, ListItemIcon, MenuItem, Typography, IconButton, Tooltip, } from '@mui/material';
 import { Delete, Edit } from '@mui/icons-material';
 
-import { firebaseConfig } from './firebase_config';
 
 import { useReactTable } from '@tanstack/react-table'
 import { ExportToCsv } from 'export-to-csv';

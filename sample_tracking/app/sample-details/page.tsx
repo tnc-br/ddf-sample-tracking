@@ -3,7 +3,6 @@ import './styles.css';
 import 'bootstrap/dist/css/bootstrap.css';
 import { doc, getDoc, getFirestore, updateDoc, DocumentReference } from "firebase/firestore";
 import { initializeApp } from "firebase/app";
-import { firebaseConfig } from '../firebase_config';
 import { useSearchParams, usePathname } from 'next/navigation'
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { useState, useEffect } from 'react';

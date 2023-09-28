@@ -7,7 +7,6 @@ import { QRCodeSVG } from "qrcode.react";
 import { useRouter } from 'next/navigation'
 import { doc, setDoc, getFirestore, getDoc } from "firebase/firestore";
 import { initializeApp, getApp } from "firebase/app";
-import { firebaseConfig } from '../firebase_config';
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { useState, useEffect } from 'react';
 import { speciesList } from '../species_list';
