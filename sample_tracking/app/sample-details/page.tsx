@@ -114,7 +114,7 @@ export default function SampleDetails() {
                 <div className="tab-content" id="myTabContent">
                     <div>
                         <div className='header-validity'>
-                            <ValidityTag isTrusted={trusted === 'trusted'} city={selectedDoc['city']} lat={selectedDoc['lat']} lon={selectedDoc['lon']}/>
+                            <ValidityTag validityLabel={selectedDoc['validity'] || ''} isTrusted={trusted === 'trusted'} city={selectedDoc['city']} lat={selectedDoc['lat']} lon={selectedDoc['lon']}/>
                         </div>
                         <div>
                             {trusted != 'trusted' ? <ValiditySection selectedDoc={selectedDoc || {}} /> : ''}

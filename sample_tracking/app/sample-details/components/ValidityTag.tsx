@@ -1,17 +1,25 @@
 import React from 'react';
 import {ValidityStatus} from '../../utils';
+import { useTranslation, Trans } from 'react-i18next';
 
 type Props = {
+    validityLabel: string;
     city: string;
     lat: string;
     lon: string;
     isTrusted: boolean;
 };
 
-const ValidityTag: React.FC<Props> = ({ city, lat, lon, isTrusted }) => {
+const ValidityTag: React.FC<Props> = ({ validityLabel, city, lat, lon, isTrusted }) => {
+    const { t } = useTranslation();
+
     var validity = ValidityStatus.Undetermined;
     if (isTrusted) {
         validity = ValidityStatus.Trusted;
+    } else if (validityLabel == "Possible") {
+        validity = ValidityStatus.Possible;
+    } else if (validityLabel == "Not Likely") {
+        validity = ValidityStatus.NotLikely;
     }
     // TODO: Input validity through props once it's being written to Firestore
 
@@ -19,15 +27,15 @@ const ValidityTag: React.FC<Props> = ({ city, lat, lon, isTrusted }) => {
     var validityClass = "";
     switch (validity) {
         case ValidityStatus.Possible:
-            validityText = "It's possible your sample comes from the following region";
+            validityText = t('possibleDescription');
             validityClass = "possible";
             break;
         case ValidityStatus.NotLikely:
-            validityText = "It's not likely your sample comes from the following region";
+            validityText = t('notLikelyDescription');
             validityClass = "not-likely";
             break;
         case ValidityStatus.Trusted:
-            validityText = "Trusted Sample"; // Show an empty string if the sample is trusted
+            validityText = t('trustedDescription'); // Show an empty string if the sample is trusted
             break;
         case ValidityStatus.Undetermined:
             validityText = ""; // Show an empty string if the sample is undetermined
@@ -41,7 +49,7 @@ const ValidityTag: React.FC<Props> = ({ city, lat, lon, isTrusted }) => {
     return (
         <div>
             <div className='validity-title'>
-                <span className={tagClassName}>{validity}</span>
+                <span className={tagClassName}>{t(validity)}</span>
                 <span>
                     {validityText}
                 </span>

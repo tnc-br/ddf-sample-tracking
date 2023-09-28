@@ -109,27 +109,27 @@ jest.mock('export-to-csv', () => {
 const samples = {
     data: [
         {
-            Code: "test1",
+            code: "test1",
             lat: "1",
             lon: "1",
             d18O_wood: 24.94,
             trusted: "trusted"
         },
         {
-            Code: "test1",
+            code: "test1",
             lat: "1",
             lon: "1",
             d18O_wood: 25.94,
             trusted: "trusted"
         },
         {
-            Code: "test2",
+            code: "test2",
             lat: "4",
             lon: "4",
             trusted: "unknown"
         },
         {
-            Code: "test2",
+            code: "test2",
             lat: "4",
             lon: "4",
             trusted: "unknown"
@@ -236,23 +236,23 @@ describe('Import', () => {
         const badSamples = {
             data: [
                 {
-                    Code: "test4",
+                    code: "test4",
                     d18O_wood: 24.94,
                     trusted: "trusted"
                 },
                 {
-                    Code: "test4",
+                    code: "test4",
                     d18O_wood: 25.94,
                     trusted: "trusted"
                 },
                 {
-                    Code: "test5",
+                    code: "test5",
                     lat: 4,
                     lon: 4,
                     trusted: "unknown"
                 },
                 {
-                    Code: "test5",
+                    code: "test5",
                     lat: 4,
                     lon: 4,
                     trusted: "unknown"
