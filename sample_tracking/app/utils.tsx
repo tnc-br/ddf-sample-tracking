@@ -1,5 +1,4 @@
 import { initializeApp, getApp } from "firebase/app";
-import { firebaseConfig } from './firebase_config';
 import { useEffect } from 'react';
 import { getAuth, onAuthStateChanged, type Auth, type User } from "firebase/auth";
 import { useRouter } from 'next/navigation'
