@@ -3,7 +3,6 @@ import './styles.css';
 import 'bootstrap/dist/css/bootstrap.css';
 import { doc, getDoc, getFirestore, updateDoc, DocumentReference } from "firebase/firestore";
 import { initializeApp } from "firebase/app";
-import { firebaseConfig } from '../firebase_config';
 import { useSearchParams, usePathname } from 'next/navigation'
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { useState, useEffect } from 'react';
@@ -114,7 +113,7 @@ export default function SampleDetails() {
                 <div className="tab-content" id="myTabContent">
                     <div>
                         <div className='header-validity'>
-                            <ValidityTag isTrusted={trusted === 'trusted'} city={selectedDoc['city']} lat={selectedDoc['lat']} lon={selectedDoc['lon']}/>
+                            <ValidityTag validityLabel={selectedDoc['validity'] || ''} isTrusted={trusted === 'trusted'} city={selectedDoc['city']} lat={selectedDoc['lat']} lon={selectedDoc['lon']}/>
                         </div>
                         <div>
                             {trusted != 'trusted' ? <ValiditySection selectedDoc={selectedDoc || {}} /> : ''}

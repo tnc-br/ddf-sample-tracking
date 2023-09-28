@@ -14,6 +14,8 @@ import Switch from '@mui/material/Switch';
 import { green } from '@mui/material/colors';
 import { alpha, styled } from '@mui/material/styles';
 import {type UserData, initializeAppIfNecessary } from './utils'
+import { TextField, Autocomplete, MenuItem, InputAdornment } from '@mui/material';
+import Image from 'next/image'
 
 /**
  * Component to render the top bar shown on most pages in TimberId. 
@@ -35,14 +37,14 @@ export default function TopBar() {
     useEffect(() => {
         if (!userData) {
             onAuthStateChanged(auth, (user) => {
-                if (!user) {
-                    router.push('/login');
-                } else {
+                if (user) {
                     setUserData({
                         name: user.displayName!,
                         photoUrl: user.photoURL!,
                         email: user.email!,
                     } as UserData)
+                } else {
+                    setUserData(null);
                 }
             });
         }
@@ -59,9 +61,7 @@ export default function TopBar() {
             }
         });
 
-    })
-
-    if (!userData) return;
+    }, [])
 
     function onLogOutClick() {
         signOut(auth).then(() => {
@@ -92,6 +92,7 @@ export default function TopBar() {
     }));
 
     function profilePopup() {
+        if (!userData) return;
         return (
             <div className='profile-popup-wrapper' id="profile-popup-wrapper">
                 <div className='prifile-wrapper'>
@@ -165,8 +166,9 @@ export default function TopBar() {
         <div id="top-bar-wrapper" className='top-bar-wrapper'>
             <div className='top-bar-product-wrapper'>
                 <div className='display-inline-flex-center'>
-                    <div className='top-bar-icon-wrapper'></div>
-                    <div onClick={() => router.push('/samples')} className='top-bar-title-text'>Timber ID</div>
+                    <div onClick={() => userData? router.push('/samples') : router.push('/login')} className='top-bar-title-text'>
+                        <Image src="/ddf-header.svg" alt="google" width="300" height="50" />
+                    </div>
                 </div>
 
                 <div className='display-inline-flex-center'>
@@ -182,13 +184,13 @@ export default function TopBar() {
                         </a>
 
                     </div>
-                    <div className='top-bar-profile-menu-wrapper'>
+                    {userData && <div className='top-bar-profile-menu-wrapper'>
                         <div className='top-bar-profile-menu'>
                             {userData.photoUrl && <img id="profile-photo" className="profile-photo" src={userData.photoUrl} width="32" height="32" />}
                             {!userData.photoUrl && <div id="profile-photo" className="letter-profile profile-photo size-32">{userData.name ? userData.name.charAt(0) : ''}</div>}
                             {showMenu && profilePopup()}
                         </div>
-                    </div>
+                    </div>}
                 </div>
 
 

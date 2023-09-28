@@ -63,13 +63,6 @@ export default function ImportSamples() {
     };
     const csvExporter = new ExportToCsv(csvOptions);
 
-
-    const originValues = {
-        unknown: 'unknown',
-        known: 'trusted',
-        uncertain: 'untrusted'
-    }
-
     const errorMessages: ErrorMessages = {
         originValueError: t('originValueError'),
         originValueRequired: t('originValueRequired'),
@@ -145,8 +138,16 @@ export default function ImportSamples() {
     }
 
     function handleDownloadClick() {
-        if (errorSampleRef.current) {
-            csvExporter.generateCsv(errorSampleRef.current);
+        let errorSamples = errorSampleRef.current
+        if (errorSamples) {
+            // If there is no error data in the first row, the errors column won't be
+            // picked up by the csvExporter and no errors will be exported. We need to 
+            // artifically add an empty errors string to the first row if there isn't 
+            // an error there already. 
+            if (!errorSamples[0].errors) {
+                errorSamples[0].errors = '';
+            }
+            csvExporter.generateCsv(errorSamples);
         } else {
             alert(t('unableToDownlaodCsv'))
         }
@@ -234,10 +235,10 @@ export default function ImportSamples() {
                 //RFC 3339 format
                 const formattedDateString = date.toISOString();
                 Object.keys(codeList).forEach((key: string) => {
-                    const sampleId = getRanHex(20);
+                    const sampleId = key;
                     const resultValues = codeList[key];
                     const newSample = {
-                        points: codeList[resultValues[0].Code],
+                        points: codeList[resultValues[0].code],
                         lat: parseFloat(resultValues[0].lat),
                         lon: parseFloat(resultValues[0].lon),
                         site: resultValues[0].site || "",
@@ -251,16 +252,17 @@ export default function ImportSamples() {
                         org: currentUserData.org,
                         org_name: currentUserData.org_name ? currentUserData.org_name : '',
                         created_by_name: currentUserData.name,
+                        // code_lab value is equal to the code value for the given sample. 
                         code_lab: sampleId,
                         visibility: "private",
                         // Combine result values into single array of floats.
-                        d18O_wood: codeList[resultValues[0].Code].filter(data => data.d18O_wood).map((data) => parseFloat(data.d18O_wood)),
-                        d15N_wood: codeList[resultValues[0].Code].filter(data => data.d15N_wood).map((data) => parseFloat(data.d15N_wood)),
-                        n_wood: codeList[resultValues[0].Code].filter(data => data.n_wood).map((data) => parseFloat(data.n_wood)),
-                        d13C_wood: codeList[resultValues[0].Code].filter(data => data.d13C_wood).map((data) => parseFloat(data.d13C_wood)),
-                        c_wood: codeList[resultValues[0].Code].filter(data => data.c_wood).map((data) => parseFloat(data.c_wood)),
-                        c_cel: codeList[resultValues[0].Code].filter(data => data.c_cel).map((data) => parseFloat(data.c_cel)),
-                        d13C_cel: codeList[resultValues[0].Code].filter(data => data.d13C_cel).map((data) => parseFloat(data.d13C_cel)),
+                        d18O_wood: codeList[resultValues[0].code].filter(data => data.d18O_wood).map((data) => parseFloat(data.d18O_wood)),
+                        d15N_wood: codeList[resultValues[0].code].filter(data => data.d15N_wood).map((data) => parseFloat(data.d15N_wood)),
+                        n_wood: codeList[resultValues[0].code].filter(data => data.n_wood).map((data) => parseFloat(data.n_wood)),
+                        d13C_wood: codeList[resultValues[0].code].filter(data => data.d13C_wood).map((data) => parseFloat(data.d13C_wood)),
+                        c_wood: codeList[resultValues[0].code].filter(data => data.c_wood).map((data) => parseFloat(data.c_wood)),
+                        c_cel: codeList[resultValues[0].code].filter(data => data.c_cel).map((data) => parseFloat(data.c_cel)),
+                        d13C_cel: codeList[resultValues[0].code].filter(data => data.d13C_cel).map((data) => parseFloat(data.d13C_cel)),
                     }
                     samples.push(newSample);
                 });
@@ -283,6 +285,7 @@ export default function ImportSamples() {
                         status: completed ? 'concluded' : 'in_progress',
                     };
                     batch.set(docRef, payload);
+                    console.log("New id added: " + sample.code_lab)
                 });
 
                 batch.commit().then(async () => {
