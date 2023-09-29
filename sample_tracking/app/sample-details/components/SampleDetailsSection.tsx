@@ -48,8 +48,8 @@ const SampleDetailsSection: React.FC<Props> = ({ selectedDoc, sampleId }) => {
             <div className="detail-row">
                 <div className='detail'></div>
                 <div className='detail'>
-                    <span className="detail-name">{t('city')}</span>
-                    <span className='detail-value'>{selectedDoc['city'] || "unknown"}</span>
+                    <span className="detail-name">{t('municipality')}</span>
+                    <span className='detail-value'>{selectedDoc['municipality'] || "unknown"}</span>
                 </div>
                 <div className='detail'>
                     <span className="detail-name">{t('collectionSite')}</span>

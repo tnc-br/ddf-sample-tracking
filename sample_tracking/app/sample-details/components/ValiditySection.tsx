@@ -64,7 +64,7 @@ const ValiditySection: React.FC<Props> = ({ selectedDoc }) => {
         <div className='details'>
         <div className='section-title'>{t('validity')}</div>
         <div>
-            <ValidityTag validityLabel={validityLabel} isTrusted={false} city={selectedDoc['city']} lat={selectedDoc['lat']} lon={selectedDoc['lon']} />
+            <ValidityTag validityLabel={validityLabel} isTrusted={false} city={selectedDoc['municipality']} lat={selectedDoc['lat']} lon={selectedDoc['lon']} />
             {validityLabel === 'Not Likely' && (
                 <div className='samples-origin-pct'>
                     {t('pctSimilarSamplesStatedOrigin', { "pct": referenceIsotopePrecision })}
