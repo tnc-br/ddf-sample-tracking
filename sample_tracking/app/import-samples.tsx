@@ -245,7 +245,6 @@ export default function ImportSamples() {
                     }
                     const errorListBar = document.getElementById("error-list")!;
                     if (errorListBar) {
-
                         errorsArray.forEach((item) => {
                             const list = document.createElement("li")
                             list.innerText = `row ${item.row}: ${item.error}`
@@ -254,9 +253,6 @@ export default function ImportSamples() {
                     }
 
                     return;
-                } else {
-                    // TO BE Deleted
-                    console.log("test - No error has been found")
                 }
                 let samples = [] as Sample[];
                 const date = new Date();
