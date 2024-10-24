@@ -38,6 +38,7 @@ export default function ImportSamples() {
     const auth = getAuth();
     const db = getFirestore();
     const { t } = useTranslation();
+    var errorsList: String = "";
 
     document.addEventListener("click", (event) => {
         const downloadContainer = document.getElementById("import-error-download");
@@ -113,6 +114,11 @@ export default function ImportSamples() {
                 <div className='import-status-text-wrapper'>
                     <div className='import-status-text'>
                         {t('fileNotUploadedErrors')}
+                    </div>
+                </div>
+                <div className='import-status-text-wrapper'>
+                    <div className='import-status-text'>
+                    ${errorsList}
                     </div>
                 </div>
                 <div className='import-status-actions-wrapper'>
@@ -203,12 +209,14 @@ export default function ImportSamples() {
                 });
                 const codeList = {};
                 let foundErrors = false;
+                let errorsArray: String[] = [];
                 results.data.forEach((result) => {
                     const errors = validateImportedEntry(result as Sample, errorMessages);
                     console.log("Errors found while validating imported entry" + errors)
                     if (errors.length > 0) {
                         result.errors = errors;
                         foundErrors = true;
+                        errorsArray.push(errors)
                     }
                     const code = result.Code ? result.Code : result.code;
                     if (code) {
@@ -222,8 +230,10 @@ export default function ImportSamples() {
                 // If there are errors with any single entry in the CSV, show error bar and return early.
                 if (foundErrors) {
                     await router.push('./samples');
-                    console.log("setting error samples: " + results.data);
+                    console.log("setting error samples: ");
+                    console.log(results.data);
                     setErrorSamples(results.data as Sample[]);
+                    errorsList = errorsArray.toString();
                     const statusBarWrapper = document.getElementById('import-status-bar');
                     const errorBar = document.getElementById("import-status-bars")!.firstChild;
                     if (statusBarWrapper && errorBar) {
