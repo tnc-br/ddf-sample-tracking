@@ -114,7 +114,12 @@ export default function ImportSamples() {
                     <div className='import-status-text'>
                         {t('fileNotUploadedErrors')} 
                     </div>
-                    <div className='import-status-text' id="error-list"> 
+                    <div className='import-status-text'>
+                        <nav>
+                            <ul id="error-list">
+
+                            </ul>
+                        </nav> 
                     </div>
                 </div>
                 <div className='import-status-actions-wrapper'>
@@ -206,6 +211,7 @@ export default function ImportSamples() {
                 const codeList = {};
                 let foundErrors = false;
                 let errorsArray:any = [];
+                let row = 0
                 results.data.forEach((result) => {
                     const errors = validateImportedEntry(result as Sample, errorMessages);
                     const code = result.Code ? result.Code : result.code;
@@ -213,7 +219,7 @@ export default function ImportSamples() {
                     if (errors.length > 0) {
                         result.errors = errors;
                         foundErrors = true;
-                        errorsArray.push({code: code, error: errors})
+                        errorsArray.push({row: row, error: errors})
                     }
                     if (code) {
                         if (codeList[code]) {
@@ -222,6 +228,7 @@ export default function ImportSamples() {
                             codeList[code] = [result];
                         }
                     }
+                    row += 1;
                 });
                 // If there are errors with any single entry in the CSV, show error bar and return early.
                 if (foundErrors) {
@@ -240,11 +247,9 @@ export default function ImportSamples() {
                     if (errorListBar) {
 
                         errorsArray.forEach((item) => {
-                            const box = document.createElement("div")                          
-                            const list = document.createElement("p")
-                            list.innerText = `${item.code}: ${item.error}`
-                            box.appendChild(list)
-                            errorListBar.appendChild(box)
+                            const list = document.createElement("li")
+                            list.innerText = `row ${item.row}: ${item.error}`
+                            errorListBar.appendChild(list)
                         })
                     }
 
