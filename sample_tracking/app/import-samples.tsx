@@ -103,6 +103,8 @@ export default function ImportSamples() {
 
     function onImportErrorBar() {
         console.log(errorsList)
+
+        console.log(errorsList)
         errorsList = "Mamamamamamamamamam"
         return (
             <div id="import-error-bar" className="import-success-status-wrapper error-background-color">
@@ -115,7 +117,7 @@ export default function ImportSamples() {
                 </div>
                 <div className='import-status-text-wrapper'>
                     <div className='import-status-text'>
-                        {t('fileNotUploadedErrors')}
+                        {t('fileNotUploadedErrors')} 
                         ${errorsList}
                     </div>
                 </div>
@@ -231,7 +233,11 @@ export default function ImportSamples() {
                     console.log("setting error samples: ");
                     console.log(results.data);
                     setErrorSamples(results.data as Sample[]);
+                    console.log("errorsArray")
+                    console.log(errorsArray)
                     errorsList = errorsArray.toString();
+                    console.log("errorsList")
+                    console.log(errorsList)
                     const statusBarWrapper = document.getElementById('import-status-bar');
                     const errorBar = document.getElementById("import-status-bars")!.firstChild;
                     if (statusBarWrapper && errorBar) {
