@@ -114,11 +114,7 @@ export default function ImportSamples() {
                 <div className='import-status-text-wrapper'>
                     <div className='import-status-text'>
                         {t('fileNotUploadedErrors')}
-                    </div>
-                </div>
-                <div className='import-status-text-wrapper'>
-                    <div className='import-status-text'>
-                    ${errorsList}
+                        ${errorsList}
                     </div>
                 </div>
                 <div className='import-status-actions-wrapper'>
