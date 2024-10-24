@@ -102,6 +102,8 @@ export default function ImportSamples() {
     }
 
     function onImportErrorBar() {
+        console.log(errorsList)
+        errorsList = "Mamamamamamamamamam"
         return (
             <div id="import-error-bar" className="import-success-status-wrapper error-background-color">
                 <div className='import-status-icon-wrapper'>
