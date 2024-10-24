@@ -38,7 +38,6 @@ export default function ImportSamples() {
     const auth = getAuth();
     const db = getFirestore();
     const { t } = useTranslation();
-    var errorsList: String = "";
 
     document.addEventListener("click", (event) => {
         const downloadContainer = document.getElementById("import-error-download");
@@ -102,10 +101,6 @@ export default function ImportSamples() {
     }
 
     function onImportErrorBar() {
-        console.log(errorsList)
-
-        console.log(errorsList)
-        errorsList = "Mamamamamamamamamam"
         return (
             <div id="import-error-bar" className="import-success-status-wrapper error-background-color">
                 <div className='import-status-icon-wrapper'>
@@ -118,7 +113,8 @@ export default function ImportSamples() {
                 <div className='import-status-text-wrapper'>
                     <div className='import-status-text'>
                         {t('fileNotUploadedErrors')} 
-                        ${errorsList}
+                    </div>
+                    <div className='import-status-text' id="error-list"> 
                     </div>
                 </div>
                 <div className='import-status-actions-wrapper'>
@@ -209,16 +205,16 @@ export default function ImportSamples() {
                 });
                 const codeList = {};
                 let foundErrors = false;
-                let errorsArray: String[] = [];
+                let errorsArray:any = [];
                 results.data.forEach((result) => {
                     const errors = validateImportedEntry(result as Sample, errorMessages);
+                    const code = result.Code ? result.Code : result.code;
                     console.log("Errors found while validating imported entry" + errors)
                     if (errors.length > 0) {
                         result.errors = errors;
                         foundErrors = true;
-                        errorsArray.push(errors)
+                        errorsArray.push({code: code, error: errors})
                     }
-                    const code = result.Code ? result.Code : result.code;
                     if (code) {
                         if (codeList[code]) {
                             codeList[code].push(result);
@@ -235,14 +231,23 @@ export default function ImportSamples() {
                     setErrorSamples(results.data as Sample[]);
                     console.log("errorsArray")
                     console.log(errorsArray)
-                    errorsList = errorsArray.toString();
-                    console.log("errorsList")
-                    console.log(errorsList)
                     const statusBarWrapper = document.getElementById('import-status-bar');
                     const errorBar = document.getElementById("import-status-bars")!.firstChild;
                     if (statusBarWrapper && errorBar) {
                         statusBarWrapper.appendChild(errorBar);
                     }
+                    const errorListBar = document.getElementById("error-list")!;
+                    if (errorListBar) {
+
+                        errorsArray.forEach((item) => {
+                            const box = document.createElement("div")                          
+                            const list = document.createElement("p")
+                            list.innerText = `${item.code}: ${item.error}`
+                            box.appendChild(list)
+                            errorListBar.appendChild(box)
+                        })
+                    }
+
                     return;
                 } else {
                     // TO BE Deleted
