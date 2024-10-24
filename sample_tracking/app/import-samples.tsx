@@ -205,6 +205,7 @@ export default function ImportSamples() {
                 let foundErrors = false;
                 results.data.forEach((result) => {
                     const errors = validateImportedEntry(result as Sample, errorMessages);
+                    console.log("Errors found while validating imported entry" + errors)
                     if (errors.length > 0) {
                         result.errors = errors;
                         foundErrors = true;
@@ -229,6 +230,9 @@ export default function ImportSamples() {
                         statusBarWrapper.appendChild(errorBar);
                     }
                     return;
+                } else {
+                    // TO BE Deleted
+                    console.log("test - No error has been found")
                 }
                 let samples = [] as Sample[];
                 const date = new Date();
