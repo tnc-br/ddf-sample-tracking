@@ -214,13 +214,13 @@ export default function ImportSamples() {
                 let row = 0
                 results.data.forEach((result) => {
                     const errors = validateImportedEntry(result as Sample, errorMessages);
-                    const code = result.Code ? result.Code : result.code;
                     console.log("Errors found while validating imported entry" + errors)
                     if (errors.length > 0) {
                         result.errors = errors;
                         foundErrors = true;
                         errorsArray.push({row: row, error: errors})
                     }
+                    const code = result.Code ? result.Code : result.code;
                     if (code) {
                         if (codeList[code]) {
                             codeList[code].push(result);
