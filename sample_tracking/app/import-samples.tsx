@@ -280,6 +280,7 @@ export default function ImportSamples() {
                         code_lab: sampleId,
                         visibility: "private",
                         // Combine result values into single array of floats.
+                        d18O_cel: codeList[resultValues[0].code].filter(data => data.d18O_cel).map((data) => parseFloat(data.d18O_cel)),
                         d18O_wood: codeList[resultValues[0].code].filter(data => data.d18O_wood).map((data) => parseFloat(data.d18O_wood)),
                         d15N_wood: codeList[resultValues[0].code].filter(data => data.d15N_wood).map((data) => parseFloat(data.d15N_wood)),
                         n_wood: codeList[resultValues[0].code].filter(data => data.n_wood).map((data) => parseFloat(data.n_wood)),
@@ -296,6 +297,7 @@ export default function ImportSamples() {
                     if (!sample.trusted) return;
                     const docRef = doc(db, sample.trusted! + "_samples", sample.code_lab);
                     const completed =
+                        sample.d18O_cel.length > 0 ||
                         sample.d18O_wood.length > 0 ||
                         sample.d15N_wood.length > 0 ||
                         sample.n_wood.length > 0 ||
