@@ -266,7 +266,7 @@ export default function SampleDataInput(props: SampleDataInputProps) {
                             name="sample_name"
                             label={t('sampleName')}
                             onChange={handleChange}
-                            value={formData.sample_name ? formData.sample_name : ''}
+                            value={formData.code_lab ? formData.code_lab : ''}
                         />
                     </div>
 
@@ -772,7 +772,7 @@ export default function SampleDataInput(props: SampleDataInputProps) {
                     <div className="detail-row">
                         <div className='detail'>
                             <span className="detail-name">{t('sampleName')}</span>
-                            <span className='detail-value'>{formData['sample_name'] || "unknown"}</span>
+                            <span className='detail-value'>{formData['code_lab'] || "unknown"}</span>
                         </div>
                         <div className='detail'>
                             <span className="detail-name">{t('latitude')}</span>

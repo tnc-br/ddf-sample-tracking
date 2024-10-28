@@ -108,7 +108,7 @@ export default function SampleDetails() {
             <button onClick={handlePrint} className='print-button'>
                 <span className="material-symbols-outlined">print</span>
             </button>
-            <p className='title'>{selectedDoc['sample_name'] || "Sample details"}</p>
+            <p className='title'>{selectedDoc['code_lab'] || "Sample details"}</p>
             <div>
                 <div className="tab-content" id="myTabContent">
                     <div>

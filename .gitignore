@@ -1,0 +1,38 @@
+# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+
+# dependencies
+sample_tracking/node_modules
+sample_tracking/.pnp
+sample_tracking/.pnp.js
+
+# testing
+sample_tracking/coverage
+
+# next.js
+sample_tracking/.next/
+sample_tracking/out/
+
+# production
+sample_tracking/build
+
+# misc
+sample_tracking/.DS_Store
+sample_tracking/*.pem
+
+# debug
+sample_tracking/npm-debug.log*
+sample_tracking/yarn-debug.log*
+sample_tracking/yarn-error.log*
+
+# local env files
+sample_tracking/.env*.local
+
+# vercel
+sample_tracking/.vercel
+
+# typescript
+sample_tracking/*.tsbuildinfo
+sample_tracking/next-env.d.ts
+
+# vscode config
+.vscode

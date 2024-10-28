@@ -112,7 +112,14 @@ export default function ImportSamples() {
                 </div>
                 <div className='import-status-text-wrapper'>
                     <div className='import-status-text'>
-                        {t('fileNotUploadedErrors')}
+                        {t('fileNotUploadedErrors')} 
+                    </div>
+                    <div className='import-status-text'>
+                        <nav>
+                            <ul id="error-list">
+
+                            </ul>
+                        </nav> 
                     </div>
                 </div>
                 <div className='import-status-actions-wrapper'>
@@ -203,11 +210,15 @@ export default function ImportSamples() {
                 });
                 const codeList = {};
                 let foundErrors = false;
+                let errorsArray:any = [];
+                let row = 0
                 results.data.forEach((result) => {
                     const errors = validateImportedEntry(result as Sample, errorMessages);
+                    console.log("Errors found while validating imported entry" + errors)
                     if (errors.length > 0) {
                         result.errors = errors;
                         foundErrors = true;
+                        errorsArray.push({row: row, error: errors})
                     }
                     const code = result.Code ? result.Code : result.code;
                     if (code) {
@@ -217,17 +228,30 @@ export default function ImportSamples() {
                             codeList[code] = [result];
                         }
                     }
+                    row += 1;
                 });
                 // If there are errors with any single entry in the CSV, show error bar and return early.
                 if (foundErrors) {
                     await router.push('./samples');
-                    console.log("setting error samples: " + results.data);
+                    console.log("setting error samples: ");
+                    console.log(results.data);
                     setErrorSamples(results.data as Sample[]);
+                    console.log("errorsArray")
+                    console.log(errorsArray)
                     const statusBarWrapper = document.getElementById('import-status-bar');
                     const errorBar = document.getElementById("import-status-bars")!.firstChild;
                     if (statusBarWrapper && errorBar) {
                         statusBarWrapper.appendChild(errorBar);
                     }
+                    const errorListBar = document.getElementById("error-list")!;
+                    if (errorListBar) {
+                        errorsArray.forEach((item) => {
+                            const list = document.createElement("li")
+                            list.innerText = `row ${item.row}: ${item.error}`
+                            errorListBar.appendChild(list)
+                        })
+                    }
+
                     return;
                 }
                 let samples = [] as Sample[];
@@ -256,6 +280,7 @@ export default function ImportSamples() {
                         code_lab: sampleId,
                         visibility: "private",
                         // Combine result values into single array of floats.
+                        d18O_cel: codeList[resultValues[0].code].filter(data => data.d18O_cel).map((data) => parseFloat(data.d18O_cel)),
                         d18O_wood: codeList[resultValues[0].code].filter(data => data.d18O_wood).map((data) => parseFloat(data.d18O_wood)),
                         d15N_wood: codeList[resultValues[0].code].filter(data => data.d15N_wood).map((data) => parseFloat(data.d15N_wood)),
                         n_wood: codeList[resultValues[0].code].filter(data => data.n_wood).map((data) => parseFloat(data.n_wood)),
@@ -272,6 +297,7 @@ export default function ImportSamples() {
                     if (!sample.trusted) return;
                     const docRef = doc(db, sample.trusted! + "_samples", sample.code_lab);
                     const completed =
+                        sample.d18O_cel.length > 0 ||
                         sample.d18O_wood.length > 0 ||
                         sample.d15N_wood.length > 0 ||
                         sample.n_wood.length > 0 ||

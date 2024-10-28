@@ -257,7 +257,7 @@ export function validateImportedEntry(data: Sample, errorMessages: ErrorMessages
   let errorString = '';
   const errors = validateSample(data, [1, 2], errorMessages);
   errors.forEach((error: SampleError) => {
-    errorString += error.errorString;
+    errorString += error.errorString + ' ; ';
   })
   return errorString
 }
