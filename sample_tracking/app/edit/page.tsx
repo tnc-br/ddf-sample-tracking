@@ -117,6 +117,7 @@ export default function Edit() {
         const sampleData = {
             ...updatedFormData,
             visibility: 'private',
+            d18O_cel: updatedFormData.d18O_cel ? updatedFormData.d18O_cel.map((value: string) => parseFloat(value)) : [],
             d18O_wood: updatedFormData.d18O_wood ? updatedFormData.d18O_wood.map((value: string) => parseFloat(value)) : [],
             d15N_wood: updatedFormData.d15N_wood ? updatedFormData.d15N_wood.map((value: string) => parseFloat(value)) : [],
             n_wood: updatedFormData.n_wood ? updatedFormData.n_wood.map((value: string) => parseFloat(value)) : [],
