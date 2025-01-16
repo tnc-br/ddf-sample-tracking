@@ -1,3 +1,7 @@
 .link {
     color: #006E2C;
 }
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
