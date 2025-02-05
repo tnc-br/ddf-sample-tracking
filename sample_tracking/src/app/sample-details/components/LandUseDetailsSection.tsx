@@ -2,6 +2,7 @@ import React from "react";
 import { type Sample } from "../../../old_components/utils";
 import { useTranslation } from "react-i18next";
 import { Trans } from "react-i18next";
+import axios from "axios";
 
 type Props = {
   selectedDoc: Sample;
@@ -14,7 +15,9 @@ type Props = {
  */
 const LandUseDetailsSection: React.FC<Props> = ({ selectedDoc, sampleId }) => {
   const { t } = useTranslation();
-  const mapUrl = `https://storage.googleapis.com/timberid-public-to-internet/timberid-maps/${sampleId}`;
+  const mapUrl = `https://storage.googleapis.com/timberid-public-to-internet/timberid-maps/${sampleId
+    .split(" ")
+    .join("")}`;
 
   function formatAsPercentage(num: number) {
     return new Intl.NumberFormat("default", {
@@ -28,14 +31,22 @@ const LandUseDetailsSection: React.FC<Props> = ({ selectedDoc, sampleId }) => {
     <div className="details">
       <div className="section-title">{t("waterAndLandUseDetails")}</div>
       <div className="iframe-wrapper">
-        <iframe
-          src={mapUrl}
-          frameborder="0"
-          height="300px"
-          width="100%"
-          marginwidth="0"
-          marginheight="0"
-        ></iframe>
+        {selectedDoc.lat && selectedDoc.lon && (
+          <iframe
+            src={mapUrl}
+            frameborder="0"
+            height="300px"
+            width="100%"
+            marginwidth="0"
+            marginheight="0"
+          ></iframe>
+        )}
+
+        {!selectedDoc.lat && !selectedDoc.lon && (
+          <div className="flex items-center justify-center h-full">
+            Sem Coordenadas
+          </div>
+        )}
       </div>
       <div className="water-land-use-details">
         <div className="table-title-land-use">{t("water")}</div>

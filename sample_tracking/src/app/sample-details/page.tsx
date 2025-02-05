@@ -52,17 +52,12 @@ export default function SampleDetails() {
   const [selectedDoc, setDoc] = useState({} as Sample);
   const [hasStartedRequest, setHasStartedRequest] = useState(false);
 
-  function updateStateDoc(data: Sample) {
-    setDoc(data);
-  }
-
   let sampleId = "12345";
   let trusted = "trusted";
 
   const searchParams = useSearchParams();
   if (typeof window !== "undefined") {
     const queryString = window.location.search;
-    console.log("Querystring: " + queryString);
     const urlParams = new URLSearchParams(queryString);
     sampleId = urlParams.get("id")
       ? urlParams.get("id")
@@ -99,12 +94,10 @@ export default function SampleDetails() {
     getDoc(docRef)
       .then((docRef) => {
         if (docRef.exists()) {
-          console.log("updated data");
-          updateStateDoc(docRef.data() as Sample);
+          setDoc(docRef.data() as Sample);
         } else {
           console.log("couldnt find data");
         }
-        console.log(docRef);
       })
       .catch((error) => {
         console.log(error);
@@ -137,10 +130,8 @@ export default function SampleDetails() {
                 />
               </div>
               <div>
-                {trusted != "trusted" ? (
+                {trusted != "trusted" && (
                   <ValiditySection selectedDoc={selectedDoc || {}} />
-                ) : (
-                  ""
                 )}
                 <SampleOverviewSection selectedDoc={selectedDoc || {}} />
                 <SampleDetailsSection
@@ -148,18 +139,14 @@ export default function SampleDetails() {
                   sampleId={sampleId}
                 />
                 <MeasurementsSection selectedDoc={selectedDoc || {}} />
-                {trusted != "trusted" ? (
+                {trusted != "trusted" && (
                   <LandUseDetailsSection
                     selectedDoc={selectedDoc || {}}
                     sampleId={sampleId}
                   />
-                ) : (
-                  ""
                 )}
-                {trusted != "trusted" ? (
+                {trusted != "trusted" && (
                   <DeforestationAlertsSection selectedDoc={selectedDoc || {}} />
-                ) : (
-                  ""
                 )}
 
                 {/* Integration Point #3. Display your new section component in the desired order with respect to other snippets. */}

@@ -20,6 +20,7 @@ import { ExportToCsv } from "export-to-csv";
 import { useTranslation } from "react-i18next";
 import "../i18n/config";
 import { ConfirmationBox, ConfirmationProps } from "./confirmation_box";
+import Link from "next/link";
 
 interface SampleDataProps {
   samplesData: Sample[];
@@ -75,13 +76,13 @@ export default function SamplesTable(props: SampleDataProps) {
         size: 150,
         Cell: ({ cell, row, renderedCellValue }) => {
           return (
-            <div
+            <Link
+              href={`/sample-details?id=${row.original.code_lab}&trusted=${row.original.trusted}`}
               id={row.original.trusted}
-              onClick={() => onSampleClick(row)}
               className="actions-button sample-link link"
             >
               <span id={row.original.code_lab}>{renderedCellValue}</span>
-            </div>
+            </Link>
           );
         },
       },
@@ -230,11 +231,6 @@ export default function SamplesTable(props: SampleDataProps) {
     },
     [sampleData]
   );
-
-  function onSampleClick(evt: any) {
-    const url = `./sample-details?trusted=${evt.original.trusted}&id=${evt.original.code_lab}`;
-    router.push(url);
-  }
 
   function onEditSampleClick(evt: any) {
     const url = `./edit?trusted=${evt.trusted}&id=${evt.code_lab}`;

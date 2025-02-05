@@ -26,14 +26,11 @@ import {
 import {
   MaterialReactTable,
   type MRT_ColumnDef,
-  type MRT_Row,
   type MRT_TableInstance,
-  type MRT_SortingState,
-  type MRT_PaginationState,
 } from "material-react-table";
 import { useTranslation } from "react-i18next";
-import "../i18n/config";
-import { Box, Button, ListItemIcon, MenuItem, Typography } from "@mui/material";
+import "../../i18n/config";
+import { MenuItem } from "@mui/material";
 import {
   ConfirmationBox,
   ConfirmationProps,

@@ -54,7 +54,6 @@ export default function AddSample() {
   const searchParams = useSearchParams();
   if (typeof window !== "undefined" && !formData.trusted) {
     const queryString = window.location.search;
-    console.log("Querystring: " + queryString);
     const urlParams = new URLSearchParams(queryString);
     status = urlParams.get("status")
       ? urlParams.get("status")

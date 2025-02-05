@@ -60,7 +60,8 @@ const ValidityTag: React.FC<Props> = ({
       </div>
       <div className="validity-location-subtitle">
         <span className="material-symbols-outlined">location_on</span>
-        <span>{`${city} (${lat}, ${lon})`}</span>
+        <span>{`${city ?? "Sem coordenadas"}`}</span>
+        {lat && lon && <span>{` (${lat}, ${lon})`}</span>}
       </div>
     </div>
   );
