@@ -26,6 +26,7 @@ jobs:
         run: |
           cd sample_tracking
           npm install
+          firebase use prod
           npm run build
 
       - uses: FirebaseExtended/action-hosting-deploy@v0
