@@ -1,14 +1,16 @@
-import React from "react";
-import { MdHelpOutline } from "react-icons/md";
+import React from 'react'
+import { MdHelpOutline } from 'react-icons/md'
 
-import HoverIcon from "../HoverIcon";
+import HoverIcon from '../HoverIcon'
+import { twMerge } from 'tailwind-merge'
 
 type Props = {
-  text?: string;
-  children?: React.ReactNode;
-};
+  text?: string
+  children?: React.ReactNode
+  className?: string
+}
 
-const InfoDummy = ({ text, children }: Props) => {
+const InfoDummy = ({ text, children, className }: Props) => {
   return (
     <HoverIcon
       icon={() => (
@@ -16,11 +18,13 @@ const InfoDummy = ({ text, children }: Props) => {
       )}
     >
       {text && (
-        <p className="flex flex-col gap-4 text-neutral-50 text-xs">{text}</p>
+        <p className={twMerge(className, 'flex flex-col gap-4 text-xs')}>
+          {text}
+        </p>
       )}
       {children && children}
     </HoverIcon>
-  );
-};
+  )
+}
 
-export default InfoDummy;
+export default InfoDummy

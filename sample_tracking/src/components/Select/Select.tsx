@@ -1,52 +1,52 @@
-import React, { useEffect, useLayoutEffect } from "react";
-import { twMerge } from "tailwind-merge";
-import { MdArrowDropDown } from "react-icons/md";
+import React, { useEffect, useLayoutEffect } from 'react'
+import { twMerge } from 'tailwind-merge'
+import { MdArrowDropDown } from 'react-icons/md'
 
-import List from "../List";
-import Loader from "../Loader";
-import Dropdown from "../Dropdown";
-import TextInput from "../TextInput";
+import List from '../List'
+import Loader from '../Loader'
+import Dropdown from '../Dropdown'
+import TextInput from '../TextInput'
 
 export type Option = {
-  label: string;
-  value: any;
-  disabled?: boolean;
-  icon?: React.ReactNode;
-};
+  label: string
+  value: any
+  disabled?: boolean
+  icon?: React.ReactNode
+}
 
 interface SelectProps extends React.HTMLAttributes<HTMLDivElement> {
-  fill?: boolean;
-  shape?: "square" | "round" | "line" | "none";
-  customTrigger?: React.ReactNode;
-  isValid?: boolean;
-  isErrored?: boolean;
-  options?: Option[];
-  value?: Option["value"];
-  onChange?: (opt: Option["value"]) => void;
-  onValueChange?: (opt: Option["value"]) => void;
-  onOptionChange?: (opt: Option) => void;
-  placeholder?: string;
-  disabled?: boolean;
-  loading?: boolean;
-  className?: string;
-  contentClassName?: string;
-  isSearchable?: boolean;
-  customSearchFn?: (opt: Option, query: string) => boolean;
-  modal?: boolean;
-  dir?: "ltr" | "rtl";
+  fill?: boolean
+  shape?: 'square' | 'round' | 'line' | 'none'
+  customTrigger?: React.ReactNode
+  isValid?: boolean
+  isErrored?: boolean
+  options?: Option[]
+  value?: Option['value']
+  onChange?: (opt: Option['value']) => void
+  onValueChange?: (opt: Option['value']) => void
+  onOptionChange?: (opt: Option) => void
+  placeholder?: string
+  disabled?: boolean
+  loading?: boolean
+  className?: string
+  contentClassName?: string
+  isSearchable?: boolean
+  customSearchFn?: (opt: Option, query: string) => boolean
+  modal?: boolean
+  dir?: 'ltr' | 'rtl'
 }
 
 const Select = (props: SelectProps) => {
-  const [isOpen, setIsOpen] = React.useState(false);
-  const [searchQuery, setSearchQuery] = React.useState("");
-  const [triggerWidth, setTriggerWidth] = React.useState(0);
+  const [isOpen, setIsOpen] = React.useState(false)
+  const [searchQuery, setSearchQuery] = React.useState('')
+  const [triggerWidth, setTriggerWidth] = React.useState(0)
 
-  const triggerRef = React.createRef<HTMLDivElement>();
-  const textInputRef = React.createRef<HTMLInputElement>();
+  const triggerRef = React.createRef<HTMLDivElement>()
+  const textInputRef = React.createRef<HTMLInputElement>()
 
   const {
     fill = false,
-    shape = "square",
+    shape = 'square',
     customTrigger: CustomTrigger,
     isValid = false,
     isErrored = false,
@@ -55,7 +55,7 @@ const Select = (props: SelectProps) => {
     onChange,
     onValueChange,
     onOptionChange,
-    placeholder = "Selecione...",
+    placeholder = 'Selecione...',
     disabled = false,
     loading = false,
     className,
@@ -65,74 +65,74 @@ const Select = (props: SelectProps) => {
     modal = false,
     dir,
     ...rest
-  } = props;
+  } = props
 
   useLayoutEffect(() => {
-    const triggerDimensions = triggerRef.current?.getBoundingClientRect();
-    setTriggerWidth(triggerDimensions?.width || 0);
-  }, [triggerRef]);
+    const triggerDimensions = triggerRef.current?.getBoundingClientRect()
+    setTriggerWidth(triggerDimensions?.width || 0)
+  }, [triggerRef])
 
   useEffect(() => {
-    setSearchQuery("");
-    if (!isOpen || !isSearchable) return;
+    setSearchQuery('')
+    if (!isOpen || !isSearchable) return
 
     const handleKeyDown = () => {
-      textInputRef.current?.focus();
-    };
+      textInputRef.current?.focus()
+    }
 
-    window.addEventListener("keydown", handleKeyDown);
+    window.addEventListener('keydown', handleKeyDown)
 
     return () => {
-      window.removeEventListener("keydown", handleKeyDown);
-    };
-  }, [isOpen, isSearchable]);
+      window.removeEventListener('keydown', handleKeyDown)
+    }
+  }, [isOpen, isSearchable])
 
   const handleSelectOption = (opt: Option) => {
-    onChange?.(opt.value);
-    onValueChange?.(opt.value);
-    onOptionChange?.(opt);
-    setIsOpen(false);
-  };
+    onChange?.(opt.value)
+    onValueChange?.(opt.value)
+    onOptionChange?.(opt)
+    setIsOpen(false)
+  }
 
   const defaultSearchFn = (opt: Option, query: string) => {
-    if (!query.trim()) return true;
+    if (!query.trim()) return true
 
     const parsedQuery = query
-      .normalize("NFD")
-      .replace(/[\u0300-\u036f]/g, "")
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
       .toLowerCase()
-      .trim();
+      .trim()
 
     const parsedLabel = opt.label
-      .normalize("NFD")
-      .replace(/[\u0300-\u036f]/g, "")
-      .toLowerCase();
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .toLowerCase()
 
-    return parsedLabel.includes(parsedQuery);
-  };
+    return parsedLabel.includes(parsedQuery)
+  }
 
-  const searchFn = customSearchFn ?? defaultSearchFn;
+  const searchFn = customSearchFn ?? defaultSearchFn
 
   const filteredOptions = options.filter((opt) => {
-    if (!isSearchable) return true;
-    return searchFn(opt, searchQuery);
-  });
+    if (!isSearchable) return true
+    return searchFn(opt, searchQuery)
+  })
 
-  const valueLabel = options?.find((opt) => opt.value === value)?.label;
-  const iconLabel = options?.find((opt) => opt.value === value)?.icon ?? null;
+  const valueLabel = options?.find((opt) => opt.value === value)?.label
+  const iconLabel = options?.find((opt) => opt.value === value)?.icon ?? null
 
-  const emptyOptions = filteredOptions.length === 0;
-  const showPlaceholder = !Boolean(valueLabel);
-  const renderedValue = showPlaceholder ? placeholder : valueLabel;
-  const renderedIcon = showPlaceholder ? null : iconLabel;
+  const emptyOptions = filteredOptions.length === 0
+  const showPlaceholder = !Boolean(valueLabel)
+  const renderedValue = showPlaceholder ? placeholder : valueLabel
+  const renderedIcon = showPlaceholder ? null : iconLabel
 
   const status = disabled
-    ? "disabled"
+    ? 'disabled'
     : isErrored
-    ? "error"
-    : isValid
-    ? "valid"
-    : "default";
+      ? 'error'
+      : isValid
+        ? 'valid'
+        : 'default'
 
   return (
     <Dropdown.Root
@@ -146,7 +146,7 @@ const Select = (props: SelectProps) => {
           <div
             {...rest}
             ref={triggerRef}
-            className={twMerge("w-fit", className)}
+            className={twMerge('w-fit', className)}
           >
             {CustomTrigger}
           </div>
@@ -154,39 +154,18 @@ const Select = (props: SelectProps) => {
           <div
             {...rest}
             ref={triggerRef}
-            className={twMerge(
-              SelectStyles({
-                shape,
-                fill,
-                status,
-              }),
-              className
-            )}
+            className={twMerge('flex justify-between', className)}
           >
             <div className="flex flex-row gap-1 items-center truncate">
               <div>{renderedIcon}</div>
-              <span
-                className={twMerge(
-                  SelectTextStyles({
-                    status,
-                  }),
-                  showPlaceholder && "text-neutral-300"
-                )}
-              >
+              <span className={twMerge(showPlaceholder && 'text-neutral-300')}>
                 {renderedValue}
               </span>
             </div>
 
             <div className="flex items-center">
-              {loading && <Loader size="XS" color="NEUTRAL_MID" />}
-              <MdArrowDropDown
-                className={twMerge(
-                  SelectIconStyles({
-                    status,
-                    isOpen,
-                  })
-                )}
-              />
+              {loading && <Loader size="LG" color="NEUTRAL_HIGH" />}
+              <MdArrowDropDown className={twMerge('')} />
             </div>
           </div>
         )}
@@ -199,9 +178,9 @@ const Select = (props: SelectProps) => {
       >
         <List.Container
           className={twMerge(
-            "w-full",
-            CustomTrigger && "min-w-48",
-            contentClassName
+            'w-full',
+            CustomTrigger && 'min-w-48',
+            contentClassName,
           )}
         >
           {isSearchable && (
@@ -216,7 +195,7 @@ const Select = (props: SelectProps) => {
               leftIcon={<TextInput.SearchIcon />}
             />
           )}
-          <div className="max-h-60 overflow-y-auto">
+          <div className="max-h-60 overflow-y-auto bg-white">
             {filteredOptions.map((opt, i) => (
               <Dropdown.Item
                 asChild
@@ -242,7 +221,7 @@ const Select = (props: SelectProps) => {
         </List.Container>
       </Dropdown.Content>
     </Dropdown.Root>
-  );
-};
+  )
+}
 
-export default Select;
+export default Select
