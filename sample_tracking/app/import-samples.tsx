@@ -270,6 +270,8 @@ export default function ImportSamples() {
                         municipality: resultValues[0].municipality || "",
                         trusted: resultValues[0].trusted,
                         species: resultValues[0].species || "",
+                        genus: resultValues[0].genus || "",
+                        family: resultValues[0].family || "",
                         created_by: user.uid,
                         created_on: formattedDateString,
                         last_updated_by: currentUserData.name,
