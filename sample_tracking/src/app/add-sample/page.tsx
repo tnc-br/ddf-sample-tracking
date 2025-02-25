@@ -1,23 +1,23 @@
-"use client";
+'use client'
 
-import "./styles.css";
-import "bootstrap/dist/css/bootstrap.css";
-import { useRouter } from "next/navigation";
-import { doc, setDoc, getFirestore, getDoc } from "firebase/firestore";
-import { getAuth, onAuthStateChanged } from "firebase/auth";
-import { useState, useEffect } from "react";
-import SampleDataInput from "../../old_components/sample_data_input";
+import './styles.css'
+import 'bootstrap/dist/css/bootstrap.css'
+import { useRouter } from 'next/navigation'
+import { doc, getFirestore, getDoc } from 'firebase/firestore'
+import { getAuth, onAuthStateChanged } from 'firebase/auth'
+import { useState, useEffect } from 'react'
+import AddNewSample from '../../old_components/Sample/AddNewSample'
 import {
   initializeAppIfNecessary,
   getRanHex,
   getPointsArrayFromSampleResults,
   type UserData,
   Sample,
-} from "../../old_components/utils";
-import { useSearchParams } from "next/navigation";
-import { useTranslation } from "react-i18next";
-import Link from "next/link";
-import { setSample } from "../../old_components/firebase_utils";
+} from '../../old_components/utils'
+import { useSearchParams } from 'next/navigation'
+import { useTranslation } from 'react-i18next'
+import Link from 'next/link'
+import { setSample } from '../../old_components/firebase_utils'
 
 /**
  * Component to handle adding a complete or incomplet sample. It uses the SampleDataInput
@@ -33,65 +33,65 @@ import { setSample } from "../../old_components/firebase_utils";
  *
  */
 export default function AddSample() {
-  const [userData, setUserdata] = useState({} as UserData);
-  const [currentTab, setCurrentTab] = useState(1);
-  const [sampleId, setSampleID] = useState("");
-  const [sampleCreationFinished, setSampleCreationFinished] = useState(false);
+  const [userData, setUserdata] = useState({} as UserData)
+  const [currentTab, setCurrentTab] = useState(1)
+  const [sampleId, setSampleID] = useState('')
+  const [sampleCreationFinished, setSampleCreationFinished] = useState(false)
 
   const [formData, setFormData] = useState({
-    visibility: "private",
-    collected_by: "supplier",
-    status: "concluded",
-  });
+    visibility: 'private',
+    collected_by: 'supplier',
+    status: 'concluded',
+  })
 
-  const router = useRouter();
-  initializeAppIfNecessary();
-  const auth = getAuth();
-  const db = getFirestore();
-  const { t } = useTranslation();
+  const router = useRouter()
+  initializeAppIfNecessary()
+  const auth = getAuth()
+  const db = getFirestore()
+  const { t } = useTranslation()
 
-  let status = "completed";
-  const searchParams = useSearchParams();
-  if (typeof window !== "undefined" && !formData.trusted) {
-    const queryString = window.location.search;
-    const urlParams = new URLSearchParams(queryString);
-    status = urlParams.get("status")
-      ? urlParams.get("status")
-      : searchParams.get("status");
+  let status = 'completed'
+  const searchParams = useSearchParams()
+  if (typeof window !== 'undefined' && !formData.trusted) {
+    const queryString = window.location.search
+    const urlParams = new URLSearchParams(queryString)
+    status = urlParams.get('status')
+      ? urlParams.get('status')
+      : searchParams.get('status')
     setFormData({
       ...formData,
-      trusted: status === "originVerification" ? "untrusted" : "trusted",
-    });
+      trusted: status === 'originVerification' ? 'untrusted' : 'trusted',
+    })
   }
 
   if (sampleId.length < 1) {
-    setSampleID(getRanHex(20));
+    setSampleID(getRanHex(20))
   }
 
   useEffect(() => {
     if (!userData.role || userData.role.length < 1) {
       onAuthStateChanged(auth, (user) => {
         if (!user) {
-          router.push("/login");
+          router.push('/login')
         } else {
-          const userDocRef = doc(db, "users", user.uid);
+          const userDocRef = doc(db, 'users', user.uid)
           getDoc(userDocRef).then((docRef) => {
             if (docRef.exists()) {
-              const docData = docRef.data();
+              const docData = docRef.data()
               if (!docData.org) {
-                router.push("/samples");
+                router.push('/samples')
               } else {
-                setUserdata(docData as UserData);
+                setUserdata(docData as UserData)
               }
             }
-          });
+          })
         }
         if (!user) {
-          router.push("/login");
+          router.push('/login')
         }
-      });
+      })
     }
-  }, []);
+  }, [])
 
   /**
    * Adds a new sample to the correct collection depending on if the sample is trusted, untrusted or unknown.
@@ -101,17 +101,17 @@ export default function AddSample() {
    * @param formSampleData The data of the sample being added
    */
   function onCreateSampleClick(sampleId: string, formSampleData: Sample) {
-    console.log("form sample data: " + formSampleData);
-    if (!formSampleData) return;
+    console.log('form sample data: ' + formSampleData)
+    if (!formSampleData) return
     if (!sampleId) {
-      console.log("Error: SampleId not provided when trying to create sample");
+      console.log('Error: SampleId not provided when trying to create sample')
     }
-    const user = auth.currentUser;
-    if (!user) return;
-    const date = new Date();
+    const user = auth.currentUser
+    if (!user) return
+    const date = new Date()
     const currentDateString = `${
       date.getMonth() + 1
-    }-${date.getDate()}-${date.getFullYear()}`;
+    }-${date.getDate()}-${date.getFullYear()}`
 
     const sampleData = {
       ...formSampleData,
@@ -119,10 +119,10 @@ export default function AddSample() {
       created_on: currentDateString,
       last_updated_by: userData.name,
       org: userData.org,
-      org_name: userData.org_name ? userData.org_name : "",
+      org_name: userData.org_name ? userData.org_name : '',
       created_by_name: userData.name,
       code_lab: sampleId,
-      visibility: "private",
+      visibility: 'private',
       d18O_wood: formSampleData.d18O_wood
         ? formSampleData.d18O_wood.map((value: string) => parseFloat(value))
         : [],
@@ -147,41 +147,39 @@ export default function AddSample() {
       d18O_cel: formSampleData.d18O_cel
         ? formSampleData.d18O_cel.map((value: string) => parseFloat(value))
         : [],
-      lat: formSampleData.lat ? parseFloat(formSampleData.lat) : "",
-      lon: formSampleData.lon ? parseFloat(formSampleData.lon) : "",
+      lat: formSampleData.lat ? parseFloat(formSampleData.lat) : '',
+      lon: formSampleData.lon ? parseFloat(formSampleData.lon) : '',
       points: getPointsArrayFromSampleResults(formSampleData),
-    };
-    setSample(sampleData.trusted, sampleId, sampleData);
-    setSampleCreationFinished(true);
-    setFormData(sampleData);
+    }
+    setSample(sampleData.trusted, sampleId, sampleData)
+    setSampleCreationFinished(true)
+    setFormData(sampleData)
   }
 
   function handleTabChange(newTab: number) {
-    setCurrentTab(newTab);
+    setCurrentTab(newTab)
   }
 
   function handlePrint() {
-    const mywindow = window.open("", "PRINT", "height=400,width=600");
-    if (!mywindow) return;
-    mywindow.document.write(
-      "<html><head><title>" + document.title + "</title>"
-    );
-    mywindow.document.write("</head><body >");
-    mywindow.document.write("<h1>" + document.title + "</h1>");
-    mywindow.document.write(document.getElementById("qr-code").innerHTML);
-    mywindow.document.write("</body></html>");
+    const mywindow = window.open('', 'PRINT', 'height=400,width=600')
+    if (!mywindow) return
+    mywindow.document.write('<html><head><title>' + document.title + '</title>')
+    mywindow.document.write('</head><body >')
+    mywindow.document.write('<h1>' + document.title + '</h1>')
+    mywindow.document.write(document.getElementById('qr-code').innerHTML)
+    mywindow.document.write('</body></html>')
 
-    mywindow.document.close(); // necessary for IE >= 10
-    mywindow.focus(); // necessary for IE >= 10*/
+    mywindow.document.close() // necessary for IE >= 10
+    mywindow.focus() // necessary for IE >= 10*/
 
-    mywindow.print();
-    mywindow.close();
+    mywindow.print()
+    mywindow.close()
 
-    return true;
+    return true
   }
 
-  const url = `timberid.org/sample-details?trusted=${formData.trusted}&id=${sampleId}`;
-  const viewSampleUrl = `/sample-details?trusted=${formData.trusted}&id=${sampleId}`;
+  const url = `timberid.org/sample-details?trusted=${formData.trusted}&id=${sampleId}`
+  const viewSampleUrl = `/sample-details?trusted=${formData.trusted}&id=${sampleId}`
 
   return (
     <div>
@@ -195,26 +193,26 @@ export default function AddSample() {
             close
           </span>
         </Link>
-        <div className="page-title-text">{t("addNewSample")}</div>
+        <div className="page-title-text">{t('addNewSample')}</div>
       </div>
       <div>
         <div className="sample-details-form-wrapper">
           {!sampleCreationFinished && (
             <div>
-              {formData.status !== "concluded" && (
+              {formData.status !== 'concluded' && (
                 <p className="sample-details-section-title">
-                  {t("addDetails")}
+                  {t('addDetails')}
                 </p>
               )}
               <p className="sample-details-requirements">
-                {t("requiredFields")}
+                {t('requiredFields')}
               </p>
             </div>
           )}
           {sampleCreationFinished && (
             <div>
-              <div className="sample-added-title">{t("newSampleAdded")}</div>
-              <div className="qr-instructions">{t("qrPrintInstructions")}</div>
+              <div className="sample-added-title">{t('newSampleAdded')}</div>
+              <div className="qr-instructions">{t('qrPrintInstructions')}</div>
               <div className="qr-code" id="qr-code">
                 <QRCodeSVG value={url} />
               </div>
@@ -228,7 +226,7 @@ export default function AddSample() {
                   className="add-sample-print-button"
                 >
                   <span className="material-symbols-outlined">print</span>
-                  {t("print")}
+                  {t('print')}
                 </div>
               </div>
             </div>
@@ -236,7 +234,7 @@ export default function AddSample() {
 
           {userData && !sampleCreationFinished && (
             <div id="sample-form">
-              <SampleDataInput
+              <AddNewSample
                 baseState={formData}
                 onActionButtonClick={(id: string, formSampleData: Sample) =>
                   onCreateSampleClick(id, formSampleData)
@@ -245,14 +243,11 @@ export default function AddSample() {
                 actionButtonTitle="Create sample"
                 isNewSampleForm={true}
                 sampleId={sampleId}
-                isCompletedSample={
-                  formData.status === "concluded" ? true : false
-                }
               />
             </div>
           )}
         </div>
       </div>
     </div>
-  );
+  )
 }

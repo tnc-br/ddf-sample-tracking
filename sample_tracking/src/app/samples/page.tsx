@@ -1,145 +1,143 @@
-"use client";
-import "bootstrap/dist/css/bootstrap.css";
-import { getAuth, onAuthStateChanged } from "firebase/auth";
-import { useState, useMemo, useRef, useEffect } from "react";
-import "./styles.css";
-import { useRouter } from "next/navigation";
-import SamplesTable from "../../old_components/samples_table";
+'use client'
+import 'bootstrap/dist/css/bootstrap.css'
+import { getAuth, onAuthStateChanged } from 'firebase/auth'
+import { useState, useMemo, useRef, useEffect } from 'react'
+import './styles.css'
+import { useRouter } from 'next/navigation'
+import SamplesTable from '../../old_components/samples_table'
 import {
   type Sample,
   type UserData,
   initializeAppIfNecessary,
   showNavBar,
   showTopBar,
-} from "../../old_components/utils";
+} from '../../old_components/utils'
 import {
   getSamplesFromCollection,
   getUserData,
-} from "../../old_components/firebase_utils";
-import { useTranslation } from "react-i18next";
-import "../../i18n/config";
+} from '../../old_components/firebase_utils'
+import { useTranslation } from 'react-i18next'
+import '../../i18n/config'
 
-const COMPLETED_SAMPLES = "completed_samples";
-const IN_PROGRESS_SAMPLES = "in_progress_samples";
+const COMPLETED_SAMPLES = 'completed_samples'
+const IN_PROGRESS_SAMPLES = 'in_progress_samples'
 
 /**
  * Component for the main page of TimberId. Renders all the samples visible to the logged in user using the SamplesTable subcomponent.
  * If the user is a site_admin, all samples in the database are fetched, otherwise only the samples linked to the users org are fetched.
  */
 export default function Samples() {
-  const [userData, setUserData] = useState({} as UserData);
-  const [samplesState, setSamplesState] = useState([{}]);
+  const [userData, setUserData] = useState({} as UserData)
+  const [samplesState, setSamplesState] = useState([{}])
   const [allSamples, setAllSamples] = useState({
     inProgress: null as Sample[] | null,
     completed: null as Sample[] | null,
-  });
+  })
 
-  initializeAppIfNecessary();
-  const router = useRouter();
-  const auth = getAuth();
-  const { t } = useTranslation();
+  initializeAppIfNecessary()
+  const router = useRouter()
+  const auth = getAuth()
+  const { t } = useTranslation()
 
   useEffect(() => {
-    showNavBar();
-    showTopBar();
+    showNavBar()
+    showTopBar()
     if (!userData.role || userData.role.length < 1) {
       onAuthStateChanged(auth, (user) => {
-        if (!user) {
-          router.push("/login");
-        } else {
+        if (user) {
           getUserData(user.uid).then((userData: UserData) => {
-            setUserData(userData);
-          });
+            setUserData(userData)
+          })
         }
-        if (!user) {
-          router.push("/login");
-        }
-      });
+        // if (!user) {
+        //   router.push("/login");
+        // }
+      })
     }
-  }, []);
+  }, [])
 
   if (!allSamples.inProgress && !allSamples.completed) {
-    addSamplesToDataList();
+    addSamplesToDataList()
   }
 
   async function addSamplesToDataList() {
     // We don't want to refetch the data if we already have.
     if (allSamples.inProgress || allSamples.completed) {
-      return;
+      return
     }
     const trustedSamples = await getSamplesFromCollection(
       userData,
-      "trusted_samples"
-    );
+      'trusted_samples',
+    )
     const untrustedSamples = await getSamplesFromCollection(
       userData,
-      "untrusted_samples"
-    );
+      'untrusted_samples',
+    )
     const unknownSamples = await getSamplesFromCollection(
       userData,
-      "unknown_samples"
-    );
+      'unknown_samples',
+    )
     if (
       trustedSamples.length + untrustedSamples.length + unknownSamples.length <
       1
     ) {
-      setAllSamples({ inProgress: [], completed: [] });
+      setAllSamples({ inProgress: [], completed: [] })
     }
 
-    let inProgressSamples: any = [];
-    let completedSamples: any = [];
+    let inProgressSamples: any = []
+    let completedSamples: any = []
     trustedSamples.forEach((sample: Sample) => {
-      if (sample.status === "concluded") {
+      if (sample.status === 'concluded') {
         completedSamples.push({
           ...sample,
-          trusted: "trusted",
-        });
+          trusted: 'trusted',
+        })
       } else {
         inProgressSamples.push({
           ...sample,
-          trusted: "trusted",
-        });
+          trusted: 'trusted',
+        })
       }
-    });
+    })
 
     untrustedSamples.forEach((sample: Sample) => {
-      if (sample.status === "concluded") {
+      if (sample.status === 'concluded') {
         completedSamples.push({
           ...sample,
-          trusted: "untrusted",
-        });
+          trusted: 'untrusted',
+        })
       } else {
         inProgressSamples.push({
           ...sample,
-          trusted: "untrusted",
-        });
+          trusted: 'untrusted',
+        })
       }
-    });
+    })
 
     unknownSamples.forEach((sample: Sample) => {
-      if (sample.status === "concluded") {
+      if (sample.status === 'concluded') {
         completedSamples.push({
           ...sample,
-          trusted: "unknown",
-        });
+          trusted: 'unknown',
+        })
       } else {
         inProgressSamples.push({
           ...sample,
-          trusted: "unknown",
-        });
+          trusted: 'unknown',
+        })
       }
-    });
+    })
 
     if (inProgressSamples.length > 0 || completedSamples.length > 0) {
       setAllSamples({
         inProgress: inProgressSamples,
         completed: completedSamples,
-      });
+      })
     }
   }
 
   function isAdmin(): boolean {
-    return userData.role === "admin" || userData.role === "site_admin";
+    return userData.role === 'admin' || userData.role === 'site_admin'
   }
 
   function viewTab(scrollToElementId: string) {
@@ -156,10 +154,10 @@ export default function Samples() {
               <span className="material-symbols-outlined">visibility</span>
             </div>
           </div>
-          <div className="filter-chip-text">{t("view")}</div>
+          <div className="filter-chip-text">{t('view')}</div>
         </div>
       </div>
-    );
+    )
   }
 
   function samplesTableHeader() {
@@ -170,7 +168,7 @@ export default function Samples() {
           Your tasks currently in progress
         </div>
       </div>
-    );
+    )
   }
 
   return (
@@ -190,7 +188,7 @@ export default function Samples() {
                   {allSamples.inProgress.length}
                 </div>
                 <span className="samples-badge samples-in-progress">
-                  {t("inProgress")}
+                  {t('inProgress')}
                 </span>
                 {viewTab(IN_PROGRESS_SAMPLES)}
               </div>
@@ -202,7 +200,7 @@ export default function Samples() {
                   {allSamples.completed.length}
                 </div>
                 <span className="samples-badge samples-completed">
-                  {t("completed")}
+                  {t('completed')}
                 </span>
                 {viewTab(COMPLETED_SAMPLES)}
               </div>
@@ -259,5 +257,5 @@ export default function Samples() {
         </div>
       )}
     </div>
-  );
+  )
 }

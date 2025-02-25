@@ -1,62 +1,56 @@
-import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useEffect, useState } from 'react'
+import { useRouter } from 'next/navigation'
 import {
   getAuth,
   createUserWithEmailAndPassword,
   updateProfile,
-} from "firebase/auth";
+} from 'firebase/auth'
 import {
   doc,
   getDocs,
   collection,
   getFirestore,
   updateDoc,
-  addDoc,
   setDoc,
-} from "firebase/firestore";
-import {
-  TextField,
-  Autocomplete,
-  MenuItem,
-  InputAdornment,
-} from "@mui/material";
+} from 'firebase/firestore'
+import { TextField, MenuItem } from '@mui/material'
 import {
   ConfirmationBox,
   ConfirmationProps,
-} from "../../old_components/confirmation_box";
-import { useTranslation } from "react-i18next";
+} from '../../old_components/confirmation_box'
+import { useTranslation } from 'react-i18next'
 
 interface SignUpProps {
-  onLogInClick: any;
+  onLogInClick: any
 }
 
 type SignUpData = {
-  firstName: string;
-  lastName: string;
-  lab: string;
-  labName: string;
-};
+  firstName: string
+  lastName: string
+  lab: string
+  labName: string
+}
 
 interface NestedSchemas {
-  [key: string]: NestedSchemas | string;
+  [key: string]: NestedSchemas | string
 }
 
 interface OrgsSchemas {
-  [key: string]: string;
+  [key: string]: string
 }
 
 type NewUser = {
-  firstName: string;
-  lastName: string;
-  email: string;
-  password: string;
-  confirmPassword: string;
-  date_requested: string;
-  org: string;
-  uid: string;
-  orgName: string;
-  newOrgName: string;
-};
+  firstName: string
+  lastName: string
+  email: string
+  password: string
+  confirmPassword: string
+  date_requested: string
+  org: string
+  uid: string
+  orgName: string
+  newOrgName: string
+}
 
 /**
  * Component to handle signing a user up using Firebase auth. When a user signs up they are added to the 'new_users' collection.
@@ -64,61 +58,61 @@ type NewUser = {
  * This data will then be fetched by admins in the SignUpRequests component to be approved/rejected.
  */
 export default function SignUp(props: SignUpProps) {
-  const [formData, setFormData] = useState({} as NewUser);
-  const [signUpTab, setSignUpTab] = useState(0);
+  const [formData, setFormData] = useState({} as NewUser)
+  const [signUpTab, setSignUpTab] = useState(0)
   const [signUpData, setSignUpData] = useState({
-    firstName: "",
-    lastName: "",
-    lab: "",
-    labName: "",
-  });
-  const [availableOrgs, setAvailableOrgs] = useState({} as OrgsSchemas);
-  const [errorText, setErrorText] = useState({} as NewUser);
+    firstName: '',
+    lastName: '',
+    lab: '',
+    labName: '',
+  })
+  const [availableOrgs, setAvailableOrgs] = useState({} as OrgsSchemas)
+  const [errorText, setErrorText] = useState({} as NewUser)
   const [confirmationBoxData, setConfirmationBoxData] = useState(
-    null as ConfirmationProps | null
-  );
+    null as ConfirmationProps | null,
+  )
 
   function updateSignUpData(signUpData: SignUpData) {
-    setSignUpData(signUpData);
+    setSignUpData(signUpData)
   }
 
-  const auth = getAuth();
-  const db = getFirestore();
-  const router = useRouter();
-  const { t } = useTranslation();
+  const auth = getAuth()
+  const db = getFirestore()
+  const router = useRouter()
+  const { t } = useTranslation()
 
   if (Object.keys(availableOrgs).length < 1) {
-    const orgs: OrgsSchemas = {};
-    getDocs(collection(db, "organizations")).then((querySnapshot) => {
+    const orgs: OrgsSchemas = {}
+    getDocs(collection(db, 'organizations')).then((querySnapshot) => {
       querySnapshot.forEach((doc) => {
-        const docData = doc.data();
-        orgs[docData["org_name"]] = doc.id;
-      });
-      orgs["Create new organization"] = "NEW";
-      setAvailableOrgs(orgs as OrgsSchemas);
-    });
+        const docData = doc.data()
+        orgs[docData['org_name']] = doc.id
+      })
+      orgs['Create new organization'] = 'NEW'
+      setAvailableOrgs(orgs as OrgsSchemas)
+    })
   }
 
   useEffect(() => {
     if (signUpTab === 1) {
-      const signupEmail = document.getElementById("signupEmail");
+      const signupEmail = document.getElementById('signupEmail')
       if (signupEmail && !formData.email) {
-        signupEmail.value = null;
+        signupEmail.value = null
       }
-      const newOrgName = document.getElementById("newOrgName");
+      const newOrgName = document.getElementById('newOrgName')
       if (newOrgName && !formData.newOrgName) {
-        newOrgName.value = null;
+        newOrgName.value = null
       }
     }
-  });
+  })
 
   async function handleSignUpButtonClicked() {
-    setErrorText({} as NewUser);
+    setErrorText({} as NewUser)
 
-    const accountInfo = document.getElementById("account-info");
+    const accountInfo = document.getElementById('account-info')
     if (!accountInfo.checkValidity()) {
-      accountInfo.reportValidity();
-      return;
+      accountInfo.reportValidity()
+      return
     }
     if (
       !formData.firstName ||
@@ -128,93 +122,93 @@ export default function SignUp(props: SignUpProps) {
       !formData.confirmPassword ||
       !formData.orgName
     ) {
-      return;
+      return
     }
     if (formData.password !== formData.confirmPassword) {
       setErrorText({
-        confirmPassword: t("passwordsDontMatch"),
-      } as NewUser);
-      return;
+        confirmPassword: t('passwordsDontMatch'),
+      } as NewUser)
+      return
     }
 
-    const newOrgName = formData.newOrgName ? formData.newOrgName : null;
+    const newOrgName = formData.newOrgName ? formData.newOrgName : null
     if (newOrgName && Object.keys(availableOrgs).includes(newOrgName)) {
       setErrorText({
-        newOrgName: t("orgNameExists"),
-      } as NewUser);
-      return;
+        newOrgName: t('orgNameExists'),
+      } as NewUser)
+      return
     }
-    if (newOrgName && newOrgName.includes(" ")) {
+    if (newOrgName && newOrgName.includes(' ')) {
       setErrorText({
-        newOrgName: t("orgNameMustBeOneWord"),
-      } as NewUser);
-      return;
+        newOrgName: t('orgNameMustBeOneWord'),
+      } as NewUser)
+      return
     }
-    const orgName = formData.orgName;
-    const name = `${formData.firstName} ${formData.lastName}`;
-    const labValue = orgName ? availableOrgs[orgName] : "";
+    const orgName = formData.orgName
+    const name = `${formData.firstName} ${formData.lastName}`
+    const labValue = orgName ? availableOrgs[orgName] : ''
 
     await createUserWithEmailAndPassword(
       auth,
       formData.email,
-      formData.password
+      formData.password,
     ).catch((error) => {
-      console.log(error);
+      console.log(error)
       switch (error.code) {
-        case "auth/weak-password":
+        case 'auth/weak-password':
           setErrorText({
             ...errorText,
-            password: t("weakPassword"),
-          });
-          return;
-        case "auth/email-already-exists":
+            password: t('weakPassword'),
+          })
+          return
+        case 'auth/email-already-exists':
           setErrorText({
             ...errorText,
-            email: t("emailAlreadyInUse"),
-          });
-          return;
-        case "auth/email-already-in-use":
+            email: t('emailAlreadyInUse'),
+          })
+          return
+        case 'auth/email-already-in-use':
           setErrorText({
             ...errorText,
-            email: t("emailAlreadyInUse"),
-          });
-          return;
+            email: t('emailAlreadyInUse'),
+          })
+          return
         default:
           const cancelFunction = () => {
-            setConfirmationBoxData(null);
-          };
-          const title = `${t("errorCreatingAccount")} + ${error.message}`;
-          const actionButtonTitle = t("confirm");
+            setConfirmationBoxData(null)
+          }
+          const title = `${t('errorCreatingAccount')} + ${error.message}`
+          const actionButtonTitle = t('confirm')
           setConfirmationBoxData({
             title: title,
             actionButtonTitle: actionButtonTitle,
             onCancelButtonClick: cancelFunction,
-          });
+          })
       }
-      return;
-    });
-    const user = auth.currentUser;
-    if (!user) return;
+      return
+    })
+    const user = auth.currentUser
+    if (!user) return
     await updateProfile(auth.currentUser, {
       displayName: name,
-    });
+    })
 
-    const date = new Date();
+    const date = new Date()
     const dateString = `${
       date.getMonth() + 1
-    } ${date.getDate()} ${date.getFullYear()}`;
+    } ${date.getDate()} ${date.getFullYear()}`
     if (newOrgName) {
-      const newOrgDoc = doc(db, "new_users", "new_orgs");
-      let newObj: NestedSchemas = {};
+      const newOrgDoc = doc(db, 'new_users', 'new_orgs')
+      let newObj: NestedSchemas = {}
       newObj[newOrgName] = {
         admin_id: auth.currentUser!.uid,
         admin_name: name,
         email: formData.email,
         date_requested: dateString,
-      };
-      updateDoc(newOrgDoc, newObj);
+      }
+      updateDoc(newOrgDoc, newObj)
     } else {
-      const newDocRef = doc(db, "new_users", auth.currentUser!.uid);
+      const newDocRef = doc(db, 'new_users', auth.currentUser!.uid)
       setDoc(newDocRef, {
         name: name,
         email: formData.email,
@@ -222,28 +216,29 @@ export default function SignUp(props: SignUpProps) {
         org: labValue,
         uid: auth.currentUser!.uid,
         org_name: orgName,
-      });
+      })
     }
-    router.push("/samples");
+
+    router.push('/samples')
   }
 
   function handleChange(evt: any) {
-    let value = evt.target.value;
-    value = value === "Create new organization" ? "NEW" : value;
+    let value = evt.target.value
+    value = value === 'Create new organization' ? 'NEW' : value
     const newFormData = {
       ...formData,
       [evt.target.name]: value,
-    };
-    setFormData(newFormData);
+    }
+    setFormData(newFormData)
   }
 
   function handleNextClick() {
-    const detailsForm = document.getElementById("details-tab");
-    if (!detailsForm) return;
+    const detailsForm = document.getElementById('details-tab')
+    if (!detailsForm) return
     if (!detailsForm.checkValidity()) {
-      detailsForm.reportValidity();
+      detailsForm.reportValidity()
     } else {
-      setSignUpTab(1);
+      setSignUpTab(1)
     }
   }
 
@@ -303,7 +298,7 @@ export default function SignUp(props: SignUpProps) {
           </button>
         </div>
       </form>
-    );
+    )
   }
 
   function accountInfo() {
@@ -318,7 +313,7 @@ export default function SignUp(props: SignUpProps) {
           </span>
           Sign up
         </p>
-        {formData["orgName"] === "NEW" && (
+        {formData['orgName'] === 'NEW' && (
           <div className="login-input-wrapper">
             <TextField
               size="small"
@@ -381,7 +376,7 @@ export default function SignUp(props: SignUpProps) {
           </div>
         </div>
       </form>
-    );
+    )
   }
 
   return (
@@ -389,5 +384,5 @@ export default function SignUp(props: SignUpProps) {
       {signUpTab === 0 ? yourDetailsTab() : accountInfo()}
       {confirmationBoxData && <ConfirmationBox {...confirmationBoxData} />}
     </div>
-  );
+  )
 }

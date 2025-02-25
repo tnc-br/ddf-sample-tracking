@@ -3,103 +3,103 @@ import {
   signInWithEmailAndPassword,
   signInWithPopup,
   GoogleAuthProvider,
-} from "firebase/auth";
-import { useState } from "react";
-import { useRouter } from "next/navigation";
-import { doc, getFirestore, getDoc, setDoc } from "firebase/firestore";
-import Image from "next/image";
-import { useTranslation } from "react-i18next";
-import TextInput from "@components/TextInput";
-
+} from 'firebase/auth'
+import { useState } from 'react'
+import { useRouter } from 'next/navigation'
+import { doc, getFirestore, getDoc, setDoc } from 'firebase/firestore'
+import Image from 'next/image'
+import { useTranslation } from 'react-i18next'
+import TextInput from '@components/TextInput'
 interface LogInProps {
-  onSignUpClick: any;
-  onForgotPasswordClick: any;
+  onSignUpClick: any
+  onForgotPasswordClick: any
 }
 
 export default function Login(props: LogInProps) {
-  const auth = getAuth();
-  const router = useRouter();
+  const auth = getAuth()
+  const router = useRouter()
 
-  const [submitIsLoading, setSubmitIsLoading] = useState(false);
-  const [errorText, setErrorText] = useState({ email: "", password: "" });
+  const [submitIsLoading, setSubmitIsLoading] = useState(false)
+  const [errorText, setErrorText] = useState({ email: '', password: '' })
 
-  const { t } = useTranslation();
+  const { t } = useTranslation()
 
   function attemptSignIn() {
-    setErrorText({ email: "", password: "" });
-    setSubmitIsLoading(true);
-    const email = (document.getElementById("email") as HTMLInputElement).value;
-    const password = (document.getElementById("password") as HTMLInputElement)
-      .value;
-    console.log("username: " + email + " password: " + password);
+    setErrorText({ email: '', password: '' })
+    setSubmitIsLoading(true)
+    const email = (document.getElementById('email') as HTMLInputElement).value
+    const password = (document.getElementById('password') as HTMLInputElement)
+      .value
+    console.log('username: ' + email + ' password: ' + password)
     signInWithEmailAndPassword(auth, email, password)
-      .then((userCredential) => {
+      .then(async (userCredential) => {
         // Signed in
-        const user = userCredential.user;
-        console.log("signed in");
-        router.push("/samples");
+        const user = userCredential.user
+
+        console.log('signed in')
+        router.push('/samples')
       })
       .catch((error) => {
-        if (error.code === "auth/invalid-email") {
-          setErrorText({ email: t("invalidEmail"), password: "" });
+        if (error.code === 'auth/invalid-email') {
+          setErrorText({ email: t('invalidEmail'), password: '' })
         } else {
-          setErrorText({ password: t("incorrectLogin"), email: "" });
+          setErrorText({ password: t('incorrectLogin'), email: '' })
         }
 
-        setSubmitIsLoading(false);
-        const errorCode = error.code;
-        const errorMessage = error.message;
-        var errorText = document.getElementById("signin-error-message");
-        console.log(errorMessage);
-      });
-    const user = auth.currentUser;
+        setSubmitIsLoading(false)
+        const errorCode = error.code
+        const errorMessage = error.message
+        var errorText = document.getElementById('signin-error-message')
+        console.log(errorMessage)
+      })
+    const user = auth.currentUser
   }
 
   function signInWithGoogle() {
-    const auth = getAuth();
-    const db = getFirestore();
-    const provider = new GoogleAuthProvider();
+    const auth = getAuth()
+    const db = getFirestore()
+    const provider = new GoogleAuthProvider()
     provider.setCustomParameters({
-      display: "popup",
-      prompt: "select_account",
-    });
+      display: 'popup',
+      prompt: 'select_account',
+    })
     signInWithPopup(auth, provider)
       .then((result) => {
         // This gives you a Google Access Token. You can use it to access the Google API.
-        const credential = GoogleAuthProvider.credentialFromResult(result);
-        if (!credential) return;
-        const token = credential.accessToken;
+        const credential = GoogleAuthProvider.credentialFromResult(result)
+        if (!credential) return
+        const token = credential.accessToken
         // The signed-in user info.
-        const user = result.user;
-        const userDocRef = doc(db, "users", user.uid);
+        const user = result.user
+        const userDocRef = doc(db, 'users', user.uid)
         getDoc(userDocRef).then((docRef) => {
           if (docRef.exists()) {
-            const docData = docRef.data();
+            const docData = docRef.data()
             if (docData.role && docData.org) {
-              router.push("/samples");
+              router.push('/samples')
             } else {
-              router.push("/select-org");
+              router.push('/select-org')
             }
           } else {
-            const date = new Date();
+            const date = new Date()
             const dateString = `${
               date.getMonth() + 1
-            } ${date.getDate()} ${date.getFullYear()}`;
+            } ${date.getDate()} ${date.getFullYear()}`
             // This is a new user.
-            const newUserDocRef = doc(db, "new_users", user.uid);
+            const newUserDocRef = doc(db, 'new_users', user.uid)
             setDoc(newUserDocRef, {
               name: user.displayName,
               email: user.email,
               date_requested: dateString,
               uid: user.uid,
-            });
-            router.push("/select-org");
+            })
+            router.push('/select-org')
           }
-        });
+        })
       })
       .catch((error) => {
-        console.log(error);
-      });
+        console.log(error)
+      })
   }
 
   return (
@@ -141,7 +141,7 @@ export default function Login(props: LogInProps) {
             onClick={
               props.onForgotPasswordClick
                 ? props.onForgotPasswordClick
-                : console.log("Could not find method to handle forgo password")
+                : console.log('Could not find method to handle forgo password')
             }
           >
             <p>Esqueci a senha</p>
@@ -171,5 +171,5 @@ export default function Login(props: LogInProps) {
         </div>
       </div>
     </div>
-  );
+  )
 }
