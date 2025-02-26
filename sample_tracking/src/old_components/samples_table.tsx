@@ -1,38 +1,37 @@
-"use client";
-import "bootstrap/dist/css/bootstrap.css";
-import { getFirestore, deleteDoc, doc, collection } from "firebase/firestore";
-import { useState, useMemo, useRef, useCallback } from "react";
-import "./styles.css";
-import { useRouter } from "next/navigation";
+'use client'
+import 'bootstrap/dist/css/bootstrap.css'
+import { deleteDoc, doc, collection } from 'firebase/firestore'
+import { useState, useMemo, useRef, useCallback } from 'react'
+import './styles.css'
+import { useRouter } from 'next/navigation'
 import {
   MaterialReactTable,
   type MRT_ColumnDef,
   type MRT_Row,
   type MRT_TableInstance,
-  type MRT_SortingState,
-  type MRT_PaginationState,
-} from "material-react-table";
-import { initializeAppIfNecessary, type Sample } from "./utils";
-import { IconButton } from "@mui/material";
-import { Delete } from "@mui/icons-material";
+} from 'material-react-table'
+import { type Sample } from './utils'
+import { IconButton } from '@mui/material'
+import { Delete } from '@mui/icons-material'
 
-import { ExportToCsv } from "export-to-csv";
-import { useTranslation } from "react-i18next";
-import "../i18n/config";
-import { ConfirmationBox, ConfirmationProps } from "./confirmation_box";
-import Link from "next/link";
+import { ExportToCsv } from 'export-to-csv'
+import { useTranslation } from 'react-i18next'
+import '../i18n/config'
+import { ConfirmationBox, ConfirmationProps } from './confirmation_box'
+import Link from 'next/link'
+import { firestore } from '@services/firebase/config'
 
 interface SampleDataProps {
-  samplesData: Sample[];
-  canDeleteSamples: boolean;
-  showValidity: boolean;
-  allowExport: boolean;
+  samplesData: Sample[]
+  canDeleteSamples: boolean
+  showValidity: boolean
+  allowExport: boolean
 }
 
 type SampleData = {
-  samples: Sample[];
-  hasBeenUpdated: boolean;
-};
+  samples: Sample[]
+  hasBeenUpdated: boolean
+}
 
 /**
  * Component used to render samples in a table format. The following data is passed in through props:
@@ -45,17 +44,16 @@ export default function SamplesTable(props: SampleDataProps) {
   const [sampleData, setSampleData] = useState({
     samples: props.samplesData as Sample[],
     hasBeenUpdated: false,
-  });
+  })
   const [confirmationBoxData, setConfirmationBoxData] = useState(
-    null as ConfirmationProps | null
-  );
+    null as ConfirmationProps | null,
+  )
 
-  const router = useRouter();
-  initializeAppIfNecessary();
-  const db = getFirestore();
-  const { t } = useTranslation();
+  const router = useRouter()
+  const db = firestore
+  const { t } = useTranslation()
 
-  const tableInstanceRef = useRef<MRT_TableInstance<Sample>>(null);
+  const tableInstanceRef = useRef<MRT_TableInstance<Sample>>(null)
 
   if (
     !sampleData.hasBeenUpdated &&
@@ -65,14 +63,14 @@ export default function SamplesTable(props: SampleDataProps) {
     setSampleData({
       samples: props.samplesData,
       hasBeenUpdated: false,
-    });
+    })
   }
 
   const columns = useMemo<MRT_ColumnDef<Sample>[]>(
     () => [
       {
-        accessorKey: "code_lab",
-        header: t("internalCode"),
+        accessorKey: 'code_lab',
+        header: t('internalCode'),
         size: 150,
         Cell: ({ cell, row, renderedCellValue }) => {
           return (
@@ -83,28 +81,28 @@ export default function SamplesTable(props: SampleDataProps) {
             >
               <span id={row.original.code_lab}>{renderedCellValue}</span>
             </Link>
-          );
+          )
         },
       },
       {
-        accessorKey: "validity",
-        header: t("validity"),
+        accessorKey: 'validity',
+        header: t('validity'),
         size: 100,
         enableColumnFilter: false, // Consider a range filter if we have ~complete data.
       },
       {
-        accessorKey: "trusted",
-        header: t("origin"),
+        accessorKey: 'trusted',
+        header: t('origin'),
         size: 100,
       },
       {
         accessorFn: (row) => row,
-        header: t("lastUpdatedBy"),
+        header: t('lastUpdatedBy'),
         size: 150,
-        filterVariant: "select",
+        filterVariant: 'select',
         Cell: ({ cell }) => {
-          const row = cell.getValue() as Sample;
-          const photo = (row as Sample).last_updated_by_photo;
+          const row = cell.getValue() as Sample
+          const photo = (row as Sample).last_updated_by_photo
           return (
             <div className="user-chip-wrapper">
               <div className="user-chip-slate-layer">
@@ -123,22 +121,22 @@ export default function SamplesTable(props: SampleDataProps) {
                       id="profile-photo"
                       className="table-letter-profile profile-photo"
                     >
-                      {row.last_updated_by ? row.last_updated_by.charAt(0) : ""}
+                      {row.last_updated_by ? row.last_updated_by.charAt(0) : ''}
                     </div>
                   )}
                 </div>
                 <div className="user-chip-name">{row.last_updated_by}</div>
               </div>
             </div>
-          );
+          )
         },
       },
       {
         accessorFn: (row) => row,
-        header: t("actions"),
+        header: t('actions'),
         size: 50,
         Cell: ({ cell }) => {
-          const row = cell.getValue();
+          const row = cell.getValue()
           return (
             <div className="action-buttons-wrapper">
               <div id={(row as Sample).trusted}>
@@ -171,98 +169,98 @@ export default function SamplesTable(props: SampleDataProps) {
                 </div>
               )}
             </div>
-          );
+          )
         },
       },
     ],
-    [sampleData.samples]
-  );
+    [sampleData.samples],
+  )
 
   const csvOptions = {
-    fieldSeparator: ",",
+    fieldSeparator: ',',
     quoteStrings: '"',
-    decimalSeparator: ".",
+    decimalSeparator: '.',
     showLabels: true,
     useBom: true,
     useKeysAsHeaders: true,
-  };
-  const csvExporter = new ExportToCsv(csvOptions);
+  }
+  const csvExporter = new ExportToCsv(csvOptions)
 
   const onDeleteSampleClick = useCallback(
     (row: MRT_Row<Sample>) => {
       const deleteSampleFunction = () => {
-        let collectionName = `${row.trusted}_samples`;
-        const deletedDocRef = doc(db, collectionName, row.code_lab);
-        deleteDoc(deletedDocRef);
+        let collectionName = `${row.trusted}_samples`
+        const deletedDocRef = doc(db, collectionName, row.code_lab)
+        deleteDoc(deletedDocRef)
         //send api delete request here, then refetch or update local table data for re-render
-        const updatedSamples = sampleData.samples.slice();
-        let index;
+        const updatedSamples = sampleData.samples.slice()
+        let index
         updatedSamples.forEach((sample: Sample, sampleIndex: number) => {
           if (sample.code_lab === row.code_lab) {
-            index = sampleIndex;
-            return;
+            index = sampleIndex
+            return
           }
-        });
+        })
         if (index) {
-          updatedSamples.splice(index, 1);
+          updatedSamples.splice(index, 1)
           setSampleData({
             samples: updatedSamples,
             hasBeenUpdated: true,
-          });
+          })
         } else {
           console.log(
-            `Error: Unable to find index for ${row.code_lab} and could not remove row from table.`
-          );
+            `Error: Unable to find index for ${row.code_lab} and could not remove row from table.`,
+          )
         }
 
-        setConfirmationBoxData(null);
-      };
+        setConfirmationBoxData(null)
+      }
       const cancelDeleteFunction = () => {
-        setConfirmationBoxData(null);
-      };
-      const title = t("confirmDeleteSample", { sample: row.code_lab });
-      const actionButtonTitle = t("delete");
+        setConfirmationBoxData(null)
+      }
+      const title = t('confirmDeleteSample', { sample: row.code_lab })
+      const actionButtonTitle = t('delete')
       setConfirmationBoxData({
         title: title,
         actionButtonTitle: actionButtonTitle,
         onActionButtonClick: deleteSampleFunction,
         onCancelButtonClick: cancelDeleteFunction,
-      });
+      })
     },
-    [sampleData]
-  );
+    [sampleData],
+  )
 
   function onEditSampleClick(evt: any) {
-    const url = `./edit?trusted=${evt.trusted}&id=${evt.code_lab}`;
-    router.push(url);
+    const url = `./edit?trusted=${evt.trusted}&id=${evt.code_lab}`
+    router.push(url)
   }
 
   function handleDownloadAllData() {
-    csvExporter.generateCsv(getExportDataFromSampleList(sampleData.samples));
+    csvExporter.generateCsv(getExportDataFromSampleList(sampleData.samples))
   }
 
   function onDowloadClick(rows: MRT_Row<Sample>[]) {
-    const sampleData = rows.map((row) => row.original);
-    csvExporter.generateCsv(getExportDataFromSampleList(sampleData));
+    const sampleData = rows.map((row) => row.original)
+    csvExporter.generateCsv(getExportDataFromSampleList(sampleData))
   }
 
   function getExportDataFromSampleList(samples: Sample[]): Sample[] {
-    let exportData: Sample[] = [];
+    let exportData: Sample[] = []
     samples.forEach((sample: Sample) => {
-      const sampleCopy = structuredClone(sample);
+      const sampleCopy = structuredClone(sample)
       if (sample.points && sample.points.length > 0) {
-        delete sampleCopy.points;
+        delete sampleCopy.points
         sample.points.forEach((point: {}) => {
           exportData.push({
             ...sampleCopy,
             ...point,
-          });
-        });
+          })
+        })
       } else {
-        exportData.push(sample);
+        exportData.push(sample)
       }
-    });
-    return exportData;
+    })
+    return exportData
   }
 
   return (
@@ -311,5 +309,5 @@ export default function SamplesTable(props: SampleDataProps) {
       </div>
       {confirmationBoxData && <ConfirmationBox {...confirmationBoxData} />}
     </div>
-  );
+  )
 }

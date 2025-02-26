@@ -1,19 +1,19 @@
 'use client'
 
 import 'bootstrap/dist/css/bootstrap.css'
-import { getAuth, signOut, onAuthStateChanged } from 'firebase/auth'
+import { signOut, onAuthStateChanged } from 'firebase/auth'
 import { useRouter } from 'next/navigation'
 import './styles.css'
 import { useState, useEffect, useRef } from 'react'
-import { getFirestore } from 'firebase/firestore'
 import { useTranslation } from 'react-i18next'
 import '../i18n/config'
 import Switch from '@mui/material/Switch'
 import { green } from '@mui/material/colors'
 import { alpha, styled } from '@mui/material/styles'
-import { type UserData, initializeAppIfNecessary } from './utils'
+import { type UserData } from './utils'
 
 import Image from 'next/image'
+import { auth, firestore } from '@services/firebase/config'
 
 /**
  * Component to render the top bar shown on most pages in TimberId.
@@ -24,10 +24,8 @@ export default function TopBar() {
   const [userData, setUserData] = useState(null as UserData | null)
   const [showMenu, setShowMenu] = useState(false)
 
-  initializeAppIfNecessary()
   const router = useRouter()
-  const auth = getAuth()
-  const db = getFirestore()
+  const db = firestore
   const { t, i18n } = useTranslation()
   const ref = useRef(null)
 

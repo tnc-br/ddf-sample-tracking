@@ -1,16 +1,16 @@
 'use client'
 
 import 'bootstrap/dist/css/bootstrap.css'
-import { getAuth, onAuthStateChanged } from 'firebase/auth'
+import { onAuthStateChanged } from 'firebase/auth'
 import { useRouter } from 'next/navigation'
 import './styles.css'
 import { useState, useEffect } from 'react'
-import { getFirestore, getDoc, doc } from 'firebase/firestore'
+import { getDoc, doc } from 'firebase/firestore'
 import Link from 'next/link'
 import { useTranslation } from 'react-i18next'
 import '../i18n/config'
 import ImportSamples from './import-samples'
-import { initializeAppIfNecessary } from './utils'
+import { auth, firestore } from '@services/firebase/config'
 
 /**
  * Component for rendering the nav bar on the left of the screen. Depending on what
@@ -22,10 +22,8 @@ export default function Nav() {
   const [role, setRole] = useState('')
   const [showAddSampleMenu, setShowAddSampleMenu] = useState(false)
 
-  initializeAppIfNecessary()
   const router = useRouter()
-  const auth = getAuth()
-  const db = getFirestore()
+  const db = firestore
   const { t } = useTranslation()
 
   useEffect(() => {

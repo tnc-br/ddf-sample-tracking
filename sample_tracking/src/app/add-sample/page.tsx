@@ -3,12 +3,11 @@
 import './styles.css'
 import 'bootstrap/dist/css/bootstrap.css'
 import { useRouter } from 'next/navigation'
-import { doc, getFirestore, getDoc } from 'firebase/firestore'
-import { getAuth, onAuthStateChanged } from 'firebase/auth'
+import { doc, getDoc } from 'firebase/firestore'
+import { onAuthStateChanged } from 'firebase/auth'
 import { useState, useEffect } from 'react'
 import AddNewSample from '../../old_components/Sample/AddNewSample'
 import {
-  initializeAppIfNecessary,
   getRanHex,
   getPointsArrayFromSampleResults,
   type UserData,
@@ -18,6 +17,7 @@ import { useSearchParams } from 'next/navigation'
 import { useTranslation } from 'react-i18next'
 import Link from 'next/link'
 import { setSample } from '../../old_components/firebase_utils'
+import { auth, firestore } from '@services/firebase/config'
 
 /**
  * Component to handle adding a complete or incomplet sample. It uses the SampleDataInput
@@ -45,9 +45,7 @@ export default function AddSample() {
   })
 
   const router = useRouter()
-  initializeAppIfNecessary()
-  const auth = getAuth()
-  const db = getFirestore()
+  const db = firestore
   const { t } = useTranslation()
 
   let status = 'completed'

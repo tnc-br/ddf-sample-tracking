@@ -6,13 +6,11 @@ import { getAuth, onAuthStateChanged } from 'firebase/auth'
 import { useRouter } from 'next/navigation'
 
 import './styles.css'
-import {
-  initializeAppIfNecessary,
-  hideNavBar,
-} from '../../old_components/utils'
+import { hideNavBar } from '../../old_components/utils'
 import Login from './login'
 import SignUp from './signup'
 import ForgotPassword from './forgot-password'
+import { auth } from '@services/firebase/config'
 
 const LogInScreen = {
   LOG_IN: 'logIn',
@@ -27,8 +25,7 @@ const LogInScreen = {
  */
 export default function LogInSignUpPage() {
   const router = useRouter()
-  initializeAppIfNecessary()
-  const auth = getAuth()
+
   onAuthStateChanged(auth, (user) => {
     if (user) {
       router.replace('/samples')

@@ -8,7 +8,6 @@ import SamplesTable from '../../old_components/samples_table'
 import {
   type Sample,
   type UserData,
-  initializeAppIfNecessary,
   showNavBar,
   showTopBar,
 } from '../../old_components/utils'
@@ -18,6 +17,7 @@ import {
 } from '../../old_components/firebase_utils'
 import { useTranslation } from 'react-i18next'
 import '../../i18n/config'
+import { auth } from '@services/firebase/config'
 
 const COMPLETED_SAMPLES = 'completed_samples'
 const IN_PROGRESS_SAMPLES = 'in_progress_samples'
@@ -34,9 +34,7 @@ export default function Samples() {
     completed: null as Sample[] | null,
   })
 
-  initializeAppIfNecessary()
   const router = useRouter()
-  const auth = getAuth()
   const { t } = useTranslation()
 
   useEffect(() => {
@@ -49,9 +47,6 @@ export default function Samples() {
             setUserData(userData)
           })
         }
-        // if (!user) {
-        //   router.push("/login");
-        // }
       })
     }
   }, [])

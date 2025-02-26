@@ -1,12 +1,11 @@
-"use client";
+'use client'
 
-import { getAuth, onAuthStateChanged } from "firebase/auth";
-import { useState, useEffect } from "react";
-import "./styles.css";
-import { useRouter } from "next/navigation";
-import "bootstrap/dist/css/bootstrap.css";
+import { onAuthStateChanged } from 'firebase/auth'
+import { useState, useEffect } from 'react'
+import './styles.css'
+import { useRouter } from 'next/navigation'
+import 'bootstrap/dist/css/bootstrap.css'
 import {
-  getFirestore,
   getDocs,
   collection,
   updateDoc,
@@ -15,28 +14,27 @@ import {
   addDoc,
   getDoc,
   arrayUnion,
-  arrayRemove,
   deleteField,
   query,
   where,
   deleteDoc,
-} from "firebase/firestore";
+} from 'firebase/firestore'
 import {
   showNavBar,
   showTopBar,
   getRanHex,
-  initializeAppIfNecessary,
   isProd,
-} from "../../old_components/utils";
-import { getUserData } from "../../old_components/firebase_utils";
+} from '../../old_components/utils'
+import { getUserData } from '../../old_components/firebase_utils'
+import { auth, firestore } from '@services/firebase/config'
 
 type UserData = {
-  role: string;
-  org: string;
-};
+  role: string
+  org: string
+}
 
 interface NestedSchemas {
-  [key: string]: NestedSchemas;
+  [key: string]: NestedSchemas
 }
 
 /**
@@ -48,104 +46,102 @@ interface NestedSchemas {
  * to let site admins approve/reject new organizations.
  */
 export default function SignUpRequests() {
-  const [pendingApprovals, setPendingApprovals] = useState({});
-  const [prospectiveUsers, setProspectiveUsers] = useState({} as NestedSchemas);
-  const [prospectiveOrgs, setProspectiveOrgs] = useState({} as NestedSchemas);
-  const [userData, setUserData] = useState({} as UserData);
+  const [pendingApprovals, setPendingApprovals] = useState({})
+  const [prospectiveUsers, setProspectiveUsers] = useState({} as NestedSchemas)
+  const [prospectiveOrgs, setProspectiveOrgs] = useState({} as NestedSchemas)
+  const [userData, setUserData] = useState({} as UserData)
 
-  initializeAppIfNecessary();
-  const auth = getAuth();
-  const router = useRouter();
-  const db = getFirestore();
+  const router = useRouter()
+  const db = firestore
 
   useEffect(() => {
-    showNavBar();
-    showTopBar();
+    showNavBar()
+    showTopBar()
     if (Object.keys(userData).length < 1) {
       onAuthStateChanged(auth, (user) => {
         if (!user) {
-          router.push("/login");
+          router.push('/login')
         } else {
-          const userDocRef = doc(db, "users", user.uid);
+          const userDocRef = doc(db, 'users', user.uid)
           getDoc(userDocRef).then((docRef) => {
             if (docRef.exists()) {
-              const docData = docRef.data();
-              if (docData.role !== "admin" && docData.role !== "site_admin") {
-                router.push("/samples");
+              const docData = docRef.data()
+              if (docData.role !== 'admin' && docData.role !== 'site_admin') {
+                router.push('/samples')
               }
-              setUserData(docRef.data() as UserData);
+              setUserData(docRef.data() as UserData)
             }
-          });
+          })
         }
-      });
+      })
     }
-  });
+  })
 
   if (Object.keys(pendingApprovals).length < 1) {
-    const pendingUsers: NestedSchemas = {};
+    const pendingUsers: NestedSchemas = {}
 
-    if (userData.role === "admin" && userData.org.length > 0) {
+    if (userData.role === 'admin' && userData.org.length > 0) {
       const q = query(
-        collection(db, "new_users"),
-        where("org", "==", userData.org)
-      );
+        collection(db, 'new_users'),
+        where('org', '==', userData.org),
+      )
       const docRef = getDocs(q).then((querySnapshot) => {
         querySnapshot.forEach((docRef) => {
-          pendingUsers[docRef.id] = docRef.data();
-        });
+          pendingUsers[docRef.id] = docRef.data()
+        })
         if (
           Object.keys(pendingUsers).length > 0 &&
           Object.keys(prospectiveUsers).length < 1
         ) {
-          setProspectiveUsers(pendingUsers);
+          setProspectiveUsers(pendingUsers)
         }
-      });
-    } else if (userData.role === "site_admin") {
-      const pendingOrgs: NestedSchemas = {};
-      getDocs(collection(db, "new_users")).then((querySnapshot) => {
+      })
+    } else if (userData.role === 'site_admin') {
+      const pendingOrgs: NestedSchemas = {}
+      getDocs(collection(db, 'new_users')).then((querySnapshot) => {
         querySnapshot.forEach((doc) => {
-          const docData = doc.data();
-          if (doc.id === "new_orgs") {
+          const docData = doc.data()
+          if (doc.id === 'new_orgs') {
             Object.keys(docData).forEach((orgName: string) => {
-              pendingOrgs[orgName] = docData[orgName];
-            });
+              pendingOrgs[orgName] = docData[orgName]
+            })
           } else {
             // If the prospective members have not selected the org they wish to join yet,
             // they can't be approved and shouldn't be shown on the pending users list.
             if (docData.org) {
-              const data = doc.data();
-              pendingUsers[doc.id] = data;
+              const data = doc.data()
+              pendingUsers[doc.id] = data
             }
           }
-        });
+        })
         if (
           Object.keys(pendingOrgs).length > 0 &&
           Object.keys(prospectiveOrgs).length < 1
         ) {
-          setProspectiveOrgs(pendingOrgs);
+          setProspectiveOrgs(pendingOrgs)
         }
         if (
           Object.keys(pendingUsers).length > 0 &&
           Object.keys(prospectiveUsers).length < 1
         ) {
-          setProspectiveUsers(pendingUsers);
+          setProspectiveUsers(pendingUsers)
         }
-      });
+      })
     }
   }
 
   function handleApproveOrgClick(evt: any) {
-    const orgName = evt.target.parentElement.parentElement.id;
-    const adminId = prospectiveOrgs[orgName].admin_id as unknown as string;
-    const date = new Date();
+    const orgName = evt.target.parentElement.parentElement.id
+    const adminId = prospectiveOrgs[orgName].admin_id as unknown as string
+    const date = new Date()
     const dateString = `${
       date.getMonth() + 1
-    } ${date.getDate()} ${date.getFullYear()}`;
-    const orgId = getRanHex(20);
-    const newOrgRef = doc(db, "organizations", orgId);
+    } ${date.getDate()} ${date.getFullYear()}`
+    const orgId = getRanHex(20)
+    const newOrgRef = doc(db, 'organizations', orgId)
     const orgEmail = isProd()
       ? `${orgName}@timberid.org`
-      : `${orgName}-test@timberid.org`;
+      : `${orgName}-test@timberid.org`
     setDoc(newOrgRef, {
       org_name: orgName,
       org_email: orgEmail,
@@ -156,94 +152,94 @@ export default function SignUpRequests() {
           id: prospectiveOrgs[orgName].admin_id,
         },
       ],
-    });
-    const newUserDocRef = doc(db, "users", adminId);
+    })
+    const newUserDocRef = doc(db, 'users', adminId)
     setDoc(newUserDocRef, {
       org: orgId,
       name: prospectiveOrgs[orgName].admin_name,
       email: prospectiveOrgs[orgName].email,
-      role: "admin",
+      role: 'admin',
       date_added: dateString,
       org_name: orgName,
-    });
-    deleteOrgFromNewOrgLists(orgName);
+    })
+    deleteOrgFromNewOrgLists(orgName)
   }
 
   function handleRejectOrgClick(evt: any) {
-    const orgName = evt.target.parentElement.parentElement.id;
-    addDoc(collection(db, "users"), {
+    const orgName = evt.target.parentElement.parentElement.id
+    addDoc(collection(db, 'users'), {
       name: prospectiveOrgs[orgName].admin_name,
       email: prospectiveOrgs[orgName].email,
-    });
-    deleteOrgFromNewOrgLists(orgName);
+    })
+    deleteOrgFromNewOrgLists(orgName)
   }
 
   function deleteOrgFromNewOrgLists(orgName: string) {
-    const newOrgDocRef = doc(db, "new_users", "new_orgs");
-    let deletedOrgDoc: any = {};
-    deletedOrgDoc[orgName] = deleteField();
-    updateDoc(newOrgDocRef, deletedOrgDoc);
-    const newProspectiveOrgs = structuredClone(prospectiveOrgs);
-    delete newProspectiveOrgs[orgName];
-    setProspectiveOrgs(newProspectiveOrgs);
+    const newOrgDocRef = doc(db, 'new_users', 'new_orgs')
+    let deletedOrgDoc: any = {}
+    deletedOrgDoc[orgName] = deleteField()
+    updateDoc(newOrgDocRef, deletedOrgDoc)
+    const newProspectiveOrgs = structuredClone(prospectiveOrgs)
+    delete newProspectiveOrgs[orgName]
+    setProspectiveOrgs(newProspectiveOrgs)
   }
 
   async function handleApproveMemberClick(evt: any) {
-    const memberId = evt.target.parentElement.parentElement.id;
-    const orgId = prospectiveUsers[memberId].org;
+    const memberId = evt.target.parentElement.parentElement.id
+    const orgId = prospectiveUsers[memberId].org
     if (!orgId) {
       alert(
-        "Prospective user has not selected an organization to join. Once they select an organization, you will be able to approve their membership"
-      );
-      return;
+        'Prospective user has not selected an organization to join. Once they select an organization, you will be able to approve their membership',
+      )
+      return
     }
-    const userId = prospectiveUsers[memberId].uid;
+    const userId = prospectiveUsers[memberId].uid
 
-    const date = new Date();
+    const date = new Date()
     const dateString = `${
       date.getMonth() + 1
-    } ${date.getDate()} ${date.getFullYear()}`;
-    const potentialUserData = await getUserData(userId as unknown as string);
-    const newUserDocRef = doc(db, "users", userId as unknown as string);
+    } ${date.getDate()} ${date.getFullYear()}`
+    const potentialUserData = await getUserData(userId as unknown as string)
+    const newUserDocRef = doc(db, 'users', userId as unknown as string)
     if (potentialUserData.email) {
       updateDoc(newUserDocRef, {
         org: orgId,
         org_name: prospectiveUsers[memberId].org_name,
         date_added: dateString,
-        role: "member",
-      });
+        role: 'member',
+      })
     } else {
       setDoc(newUserDocRef, {
         name: prospectiveUsers[memberId].name,
         org: orgId,
         org_name: prospectiveUsers[memberId].org_name,
         date_added: dateString,
-        role: "member",
+        role: 'member',
         email: prospectiveUsers[memberId].email,
-      });
+      })
     }
 
-    const orgDocRef = doc(db, "organizations", orgId);
+    const orgDocRef = doc(db, 'organizations', orgId)
     updateDoc(orgDocRef, {
       members: arrayUnion(prospectiveUsers[memberId].email),
-    });
-    deleteMemberFromNewMemberList(memberId);
+    })
+    deleteMemberFromNewMemberList(memberId)
   }
 
   function handleRejectMemberClick(evt: any) {
-    const memberId = evt.target.parentElement.parentElement.id;
-    addDoc(collection(db, "users"), {
+    const memberId = evt.target.parentElement.parentElement.id
+    addDoc(collection(db, 'users'), {
       name: prospectiveUsers[memberId].name,
       email: prospectiveUsers[memberId].email,
-    });
-    deleteMemberFromNewMemberList(memberId);
+    })
+    deleteMemberFromNewMemberList(memberId)
   }
 
   function deleteMemberFromNewMemberList(memberId: string) {
-    deleteDoc(doc(db, "new_users", memberId));
-    const newProspectiveUsersList = structuredClone(prospectiveUsers);
-    delete newProspectiveUsersList[memberId];
-    setProspectiveUsers(newProspectiveUsersList);
+    deleteDoc(doc(db, 'new_users', memberId))
+    const newProspectiveUsersList = structuredClone(prospectiveUsers)
+    delete newProspectiveUsersList[memberId]
+    setProspectiveUsers(newProspectiveUsersList)
   }
 
   return (
@@ -296,7 +292,7 @@ export default function SignUpRequests() {
                     </button>
                   </td>
                 </tr>
-              );
+              )
             })}
           </tbody>
         </table>
@@ -348,11 +344,11 @@ export default function SignUpRequests() {
                     </button>
                   </td>
                 </tr>
-              );
+              )
             })}
           </tbody>
         </table>
       </div>
     </div>
-  );
+  )
 }

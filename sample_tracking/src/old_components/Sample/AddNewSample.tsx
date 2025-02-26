@@ -15,7 +15,7 @@ import {
 import { useTranslation } from 'react-i18next'
 import '../../i18n/config'
 
-import { ActionButton, BackButton, CancelButton, NextButton } from './actions'
+import { ActionButton, BackButton, CancelButton, NextButton } from './Actions'
 import BasicInfoTab from './BasicInfoTab'
 import SampleMeasurementsTab from './SampleMeasurementTab'
 import ReviewAndSubmitTab from './ReviewSample'
@@ -110,7 +110,7 @@ export default function AddNewSample({
       const value = evt.$d
       newFormData = {
         ...formData,
-        date_collected: evt.$d,
+        date_collected: value,
       }
     } else {
       let value

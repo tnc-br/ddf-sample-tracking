@@ -1,19 +1,11 @@
 import { initializeApp, getApp } from 'firebase/app'
-import { useEffect } from 'react'
-import {
-  getAuth,
-  onAuthStateChanged,
-  type Auth,
-  type User,
-} from 'firebase/auth'
-import { useRouter } from 'next/navigation'
+import { type User } from 'firebase/auth'
 import {
   getDoc,
   doc,
   type Firestore,
   type DocumentReference,
 } from 'firebase/firestore'
-import { useSearchParams } from 'next/navigation'
 import { getAnalytics, isSupported } from 'firebase/analytics'
 
 export type UserData = {
@@ -199,7 +191,7 @@ export function getRanHex(size: number): string {
   return result.join('')
 }
 
-export async function initializeAppIfNecessary() {
+async function initializeAppIfNecessary() {
   try {
     getApp()
   } catch (any) {

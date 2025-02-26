@@ -1,30 +1,16 @@
-"use client";
+'use client'
 
-import "./styles.css";
-import "bootstrap/dist/css/bootstrap.css";
-import { useRouter } from "next/navigation";
-import {
-  doc,
-  setDoc,
-  getFirestore,
-  getDoc,
-  getDocs,
-  collection,
-  query,
-  where,
-  updateDoc,
-} from "firebase/firestore";
-import { getAuth, onAuthStateChanged } from "firebase/auth";
-import { useState, useEffect } from "react";
-import {
-  hideNavBar,
-  hideTopBar,
-  initializeAppIfNecessary,
-  type UserData,
-} from "../../old_components/utils";
+import './styles.css'
+import 'bootstrap/dist/css/bootstrap.css'
+import { useRouter } from 'next/navigation'
+import { doc, getDoc, getDocs, collection, updateDoc } from 'firebase/firestore'
+import { onAuthStateChanged } from 'firebase/auth'
+import { useState, useEffect } from 'react'
+import { hideNavBar, hideTopBar } from '../../old_components/utils'
+import { auth, firestore } from '@services/firebase/config'
 
 interface OrgsSchemas {
-  [key: string]: string;
+  [key: string]: string
 }
 
 /**
@@ -32,74 +18,72 @@ interface OrgsSchemas {
  * 'org' and 'org_name' fields in the user's document in the 'new_users' collection. They can't be approved as TimberId members before this happens.
  */
 export default function SelectOrg() {
-  const [availableOrgs, setAvailableOrgs] = useState({} as OrgsSchemas);
-  const [userDocId, setNewUserDocId] = useState("");
+  const [availableOrgs, setAvailableOrgs] = useState({} as OrgsSchemas)
+  const [userDocId, setNewUserDocId] = useState('')
 
-  const router = useRouter();
-  const app = initializeAppIfNecessary();
-  const auth = getAuth();
-  const db = getFirestore();
+  const router = useRouter()
+  const db = firestore
 
   useEffect(() => {
-    hideNavBar();
-    hideTopBar();
+    hideNavBar()
+    hideTopBar()
     if (userDocId.length < 1) {
       onAuthStateChanged(auth, (user) => {
         if (user) {
-          console.log(user);
-          const userDocRef = doc(db, "users", user.uid);
+          console.log(user)
+          const userDocRef = doc(db, 'users', user.uid)
           getDoc(userDocRef).then((docRef) => {
             if (docRef.exists() && docRef.data().org.length > 0) {
               // User exists in users collection already, they should not be here to select a new organization.
               console.log(
-                "Error: user already exists. Forwarding to samples page"
-              );
-              router.push("/samples");
+                'Error: user already exists. Forwarding to samples page',
+              )
+              router.push('/samples')
             }
-          });
-          getDoc(doc(db, "new_users", user.uid)).then((docRef) => {
+          })
+          getDoc(doc(db, 'new_users', user.uid)).then((docRef) => {
             if (docRef.exists()) {
-              const data = docRef.data();
+              const data = docRef.data()
               if (data.org) {
                 console.log(
-                  "Error: this new user already has a pending org request. Forwarding to samples."
-                );
-                router.push("/samples");
+                  'Error: this new user already has a pending org request. Forwarding to samples.',
+                )
+                router.push('/samples')
               }
-              setNewUserDocId(docRef.id);
+              setNewUserDocId(docRef.id)
             }
-          });
+          })
         }
-      });
+      })
     }
-  });
+  })
 
   if (Object.keys(availableOrgs).length < 1) {
-    const orgs: OrgsSchemas = {};
-    getDocs(collection(db, "organizations")).then((querySnapshot) => {
-      console.log("made request to organizations");
+    const orgs: OrgsSchemas = {}
+    getDocs(collection(db, 'organizations')).then((querySnapshot) => {
+      console.log('made request to organizations')
       querySnapshot.forEach((doc) => {
-        const docData = doc.data();
-        orgs[docData["org_name"]] = doc.id;
-      });
-      setAvailableOrgs(orgs as OrgsSchemas);
-    });
+        const docData = doc.data()
+        orgs[docData['org_name']] = doc.id
+      })
+      setAvailableOrgs(orgs as OrgsSchemas)
+    })
   }
 
   async function handleOrgSelectButtonClick(evt: any) {
-    console.log(evt);
-    const orgName = (document.getElementById("orgSelect") as HTMLInputElement)
-      .value;
-    const orgId = availableOrgs[orgName];
-    const newUserDocRef = doc(db, "new_users", userDocId);
+    console.log(evt)
+    const orgName = (document.getElementById('orgSelect') as HTMLInputElement)
+      .value
+    const orgId = availableOrgs[orgName]
+    const newUserDocRef = doc(db, 'new_users', userDocId)
     updateDoc(newUserDocRef, {
       org: orgId,
       org_name: orgName,
     }).catch((error) => {
-      console.log(error);
-    });
+      console.log(error)
+    })
 
-    router.push("/samples");
+    router.push('/samples')
   }
 
   return (
@@ -116,7 +100,7 @@ export default function SelectOrg() {
               <option key={key} className={availableOrgs[key]} id={key}>
                 {key}
               </option>
-            );
+            )
           })}
         </select>
         <button
@@ -128,5 +112,5 @@ export default function SelectOrg() {
         </button>
       </div>
     </div>
-  );
+  )
 }

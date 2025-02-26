@@ -11,14 +11,12 @@ import { useSearchParams } from 'next/navigation'
 import {
   type Sample,
   type UserData,
-  confirmUserLoggedIn,
-  initializeAppIfNecessary,
-  getDocRefForTrustedValue,
   getPointsArrayFromSampleResults,
 } from '../../old_components/utils'
 import Link from 'next/link'
 import { useTranslation } from 'react-i18next'
 import AddNewSample from '../../old_components/Sample/AddNewSample'
+import { auth, firestore } from '@services/firebase/config'
 
 /**
  * Component to handle editing a sample. It uses the SampleDataInput subcomponent to handle data input.
@@ -39,9 +37,7 @@ export default function Edit() {
   })
 
   const router = useRouter()
-  initializeAppIfNecessary()
-  const auth = getAuth()
-  const db = getFirestore()
+  const db = firestore
   const { t } = useTranslation()
 
   let sampleId = '12345'

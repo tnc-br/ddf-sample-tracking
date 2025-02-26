@@ -3,7 +3,6 @@ import { useForm, Controller } from 'react-hook-form'
 import { ErrorMessage } from '@hookform/error-message'
 
 import { useTranslation } from 'react-i18next'
-import { TextField, Autocomplete, MenuItem } from '@mui/material'
 import dayjs from 'dayjs'
 import { LocalizationProvider, DatePicker } from '@mui/x-date-pickers'
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
@@ -73,14 +72,6 @@ function BasicInfoTab({
     setValue,
   } = useForm<FormSchema>()
 
-  const style = {
-    '& .MuiOutlinedInput-root': {
-      '&.Mui-focused fieldset': {
-        borderColor: 'green',
-      },
-    },
-  }
-
   const SPECIES_NAMES_OPTIONS = speciesList.split('\n').map((species) => ({
     value: species.trim().toLowerCase(),
     label: species.trim(),
@@ -99,7 +90,10 @@ function BasicInfoTab({
     }))
 
   return (
-    <form className="grid grid-cols-2 gap-5">
+    <form
+      className="grid grid-cols-2 gap-5"
+      onSubmit={handleSubmit(onChangeClick)}
+    >
       <div className="flex flex-col gap-3">
         <div className="">
           <label
@@ -295,7 +289,7 @@ function BasicInfoTab({
           </div>
         )}
 
-        <div className="input-text-field-wrapper">
+        {/* <div className="input-text-field-wrapper">
           <LocalizationProvider dateAdapter={AdapterDayjs}>
             <DatePicker
               label={t('dateCollected')}
@@ -304,7 +298,7 @@ function BasicInfoTab({
               {...register('date_collected')}
             />
           </LocalizationProvider>
-        </div>
+        </div> */}
       </div>
       <div className="">
         <div className="collected-by-wrapper">
@@ -347,30 +341,34 @@ function BasicInfoTab({
           </div>
         </div>
         {formData.collected_by === 'supplier' && (
-          <div className="input-text-field-wrapper">
-            <TextField
-              size="small"
-              sx={style}
-              fullWidth
+          <div className="">
+            <label
+              className="text-xs text-neutral-400 font-medium"
+              htmlFor="supplier"
+            >
+              {t('supplier')}
+            </label>
+            <TextInput
+              required
               id="supplier"
-              name="supplier"
-              label={t('supplier')}
-              onChange={onChangeClick}
-              value={formData.supplier}
+              placeholder="Amostra 123"
+              {...register('supplier')}
             />
           </div>
         )}
 
-        <div className="input-text-field-wrapper">
-          <TextField
-            size="small"
-            sx={style}
-            fullWidth
+        <div className="">
+          <label
+            className="text-xs text-neutral-400 font-medium"
+            htmlFor="city"
+          >
+            {t('city')}
+          </label>
+          <TextInput
+            required
             id="city"
-            name="city"
-            label={t('city')}
-            onChange={onChangeClick}
-            value={formData.city}
+            placeholder="Amostra 123"
+            {...register('city')}
           />
         </div>
       </div>
