@@ -4,7 +4,9 @@ interface ReviewAndSubmitTabProps {
   formData: any
   numMeasurements: number
   currentMeasurementsTab: number
-  handleMeasurementsTabClick: (event: any) => void
+  onNextClick: () => void
+  onCancelClick: () => void
+  handleMeasurementsTabClick: (e: any) => void
 }
 
 function ReviewAndSubmitTab({
@@ -12,6 +14,8 @@ function ReviewAndSubmitTab({
   numMeasurements,
   currentMeasurementsTab,
   handleMeasurementsTabClick,
+  onNextClick,
+  onCancelClick,
 }: ReviewAndSubmitTabProps) {
   const { t } = useTranslation()
 
@@ -191,6 +195,31 @@ function ReviewAndSubmitTab({
             </div>
           </div>
         </div>
+      </div>
+      <div className="flex justify-between my-10">
+        <button
+          onClick={onCancelClick}
+          type="button"
+          className="back-button-wrapper add-sample-button-wrapper"
+        >
+          <div className="add-sample-slate-layer">
+            <div className="add-sample-button-text green-button-text">
+              {t('back')}
+            </div>
+          </div>
+        </button>
+        <button
+          id="next-button-wrapper"
+          type="button"
+          onClick={onNextClick}
+          className="add-sample-button-wrapper next-button-wrapper"
+        >
+          <div className="add-sample-slate-layer">
+            <div className="add-sample-button-text white-button-text">
+              {t('next')}
+            </div>
+          </div>
+        </button>
       </div>
     </div>
   )

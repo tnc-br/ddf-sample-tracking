@@ -2,7 +2,7 @@
 import './styles.css'
 import 'bootstrap/dist/css/bootstrap.css'
 import { doc, getDoc } from 'firebase/firestore'
-import { useSearchParams } from 'next/navigation'
+import { useParams, useSearchParams } from 'next/navigation'
 import { onAuthStateChanged } from 'firebase/auth'
 import { useState, useEffect } from 'react'
 import { type Sample, showNavBar, showTopBar } from '../../old_components/utils'
@@ -42,17 +42,9 @@ export default function SampleDetails() {
   let sampleId = '12345'
   let trusted = 'trusted'
 
+  const params = useParams()
+
   const searchParams = useSearchParams()
-  if (typeof window !== 'undefined') {
-    const queryString = window.location.search
-    const urlParams = new URLSearchParams(queryString)
-    sampleId = urlParams.get('id')
-      ? urlParams.get('id')
-      : searchParams.get('id')
-    trusted = urlParams.get('trusted')
-      ? urlParams.get('trusted')
-      : searchParams.get('trusted')
-  }
 
   const db = firestore
   const { t } = useTranslation()
@@ -61,6 +53,17 @@ export default function SampleDetails() {
   useEffect(() => {
     showNavBar()
     showTopBar()
+
+    if (typeof window !== 'undefined') {
+      const queryString = params
+      const urlParams = new URLSearchParams(queryString)
+      sampleId = urlParams.get('id')
+        ? urlParams.get('id')
+        : searchParams.get('id')
+      trusted = urlParams.get('trusted')
+        ? urlParams.get('trusted')
+        : searchParams.get('trusted')
+    }
 
     onAuthStateChanged(auth, (user) => {
       if (!user) {

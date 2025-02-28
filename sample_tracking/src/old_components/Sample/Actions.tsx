@@ -36,18 +36,12 @@ export function CancelButton({ onCancleClick }: { onCancleClick: () => void }) {
   )
 }
 
-export function NextButton({
-  attemptToUpdateCurrentTab,
-  currentTab,
-}: {
-  attemptToUpdateCurrentTab: (tab: number) => void
-  currentTab: number
-}) {
+export function NextButton({ onClick }: { onClick: () => void }) {
   const { t } = useTranslation()
   return (
     <div
       id="next-button-wrapper"
-      onClick={() => attemptToUpdateCurrentTab(currentTab + 1)}
+      onClick={onClick}
       className="add-sample-button-wrapper next-button-wrapper"
     >
       <div className="add-sample-slate-layer">
@@ -67,6 +61,7 @@ export function ActionButton({
   onActionButtonClick: () => void
 }) {
   const { t } = useTranslation()
+
   return (
     <div
       id="action-button"

@@ -3,7 +3,7 @@
 // import './styles.css';
 import '../add-sample/styles.css'
 import 'bootstrap/dist/css/bootstrap.css'
-import { useRouter } from 'next/navigation'
+import { useParams, useRouter } from 'next/navigation'
 import { doc, updateDoc, getFirestore, getDoc } from 'firebase/firestore'
 import { getAuth, onAuthStateChanged } from 'firebase/auth'
 import { useState, useEffect } from 'react'
@@ -36,6 +36,7 @@ export default function Edit() {
     collected_by: 'supplier',
   })
 
+  const params = useParams()
   const router = useRouter()
   const db = firestore
   const { t } = useTranslation()
@@ -44,18 +45,19 @@ export default function Edit() {
   let trusted = 'trusted'
 
   const searchParams = useSearchParams()
-  if (typeof window !== 'undefined') {
-    const queryString = window.location.search
-    const urlParams = new URLSearchParams(queryString)
-    sampleId = urlParams.get('id')
-      ? urlParams.get('id')
-      : searchParams.get('id')
-    trusted = urlParams.get('trusted')
-      ? urlParams.get('trusted')
-      : searchParams.get('trusted')
-  }
 
   useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const queryString = params
+      const urlParams = new URLSearchParams(queryString)
+      sampleId = urlParams.get('id')
+        ? urlParams.get('id')
+        : searchParams.get('id')
+      trusted = urlParams.get('trusted')
+        ? urlParams.get('trusted')
+        : searchParams.get('trusted')
+    }
+
     if (!userData.role) {
       onAuthStateChanged(auth, (user) => {
         if (!user) {

@@ -13,11 +13,12 @@ import {
   type UserData,
   Sample,
 } from '../../old_components/utils'
-import { useSearchParams } from 'next/navigation'
+import { useSearchParams, useParams } from 'next/navigation'
 import { useTranslation } from 'react-i18next'
 import Link from 'next/link'
 import { setSample } from '../../old_components/firebase_utils'
 import { auth, firestore } from '@services/firebase/config'
+import { QRCodeSVG } from 'qrcode.react'
 
 /**
  * Component to handle adding a complete or incomplet sample. It uses the SampleDataInput
@@ -37,7 +38,7 @@ export default function AddSample() {
   const [currentTab, setCurrentTab] = useState(1)
   const [sampleId, setSampleID] = useState('')
   const [sampleCreationFinished, setSampleCreationFinished] = useState(false)
-
+  const params = useParams()
   const [formData, setFormData] = useState({
     visibility: 'private',
     collected_by: 'supplier',
@@ -50,23 +51,24 @@ export default function AddSample() {
 
   let status = 'completed'
   const searchParams = useSearchParams()
-  if (typeof window !== 'undefined' && !formData.trusted) {
-    const queryString = window.location.search
-    const urlParams = new URLSearchParams(queryString)
-    status = urlParams.get('status')
-      ? urlParams.get('status')
-      : searchParams.get('status')
-    setFormData({
-      ...formData,
-      trusted: status === 'originVerification' ? 'untrusted' : 'trusted',
-    })
-  }
 
   if (sampleId.length < 1) {
     setSampleID(getRanHex(20))
   }
 
   useEffect(() => {
+    if (typeof window !== 'undefined' && !formData.trusted) {
+      const queryString = params
+      const urlParams = new URLSearchParams(queryString)
+      status = urlParams.get('status')
+        ? urlParams.get('status')
+        : searchParams.get('status')
+      setFormData({
+        ...formData,
+        trusted: status === 'originVerification' ? 'untrusted' : 'trusted',
+      })
+    }
+
     if (!userData.role || userData.role.length < 1) {
       onAuthStateChanged(auth, (user) => {
         if (!user) {

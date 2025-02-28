@@ -2,20 +2,11 @@
 
 import '../styles.css'
 import 'bootstrap/dist/css/bootstrap.css'
-import { useRouter } from 'next/navigation'
 import { useState, useEffect } from 'react'
-import {
-  hideNavBar,
-  hideTopBar,
-  validateSample,
-  Sample,
-  SampleError,
-  ErrorMessages,
-} from '../utils'
+import { hideNavBar, hideTopBar, Sample } from '../utils'
 import { useTranslation } from 'react-i18next'
 import '../../i18n/config'
 
-import { ActionButton, BackButton, CancelButton, NextButton } from './Actions'
 import BasicInfoTab from './BasicInfoTab'
 import SampleMeasurementsTab from './SampleMeasurementTab'
 import ReviewAndSubmitTab from './ReviewSample'
@@ -55,19 +46,8 @@ export default function AddNewSample({
   const [formData, setFormData] = useState(baseState)
   const [numMeasurements, setNumMeasurements] = useState(2)
   const [currentMeasurementsTab, setCurentMeasurementsTab] = useState(0)
-  const [errorText, setErrorText] = useState<Sample | null>(null)
 
-  const router = useRouter()
   const { t } = useTranslation()
-
-  const errorMessages: ErrorMessages = {
-    originValueError: t('originValueError'),
-    originValueRequired: t('originValueRequired'),
-    latLonRequired: t('latLonRequired'),
-    shouldBeWithinTheRange: t('shouldBeWithinTheRange'),
-    and: t('and'),
-    isRequired: t('isRequired'),
-  }
 
   useEffect(() => {
     hideNavBar()
@@ -80,12 +60,8 @@ export default function AddNewSample({
     setFormData(baseState)
   }
 
-  function attemptToUpdateCurrentTab(newTab: number) {
-    if (newTab < currentTab || checkCurrentTabFormValidity()) {
-      setCurrentTab(newTab)
-      if (onTabChange) onTabChange(newTab)
-      setErrorText(null)
-    }
+  const handleChangeTab = (tab: number) => {
+    setCurrentTab(tab)
   }
 
   function handleSelectSupplier() {
@@ -104,100 +80,10 @@ export default function AddNewSample({
     setFormData(newFormData)
   }
 
-  function handleChange(evt: any, newValue?: any) {
-    let newFormData
-    if (evt.$d) {
-      const value = evt.$d
-      newFormData = {
-        ...formData,
-        date_collected: value,
-      }
-    } else {
-      let value
-      let name
-      if (newValue && newValue.length) {
-        value = newValue
-        const id = evt.target.id
-        name = id.substring(0, id.indexOf('-option'))
-      } else {
-        value =
-          evt.target.type === 'checkbox'
-            ? evt.target.checked
-            : evt.$d
-              ? evt.$d
-              : evt.target.value
-        name = evt.target.name
-      }
-
-      newFormData = {
-        ...formData,
-        [name]: value,
-      }
-    }
-    setFormData(newFormData)
-  }
-
-  function handleResultChange(evt: any) {
-    const value = evt.target.value
-    let newFormDataMeasurementsArray = structuredClone(
-      formData[evt.target.name],
-    )
-    if (!newFormDataMeasurementsArray) {
-      newFormDataMeasurementsArray = []
-    }
-    newFormDataMeasurementsArray[currentMeasurementsTab] = value
-    const newFormData = {
-      ...formData,
-      [evt.target.name]: newFormDataMeasurementsArray,
-    }
-    setFormData(newFormData)
-  }
-
-  function onCancleClick() {
-    router.push('samples')
-  }
-
-  function handleButtonClick() {
-    const currentTabRef = getCurrentTabFormRef()
-    if (!checkCurrentTabFormValidity()) return
-    onActionButtonClick(sampleId, formData)
-  }
-
-  function getCurrentTabFormRef() {
-    if (currentTab === 1) {
-      return document.getElementById('info-tab')!
-    } else if (currentTab === 2) {
-      return document.getElementById('sample-measurements')!
-    } else {
-      return document.getElementById('results-tab')!
-    }
-  }
-
-  function checkCurrentTabFormValidity(): boolean {
-    if (currentTab === 3) return true
-
-    const currentTabRef = getCurrentTabFormRef()
-    // if (currentTab === 2 && !validateSampleResultsTab()) return false;
-
-    if (currentTabRef.checkValidity()) {
-      const possibleErrors = validateSample(
-        formData,
-        [currentTab],
-        errorMessages,
-      )
-      let tempErrorText = {} as Sample
-      if (possibleErrors.length > 0) {
-        possibleErrors.forEach((error: SampleError) => {
-          tempErrorText[error.fieldWithError] = error.errorString
-        })
-        setErrorText(tempErrorText)
-        return false
-      }
-      return true
-    } else {
-      currentTabRef.reportValidity()
-      return false
-    }
+  const saveChanges = (res: any) => {
+    setFormData((prev) => {
+      return { ...prev, ...res }
+    })
   }
 
   function handleMeasurementsTabClick(evt: any) {
@@ -208,35 +94,17 @@ export default function AddNewSample({
     setNumMeasurements(numMeasurements + 1)
   }
 
-  const sampleTypeValues = {
-    Disc: 'disk',
-    Triangular: 'triangular',
-    Chunk: 'chunk',
-    Fiber: 'fiber',
-  }
-
-  const userIsOnLastTab = currentTab === 4
-
-  const shouldShowNextButton = currentTab < 3
-
-  const shouldShowBackButton = currentTab !== 1 && !userIsOnLastTab
-
-  const shouldShowCancelButton = !userIsOnLastTab
-
-  const shouldShowActionItemButton = currentTab === 3 || !isNewSampleForm
   const originIsKnownOrUncertain =
     formData.trusted === 'trusted' || formData.trusted === 'untrusted'
 
-  function handleReturnToDashboard() {
-    router.push('/samples')
+  const finish = async () => {
+    console.log('formData', formData)
+    console.log('sampleId', sampleId)
+    await onActionButtonClick(sampleId, formData)
   }
 
   return (
     <div className="add-sample-page-wrapper">
-      <link
-        rel="stylesheet"
-        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@48,400,0,0&display=optional"
-      />
       <div>
         <div id="sample-form">
           {
@@ -333,25 +201,20 @@ export default function AddNewSample({
           <div>
             {currentTab === 1 && (
               <BasicInfoTab
-                errorText={errorText}
                 formData={formData}
-                onChangeClick={handleChange}
+                onSave={saveChanges}
                 onChangeClickMyOrg={handleSelectMyOrg}
                 onChangeClickSupplier={handleSelectSupplier}
                 originIsKnownOrUncertain={originIsKnownOrUncertain}
+                nextTab={() => handleChangeTab(currentTab + 1)}
               />
             )}
             {currentTab === 2 && (
               <SampleMeasurementsTab
-                currentMeasurementsTab={currentMeasurementsTab}
-                errorText={errorText}
-                formData={formData}
+                nextTab={() => handleChangeTab(currentTab + 1)}
+                onSave={saveChanges}
+                onCancelClick={() => handleChangeTab(currentTab - 1)}
                 handleAddMeasurementClick={handleAddMeasurementClick}
-                handleChange={handleChange}
-                handleMeasurementsTabClick={handleMeasurementsTabClick}
-                handleResultChange={handleResultChange}
-                numMeasurements={numMeasurements}
-                sampleTypeValues={sampleTypeValues}
               />
             )}
             {currentTab === 3 && (
@@ -360,46 +223,11 @@ export default function AddNewSample({
                 formData={formData}
                 handleMeasurementsTabClick={handleMeasurementsTabClick}
                 numMeasurements={numMeasurements}
+                onCancelClick={() => handleChangeTab(currentTab - 1)}
+                onNextClick={finish}
               />
             )}
-            {/* {currentTab === 4 && createSampleTab()} */}
           </div>
-        </div>
-      </div>
-      <div className="submit-buttons">
-        <div>
-          {shouldShowCancelButton && (
-            <CancelButton onCancleClick={onCancleClick} />
-          )}
-        </div>
-        <div className="submit-buttons-right">
-          {shouldShowBackButton && (
-            <BackButton
-              attemptToUpdateCurrentTab={attemptToUpdateCurrentTab}
-              currentTab={currentTab}
-            />
-          )}
-          {shouldShowNextButton && (
-            <NextButton
-              attemptToUpdateCurrentTab={attemptToUpdateCurrentTab}
-              currentTab={currentTab}
-            />
-          )}
-          {shouldShowActionItemButton && (
-            <ActionButton
-              actionButtonTitle={actionButtonTitle}
-              onActionButtonClick={handleButtonClick}
-            />
-          )}
-          {userIsOnLastTab && (
-            <button
-              type="button"
-              onClick={handleReturnToDashboard}
-              className="btn btn-primary"
-            >
-              Return to dashboard
-            </button>
-          )}
         </div>
       </div>
     </div>
