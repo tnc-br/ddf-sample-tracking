@@ -279,6 +279,8 @@ export default function ImportSamples() {
             trusted: resultValues[0].trusted,
             species: resultValues[0].species || '',
             created_by: user.uid,
+            genus: resultValues[0].genus || '',
+            family: resultValues[0].family || '',
             created_on: formattedDateString,
             last_updated_by: currentUserData.name,
             org: currentUserData.org,
