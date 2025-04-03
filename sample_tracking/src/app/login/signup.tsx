@@ -1,24 +1,14 @@
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import {
-  getAuth,
-  createUserWithEmailAndPassword,
-  updateProfile,
-} from 'firebase/auth'
-import {
-  doc,
-  getDocs,
-  collection,
-  getFirestore,
-  updateDoc,
-  setDoc,
-} from 'firebase/firestore'
+import { createUserWithEmailAndPassword, updateProfile } from 'firebase/auth'
+import { doc, getDocs, collection, updateDoc, setDoc } from 'firebase/firestore'
 import { TextField, MenuItem } from '@mui/material'
 import {
   ConfirmationBox,
   ConfirmationProps,
 } from '../../old_components/confirmation_box'
 import { useTranslation } from 'react-i18next'
+import { auth, firestore } from '@services/firebase/config'
 
 interface SignUpProps {
   onLogInClick: any
@@ -76,8 +66,7 @@ export default function SignUp(props: SignUpProps) {
     setSignUpData(signUpData)
   }
 
-  const auth = getAuth()
-  const db = getFirestore()
+  const db = firestore
   const router = useRouter()
   const { t } = useTranslation()
 

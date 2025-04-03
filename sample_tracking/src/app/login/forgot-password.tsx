@@ -1,11 +1,12 @@
-import "./styles.css";
-import { getAuth, sendPasswordResetEmail } from "firebase/auth";
-import { useState } from "react";
-import { TextField } from "@mui/material";
-import { MdArrowBack } from "react-icons/md";
+import './styles.css'
+import { sendPasswordResetEmail } from 'firebase/auth'
+import { useState } from 'react'
+import { TextField } from '@mui/material'
+import { MdArrowBack } from 'react-icons/md'
+import { auth } from '@services/firebase/config'
 
 interface ForgotPasswordProps {
-  returnToSignInClick: any;
+  returnToSignInClick: any
 }
 
 /**
@@ -13,22 +14,21 @@ interface ForgotPasswordProps {
  * auth to send password reset email to the specified email.
  */
 export default function ForgotPassword(props: ForgotPasswordProps) {
-  const [emailSent, setEmailSent] = useState(false);
+  const [emailSent, setEmailSent] = useState(false)
 
   function handleSubmitButtonClick() {
-    const emailForm = document.getElementById("email-form");
-    if (!emailForm) return;
-    if (!emailForm.checkValidity()) emailForm.reportValidity();
-    const email = document.getElementById("email").value;
-    if (!email) return;
-    const auth = getAuth();
+    const emailForm = document.getElementById('email-form')
+    if (!emailForm) return
+    if (!emailForm.checkValidity()) emailForm.reportValidity()
+    const email = document.getElementById('email').value
+    if (!email) return
     sendPasswordResetEmail(auth, email).then(() => {
-      setEmailSent(true);
-    });
+      setEmailSent(true)
+    })
   }
 
   function handleReturnClick() {
-    props.returnToSignInClick();
+    props.returnToSignInClick()
   }
 
   return (
@@ -42,7 +42,7 @@ export default function ForgotPassword(props: ForgotPasswordProps) {
                 onClick={
                   props.returnToSignInClick
                     ? props.returnToSignInClick
-                    : console.log("Error: unable to return to login screen")
+                    : console.log('Error: unable to return to login screen')
                 }
                 className="forgot-password-button-text"
               >
@@ -85,5 +85,5 @@ export default function ForgotPassword(props: ForgotPasswordProps) {
         </div>
       )}
     </div>
-  );
+  )
 }

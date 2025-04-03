@@ -1,12 +1,11 @@
 'use client'
 
-import { getAuth, onAuthStateChanged } from 'firebase/auth'
+import { onAuthStateChanged } from 'firebase/auth'
 import { useState, useEffect, useMemo, useRef } from 'react'
 import './styles.css'
 import { useRouter } from 'next/navigation'
 import 'bootstrap/dist/css/bootstrap.css'
 import {
-  getFirestore,
   getDocs,
   collection,
   updateDoc,

@@ -1,11 +1,11 @@
 'use client'
 
 import 'bootstrap/dist/css/bootstrap.css'
-import { getAuth, type User } from 'firebase/auth'
+import { type User } from 'firebase/auth'
 import { useRouter } from 'next/navigation'
 import './styles.css'
 import { useState, useRef } from 'react'
-import { getFirestore, getDoc, doc, writeBatch } from 'firebase/firestore'
+import { getDoc, doc, writeBatch } from 'firebase/firestore'
 import { useTranslation } from 'react-i18next'
 import '../i18n/config'
 import Papa from 'papaparse'

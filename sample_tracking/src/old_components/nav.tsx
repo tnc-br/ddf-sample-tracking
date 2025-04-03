@@ -117,9 +117,9 @@ export default function Nav() {
             >
               {t('singleReferenceSample')}
             </Link>
-            <div className="nav-link add-sample-option import-option">
-              <ImportSamples />
-            </div>
+            <Link className="nav-link add-sample-option" href="./AddCSVSample">
+              {t('importSamples')}
+            </Link>
             {/* <Link className="nav-link" href="./add-sample?status=incomplete">{t('uploadMultipleSamples')}</Link> */}
           </div>
         )}

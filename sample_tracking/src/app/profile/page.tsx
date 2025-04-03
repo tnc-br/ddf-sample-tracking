@@ -7,16 +7,10 @@ import {
   hideNavBar,
   hideTopBar,
 } from '../../old_components/utils'
-import { useState, useEffect, useRef } from 'react'
-import { getAuth, onAuthStateChanged, deleteUser } from 'firebase/auth'
+import { useState, useEffect } from 'react'
+import { onAuthStateChanged, deleteUser } from 'firebase/auth'
 import { useRouter } from 'next/navigation'
-import { getFirestore, getDoc, doc, deleteDoc } from 'firebase/firestore'
-import {
-  TextField,
-  Autocomplete,
-  MenuItem,
-  InputAdornment,
-} from '@mui/material'
+import { getDoc, doc, deleteDoc } from 'firebase/firestore'
 import { useTranslation } from 'react-i18next'
 import { auth, firestore } from '@services/firebase/config'
 

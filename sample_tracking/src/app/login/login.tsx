@@ -1,22 +1,21 @@
 import {
-  getAuth,
   signInWithEmailAndPassword,
   signInWithPopup,
   GoogleAuthProvider,
 } from 'firebase/auth'
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { doc, getFirestore, getDoc, setDoc } from 'firebase/firestore'
+import { doc, getDoc, setDoc } from 'firebase/firestore'
 import Image from 'next/image'
 import { useTranslation } from 'react-i18next'
 import TextInput from '@components/TextInput'
+import { auth, firestore } from '@services/firebase/config'
 interface LogInProps {
   onSignUpClick: any
   onForgotPasswordClick: any
 }
 
 export default function Login(props: LogInProps) {
-  const auth = getAuth()
   const router = useRouter()
 
   const [submitIsLoading, setSubmitIsLoading] = useState(false)
@@ -56,8 +55,7 @@ export default function Login(props: LogInProps) {
   }
 
   function signInWithGoogle() {
-    const auth = getAuth()
-    const db = getFirestore()
+    const db = firestore
     const provider = new GoogleAuthProvider()
     provider.setCustomParameters({
       display: 'popup',

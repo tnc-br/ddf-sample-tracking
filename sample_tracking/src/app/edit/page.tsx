@@ -4,8 +4,8 @@
 import '../add-sample/styles.css'
 import 'bootstrap/dist/css/bootstrap.css'
 import { useParams, useRouter } from 'next/navigation'
-import { doc, updateDoc, getFirestore, getDoc } from 'firebase/firestore'
-import { getAuth, onAuthStateChanged } from 'firebase/auth'
+import { doc, updateDoc, getDoc } from 'firebase/firestore'
+import { onAuthStateChanged } from 'firebase/auth'
 import { useState, useEffect } from 'react'
 import { useSearchParams } from 'next/navigation'
 import {
