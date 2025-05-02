@@ -32,6 +32,7 @@ import {
   ConfirmationProps,
 } from '../../old_components/confirmation_box'
 import { auth, firestore } from '@services/firebase/config'
+import moment from 'moment'
 
 interface NestedSchemas {
   [key: string]: NestedSchemas
@@ -101,9 +102,11 @@ export default function Users() {
         .then((querySnapshot) => {
           querySnapshot.forEach((doc) => {
             const docData = doc.data()
+
             if (docData.org) {
               usersListArray.push({
                 ...docData,
+                date_added: moment(docData.date_added).format('DD/MM/YYYY'),
                 user_id: doc.id,
               } as UserData)
             }
@@ -121,8 +124,10 @@ export default function Users() {
         .then((querySnapshot) => {
           querySnapshot.forEach((doc) => {
             const docData = doc.data()
+
             usersListArray.push({
               ...docData,
+              date_added: moment(docData.date_added).format('DD/MM/YYYY'),
               user_id: doc.id,
             } as UserData)
           })
@@ -147,7 +152,6 @@ export default function Users() {
 
         querySnapshot.forEach((doc) => {
           const docData = doc.data()
-          console.log(docData)
           orgList.push({
             name: docData.org_name,
             admin: docData.admins ? docData.admins[0].name : '',

@@ -27,14 +27,38 @@ import {
 } from '../../old_components/utils'
 import { getUserData } from '../../old_components/firebase_utils'
 import { auth, firestore } from '@services/firebase/config'
+import moment from 'moment'
 
 type UserData = {
   role: string
   org: string
 }
 
-interface NestedSchemas {
-  [key: string]: NestedSchemas
+interface prospectiveUserSchema {
+  [key: string]: prospectiveUser
+}
+
+interface prospectiveUser {
+  name: string
+  org_name: string
+  date_requested: string
+  email: string
+  // email: string
+  org?: string
+  uid?: string
+}
+
+interface prospectiveOrgSchema {
+  [key: string]: prospectiveOrg
+}
+
+interface prospectiveOrg {
+  name: string
+  org_name: string
+  date_requested: string
+  email: string
+  admin_name: string
+  admin_id: string
 }
 
 /**
@@ -47,8 +71,12 @@ interface NestedSchemas {
  */
 export default function SignUpRequests() {
   const [pendingApprovals, setPendingApprovals] = useState({})
-  const [prospectiveUsers, setProspectiveUsers] = useState({} as NestedSchemas)
-  const [prospectiveOrgs, setProspectiveOrgs] = useState({} as NestedSchemas)
+  const [prospectiveUsers, setProspectiveUsers] = useState(
+    {} as prospectiveUserSchema,
+  )
+  const [prospectiveOrgs, setProspectiveOrgs] = useState(
+    {} as prospectiveOrgSchema,
+  )
   const [userData, setUserData] = useState({} as UserData)
 
   const router = useRouter()
@@ -78,7 +106,7 @@ export default function SignUpRequests() {
   })
 
   if (Object.keys(pendingApprovals).length < 1) {
-    const pendingUsers: NestedSchemas = {}
+    const pendingUsers: prospectiveUserSchema = {}
 
     if (userData.role === 'admin' && userData.org.length > 0) {
       const q = query(
@@ -87,7 +115,7 @@ export default function SignUpRequests() {
       )
       const docRef = getDocs(q).then((querySnapshot) => {
         querySnapshot.forEach((docRef) => {
-          pendingUsers[docRef.id] = docRef.data()
+          pendingUsers[docRef.id] = docRef.data() as prospectiveUser
         })
         if (
           Object.keys(pendingUsers).length > 0 &&
@@ -97,7 +125,7 @@ export default function SignUpRequests() {
         }
       })
     } else if (userData.role === 'site_admin') {
-      const pendingOrgs: NestedSchemas = {}
+      const pendingOrgs: prospectiveOrgSchema = {}
       getDocs(collection(db, 'new_users')).then((querySnapshot) => {
         querySnapshot.forEach((doc) => {
           const docData = doc.data()
@@ -110,7 +138,7 @@ export default function SignUpRequests() {
             // they can't be approved and shouldn't be shown on the pending users list.
             if (docData.org) {
               const data = doc.data()
-              pendingUsers[doc.id] = data
+              pendingUsers[doc.id] = data as prospectiveUser
             }
           }
         })
@@ -131,6 +159,14 @@ export default function SignUpRequests() {
   }
 
   function handleApproveOrgClick(evt: any) {
+    const confirmAnswer = confirm(
+      'Are you sure you want to approve this organization? They will be able to log in and access the system.',
+    )
+
+    if (!confirmAnswer) {
+      return
+    }
+
     const orgName = evt.target.parentElement.parentElement.id
     const adminId = prospectiveOrgs[orgName].admin_id as unknown as string
     const date = new Date()
@@ -166,6 +202,14 @@ export default function SignUpRequests() {
   }
 
   function handleRejectOrgClick(evt: any) {
+    const confirmAnswer = confirm(
+      'Are you sure you want to reject this organization? They will not be able to log in and access the system.',
+    )
+
+    if (!confirmAnswer) {
+      return
+    }
+
     const orgName = evt.target.parentElement.parentElement.id
     addDoc(collection(db, 'users'), {
       name: prospectiveOrgs[orgName].admin_name,
@@ -185,6 +229,14 @@ export default function SignUpRequests() {
   }
 
   async function handleApproveMemberClick(evt: any) {
+    const confirmAnswer = confirm(
+      'Are you sure you want to approve this user? They will be able to log in and access the system.',
+    )
+
+    if (!confirmAnswer) {
+      return
+    }
+
     const memberId = evt.target.parentElement.parentElement.id
     const orgId = prospectiveUsers[memberId].org
     if (!orgId) {
@@ -227,6 +279,14 @@ export default function SignUpRequests() {
   }
 
   function handleRejectMemberClick(evt: any) {
+    const confirmAnswer = confirm(
+      'Are you sure you want to reject this user? They will not be able to log in and access the system.',
+    )
+
+    if (!confirmAnswer) {
+      return
+    }
+
     const memberId = evt.target.parentElement.parentElement.id
     addDoc(collection(db, 'users'), {
       name: prospectiveUsers[memberId].name,
@@ -269,11 +329,13 @@ export default function SignUpRequests() {
             {Object.keys(prospectiveUsers).map((key, i) => {
               return (
                 <tr key={i} id={key}>
-                  <td>{prospectiveUsers[key].name as unknown as string}</td>
-                  <td>{prospectiveUsers[key].org_name as unknown as string}</td>
-                  <td>{prospectiveUsers[key].email as unknown as string}</td>
+                  <td>{prospectiveUsers[key].name}</td>
+                  <td>{prospectiveUsers[key].org_name}</td>
+                  <td>{prospectiveUsers[key].email}</td>
                   <td>
-                    {prospectiveUsers[key].date_requested as unknown as string}
+                    {moment(prospectiveUsers[key].date_requested).format(
+                      'DD/MM/YYYY',
+                    )}
                   </td>
                   <td className="approve-reject-wrapper">
                     <button
@@ -308,8 +370,7 @@ export default function SignUpRequests() {
           <thead>
             <tr id="table-header">
               <th>Lab name</th>
-              <th>Org Admin</th>
-              <th>Admin email</th>
+              <th>Email</th>
               <th>Date requested</th>
             </tr>
           </thead>
@@ -317,15 +378,12 @@ export default function SignUpRequests() {
             {Object.keys(prospectiveOrgs).map((key, i) => {
               return (
                 <tr key={i} id={key}>
+                  <td>{prospectiveOrgs[key].admin_name}</td>
+                  <td>{prospectiveOrgs[key].email}</td>
                   <td>
-                    {prospectiveOrgs[key].admin_name as unknown as string}
-                  </td>
-                  <td>{prospectiveOrgs[key].email as unknown as string}</td>
-                  <td>
-                    {prospectiveOrgs[key].date_requested as unknown as string}
-                  </td>
-                  <td>
-                    {prospectiveOrgs[key].date_requested as unknown as string}
+                    {moment(prospectiveOrgs[key].date_requested).format(
+                      'DD/MM/YYYY',
+                    )}
                   </td>
                   <td className="approve-reject-wrapper">
                     <button

@@ -11,6 +11,7 @@ import { useTranslation } from 'react-i18next'
 import '../i18n/config'
 import ImportSamples from './import-samples'
 import { auth, firestore } from '@services/firebase/config'
+import { MdAdd } from 'react-icons/md'
 
 /**
  * Component for rendering the nav bar on the left of the screen. Depending on what
@@ -73,8 +74,7 @@ export default function Nav() {
         {canAddSample() && (
           <li className="nav-item">
             <div id="add-sample-button" className="nav-link add-sample-button">
-              <span className="material-symbols-outlined">add</span>{' '}
-              {t('addSample')}
+              <MdAdd /> {t('addSample')}
             </div>
           </li>
         )}

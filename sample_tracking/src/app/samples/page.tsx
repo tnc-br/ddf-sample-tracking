@@ -206,7 +206,7 @@ export default function Samples() {
             {/* <p className='samples-header'>{t('inProgress')}</p> */}
             <div className="samples-header-wrapper">
               <div className="samples-header">
-                In progress ({allSamples.inProgress.length})
+                In progress ({allSamples?.inProgress?.length ?? 0})
               </div>
               <div className="samples-subheader">
                 Your tasks currently in progress
@@ -214,7 +214,14 @@ export default function Samples() {
             </div>
             {allSamples.inProgress && (
               <SamplesTable
-                samplesData={allSamples.inProgress as Sample[]}
+                samplesData={
+                  allSamples.inProgress.map((item) => ({
+                    ...item,
+                    code_lab: item.code_lab ?? '',
+                    validity: item.validity ?? '',
+                    trusted: item.trusted ?? '',
+                  })) as Sample[]
+                }
                 canDeleteSamples={isAdmin()}
                 showValidity={false}
                 allowExport={false}
@@ -226,13 +233,20 @@ export default function Samples() {
             {/* <p className='samples-header'>{t('completed')}</p> */}
             <div className="samples-header-wrapper">
               <div className="samples-header">
-                Completed ({allSamples.completed.length})
+                Completed ({allSamples?.completed?.length ?? 0})
               </div>
               <div className="samples-subheader">Your completed tasks</div>
             </div>
             {allSamples.completed && (
               <SamplesTable
-                samplesData={allSamples.completed as Sample[]}
+                samplesData={
+                  allSamples.completed.map((item) => ({
+                    ...item,
+                    code_lab: item.code_lab ?? '',
+                    validity: item.validity ?? '',
+                    trusted: item.trusted ?? '',
+                  })) as Sample[]
+                }
                 canDeleteSamples={isAdmin()}
                 showValidity={true}
                 allowExport={true}

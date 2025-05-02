@@ -96,18 +96,52 @@ export default function SamplesTable(props: SampleDataProps) {
         size: 100,
       },
       {
-        accessorFn: (row) => row,
+        accessorFn: (row) => row?.last_updated_by ?? '',
         header: t('lastUpdatedBy'),
         size: 150,
         filterVariant: 'select',
-        Cell: ({ cell }) => {
-          const row = cell.getValue() as Sample
-          const photo = (row as Sample).last_updated_by_photo
+        // Cell: ({ cell }) => {
+        //   const row = cell.getValue() as Sample
+        //   const photo = (row as Sample)?.last_updated_by_photo
+
+        //   return (
+        //     <div className="user-chip-wrapper">
+        //       <div className="user-chip-slate-layer">
+        //         <div className="user-chip-photo">
+        //           {photo && (
+        //             <img
+        //               id="profile-photo"
+        //               className="profile-photo"
+        //               src={photo}
+        //               width="24"
+        //               height="24"
+        //             />
+        //           )}
+        //           {!photo && (
+        //             <div
+        //               id="profile-photo"
+        //               className="table-letter-profile profile-photo"
+        //             >
+        //               {row.last_updated_by ? row.last_updated_by.charAt(0) : ''}
+        //             </div>
+        //           )}
+        //         </div>
+        //         <div className="user-chip-name">
+        //           {row?.last_updated_by ?? ''}
+        //         </div>
+        //       </div>
+        //     </div>
+        //   )
+        // },
+        Cell: ({ row }) => {
+          const data = row.original as Sample
+          const photo = data.last_updated_by_photo
+
           return (
             <div className="user-chip-wrapper">
               <div className="user-chip-slate-layer">
                 <div className="user-chip-photo">
-                  {photo && (
+                  {photo ? (
                     <img
                       id="profile-photo"
                       className="profile-photo"
@@ -115,17 +149,20 @@ export default function SamplesTable(props: SampleDataProps) {
                       width="24"
                       height="24"
                     />
-                  )}
-                  {!photo && (
+                  ) : (
                     <div
                       id="profile-photo"
                       className="table-letter-profile profile-photo"
                     >
-                      {row.last_updated_by ? row.last_updated_by.charAt(0) : ''}
+                      {data.last_updated_by
+                        ? data.last_updated_by.charAt(0)
+                        : ''}
                     </div>
                   )}
                 </div>
-                <div className="user-chip-name">{row.last_updated_by}</div>
+                <div className="user-chip-name">
+                  {data.last_updated_by ?? ''}
+                </div>
               </div>
             </div>
           )
@@ -262,6 +299,9 @@ export default function SamplesTable(props: SampleDataProps) {
     })
     return exportData
   }
+
+  console.log(columns, ' columns')
+  console.log(sampleData.samples, ' sampleData.samples')
 
   return (
     <div className="samples-page-wrapper" id="samples-table-wrapper">
