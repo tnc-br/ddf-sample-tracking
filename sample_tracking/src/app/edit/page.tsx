@@ -41,7 +41,7 @@ export default function Edit() {
   const db = firestore
   const { t } = useTranslation()
 
-  let sampleId = '12345'
+  let sampleId = 'Sem ID'
   let trusted = 'trusted'
 
   const searchParams = useSearchParams()

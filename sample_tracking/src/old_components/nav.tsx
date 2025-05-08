@@ -3,7 +3,7 @@
 import 'bootstrap/dist/css/bootstrap.css'
 import { onAuthStateChanged } from 'firebase/auth'
 import { useRouter } from 'next/navigation'
-import './styles.css'
+// import './styles.css'
 import { useState, useEffect } from 'react'
 import { getDoc, doc } from 'firebase/firestore'
 import Link from 'next/link'
@@ -11,7 +11,9 @@ import { useTranslation } from 'react-i18next'
 import '../i18n/config'
 import ImportSamples from './import-samples'
 import { auth, firestore } from '@services/firebase/config'
-import { MdAdd } from 'react-icons/md'
+import { MdAdd, MdMenu } from 'react-icons/md'
+import { FaUserPlus, FaUsers } from 'react-icons/fa'
+import Dropdown from '@components/Dropdown'
 
 /**
  * Component for rendering the nav bar on the left of the screen. Depending on what
@@ -21,7 +23,6 @@ import { MdAdd } from 'react-icons/md'
  */
 export default function Nav() {
   const [role, setRole] = useState('')
-  const [showAddSampleMenu, setShowAddSampleMenu] = useState(false)
 
   const router = useRouter()
   const db = firestore
@@ -42,18 +43,6 @@ export default function Nav() {
         }
       })
     }
-
-    document.addEventListener('mousedown', (event) => {
-      const popupContainer = document.getElementById('add-sample-popup')
-      const addSampleButton = document.getElementById('add-sample-button')
-      if (addSampleButton?.contains(event.target as any)) {
-        setShowAddSampleMenu(!showAddSampleMenu)
-        return
-      }
-      if (!popupContainer?.contains(event.target as any)) {
-        setShowAddSampleMenu(false)
-      }
-    })
   })
 
   function canAddSample() {
@@ -72,55 +61,76 @@ export default function Nav() {
       />
       <ul className="nav flex-column">
         {canAddSample() && (
-          <li className="nav-item">
-            <div id="add-sample-button" className="nav-link add-sample-button">
-              <MdAdd /> {t('addSample')}
-            </div>
-          </li>
+          <Dropdown.Root>
+            <Dropdown.Trigger className="nav-item">
+              <div
+                id="add-sample-button"
+                className="rounded-2xl border border-gray-300 w-fit flex items-center p-2 gap-2"
+              >
+                <MdAdd />
+                <span>{t('addSample')}</span>
+              </div>
+            </Dropdown.Trigger>
+            <Dropdown.Content
+              collisionPadding={8}
+              sideOffset={5}
+              className="flex flex-col bg-white shadow-xl rounded-lg border border-neutral-100"
+            >
+              <Dropdown.Item>
+                <Link
+                  className="nav-link add-sample-option"
+                  href="./add-sample?status=originVerification"
+                >
+                  {t('originVerification')}
+                </Link>
+              </Dropdown.Item>
+              <Dropdown.Item>
+                <Link
+                  className="nav-link add-sample-option"
+                  href="./add-sample?status=singleReference"
+                >
+                  {t('singleReferenceSample')}
+                </Link>
+              </Dropdown.Item>
+              <Dropdown.Item>
+                <Link
+                  className="nav-link add-sample-option"
+                  href="./AddCSVSample"
+                >
+                  {t('importSamples')}
+                </Link>
+              </Dropdown.Item>
+            </Dropdown.Content>
+          </Dropdown.Root>
         )}
-        <li className="nav-item">
-          <Link className="nav-link" href="./samples">
+        <li className="nav-item mt-4">
+          <Link
+            className="flex gap-2 items-center text-decoration-none text-sm mb-2 text-gray-600 hover:text-blue-400 transition-all"
+            href="./samples"
+          >
             {' '}
-            <span className="material-symbols-outlined">lab_panel</span>{' '}
-            {t('allSamples')}
+            <MdMenu /> {t('allSamples')}
           </Link>
         </li>
-        <div className="admin-options">
-          {isAdmin() && (
+        {isAdmin() && (
+          <div className="admin-options flex flex-col gap-2 pt-3">
             <li className="nav-item">
-              <Link className="nav-link" href="./sign-up-requests">
-                <span className="material-symbols-outlined">person_add</span>{' '}
-                {t('signUpRequests')}
+              <Link
+                className="flex gap-2 items-center text-decoration-none text-sm text-gray-600 hover:text-blue-400 transition-all"
+                href="./sign-up-requests"
+              >
+                <FaUserPlus /> {t('signUpRequests')}
               </Link>
             </li>
-          )}
-          {isAdmin() && (
             <li className="nav-item">
-              <Link className="nav-link" href="./all-users">
-                <span className="material-symbols-outlined">groups</span>{' '}
+              <Link
+                className="flex gap-2 items-center text-decoration-none text-sm text-gray-600 hover:text-blue-400 transition-all"
+                href="./all-users"
+              >
+                <FaUsers />{' '}
                 {role === 'site_admin' ? t('allUsers') : t('myOrganization')}
               </Link>
             </li>
-          )}
-        </div>
-        {showAddSampleMenu && (
-          <div id="add-sample-popup" className="add-sample-options-wrapper">
-            <Link
-              className="nav-link add-sample-option"
-              href="./add-sample?status=originVerification"
-            >
-              {t('originVerification')}
-            </Link>
-            <Link
-              className="nav-link add-sample-option"
-              href="./add-sample?status=singleReference"
-            >
-              {t('singleReferenceSample')}
-            </Link>
-            <Link className="nav-link add-sample-option" href="./AddCSVSample">
-              {t('importSamples')}
-            </Link>
-            {/* <Link className="nav-link" href="./add-sample?status=incomplete">{t('uploadMultipleSamples')}</Link> */}
           </div>
         )}
       </ul>

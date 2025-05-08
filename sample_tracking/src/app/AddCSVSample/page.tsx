@@ -88,12 +88,16 @@ const AddCSVSample = () => {
         ...sample,
         status: completed ? 'concluded' : 'in_progress',
       }
+
+      console.log('payload', payload)
+      console.log('docRef', docRef)
       batch.set(docRef, payload)
     })
 
     batch
       .commit()
-      .then(async () => {
+      .then(async (data) => {
+        console.log(data)
         alert(`Sucesso!`)
       })
       .catch((error) => {
@@ -241,6 +245,7 @@ const AddCSVSample = () => {
             genus: resultValues[0].genus || '',
             family: resultValues[0].family || '',
             created_on: formattedDateString,
+            createdAt: date,
             last_updated_by: currentUserData.name,
             org: currentUserData.org,
             org_name: currentUserData.org_name ? currentUserData.org_name : '',

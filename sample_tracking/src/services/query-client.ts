@@ -1,19 +1,26 @@
-import { AxiosError } from "axios";
-import { QueryClient } from "@tanstack/react-query";
+import { AxiosError } from 'axios'
+import { QueryClient } from '@tanstack/react-query'
 
-const MAX_RETRIES = 3;
+const MAX_RETRIES = 3
 
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
       refetchOnWindowFocus: false,
-      //   retry: (failureCount, error: AxiosError) => {
-      //     const statusCode = error?.response?.status ?? error?.status;
+      retry: (failureCount, error: any) => {
+        const statusCode = error?.response?.status ?? error?.status
+        const isValidStatusCode =
+          !statusCode ||
+          statusCode >= 500 ||
+          statusCode === 401 ||
+          statusCode === 403
 
-      //     return statusCode < 500 && failureCount < MAX_RETRIES;
-      //   },
+        const shouldRetry = isValidStatusCode && failureCount < MAX_RETRIES
+
+        return shouldRetry
+      },
     },
   },
-});
+})
 
-export default queryClient;
+export default queryClient

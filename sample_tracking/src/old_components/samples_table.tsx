@@ -300,8 +300,8 @@ export default function SamplesTable(props: SampleDataProps) {
     return exportData
   }
 
-  console.log(columns, ' columns')
-  console.log(sampleData.samples, ' sampleData.samples')
+  // console.log(columns, ' columns')
+  // console.log(sampleData.samples, ' sampleData.samples')
 
   return (
     <div className="samples-page-wrapper" id="samples-table-wrapper">

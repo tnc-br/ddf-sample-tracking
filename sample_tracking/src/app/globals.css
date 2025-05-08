@@ -1,8 +1,13 @@
-.link {
-    color: #006E2C;
-    /* background-color: red; */
-}
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+.link {
+  color: #006e2c;
+  /* background-color: red; */
+}
+
+a {
+  text-decoration: none;
+  color: black;
+}
