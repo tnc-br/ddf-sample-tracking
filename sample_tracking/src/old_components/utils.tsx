@@ -69,6 +69,8 @@ export type Sample = {
   points?: []
   request: string
   validity_details?: ValidityDetails
+
+  municipality?: string
 }
 
 export type ValidityDetails = {

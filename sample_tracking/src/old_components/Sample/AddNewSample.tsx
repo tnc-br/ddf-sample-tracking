@@ -1,6 +1,5 @@
 'use client'
 
-import '../styles.css'
 import 'bootstrap/dist/css/bootstrap.css'
 import { useState, useEffect } from 'react'
 import { hideNavBar, hideTopBar, Sample } from '../utils'

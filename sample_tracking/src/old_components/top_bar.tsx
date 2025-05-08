@@ -3,7 +3,6 @@
 import 'bootstrap/dist/css/bootstrap.css'
 import { signOut, onAuthStateChanged } from 'firebase/auth'
 import { useRouter } from 'next/navigation'
-import './styles.css'
 import { useState, useEffect, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
 import '../i18n/config'
@@ -23,6 +22,8 @@ import { auth, firestore } from '@services/firebase/config'
 export default function TopBar() {
   const [userData, setUserData] = useState(null as UserData | null)
   const [showMenu, setShowMenu] = useState(false)
+
+  console.log('Top bar')
 
   const router = useRouter()
   const db = firestore

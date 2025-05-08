@@ -2,7 +2,6 @@
 import 'bootstrap/dist/css/bootstrap.css'
 import { deleteDoc, doc, collection } from 'firebase/firestore'
 import { useState, useMemo, useRef, useCallback } from 'react'
-import './styles.css'
 import { useRouter } from 'next/navigation'
 import {
   MaterialReactTable,
@@ -16,7 +15,7 @@ import { Delete } from '@mui/icons-material'
 
 import { ExportToCsv } from 'export-to-csv'
 import { useTranslation } from 'react-i18next'
-import '../i18n/config'
+import '@i18n/config'
 import { ConfirmationBox, ConfirmationProps } from './confirmation_box'
 import Link from 'next/link'
 import { firestore } from '@services/firebase/config'

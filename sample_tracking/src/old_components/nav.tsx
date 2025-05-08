@@ -3,7 +3,6 @@
 import 'bootstrap/dist/css/bootstrap.css'
 import { onAuthStateChanged } from 'firebase/auth'
 import { useRouter } from 'next/navigation'
-// import './styles.css'
 import { useState, useEffect } from 'react'
 import { getDoc, doc } from 'firebase/firestore'
 import Link from 'next/link'
@@ -23,6 +22,7 @@ import Dropdown from '@components/Dropdown'
  */
 export default function Nav() {
   const [role, setRole] = useState('')
+  console.log('nav bar')
 
   const router = useRouter()
   const db = firestore

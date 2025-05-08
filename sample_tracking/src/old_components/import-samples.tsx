@@ -3,7 +3,6 @@
 import 'bootstrap/dist/css/bootstrap.css'
 import { type User } from 'firebase/auth'
 import { useRouter } from 'next/navigation'
-import './styles.css'
 import { useState, useRef } from 'react'
 import { getDoc, doc, writeBatch } from 'firebase/firestore'
 import { useTranslation } from 'react-i18next'

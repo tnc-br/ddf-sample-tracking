@@ -7,18 +7,18 @@ const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
       refetchOnWindowFocus: false,
-      retry: (failureCount, error: any) => {
-        const statusCode = error?.response?.status ?? error?.status
-        const isValidStatusCode =
-          !statusCode ||
-          statusCode >= 500 ||
-          statusCode === 401 ||
-          statusCode === 403
+      // retry: (failureCount, error: any) => {
+      //   const statusCode = error?.response?.status ?? error?.status
+      //   const isValidStatusCode =
+      //     !statusCode ||
+      //     statusCode >= 500 ||
+      //     statusCode === 401 ||
+      //     statusCode === 403
 
-        const shouldRetry = isValidStatusCode && failureCount < MAX_RETRIES
+      //   const shouldRetry = isValidStatusCode && failureCount < MAX_RETRIES
 
-        return shouldRetry
-      },
+      //   return shouldRetry
+      // },
     },
   },
 })
