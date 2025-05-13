@@ -70,26 +70,33 @@ export default function SampleDetails() {
         router.push('/login')
       }
     })
+
+    searchSample()
   }, [])
 
-  let docRef = doc(db, 'trusted_samples', sampleId!)
-  if (trusted === 'untrusted') {
-    docRef = doc(db, 'untrusted_samples', sampleId!)
-  } else if (trusted === 'unknown') {
-    docRef = doc(db, 'unknown_samples', sampleId!)
-  }
-  if (Object.keys(selectedDoc).length < 1 && !hasStartedRequest && docRef) {
-    getDoc(docRef)
-      .then((docRef) => {
-        if (docRef.exists()) {
-          setDoc(docRef.data() as Sample)
-        } else {
-          console.log('couldnt find data')
-        }
-      })
-      .catch((error) => {
-        console.log(error)
-      })
+  const searchSample = () => {
+    let docRef = doc(db, 'trusted_samples', sampleId!)
+
+    if (trusted === 'untrusted') {
+      docRef = doc(db, 'untrusted_samples', sampleId!)
+      console.log('trusted', trusted)
+    } else if (trusted === 'unknown') {
+      docRef = doc(db, 'unknown_samples', sampleId!)
+    }
+
+    if (Object.keys(selectedDoc).length < 1 && !hasStartedRequest && docRef) {
+      getDoc(docRef)
+        .then((docRef) => {
+          if (docRef.exists()) {
+            setDoc(docRef.data() as Sample)
+          } else {
+            console.log('couldnt find data')
+          }
+        })
+        .catch((error) => {
+          console.log(error)
+        })
+    }
   }
 
   const handlePrint = () => {

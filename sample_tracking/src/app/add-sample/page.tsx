@@ -119,6 +119,7 @@ export default function AddSample() {
       created_on: currentDateString,
       last_updated_by: userData.name,
       org: userData.org,
+      createdAt: date,
       org_name: userData.org_name ? userData.org_name : '',
       created_by_name: userData.name,
       code_lab: sampleId,

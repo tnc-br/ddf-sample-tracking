@@ -371,16 +371,23 @@ export function validateSample(
           errorString: `lon ${errorMessages.isRequired}`,
         })
       }
+
       const lat = data['lat']
       const lon = data['lon']
-      if (lat && (lat < -90 || lat > 90)) {
+
+      const latitudeRegex = /^-?([1-8]?\d(\.\d+)?|90(\.0+)?)$/
+      const longitudeRegex =
+        /^-?(1[0-7]\d(\.\d+)?|0?\d{1,2}(\.\d+)?|180(\.0+)?)$/
+
+      if (lat && !latitudeRegex.test(lat)) {
         errors.push({
           errorType: SampleErrorType.IS_OUT_OF_RANGE,
           fieldWithError: 'lat',
           errorString: `lat ${errorMessages.shouldBeWithinTheRange} ${resultRanges['lat'].min} ${errorMessages.and} ${resultRanges['lat'].max}`,
         })
       }
-      if (lon && (lon < -180 || lon > 180)) {
+
+      if (lon && !longitudeRegex.test(lon)) {
         errors.push({
           errorType: SampleErrorType.IS_OUT_OF_RANGE,
           fieldWithError: 'lon',

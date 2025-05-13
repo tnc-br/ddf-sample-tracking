@@ -219,7 +219,17 @@ function BasicInfoTab({
                   htmlFor="inputLon"
                 >
                   {t('latitude')}{' '}
-                  <InfoDummy text={'Texto informativo da latitude'} />
+                  <InfoDummy
+                    children={
+                      <>
+                        📍 Formato esperado: decimal (WGS84) <br />
+                        Ex: Latitude: -23.55052, Longitude: -46.63331 <br />
+                        • Use ponto como separador decimal <br />• Sem símbolos
+                        como °, N, S, E, W <br />• Latitude: -90 a 90 <br />•
+                        Longitude: -180 a 180
+                      </>
+                    }
+                  />
                 </label>
                 <TextInput
                   required
@@ -234,7 +244,17 @@ function BasicInfoTab({
                   htmlFor="inputLon"
                 >
                   {t('longitude')}{' '}
-                  <InfoDummy text={'Texto informativo da longitude'} />
+                  <InfoDummy
+                    children={
+                      <>
+                        📍 Formato esperado: decimal (WGS84) <br />
+                        Ex: Latitude: -23.55052, Longitude: -46.63331 <br />
+                        • Use ponto como separador decimal <br />• Sem símbolos
+                        como °, N, S, E, W <br />• Latitude: -90 a 90 <br />•
+                        Longitude: -180 a 180
+                      </>
+                    }
+                  />
                 </label>
                 <TextInput
                   required

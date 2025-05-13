@@ -89,8 +89,6 @@ const AddCSVSample = () => {
         status: completed ? 'concluded' : 'in_progress',
       }
 
-      console.log('payload', payload)
-      console.log('docRef', docRef)
       batch.set(docRef, payload)
     })
 
@@ -194,7 +192,10 @@ const AddCSVSample = () => {
         let row = 1
 
         for (const data of results.data) {
-          const errors = validateImportedEntry(data as Sample, errorMessages)
+          const errors = await validateImportedEntry(
+            data as Sample,
+            errorMessages,
+          )
 
           if (errors.length > 0) {
             data.errors = errors
@@ -280,7 +281,6 @@ const AddCSVSample = () => {
           samples.push(newSample)
         })
 
-        console.log(errorSamples)
         setSample(samples)
       },
     })
@@ -327,7 +327,7 @@ const AddCSVSample = () => {
                 Existe alguns erros na planilha
               </div>
               <div className="import-status-text">
-                {errorSamples.length} Erros encontrados <br />
+                {errorTexts.length} Erros encontrados <br />
                 {samples?.length ?? 0} Itens importados
               </div>
 
