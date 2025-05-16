@@ -1,20 +1,20 @@
-import React from "react";
-import { motion } from "framer-motion";
-import { twMerge } from "tailwind-merge";
+import React from 'react'
+import { motion } from 'framer-motion'
+import { twMerge } from 'tailwind-merge'
 
-import * as RadixDropdown from "@radix-ui/react-dropdown-menu";
+import * as RadixDropdown from '@radix-ui/react-dropdown-menu'
 
 const DropdownRoot = (
-  props: React.ComponentProps<typeof RadixDropdown.Root>
-) => <RadixDropdown.Root modal={false} {...props} />;
+  props: React.ComponentProps<typeof RadixDropdown.Root>,
+) => <RadixDropdown.Root modal={false} {...props} />
 
-type DropdownTriggerProps = React.ComponentProps<typeof RadixDropdown.Trigger>;
+type DropdownTriggerProps = React.ComponentProps<typeof RadixDropdown.Trigger>
 const DropdownTrigger = (props: DropdownTriggerProps) => {
-  return <RadixDropdown.Trigger {...props} />;
-};
+  return <RadixDropdown.Trigger {...props} />
+}
 
 type DropdownContentProps = React.ComponentProps<typeof motion.div> &
-  React.ComponentProps<typeof RadixDropdown.Content>;
+  React.ComponentProps<typeof RadixDropdown.Content>
 const DropdownContent = ({
   children,
   className,
@@ -30,7 +30,7 @@ const DropdownContent = ({
     exit,
     transition,
     className,
-  };
+  }
 
   return (
     <RadixDropdown.Content asChild {...props}>
@@ -49,20 +49,20 @@ const DropdownContent = ({
           }
         }
         transition={
-          motionProps.transition ?? { duration: 0.2, ease: "easeInOut" }
+          motionProps.transition ?? { duration: 0.2, ease: 'easeInOut' }
         }
-        className={twMerge("z-10", className)}
+        className={twMerge('z-10 bg-white', className)}
       >
         {children}
       </motion.div>
     </RadixDropdown.Content>
-  );
-};
+  )
+}
 
-type DropdownPortalProps = React.ComponentProps<typeof RadixDropdown.Portal>;
+type DropdownPortalProps = React.ComponentProps<typeof RadixDropdown.Portal>
 const DropdownPortal = (props: DropdownPortalProps) => {
-  return <RadixDropdown.Portal forceMount {...props} />;
-};
+  return <RadixDropdown.Portal forceMount {...props} />
+}
 
 const Dropdown = {
   Root: DropdownRoot,
@@ -81,6 +81,6 @@ const Dropdown = {
   Sub: RadixDropdown.Sub,
   SubTrigger: RadixDropdown.SubTrigger,
   SubContent: RadixDropdown.SubContent,
-};
+}
 
-export default Dropdown;
+export default Dropdown

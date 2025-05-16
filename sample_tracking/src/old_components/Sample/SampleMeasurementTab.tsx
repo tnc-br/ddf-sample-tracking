@@ -5,50 +5,53 @@ import TextInput from '@components/TextInput'
 import Select from '@components/Select'
 import TextArea from '@components/TextArea'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { ErrorMessage } from '@hookform/error-message'
 
 interface SampleMeasurementsTabProps {
   handleAddMeasurementClick: any
+  formData: any
   onCancelClick: () => void
   onSave: (data: any) => void
   nextTab: () => void
 }
 
 const FormSchema = z.object({
-  measureing_height: z.string(),
-  sample_type: z.string(),
-  diameter: z.string(),
-  avp: z.string(),
-  mean_annual_temperature: z.string(),
-  mean_annual_precipitation: z.string(),
-  observations: z.string(),
+  measureing_height: z.string().optional(),
+  sample_type: z.string().optional(),
+  diameter: z.string().optional(),
+  avp: z.string().optional(),
+  mean_annual_temperature: z.string().optional(),
+  mean_annual_precipitation: z.string().optional(),
+  observations: z.string().optional(),
   info: z
     .array(
       z.object({
-        d18O_cel: z.string(),
-        d18O_wood: z.string(),
-        d15N_wood: z.string(),
-        n_wood: z.string(),
-        d13C_wood: z.string(),
-        c_wood: z.string(),
-        c_cel: z.string(),
-        d13C_cel: z.string(),
+        d18O_cel: z.string().optional(),
+        d18O_wood: z.string().optional(),
+        d15N_wood: z.string().optional(),
+        n_wood: z.string().optional(),
+        d13C_wood: z.string().optional(),
+        c_wood: z.string().optional(),
+        c_cel: z.string().optional(),
+        d13C_cel: z.string().optional(),
       }),
     )
     .refine(
       (infos) =>
         infos.some(
           (item) =>
-            item.d18O_cel &&
-            item.d18O_wood &&
-            item.d15N_wood &&
-            item.n_wood &&
-            item.d13C_wood &&
-            item.c_wood &&
-            item.c_cel &&
+            item.d18O_cel ||
+            item.d18O_wood ||
+            item.d15N_wood ||
+            item.n_wood ||
+            item.d13C_wood ||
+            item.c_wood ||
+            item.c_cel ||
             item.d13C_cel,
         ),
       {
-        message: 'Pelo menos um item deve estar completamente preenchido.',
+        message:
+          'Pelo menos um item dos Dados Isotópicos deve estar completamente preenchido.',
       },
     ),
 })
@@ -58,32 +61,57 @@ type FormSchema = z.infer<typeof FormSchema>
 function SampleMeasurementsTab({
   onCancelClick,
   nextTab,
+  formData,
   onSave,
 }: SampleMeasurementsTabProps) {
   const { t } = useTranslation()
 
+  console.log(formData.d180_cel)
+  console.log(formData)
   const {
     register,
     handleSubmit,
     formState: { errors },
     control,
+    watch,
   } = useForm<FormSchema>({
     resolver: zodResolver(FormSchema),
+    shouldUseNativeValidation: false,
     defaultValues: {
-      info: [
-        {
-          d18O_cel: '',
-          d18O_wood: '',
-          d15N_wood: '',
-          n_wood: '',
-          d13C_wood: '',
-          c_wood: '',
-          c_cel: '',
-          d13C_cel: '',
-        },
-      ],
+      ...formData,
+      info: formData?.d180_cel
+        ? formData?.d180_cel?.map((_: any, index: number) => {
+            console.log('index', index)
+            const obj = {
+              d18O_cel: formData.d18O_cel[index] ?? '',
+              d18O_wood: formData.d18O_wood[index] ?? '',
+              d15N_wood: formData.d15N_wood[index] ?? '',
+              n_wood: formData.n_wood[index] ?? '',
+              d13C_wood: formData.d13C_wood[index] ?? '',
+              c_wood: formData.c_wood[index] ?? '',
+              c_cel: formData.c_cel[index] ?? '',
+              d13C_cel: formData.d13C_cel[index] ?? '',
+            }
+
+            return obj
+          })
+        : [
+            {
+              d18O_cel: '',
+              d18O_wood: '',
+              d15N_wood: '',
+              n_wood: '',
+              d13C_wood: '',
+              c_wood: '',
+              c_cel: '',
+              d13C_cel: '',
+            },
+          ],
     },
+    mode: 'onSubmit',
   })
+
+  console.log('formData', watch('info'))
 
   const sampleTypeValues = [
     {
@@ -155,6 +183,7 @@ function SampleMeasurementsTab({
     },
     (err) => {
       console.log(err)
+      alert(err.info?.root?.message ?? 'Preencha todos os campos obrigatórios.')
       // notification.display('Preencha todos os campos obrigatórios.', 'error')
     },
   )
@@ -165,7 +194,7 @@ function SampleMeasurementsTab({
   })
 
   return (
-    <form id="sample-measurements" onSubmit={handleSubmitForm}>
+    <form id="sample-measurements" onSubmit={handleSubmitForm} noValidate>
       <div>
         <div className="flex flex-col gap-4">
           <div className="flex flex-row gap-4">
@@ -181,6 +210,15 @@ function SampleMeasurementsTab({
                 id="measureing_height"
                 placeholder=""
                 {...register('measureing_height')}
+              />
+              <ErrorMessage
+                errors={errors}
+                name="measureing_height"
+                render={({ message }) => (
+                  <span className="text-xs text-red-500 text-left">
+                    {message}
+                  </span>
+                )}
               />
             </div>
 
@@ -208,6 +246,16 @@ function SampleMeasurementsTab({
                   />
                 )}
               />
+
+              <ErrorMessage
+                errors={errors}
+                name="sample_type"
+                render={({ message }) => (
+                  <span className="text-xs text-red-500 text-left">
+                    {message}
+                  </span>
+                )}
+              />
             </div>
           </div>
           <div className="flex flex-row gap-4">
@@ -224,6 +272,16 @@ function SampleMeasurementsTab({
                 placeholder=""
                 {...register('diameter')}
               />
+
+              <ErrorMessage
+                errors={errors}
+                name="diameter"
+                render={({ message }) => (
+                  <span className="text-xs text-red-500 text-left">
+                    {message}
+                  </span>
+                )}
+              />
             </div>
 
             <div className="w-full">
@@ -238,6 +296,16 @@ function SampleMeasurementsTab({
                 id="avp"
                 placeholder=""
                 {...register('avp')}
+              />
+
+              <ErrorMessage
+                errors={errors}
+                name="avp"
+                render={({ message }) => (
+                  <span className="text-xs text-red-500 text-left">
+                    {message}
+                  </span>
+                )}
               />
             </div>
           </div>
@@ -255,6 +323,16 @@ function SampleMeasurementsTab({
                 placeholder=""
                 {...register('mean_annual_temperature')}
               />
+
+              <ErrorMessage
+                errors={errors}
+                name="mean_annual_temperature"
+                render={({ message }) => (
+                  <span className="text-xs text-red-500 text-left">
+                    {message}
+                  </span>
+                )}
+              />
             </div>
             <div className="w-full">
               <label
@@ -268,6 +346,16 @@ function SampleMeasurementsTab({
                 id="mean_annual_precipitation"
                 placeholder=""
                 {...register('mean_annual_precipitation')}
+              />
+
+              <ErrorMessage
+                errors={errors}
+                name="mean_annual_precipitation"
+                render={({ message }) => (
+                  <span className="text-xs text-red-500 text-left">
+                    {message}
+                  </span>
+                )}
               />
             </div>
           </div>
@@ -284,6 +372,16 @@ function SampleMeasurementsTab({
                 id="observations"
                 placeholder=""
                 {...register('observations')}
+              />
+
+              <ErrorMessage
+                errors={errors}
+                name="observations"
+                render={({ message }) => (
+                  <span className="text-xs text-red-500 text-left">
+                    {message}
+                  </span>
+                )}
               />
             </div>
           </div>
@@ -375,24 +473,16 @@ function SampleMeasurementsTab({
         <button
           onClick={onCancelClick}
           type="button"
-          className="back-button-wrapper add-sample-button-wrapper"
+          className="rounded border border-green-300 px-4 py-2 text-green-300 text-sm"
         >
-          <div className="add-sample-slate-layer">
-            <div className="add-sample-button-text green-button-text">
-              {t('back')}
-            </div>
-          </div>
+          {t('back')}
         </button>
         <button
           id="next-button-wrapper"
           type="submit"
-          className="add-sample-button-wrapper next-button-wrapper"
+          className="rounded border bg-green-800 px-4 py-2 text-white text-sm"
         >
-          <div className="add-sample-slate-layer">
-            <div className="add-sample-button-text white-button-text">
-              {t('next')}
-            </div>
-          </div>
+          {t('next')}
         </button>
       </div>
     </form>

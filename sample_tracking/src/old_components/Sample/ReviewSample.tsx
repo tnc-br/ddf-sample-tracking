@@ -200,25 +200,17 @@ function ReviewAndSubmitTab({
         <button
           onClick={onCancelClick}
           type="button"
-          className="back-button-wrapper add-sample-button-wrapper"
+          className="rounded border border-green-300 px-4 py-2 text-green-300 text-sm"
         >
-          <div className="add-sample-slate-layer">
-            <div className="add-sample-button-text green-button-text">
-              {t('back')}
-            </div>
-          </div>
+          {t('back')}
         </button>
         <button
           id="next-button-wrapper"
           type="button"
           onClick={onNextClick}
-          className="add-sample-button-wrapper next-button-wrapper"
+          className="rounded border bg-green-800 px-4 py-2 text-white text-sm"
         >
-          <div className="add-sample-slate-layer">
-            <div className="add-sample-button-text white-button-text">
-              {t('next')}
-            </div>
-          </div>
+          {t('next')}
         </button>
       </div>
     </div>

@@ -86,6 +86,7 @@ export default function Edit() {
   } else if (trusted === 'unknown') {
     docRef = doc(db, 'unknown_samples', sampleId!)
   }
+
   if (Object.keys(selectedDoc).length < 1 && !userData.role && docRef) {
     getDoc(docRef)
       .then((docRef) => {

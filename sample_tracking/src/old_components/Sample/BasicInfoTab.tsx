@@ -7,9 +7,13 @@ import TextInput from '@components/TextInput'
 import Select from '@components/Select'
 import { speciesList } from '../species_list'
 import InfoDummy from '@components/Tooltip'
-import { statesList } from '../states_list'
-import { municipalitiesList } from '../municipalities_list'
+import { states_list } from '../states_list'
+import { municipalities_list } from '../municipalities_list'
 import { useRouter } from 'next/navigation'
+import { useEffect, useState } from 'react'
+import DatePicker from '@components/DatePicker'
+import moment from 'moment'
+import { zodResolver } from '@hookform/resolvers/zod'
 
 interface BasicInfoTabProps {
   onSave: (data: any) => void
@@ -20,20 +24,35 @@ interface BasicInfoTabProps {
   nextTab: () => void
 }
 
+type Municipalitie = {
+  ID: string
+  Nome: string
+  Estado: string
+}
+
+type State = {
+  ID: string
+  Nome: string
+  Sigla: string
+}
+
 const FormSchema = z.object({
-  sample_name: z.string(),
+  sample_name: z
+    .string({ required_error: '*Campo obrigatório' })
+    .min(1, '*Campo obrigatório'),
   status: z.string(),
-  species: z.string(),
-  trusted: z.string(),
-  site: z.string(),
-  lat: z.string(),
-  lon: z.string(),
-  state: z.string(),
-  municipality: z.string(),
-  date_collected: z.string(),
+  species: z.string().optional(),
+  trusted: z.string().optional(),
+  site: z.string().optional(),
+  lat: z.string().optional(),
+  lon: z.string().optional(),
+  state: z.string({ required_error: '*Campo obrigatório' }),
+  municipality: z.string({ required_error: '*Campo obrigatório' }),
+  date_collected: z.date().optional().nullish(),
   collected_by: z.string(),
-  supplier: z.string(),
-  city: z.string(),
+  supplier: z.string().optional(),
+  city: z.string().optional(),
+  collection_site: z.string().optional(),
 })
 
 type FormSchema = z.infer<typeof FormSchema>
@@ -62,29 +81,62 @@ function BasicInfoTab({
   const { t } = useTranslation()
   const router = useRouter()
 
+  const [municipalitiesList, setMunicipalitiesList] =
+    useState<{ label: string; value: string }[]>()
+
   const {
     register,
     handleSubmit,
     formState: { errors },
     control,
-  } = useForm<FormSchema>()
+    watch,
+    setValue,
+  } = useForm<FormSchema>({
+    resolver: zodResolver(FormSchema),
+    shouldUseNativeValidation: false,
+    defaultValues: {
+      date_collected: formData.date_collected ? formData.date_collected : null,
+      ...formData,
+    },
+    mode: 'onSubmit',
+  })
 
   const SPECIES_NAMES_OPTIONS = speciesList.split('\n').map((species) => ({
     value: species.trim().toLowerCase(),
     label: species.trim(),
   }))
 
-  const STATES_OPTIONS = statesList.split('\n').map((state) => ({
-    value: state.trim().toLowerCase(),
-    label: state.trim(),
+  const STATES_OPTIONS = states_list.map((state: State) => ({
+    value: state.Nome,
+    label: state.Nome,
   }))
 
-  const MUNICIPALITIES_OPTIONS = municipalitiesList
-    .split('\n')
-    .map((municipality) => ({
-      value: municipality.trim().toLowerCase(),
-      label: municipality.trim(),
-    }))
+  const { state } = watch()
+
+  useEffect(() => {
+    if (!state) {
+      setValue('municipality', '')
+      return
+    }
+
+    const selectedState = states_list.find((s) => s.Nome === state)
+
+    if (!selectedState) {
+      return
+    }
+
+    const filteredMunicipalities = municipalities_list
+      .filter(
+        (municipality: Municipalitie) =>
+          municipality.Estado === selectedState.ID,
+      )
+      .map((municipality: Municipalitie) => ({
+        value: municipality.Nome,
+        label: municipality.Nome,
+      }))
+
+    setMunicipalitiesList(filteredMunicipalities)
+  }, [state])
 
   const handleSubmitForm = handleSubmit(
     (data) => {
@@ -98,12 +150,12 @@ function BasicInfoTab({
     },
   )
 
-  const onCancleClick = () => {
+  const onCancelClick = () => {
     router.push('samples')
   }
 
   return (
-    <form className="" onSubmit={handleSubmitForm}>
+    <form className="" onSubmit={handleSubmitForm} noValidate>
       <div className="grid grid-cols-2 gap-5">
         <div className="flex flex-col gap-3">
           <div className="">
@@ -116,8 +168,18 @@ function BasicInfoTab({
             <TextInput
               required
               id="sampleName"
-              placeholder="Amostra 123"
+              placeholder="Digite..."
               {...register('sample_name')}
+              isErrored={!!errors.sample_name}
+            />
+            <ErrorMessage
+              errors={errors}
+              name="sample_name"
+              render={({ message }) => (
+                <span className="text-xs text-red-500 text-left">
+                  {message}
+                </span>
+              )}
             />
           </div>
 
@@ -141,6 +203,16 @@ function BasicInfoTab({
                   value={value}
                   options={STATUS_OPTIONS}
                 />
+              )}
+            />
+
+            <ErrorMessage
+              errors={errors}
+              name="status"
+              render={({ message }) => (
+                <span className="text-xs text-red-500 text-left">
+                  {message}
+                </span>
               )}
             />
           </div>
@@ -168,6 +240,16 @@ function BasicInfoTab({
                 />
               )}
             />
+
+            <ErrorMessage
+              errors={errors}
+              name="species"
+              render={({ message }) => (
+                <span className="text-xs text-red-500 text-left">
+                  {message}
+                </span>
+              )}
+            />
           </div>
 
           <div className="">
@@ -192,6 +274,16 @@ function BasicInfoTab({
                 />
               )}
             />
+
+            <ErrorMessage
+              errors={errors}
+              name="trusted"
+              render={({ message }) => (
+                <span className="text-xs text-red-500 text-left">
+                  {message}
+                </span>
+              )}
+            />
           </div>
 
           {originIsKnownOrUncertain && (
@@ -205,8 +297,17 @@ function BasicInfoTab({
               <TextInput
                 required
                 id="collectionSite"
-                placeholder="Amostra 123"
-                {...register('sample_name')}
+                placeholder="Digite..."
+                {...register('collection_site')}
+              />
+              <ErrorMessage
+                errors={errors}
+                name="collection_site"
+                render={({ message }) => (
+                  <span className="text-xs text-red-500 text-left">
+                    {message}
+                  </span>
+                )}
               />
             </div>
           )}
@@ -219,13 +320,33 @@ function BasicInfoTab({
                   htmlFor="inputLon"
                 >
                   {t('latitude')}{' '}
-                  <InfoDummy text={'Texto informativo da latitude'} />
+                  <InfoDummy
+                    children={
+                      <>
+                        📍 Formato esperado: decimal (WGS84) <br />
+                        Ex: Latitude: -23.55052, Longitude: -46.63331 <br />
+                        • Use ponto como separador decimal <br />• Sem símbolos
+                        como °, N, S, E, W <br />• Latitude: -90 a 90 <br />•
+                        Longitude: -180 a 180
+                      </>
+                    }
+                  />
                 </label>
                 <TextInput
                   required
                   id="inputLat"
-                  placeholder="Amostra 123"
+                  placeholder="Digite..."
                   {...register('lat')}
+                />
+
+                <ErrorMessage
+                  errors={errors}
+                  name="lat"
+                  render={({ message }) => (
+                    <span className="text-xs text-red-500 text-left">
+                      {message}
+                    </span>
+                  )}
                 />
               </div>
               <div className="w-full">
@@ -234,13 +355,33 @@ function BasicInfoTab({
                   htmlFor="inputLon"
                 >
                   {t('longitude')}{' '}
-                  <InfoDummy text={'Texto informativo da longitude'} />
+                  <InfoDummy
+                    children={
+                      <>
+                        📍 Formato esperado: decimal (WGS84) <br />
+                        Ex: Latitude: -23.55052, Longitude: -46.63331 <br />
+                        • Use ponto como separador decimal <br />• Sem símbolos
+                        como °, N, S, E, W <br />• Latitude: -90 a 90 <br />•
+                        Longitude: -180 a 180
+                      </>
+                    }
+                  />
                 </label>
                 <TextInput
                   required
                   id="inputLon"
-                  placeholder="Amostra 123"
+                  placeholder="Digite..."
                   {...register('lon')}
+                />
+
+                <ErrorMessage
+                  errors={errors}
+                  name="lon"
+                  render={({ message }) => (
+                    <span className="text-xs text-red-500 text-left">
+                      {message}
+                    </span>
+                  )}
                 />
               </div>
             </div>
@@ -270,6 +411,16 @@ function BasicInfoTab({
                   />
                 )}
               />
+
+              <ErrorMessage
+                errors={errors}
+                name="state"
+                render={({ message }) => (
+                  <span className="text-xs text-red-500 text-left">
+                    {message}
+                  </span>
+                )}
+              />
             </div>
           )}
 
@@ -293,23 +444,62 @@ function BasicInfoTab({
                     className="border border-solid border-neutral-100 rounded-md h-7 text-sm"
                     value={value}
                     isSearchable
-                    options={MUNICIPALITIES_OPTIONS}
+                    options={municipalitiesList}
                   />
+                )}
+              />
+
+              <ErrorMessage
+                errors={errors}
+                name="municipality"
+                render={({ message }) => (
+                  <span className="text-xs text-red-500 text-left">
+                    {message}
+                  </span>
                 )}
               />
             </div>
           )}
 
-          {/* <div className="input-text-field-wrapper">
-          <LocalizationProvider dateAdapter={AdapterDayjs}>
-            <DatePicker
-              label={t('dateCollected')}
-              sx={style}
-              slotProps={{ textField: { size: 'small' } }}
-              {...register('date_collected')}
+          <div className="">
+            <label className="text-xs text-neutral-400 font-medium">
+              {t('dateCollected')}
+            </label>
+
+            <Controller
+              control={control}
+              name="date_collected"
+              rules={{
+                required: '*Por favor, selecione uma opção',
+              }}
+              render={({ field: { onChange, value } }) => (
+                <DatePicker
+                  className={`w-full ${
+                    errors.date_collected ? 'border-red-300' : ''
+                  }`}
+                  shape="square"
+                  leftIcon
+                  closeOnSelect
+                  date={
+                    moment(value).isValid() ? moment(value).toDate() : undefined
+                  }
+                  onChange={(date_collected) =>
+                    onChange(moment(date_collected).toISOString())
+                  }
+                />
+              )}
             />
-          </LocalizationProvider>
-        </div> */}
+
+            <ErrorMessage
+              errors={errors}
+              name="date_collected"
+              render={({ message }) => (
+                <span className="text-xs text-red-500 text-left">
+                  {message}
+                </span>
+              )}
+            />
+          </div>
         </div>
         <div className="">
           <div className="collected-by-wrapper">
@@ -362,8 +552,18 @@ function BasicInfoTab({
               <TextInput
                 required
                 id="supplier"
-                placeholder="Amostra 123"
+                placeholder="Digite..."
                 {...register('supplier')}
+              />
+
+              <ErrorMessage
+                errors={errors}
+                name="supplier"
+                render={({ message }) => (
+                  <span className="text-xs text-red-500 text-left">
+                    {message}
+                  </span>
+                )}
               />
             </div>
           )}
@@ -378,34 +578,36 @@ function BasicInfoTab({
             <TextInput
               required
               id="city"
-              placeholder="Amostra 123"
+              placeholder="Digite..."
               {...register('city')}
+            />
+
+            <ErrorMessage
+              errors={errors}
+              name="city"
+              render={({ message }) => (
+                <span className="text-xs text-red-500 text-left">
+                  {message}
+                </span>
+              )}
             />
           </div>
         </div>
       </div>
       <div className="flex justify-between my-10">
         <button
-          onClick={onCancleClick}
+          onClick={onCancelClick}
           type="button"
-          className="back-button-wrapper add-sample-button-wrapper"
+          className="rounded border border-green-300 px-4 py-2 text-green-300 text-sm"
         >
-          <div className="add-sample-slate-layer">
-            <div className="add-sample-button-text green-button-text">
-              {t('back')}
-            </div>
-          </div>
+          {t('back')}
         </button>
         <button
           id="next-button-wrapper"
           type="submit"
-          className="add-sample-button-wrapper next-button-wrapper"
+          className="rounded border bg-green-800 px-4 py-2 text-white text-sm"
         >
-          <div className="add-sample-slate-layer">
-            <div className="add-sample-button-text white-button-text">
-              {t('next')}
-            </div>
-          </div>
+          {t('next')}
         </button>
       </div>
     </form>

@@ -35,7 +35,7 @@ const TextInputButton = (props: TextInputButtonProps) => {
             !paint || (!isValid && !isErrored && !disabled),
           '[&_*]:text-neutral-200': disabled,
           '[&_*]:text-nice-mid': paint && isValid && !isErrored && !disabled,
-          '[&_*]:text-alert-mid': paint && isErrored && !disabled,
+          '[&_*]:text-red-500': paint && isErrored && !disabled,
         })}
       >
         {children}

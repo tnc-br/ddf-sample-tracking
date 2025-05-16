@@ -120,6 +120,7 @@ export default function AddSample() {
       org: userData.org,
       org_name: userData.org_name ? userData.org_name : '',
       created_by_name: userData.name,
+      createdAt: date,
       code_lab: sampleId,
       visibility: 'private',
       d18O_wood: formSampleData.d18O_wood

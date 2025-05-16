@@ -178,7 +178,7 @@ const Select = (props: SelectProps) => {
       >
         <List.Container
           className={twMerge(
-            'w-full',
+            'w-full relative z-40',
             CustomTrigger && 'min-w-48',
             contentClassName,
           )}
@@ -191,7 +191,7 @@ const Select = (props: SelectProps) => {
               onKeyDown={(e) => e.stopPropagation()}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Pesquisar..."
-              className="w-full"
+              className="w-full bg-white"
               leftIcon={<TextInput.SearchIcon />}
             />
           )}

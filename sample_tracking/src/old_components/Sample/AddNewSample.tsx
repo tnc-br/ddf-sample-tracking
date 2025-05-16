@@ -83,6 +83,7 @@ export default function AddNewSample({
     setFormData((prev) => {
       return { ...prev, ...res }
     })
+    console.log('saveChanges', res)
   }
 
   function handleMeasurementsTabClick(evt: any) {
@@ -97,8 +98,6 @@ export default function AddNewSample({
     formData.trusted === 'trusted' || formData.trusted === 'untrusted'
 
   const finish = async () => {
-    console.log('formData', formData)
-    console.log('sampleId', sampleId)
     await onActionButtonClick(sampleId, formData)
   }
 
@@ -213,6 +212,7 @@ export default function AddNewSample({
                 nextTab={() => handleChangeTab(currentTab + 1)}
                 onSave={saveChanges}
                 onCancelClick={() => handleChangeTab(currentTab - 1)}
+                formData={formData}
                 handleAddMeasurementClick={handleAddMeasurementClick}
               />
             )}

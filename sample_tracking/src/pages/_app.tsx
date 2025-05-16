@@ -26,8 +26,8 @@ const MyApp: React.FC<AppProps> = ({ Component, pageProps }) => {
 
       {/* <QueryClientProvider client={queryClient}> */}
       <>
-        {/* <TopBar />
-        <Nav /> */}
+        {/* <TopBar />*/}
+        <Nav />
         <Component {...pageProps} />
       </>
       {/* </QueryClientProvider> */}
