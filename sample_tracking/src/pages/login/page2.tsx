@@ -9,7 +9,7 @@ import { doc, getDoc, setDoc } from 'firebase/firestore'
 import Image from 'next/image'
 import { useTranslation } from 'react-i18next'
 import TextInput from '@components/TextInput'
-import { auth, firestore } from '@services/firebase/config'
+import { auth, db } from '@services/firebase/config'
 interface LogInProps {
   onSignUpClick: any
   onForgotPasswordClick: any
@@ -29,7 +29,6 @@ export default function Login(props: LogInProps) {
     const email = (document.getElementById('email') as HTMLInputElement).value
     const password = (document.getElementById('password') as HTMLInputElement)
       .value
-    console.log('username: ' + email + ' password: ' + password)
     signInWithEmailAndPassword(auth, email, password)
       .then(async (userCredential) => {
         // Signed in
@@ -55,7 +54,6 @@ export default function Login(props: LogInProps) {
   }
 
   function signInWithGoogle() {
-    const db = firestore
     const provider = new GoogleAuthProvider()
     provider.setCustomParameters({
       display: 'popup',

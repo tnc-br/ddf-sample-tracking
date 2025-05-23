@@ -32,9 +32,6 @@ export type Sample = {
   sample_name: string
   species: string
   site: string
-  state: string
-  lat: string
-  lon: string
   date_of_harvest: string
   created_by: string
   current_step: string
@@ -49,15 +46,6 @@ export type Sample = {
   doc_id: string
   updated_state: boolean
   collected_by: string
-  oxygen: string[]
-  nitrogen: string[]
-  n_wood: string[]
-  carbon: string[]
-  c_wood: string[]
-  c_cel: string[]
-  d13C_cel: string[]
-  d18O_cel: string[]
-  city: string
   supplier: string
   measureing_height: string
   sample_type: string
@@ -70,7 +58,20 @@ export type Sample = {
   request: string
   validity_details?: ValidityDetails
 
+  lat: string
+  lon: string
+  state: string
+  city: string
   municipality?: string
+
+  oxygen: string[]
+  nitrogen: string[]
+  n_wood: string[]
+  carbon: string[]
+  c_wood: string[]
+  c_cel: string[]
+  d13C_cel: string[]
+  d18O_cel: string[]
 }
 
 export type ValidityDetails = {
@@ -210,34 +211,6 @@ async function initializeAppIfNecessary() {
         const analytics = getAnalytics(app)
       }
     })
-  }
-}
-
-export function showNavBar() {
-  const navBar = document.getElementById('nav-wrapper')
-  if (navBar) {
-    navBar.style.display = 'block'
-  }
-}
-
-export function showTopBar() {
-  const navBar = document.getElementById('top-bar-wrapper')
-  if (navBar) {
-    navBar.style.display = 'block'
-  }
-}
-
-export function hideTopBar() {
-  const navBar = document.getElementById('top-bar-wrapper')
-  if (navBar) {
-    navBar.style.display = 'none'
-  }
-}
-
-export function hideNavBar() {
-  const navBar = document.getElementById('nav-wrapper')
-  if (navBar) {
-    navBar.style.display = 'none'
   }
 }
 

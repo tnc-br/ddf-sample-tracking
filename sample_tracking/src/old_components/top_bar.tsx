@@ -9,10 +9,11 @@ import '../i18n/config'
 import Switch from '@mui/material/Switch'
 import { green } from '@mui/material/colors'
 import { alpha, styled } from '@mui/material/styles'
-import { type UserData } from './utils'
 
 import Image from 'next/image'
-import { auth, firestore } from '@services/firebase/config'
+import { auth } from '@services/firebase/config'
+import { useGlobal } from '@hooks/useGlobal'
+import { useAuthState } from 'react-firebase-hooks/auth'
 
 /**
  * Component to render the top bar shown on most pages in TimberId.
@@ -20,43 +21,16 @@ import { auth, firestore } from '@services/firebase/config'
  * or first initial on top left to let user access profile menu.
  */
 export default function TopBar() {
-  const [userData, setUserData] = useState(null as UserData | null)
-  const [showMenu, setShowMenu] = useState(false)
+  const showMenu = false
 
-  console.log('Top bar')
-
-  const router = useRouter()
-  const db = firestore
+  const { showTopBar } = useGlobal()
+  const [user, loading, error] = useAuthState(auth)
   const { t, i18n } = useTranslation()
-  const ref = useRef(null)
+  const router = useRouter()
 
-  useEffect(() => {
-    if (!userData) {
-      onAuthStateChanged(auth, (user) => {
-        if (user) {
-          setUserData({
-            name: user.displayName!,
-            photoUrl: user.photoURL!,
-            email: user.email!,
-          } as UserData)
-        } else {
-          setUserData(null)
-        }
-      })
-    }
-
-    document.addEventListener('mousedown', (event) => {
-      const popupContainer = document.getElementById('profile-popup-wrapper')
-      const profilePhoto = document.getElementById('profile-photo')
-      if (profilePhoto?.contains(event.target)) {
-        setShowMenu(!showMenu)
-        return
-      }
-      if (!popupContainer?.contains(event.target)) {
-        setShowMenu(false)
-      }
-    })
-  }, [])
+  if (!showTopBar) {
+    return null
+  }
 
   function onLogOutClick() {
     signOut(auth)
@@ -89,31 +63,31 @@ export default function TopBar() {
   }))
 
   function profilePopup() {
-    if (!userData) return
+    if (!user) return
     return (
       <div className="profile-popup-wrapper" id="profile-popup-wrapper">
         <div className="prifile-wrapper">
           <div className="monogram-wrapper">
             <div>
-              {userData.photoUrl && (
+              {user.photoURL && (
                 <img
                   className="popup-profile-photo"
-                  src={userData.photoUrl}
+                  src={user.photoURL}
                   alt="Trulli"
                   width="32"
                   height="32"
                 />
               )}
-              {!userData.photoUrl && (
+              {!user.photoURL && (
                 <div className="popup-letter-profile popup-profile-photo">
-                  {userData.name ? userData.name.charAt(0) : ''}
+                  {user.displayName ? user.displayName.charAt(0) : ''}
                 </div>
               )}
             </div>
           </div>
           <div className="popup-header-wrapper">
-            <div className="popup-name-text">{userData.name}</div>
-            <div className="popup-email-text">{userData.email}</div>
+            <div className="popup-name-text">{user.displayName}</div>
+            <div className="popup-email-text">{user.email}</div>
           </div>
         </div>
         <div className="manage-profile-link-wrapper">
@@ -175,9 +149,7 @@ export default function TopBar() {
       <div className="top-bar-product-wrapper">
         <div className="display-inline-flex-center">
           <div
-            onClick={() =>
-              userData ? router.push('/samples') : router.push('/login')
-            }
+            onClick={() => router.push('/samples')}
             className="top-bar-title-text"
           >
             <Image src="/ddf-header.svg" alt="google" width="300" height="50" />
@@ -207,24 +179,24 @@ export default function TopBar() {
               </div>
             </a>
           </div>
-          {userData && (
+          {user && (
             <div className="top-bar-profile-menu-wrapper">
               <div className="top-bar-profile-menu">
-                {userData.photoUrl && (
+                {user.photoURL && (
                   <img
                     id="profile-photo"
                     className="profile-photo"
-                    src={userData.photoUrl}
+                    src={user.photoURL}
                     width="32"
                     height="32"
                   />
                 )}
-                {!userData.photoUrl && (
+                {!user.photoURL && (
                   <div
                     id="profile-photo"
                     className="letter-profile profile-photo size-32"
                   >
-                    {userData.name ? userData.name.charAt(0) : ''}
+                    {user.displayName ? user.displayName.charAt(0) : ''}
                   </div>
                 )}
                 {showMenu && profilePopup()}

@@ -8,13 +8,12 @@ import {
   setDoc,
 } from 'firebase/firestore'
 import * as utils from './utils'
-import { firestore } from '@services/firebase/config'
+import { db } from '@services/firebase/config'
 
 export async function getSamplesFromCollection(
   userData: utils.UserData,
   collectionName: string,
 ): Promise<Map<string, Map<string, string>>[]> {
-  const db = firestore
   const samples: any = {}
   const samplesStateArray: any = []
   const verifiedSamplesRef = collection(db, collectionName)
@@ -65,7 +64,6 @@ export async function getSamplesFromCollection(
 }
 
 export async function getUserData(userId: string): Promise<utils.UserData> {
-  const db = firestore
   const userDocRef = doc(db, 'users', userId)
   const userDoc = await getDoc(userDocRef)
   if (userDoc.exists()) {
@@ -76,7 +74,6 @@ export async function getUserData(userId: string): Promise<utils.UserData> {
 }
 
 export async function getNewUserData(userId: string): Promise<utils.UserData> {
-  const db = firestore
   const userDocRef = doc(db, 'new_users', userId)
   const userDoc = await getDoc(userDocRef)
   if (userDoc.exists()) {
@@ -92,7 +89,6 @@ export function setSample(
   sample: utils.Sample,
 ) {
   if (!trustedValue) return
-  const db = firestore
   let docRef
   if (trustedValue === 'trusted') {
     docRef = doc(db, 'trusted_samples', sampleId)

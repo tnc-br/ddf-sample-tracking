@@ -5,8 +5,8 @@ import { useRouter } from 'next/navigation'
 import { doc, getDoc, getDocs, collection, updateDoc } from 'firebase/firestore'
 import { onAuthStateChanged } from 'firebase/auth'
 import { useState, useEffect } from 'react'
-import { hideNavBar, hideTopBar } from '../../old_components/utils'
-import { auth, firestore } from '@services/firebase/config'
+import { auth, db } from '@services/firebase/config'
+import { useGlobal } from '@hooks/useGlobal'
 
 interface OrgsSchemas {
   [key: string]: string
@@ -21,11 +21,13 @@ export default function SelectOrg() {
   const [userDocId, setNewUserDocId] = useState('')
 
   const router = useRouter()
-  const db = firestore
+
+  const { setShowNavBar, setShowTopBar } = useGlobal()
 
   useEffect(() => {
-    hideNavBar()
-    hideTopBar()
+    setShowNavBar(false)
+    setShowTopBar(false)
+
     if (userDocId.length < 1) {
       onAuthStateChanged(auth, (user) => {
         if (user) {

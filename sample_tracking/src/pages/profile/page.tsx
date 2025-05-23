@@ -1,17 +1,14 @@
 'use client'
 
 import InputTopBar from '../../old_components/input-top-bar'
-import {
-  type UserData,
-  hideNavBar,
-  hideTopBar,
-} from '../../old_components/utils'
+import { type UserData } from '../../old_components/utils'
 import { useState, useEffect } from 'react'
 import { onAuthStateChanged, deleteUser } from 'firebase/auth'
 import { useRouter } from 'next/navigation'
 import { getDoc, doc, deleteDoc } from 'firebase/firestore'
 import { useTranslation } from 'react-i18next'
-import { auth, firestore } from '@services/firebase/config'
+import { auth, db } from '@services/firebase/config'
+import { useGlobal } from '@hooks/useGlobal'
 
 /**
  * Page to display user account info and the option to delete an account.
@@ -24,12 +21,14 @@ export default function Profile() {
   const [userData, setUserData] = useState(null as UserData | null)
 
   const router = useRouter()
-  const db = firestore
   const { t } = useTranslation()
 
+  const { setShowNavBar, setShowTopBar } = useGlobal()
+
   useEffect(() => {
-    hideNavBar()
-    hideTopBar()
+    setShowNavBar(false)
+    setShowTopBar(false)
+
     if (!userData) {
       onAuthStateChanged(auth, (user) => {
         if (!user) {

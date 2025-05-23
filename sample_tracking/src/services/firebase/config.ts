@@ -15,9 +15,9 @@ const firebaseConfig = {
 const app = !getApps().length ? initializeApp(firebaseConfig) : getApp()
 
 const auth = getAuth(app)
-const firestore = getFirestore(app)
+const db = getFirestore(app)
 const analytics = isSupported().then((res) => {
   return res ? getAnalytics(app) : null
 })
 
-export { auth, app, analytics, firestore }
+export { auth, app, analytics, db }

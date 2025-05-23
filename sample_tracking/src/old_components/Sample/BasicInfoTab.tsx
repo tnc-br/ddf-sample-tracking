@@ -14,12 +14,12 @@ import { useEffect, useState } from 'react'
 import DatePicker from '@components/DatePicker'
 import moment from 'moment'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { Sample } from '../utils'
 
 interface BasicInfoTabProps {
   onSave: (data: any) => void
-  formData: any
+  formData: Partial<Sample>
   onChangeClickSupplier: (event: any) => void
-  originIsKnownOrUncertain: boolean
   onChangeClickMyOrg: (event: any) => void
   nextTab: () => void
 }
@@ -44,12 +44,12 @@ const FormSchema = z.object({
   species: z.string().optional(),
   trusted: z.string().optional(),
   site: z.string().optional(),
-  lat: z.string().optional(),
-  lon: z.string().optional(),
-  state: z.string({ required_error: '*Campo obrigatório' }),
-  municipality: z.string({ required_error: '*Campo obrigatório' }),
-  date_collected: z.date().optional().nullish(),
-  collected_by: z.string(),
+  lat: z.union([z.string(), z.number()]).optional(),
+  lon: z.union([z.string(), z.number()]).optional(),
+  state: z.string().optional(),
+  municipality: z.string().optional(),
+  date_collected: z.union([z.date(), z.string()]).optional().nullish(),
+  collected_by: z.string().optional(),
   supplier: z.string().optional(),
   city: z.string().optional(),
   collection_site: z.string().optional(),
@@ -74,7 +74,6 @@ function BasicInfoTab({
   onSave,
   formData,
   onChangeClickSupplier,
-  originIsKnownOrUncertain,
   onChangeClickMyOrg,
   nextTab,
 }: BasicInfoTabProps) {
@@ -101,17 +100,14 @@ function BasicInfoTab({
     mode: 'onSubmit',
   })
 
-  const SPECIES_NAMES_OPTIONS = speciesList.split('\n').map((species) => ({
-    value: species.trim().toLowerCase(),
-    label: species.trim(),
-  }))
+  const SPECIES_NAMES_OPTIONS = speciesList
 
   const STATES_OPTIONS = states_list.map((state: State) => ({
     value: state.Nome,
     label: state.Nome,
   }))
 
-  const { state } = watch()
+  const { state, trusted } = watch()
 
   useEffect(() => {
     if (!state) {
@@ -140,7 +136,6 @@ function BasicInfoTab({
 
   const handleSubmitForm = handleSubmit(
     (data) => {
-      console.log(data)
       onSave(data)
       nextTab()
     },
@@ -153,6 +148,9 @@ function BasicInfoTab({
   const onCancelClick = () => {
     router.push('samples')
   }
+
+  const originIsKnownOrUncertain =
+    trusted === 'trusted' || trusted === 'untrusted'
 
   return (
     <form className="" onSubmit={handleSubmitForm} noValidate>
@@ -336,6 +334,7 @@ function BasicInfoTab({
                   required
                   id="inputLat"
                   placeholder="Digite..."
+                  type="number"
                   {...register('lat')}
                 />
 
@@ -371,6 +370,7 @@ function BasicInfoTab({
                   required
                   id="inputLon"
                   placeholder="Digite..."
+                  type="number"
                   {...register('lon')}
                 />
 

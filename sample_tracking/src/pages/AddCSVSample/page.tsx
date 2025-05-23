@@ -8,7 +8,7 @@ import { getDoc, doc, writeBatch } from 'firebase/firestore'
 import Papa from 'papaparse'
 import { ExportToCsv } from 'export-to-csv'
 
-import { auth, firestore } from '@services/firebase/config'
+import { auth, db } from '@services/firebase/config'
 
 import {
   type Sample,
@@ -16,6 +16,8 @@ import {
   type ErrorMessages,
   validateImportedEntry,
 } from '../../old_components/utils'
+import { MdInfo } from 'react-icons/md'
+import HoverIcon from '@components/HoverIcon'
 
 const AddCSVSample = () => {
   const [file, setFile] = useState(null)
@@ -29,7 +31,6 @@ const AddCSVSample = () => {
   const errorSampleRef = useRef({})
   errorSampleRef.current = errorSamples
 
-  const db = firestore
   const { t } = useTranslation()
 
   const errorMessages: ErrorMessages = {
@@ -101,6 +102,18 @@ const AddCSVSample = () => {
       .catch((error) => {
         console.log(error)
       })
+  }
+
+  const handleDeleteCSV = () => {
+    setFile(null)
+    setErrorSamples([])
+    setErrorTexts([])
+    setSample(null)
+
+    const fileInput = document.getElementById('fileInput') as HTMLInputElement
+    if (fileInput) {
+      fileInput.value = ''
+    }
   }
 
   const csvOptions = {
@@ -288,6 +301,24 @@ const AddCSVSample = () => {
   return (
     <div className="absolute max-w-screen-lg w-full left-[304px] top-[67px] ">
       <div className="pt-6 flex flex-col items-center">
+        <div className="py-8">
+          <span className="flex items-center gap-2">
+            <span>
+              <a
+                href="https://firebasestorage.googleapis.com/v0/b/river-sky-386919.appspot.com/o/planilha_exemplo.csv?alt=media&token=46e4c9eb-790b-459b-acd1-037385bfad86"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                Clique aqui
+              </a>{' '}
+              para baixar o modelo de planilha.
+            </span>
+            <HoverIcon
+              customTrigger={<MdInfo />}
+              message="É necessário que a planilha obedeça os nomes dos campos e tenha as colunas: code, lat, lon"
+            />
+          </span>
+        </div>
         <div
           className={`w-full max-w-lg p-6 border-2 border-dashed rounded-lg bg-white text-center transition-all ${dragging ? 'border-blue-500 bg-blue-50' : 'border-gray-300'}`}
           onDragOver={handleDragOver}
@@ -309,7 +340,7 @@ const AddCSVSample = () => {
           {file && <p className="mt-3 text-green-600">{file.name}</p>}
         </div>
         <button
-          disabled={!file}
+          disabled={!file || (samples?.length ?? 0) == 0}
           onClick={handleUpload}
           className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-lg shadow hover:bg-blue-700 disabled:bg-blue-600/30 cursor-not-allowed transition"
         >
@@ -319,7 +350,7 @@ const AddCSVSample = () => {
       <div id="import-status-bars">
         {errorSamples.length > 0 && file && (
           <div id="" className="bg-red-300 rounded-md p-4 mt-4">
-            <div className="import-status-text-wrapper">
+            <div className="py-3 gap-2 flex flex-col">
               <div className="import-status-text">
                 Existe alguns erros na planilha
               </div>
@@ -355,7 +386,7 @@ const AddCSVSample = () => {
           </div>
         )}
         {errorSamples.length <= 0 && file && (
-          <div className="import-success-status-wrapper success-background-color">
+          <div className="flex items-center rounded mt-4 success-background-color">
             <div className="import-status-icon-wrapper">
               <div className="import-status-icon">
                 <span className="material-symbols-outlined import-status-icon icon-color-green">
@@ -385,6 +416,17 @@ const AddCSVSample = () => {
           </div>
         )}
       </div>
+
+      {file && (
+        <div className="mb-8 w-full">
+          <button
+            onClick={handleDeleteCSV}
+            className="mt-4 px-4 py-2 bg-blue-600 mx-auto text-white rounded-lg shadow hover:bg-blue-700 disabled:bg-blue-600/30 cursor-not-allowed transition"
+          >
+            Retirar CSV
+          </button>
+        </div>
+      )}
     </div>
   )
 }

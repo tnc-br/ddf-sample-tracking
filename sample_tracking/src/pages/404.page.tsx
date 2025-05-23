@@ -7,7 +7,7 @@ const NotFound = () => {
 
   useEffect(() => {
     if (!router.isReady) return
-    const token = Cookie.get('sa.token')
+    const token = Cookie.get('token')
     if (token) router.replace({ pathname: '/home', query: { ...router.query } })
     else router.replace('/login')
   }, [router.isReady])

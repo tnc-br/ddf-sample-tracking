@@ -5,11 +5,11 @@ import React, { useState, useEffect } from 'react'
 import { useAuthState } from 'react-firebase-hooks/auth'
 import { useRouter } from 'next/navigation'
 
-import { hideNavBar } from '../../old_components/utils'
 import Login from './page2'
 import SignUp from './signup'
 import ForgotPassword from './forgot-password'
 import { auth } from '@services/firebase/config'
+import { useGlobal } from '@hooks/useGlobal'
 
 const LogInScreen = {
   LOG_IN: 'logIn',
@@ -25,33 +25,32 @@ const LogInScreen = {
 export default function LogInSignUpPage() {
   const router = useRouter()
 
-  // const [user, loading, error] = useAuthState(auth)
+  const [user, loading, error] = useAuthState(auth)
 
-  // if (user && !loading && !error) {
-  //   router.replace('/samples')
-  // }
+  if (user && !loading && !error) {
+    router.replace('/samples')
+  }
 
   const [canSignIn, setCanSignIn] = useState(true)
   const [signInScreen, setSignInScreen] = useState(LogInScreen.LOG_IN)
+  const { setShowNavBar } = useGlobal()
 
   useEffect(() => {
-    hideNavBar()
+    setShowNavBar(false)
   }, [])
 
-  console.log('signInScreen')
-
   function handleSignUpClick() {
-    // setSignInScreen(LogInScreen.SIGN_UP)
-    // setCanSignIn(false)
+    setSignInScreen(LogInScreen.SIGN_UP)
+    setCanSignIn(false)
   }
   function handleSignInClick() {
-    // setCanSignIn(true)
+    setCanSignIn(true)
   }
   function handleForgotPasswordClick() {
-    // setSignInScreen(LogInScreen.FORGOT_PASSWORD)
+    setSignInScreen(LogInScreen.FORGOT_PASSWORD)
   }
   function handleReturnToSignInClick() {
-    // setSignInScreen(LogInScreen.LOG_IN)
+    setSignInScreen(LogInScreen.LOG_IN)
   }
 
   return (

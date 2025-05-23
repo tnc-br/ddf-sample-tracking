@@ -1,20 +1,24 @@
 'use client'
 
 import 'bootstrap/dist/css/bootstrap.css'
-import { useParams, useRouter } from 'next/navigation'
-import { doc, updateDoc, getDoc } from 'firebase/firestore'
-import { onAuthStateChanged } from 'firebase/auth'
-import { useState, useEffect } from 'react'
-import { useSearchParams } from 'next/navigation'
+import { useRouter } from 'next/router'
+import { doc, updateDoc } from 'firebase/firestore'
 import {
   type Sample,
-  type UserData,
   getPointsArrayFromSampleResults,
 } from '../../old_components/utils'
 import Link from 'next/link'
 import { useTranslation } from 'react-i18next'
 import AddNewSample from '../../old_components/Sample/AddNewSample'
-import { auth, firestore } from '@services/firebase/config'
+import { auth, db } from '@services/firebase/config'
+import { useAuthState } from 'react-firebase-hooks/auth'
+import { useDocument } from 'react-firebase-hooks/firestore'
+
+const SAMPLES_COLLECTION_DICT = {
+  trusted: 'trusted_samples',
+  untrusted: 'untrusted_samples',
+  unknown: 'unknown_samples',
+}
 
 /**
  * Component to handle editing a sample. It uses the SampleDataInput subcomponent to handle data input.
@@ -25,89 +29,28 @@ import { auth, firestore } from '@services/firebase/config'
  * Once the sample is fetched from the correct collection, it's data is passed to SampleDataComponent to pre-fill the input fields.
  */
 export default function Edit() {
-  const [userData, setUserdata] = useState({} as UserData)
-  const [currentTab, setCurrentTab] = useState(1)
-  const [selectedDoc, setDoc] = useState({} as Sample)
-
-  const [formData, setFormData] = useState({
-    visibility: 'public',
-    collected_by: 'supplier',
-  })
-
-  const params = useParams()
   const router = useRouter()
-  const db = firestore
   const { t } = useTranslation()
+  const [user, loadingUser, errorUser] = useAuthState(auth)
 
-  let sampleId = 'Sem ID'
-  let trusted = 'trusted'
-
-  const searchParams = useSearchParams()
-
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      const queryString = params
-      const urlParams = new URLSearchParams(queryString)
-      sampleId = urlParams.get('id')
-        ? urlParams.get('id')
-        : searchParams.get('id')
-      trusted = urlParams.get('trusted')
-        ? urlParams.get('trusted')
-        : searchParams.get('trusted')
-    }
-
-    if (!userData.role) {
-      onAuthStateChanged(auth, (user) => {
-        if (!user) {
-          router.push('/login')
-        } else {
-          const userDocRef = doc(db, 'users', user.uid)
-          getDoc(userDocRef).then((docRef) => {
-            if (docRef.exists()) {
-              const docData = docRef.data()
-              if (!docData.org) {
-                router.push('/samples')
-              } else {
-                setUserdata(docData as UserData)
-              }
-            }
-          })
-        }
-        if (!user) {
-          router.push('/login')
-        }
-      })
-    }
-  }, [])
-
-  let docRef = doc(db, 'trusted_samples', sampleId!)
-  if (trusted === 'untrusted') {
-    docRef = doc(db, 'untrusted_samples', sampleId!)
-  } else if (trusted === 'unknown') {
-    docRef = doc(db, 'unknown_samples', sampleId!)
+  const { id = '', trusted = 'trusted' } = router.query as {
+    id: string
+    trusted: string
   }
 
-  if (Object.keys(selectedDoc).length < 1 && !userData.role && docRef) {
-    getDoc(docRef)
-      .then((docRef) => {
-        if (docRef.exists()) {
-          setFormData({
-            ...docRef.data(),
-            trusted: trusted,
-          } as Sample)
-        } else {
-          console.log('Error: Unable to find data for specified sample')
-          alert(
-            'There was an internal error and the requested sample could not be found.',
-          )
-        }
-      })
-      .catch((error) => {
-        console.log(error)
-      })
-  }
+  const sampleId = id ?? 'Sem ID'
 
-  function onUpdateSampleClick(updatedFormData: Sample) {
+  const userRef = user ? doc(db, 'users', user?.uid || '') : null
+  const [userData, loadingUserData, errorUserData] = useDocument(userRef)
+
+  const collectionName =
+    SAMPLES_COLLECTION_DICT[trusted as keyof typeof SAMPLES_COLLECTION_DICT]
+
+  let sampleRef = sampleId ? doc(db, collectionName, sampleId || '') : null
+
+  const [sample, loadingSample, errorSample] = useDocument(sampleRef)
+
+  function onUpdateSampleClick(updatedFormData: Partial<Sample>) {
     if (!updatedFormData) return
     let docRef = doc(db, 'trusted_samples', sampleId!)
     if (trusted === 'untrusted') {
@@ -164,6 +107,27 @@ export default function Edit() {
     })
   }
 
+  const isLoading = loadingSample || loadingUserData || loadingUser
+  const isError = errorSample || errorUserData || errorUser
+
+  if (isLoading) {
+    return <div className="bg-red-500 text-white">{t('loading')}</div>
+  }
+
+  if (isError) {
+    alert('Error loading data')
+  }
+
+  if (!userData?.data() || !sample?.data()) {
+    return <div className="bg-red-500 text-white">Sem Sample</div>
+  }
+
+  const defaultValue = {
+    ...sample.data(),
+    visibility: 'public',
+    collected_by: 'supplier',
+  }
+
   return (
     <div>
       <link
@@ -180,21 +144,17 @@ export default function Edit() {
       </div>
       <div>
         <div className="sample-details-form-wrapper">
-          {userData && (
-            <div id="sample-form">
-              <AddNewSample
-                baseState={formData}
-                onActionButtonClick={(
-                  sampleID: string,
-                  updatedFormData: Sample,
-                ) => onUpdateSampleClick(updatedFormData)}
-                actionButtonTitle="Update sample"
-                sampleId={sampleId}
-                tab={currentTab}
-                onTabChange={(tab) => setCurrentTab(tab)}
-              />
-            </div>
-          )}
+          <div id="sample-form">
+            <AddNewSample
+              defaultValue={defaultValue}
+              onActionButtonClick={(
+                sampleID: string,
+                updatedFormData: Partial<Sample>,
+              ) => onUpdateSampleClick(updatedFormData)}
+              actionButtonTitle="Update sample"
+              sampleId={sampleId}
+            />
+          </div>
         </div>
       </div>
     </div>

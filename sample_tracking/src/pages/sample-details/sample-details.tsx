@@ -6,7 +6,7 @@ import { useRouter } from 'next/router'
 import { doc, getDoc } from 'firebase/firestore'
 import { onAuthStateChanged } from 'firebase/auth'
 import { useState, useEffect } from 'react'
-import { type Sample, showNavBar, showTopBar } from '../../old_components/utils'
+import { type Sample } from '../../old_components/utils'
 
 import 'jquery'
 import 'popper.js'
@@ -22,7 +22,8 @@ import SampleDetailsSection from './components/SampleDetailsSection'
 import MeasurementsSection from './components/MeasurementsSection'
 import LandUseDetailsSection from './components/LandUseDetailsSection'
 import DeforestationAlertsSection from './components/DeforestationAlertsSection'
-import { auth, firestore } from '@services/firebase/config'
+import { auth, db } from '@services/firebase/config'
+import { useGlobal } from '@hooks/useGlobal'
 
 type WaterPercentageResults = {
   is_point_water: boolean
@@ -43,12 +44,12 @@ export default function SampleDetails() {
 
   const sampleId = id ?? 'Sem ID'
 
-  const db = firestore
   const { t } = useTranslation()
+  const { setShowNavBar, setShowTopBar } = useGlobal()
 
   useEffect(() => {
-    showNavBar()
-    showTopBar()
+    setShowNavBar(true)
+    setShowTopBar(true)
 
     onAuthStateChanged(auth, (user) => {
       if (!user) {
@@ -94,6 +95,8 @@ export default function SampleDetails() {
   }
 
   const url = `timberid.org/sample-details?trusted=${trusted}&id=${sampleId}`
+
+  console.log(selectedDoc)
 
   return (
     <div>

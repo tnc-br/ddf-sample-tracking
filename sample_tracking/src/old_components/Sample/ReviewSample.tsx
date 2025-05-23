@@ -1,23 +1,36 @@
+import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import { getLargestIndex } from './SampleMeasurementTab'
 
 interface ReviewAndSubmitTabProps {
   formData: any
-  numMeasurements: number
-  currentMeasurementsTab: number
   onNextClick: () => void
   onCancelClick: () => void
-  handleMeasurementsTabClick: (e: any) => void
 }
 
 function ReviewAndSubmitTab({
   formData,
-  numMeasurements,
-  currentMeasurementsTab,
-  handleMeasurementsTabClick,
   onNextClick,
   onCancelClick,
 }: ReviewAndSubmitTabProps) {
   const { t } = useTranslation()
+
+  const numMeasurements = getLargestIndex([
+    formData.d18O_cel,
+    formData.d18O_wood,
+    formData.d15N_wood,
+    formData.n_wood,
+    formData.d13C_wood,
+    formData.c_wood,
+    formData.c_cel,
+    formData.d13C_cel,
+  ])
+
+  const [currentMeasurementsTab, setCurentMeasurementsTab] = useState(0)
+
+  function handleMeasurementsTabClick(evt: any) {
+    setCurentMeasurementsTab(parseInt(evt.target.id))
+  }
 
   return (
     <div id="review-and-submit">
@@ -27,38 +40,41 @@ function ReviewAndSubmitTab({
           <div className="detail">
             <span className="detail-name">{t('sampleName')}</span>
             <span className="detail-value">
-              {formData['visibility'] || 'unknown'}
+              {formData['sample_name'] || 'Não preenchido'}
             </span>
           </div>
           <div className="detail">
             <span className="detail-name">{t('collectionSite')}</span>
             <span className="detail-value">
-              {formData['site'] || 'unknown'}
+              {formData['site'] || 'Não preenchido'}
             </span>
           </div>
           <div className="detail">
             <span className="detail-name">{t('supplierName')}</span>
             <span className="detail-value">
-              {formData['supplier'] || 'unknown'}
+              {formData['supplier'] || 'Não preenchido'}
             </span>
           </div>
         </div>
 
         <div className="detail-row">
           <div className="detail">
-            <span className="detail-name">{t('sampleName')}</span>
+            <span className="detail-name">Código</span>
             <span className="detail-value">
-              {formData['code_lab'] || 'unknown'}
+              {formData['code_lab'] || 'Não preenchido'}
             </span>
           </div>
           <div className="detail">
             <span className="detail-name">{t('latitude')}</span>
-            <span className="detail-value">{formData['lat'] || 'unknown'}</span>
+            <span className="detail-value">
+              {formData['lat'] || 'Não preenchido'}
+            </span>
           </div>
+
           <div className="detail">
             <span className="detail-name">{t('city')}</span>
             <span className="detail-value">
-              {formData['city'] || 'unknown'}
+              {formData['city'] || 'Não preenchido'}
             </span>
           </div>
         </div>
@@ -67,12 +83,14 @@ function ReviewAndSubmitTab({
           <div className="detail">
             <span className="detail-name">{t('treeSpecies')}</span>
             <span className="detail-value">
-              {formData['species'] || 'unknown'}
+              {formData['species'] || 'Não preenchido'}
             </span>
           </div>
           <div className="detail">
             <span className="detail-name">{t('longitude')}</span>
-            <span className="detail-value">{formData['lon'] || 'unknown'}</span>
+            <span className="detail-value">
+              {formData['lon'] || 'Não preenchido'}
+            </span>
           </div>
           <div className="detail">
             <span className="detail-name">{t('collectedBy')}</span>
@@ -90,7 +108,7 @@ function ReviewAndSubmitTab({
       <div className="measurements-table">
         <div className="measurements-table-tabs">
           <div className="measurements-table-tabs-group">
-            {Array.from({ length: numMeasurements }, (_, index) => (
+            {numMeasurements.map((_, index) => (
               <div key={index} onClick={handleMeasurementsTabClick}>
                 <div
                   className={

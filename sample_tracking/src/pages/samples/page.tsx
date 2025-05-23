@@ -4,12 +4,7 @@ import { onAuthStateChanged } from 'firebase/auth'
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import SamplesTable from '../../old_components/samples_table'
-import {
-  type Sample,
-  type UserData,
-  showNavBar,
-  showTopBar,
-} from '../../old_components/utils'
+import { type Sample, type UserData } from '../../old_components/utils'
 import {
   getSamplesFromCollection,
   getUserData,
@@ -17,6 +12,7 @@ import {
 import { useTranslation } from 'react-i18next'
 import '@i18n/config'
 import { auth } from '@services/firebase/config'
+import { useGlobal } from '@hooks/useGlobal'
 
 const COMPLETED_SAMPLES = 'completed_samples'
 const IN_PROGRESS_SAMPLES = 'in_progress_samples'
@@ -36,9 +32,12 @@ export default function Samples() {
   const router = useRouter()
   const { t } = useTranslation()
 
+  const { setShowNavBar, setShowTopBar } = useGlobal()
+
   useEffect(() => {
-    showNavBar()
-    showTopBar()
+    setShowNavBar(true)
+    setShowTopBar(true)
+
     if (!userData.role || userData.role.length < 1) {
       onAuthStateChanged(auth, (user) => {
         if (user) {

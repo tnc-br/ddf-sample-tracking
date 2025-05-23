@@ -18,7 +18,7 @@ import { useTranslation } from 'react-i18next'
 import '@i18n/config'
 import { ConfirmationBox, ConfirmationProps } from './confirmation_box'
 import Link from 'next/link'
-import { firestore } from '@services/firebase/config'
+import { db } from '@services/firebase/config'
 
 interface SampleDataProps {
   samplesData: Sample[]
@@ -49,7 +49,6 @@ export default function SamplesTable(props: SampleDataProps) {
   )
 
   const router = useRouter()
-  const db = firestore
   const { t } = useTranslation()
 
   const tableInstanceRef = useRef<MRT_TableInstance<Sample>>(null)

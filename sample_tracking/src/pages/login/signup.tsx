@@ -8,7 +8,7 @@ import {
   ConfirmationProps,
 } from '../../old_components/confirmation_box'
 import { useTranslation } from 'react-i18next'
-import { auth, firestore } from '@services/firebase/config'
+import { auth, db } from '@services/firebase/config'
 
 interface SignUpProps {
   onLogInClick: any
@@ -66,7 +66,6 @@ export default function SignUp(props: SignUpProps) {
     setSignUpData(signUpData)
   }
 
-  const db = firestore
   const router = useRouter()
   const { t } = useTranslation()
 

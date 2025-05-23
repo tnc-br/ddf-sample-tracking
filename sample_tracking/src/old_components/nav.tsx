@@ -8,11 +8,12 @@ import { getDoc, doc } from 'firebase/firestore'
 import Link from 'next/link'
 import { useTranslation } from 'react-i18next'
 import '../i18n/config'
-import ImportSamples from './import-samples'
-import { auth, firestore } from '@services/firebase/config'
+import { auth, db } from '@services/firebase/config'
 import { MdAdd, MdMenu } from 'react-icons/md'
 import { FaUserPlus, FaUsers } from 'react-icons/fa'
 import Dropdown from '@components/Dropdown'
+import { useGlobal } from '@hooks/useGlobal'
+import { useAuthState } from 'react-firebase-hooks/auth'
 
 /**
  * Component for rendering the nav bar on the left of the screen. Depending on what
@@ -22,28 +23,24 @@ import Dropdown from '@components/Dropdown'
  */
 export default function Nav() {
   const [role, setRole] = useState('')
-  console.log('nav bar')
 
+  const { showNavBar } = useGlobal()
   const router = useRouter()
-  const db = firestore
   const { t } = useTranslation()
+  const [user] = useAuthState(auth)
 
-  useEffect(() => {
-    if (role.length < 1) {
-      onAuthStateChanged(auth, (user) => {
-        if (!user) {
-          router.push('/login')
-        } else {
-          const userDocRef = doc(db, 'users', user.uid)
-          getDoc(userDocRef).then((docRef) => {
-            if (docRef.exists()) {
-              setRole(docRef.data().role)
-            }
-          })
-        }
-      })
-    }
-  })
+  if (!showNavBar) {
+    return null
+  }
+
+  if (user) {
+    const userDocRef = doc(db, 'users', user.uid)
+    getDoc(userDocRef).then((docRef) => {
+      if (docRef.exists()) {
+        setRole(docRef.data().role)
+      }
+    })
+  }
 
   function canAddSample() {
     return role === 'admin' || role === 'member' || role === 'site_admin'

@@ -18,15 +18,11 @@ import {
   where,
   deleteDoc,
 } from 'firebase/firestore'
-import {
-  showNavBar,
-  showTopBar,
-  getRanHex,
-  isProd,
-} from '../../old_components/utils'
+import { getRanHex, isProd } from '../../old_components/utils'
 import { getUserData } from '../../old_components/firebase_utils'
-import { auth, firestore } from '@services/firebase/config'
+import { auth, db } from '@services/firebase/config'
 import moment from 'moment'
+import { useGlobal } from '@hooks/useGlobal'
 
 type UserData = {
   role: string
@@ -79,11 +75,13 @@ export default function SignUpRequests() {
   const [userData, setUserData] = useState({} as UserData)
 
   const router = useRouter()
-  const db = firestore
+
+  const { setShowNavBar, setShowTopBar } = useGlobal()
 
   useEffect(() => {
-    showNavBar()
-    showTopBar()
+    setShowNavBar(true)
+    setShowTopBar(true)
+
     if (Object.keys(userData).length < 1) {
       onAuthStateChanged(auth, (user) => {
         if (!user) {

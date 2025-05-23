@@ -8,55 +8,109 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { ErrorMessage } from '@hookform/error-message'
 
 interface SampleMeasurementsTabProps {
-  handleAddMeasurementClick: any
   formData: any
   onCancelClick: () => void
   onSave: (data: any) => void
   nextTab: () => void
 }
 
-const FormSchema = z.object({
-  measureing_height: z.string().optional(),
-  sample_type: z.string().optional(),
-  diameter: z.string().optional(),
-  avp: z.string().optional(),
-  mean_annual_temperature: z.string().optional(),
-  mean_annual_precipitation: z.string().optional(),
-  observations: z.string().optional(),
-  info: z
-    .array(
-      z.object({
-        d18O_cel: z.string().optional(),
-        d18O_wood: z.string().optional(),
-        d15N_wood: z.string().optional(),
-        n_wood: z.string().optional(),
-        d13C_wood: z.string().optional(),
-        c_wood: z.string().optional(),
-        c_cel: z.string().optional(),
-        d13C_cel: z.string().optional(),
-      }),
-    )
-    .refine(
-      (infos) =>
-        infos.some(
-          (item) =>
-            item.d18O_cel ||
-            item.d18O_wood ||
-            item.d15N_wood ||
-            item.n_wood ||
-            item.d13C_wood ||
-            item.c_wood ||
-            item.c_cel ||
-            item.d13C_cel,
-        ),
-      {
-        message:
-          'Pelo menos um item dos Dados Isotópicos deve estar completamente preenchido.',
-      },
-    ),
-})
+const FormSchema = z
+  .object({
+    measureing_height: z.string().optional(),
+    sample_type: z.string().optional(),
+    diameter: z.string().optional(),
+    avp: z.string().optional(),
+    mean_annual_temperature: z.string().optional(),
+    mean_annual_precipitation: z.string().optional(),
+    observations: z.string().optional(),
+    d18O_cel: z
+      .array(z.union([z.string(), z.number()]))
+      .optional()
+      .default(['']),
+    d18O_wood: z
+      .array(z.union([z.string(), z.number()]))
+      .optional()
+      .default(['']),
+    d15N_wood: z
+      .array(z.union([z.string(), z.number()]))
+      .optional()
+      .default(['']),
+    n_wood: z
+      .array(z.union([z.string(), z.number()]))
+      .optional()
+      .default(['']),
+    d13C_wood: z
+      .array(z.union([z.string(), z.number()]))
+      .optional()
+      .default(['']),
+    c_wood: z
+      .array(z.union([z.string(), z.number()]))
+      .optional()
+      .default(['']),
+    c_cel: z
+      .array(z.union([z.string(), z.number()]))
+      .optional()
+      .default(['']),
+    d13C_cel: z
+      .array(z.union([z.string(), z.number()]))
+      .optional()
+      .default(['']),
+  })
+  .refine(
+    (item) => {
+      const fieldsToCheck = [
+        item.d18O_cel,
+        item.d18O_wood,
+        item.d15N_wood,
+        item.n_wood,
+        item.d13C_wood,
+        item.c_wood,
+        item.c_cel,
+        item.d13C_cel,
+      ]
+
+      for (const arr of fieldsToCheck) {
+        if (
+          arr &&
+          arr.some(
+            (value) =>
+              (typeof value === 'string' && value.trim() !== '') ||
+              typeof value === 'number',
+          )
+        ) {
+          return true // Pelo menos um item em um dos arrays está preenchido
+        }
+      }
+      return false // Nenhum item preenchido em nenhum dos arrays
+    },
+    {
+      message:
+        'Pelo menos um item dos Dados Isotópicos deve estar completamente preenchido.',
+    },
+  )
 
 type FormSchema = z.infer<typeof FormSchema>
+
+type IsotopicArrayKey =
+  | 'd18O_cel'
+  | 'd18O_wood'
+  | 'd15N_wood'
+  | 'n_wood'
+  | 'd13C_wood'
+  | 'c_wood'
+  | 'c_cel'
+  | 'd13C_cel'
+
+export function getLargestIndex(arrays: any[][]): any[] {
+  let maxLength: any[] = []
+  for (const arr of arrays) {
+    if (arr && arr.length > maxLength.length) {
+      maxLength = arr
+    }
+  }
+
+  return maxLength.length > 0 ? maxLength : []
+}
 
 function SampleMeasurementsTab({
   onCancelClick,
@@ -66,52 +120,29 @@ function SampleMeasurementsTab({
 }: SampleMeasurementsTabProps) {
   const { t } = useTranslation()
 
-  console.log(formData.d180_cel)
-  console.log(formData)
   const {
     register,
     handleSubmit,
     formState: { errors },
     control,
     watch,
+    setValue,
   } = useForm<FormSchema>({
     resolver: zodResolver(FormSchema),
     shouldUseNativeValidation: false,
     defaultValues: {
+      d13C_cel: [''],
+      d18O_cel: [''],
+      d18O_wood: [''],
+      d15N_wood: [''],
+      d13C_wood: [''],
+      c_cel: [''],
+      c_wood: [''],
+      n_wood: [''],
       ...formData,
-      info: formData?.d180_cel
-        ? formData?.d180_cel?.map((_: any, index: number) => {
-            console.log('index', index)
-            const obj = {
-              d18O_cel: formData.d18O_cel[index] ?? '',
-              d18O_wood: formData.d18O_wood[index] ?? '',
-              d15N_wood: formData.d15N_wood[index] ?? '',
-              n_wood: formData.n_wood[index] ?? '',
-              d13C_wood: formData.d13C_wood[index] ?? '',
-              c_wood: formData.c_wood[index] ?? '',
-              c_cel: formData.c_cel[index] ?? '',
-              d13C_cel: formData.d13C_cel[index] ?? '',
-            }
-
-            return obj
-          })
-        : [
-            {
-              d18O_cel: '',
-              d18O_wood: '',
-              d15N_wood: '',
-              n_wood: '',
-              d13C_wood: '',
-              c_wood: '',
-              c_cel: '',
-              d13C_cel: '',
-            },
-          ],
     },
     mode: 'onSubmit',
   })
-
-  console.log('formData', watch('info'))
 
   const sampleTypeValues = [
     {
@@ -134,64 +165,78 @@ function SampleMeasurementsTab({
 
   const handleSubmitForm = handleSubmit(
     (data) => {
-      const { info, ...rest } = data
-
-      const d18O_cel_arr: any[] = []
-      const d18O_wood_arr: any[] = []
-      const d15N_wood_arr: any[] = []
-      const n_wood_arr: any[] = []
-      const d13C_wood_arr: any[] = []
-      const c_wood_arr: any[] = []
-      const c_cel_arr: any[] = []
-      const d13C_cel_arr: any[] = []
-
-      info.map((d) => {
-        const {
-          d18O_cel,
-          d18O_wood,
-          d15N_wood,
-          n_wood,
-          d13C_wood,
-          c_wood,
-          c_cel,
-          d13C_cel,
-        } = d
-
-        d18O_cel_arr.push(d18O_cel)
-        d18O_wood_arr.push(d18O_wood)
-        d15N_wood_arr.push(d15N_wood)
-        n_wood_arr.push(n_wood)
-        d13C_wood_arr.push(d13C_wood)
-        c_wood_arr.push(c_wood)
-        c_cel_arr.push(c_cel)
-        d13C_cel_arr.push(d13C_cel)
-      })
+      const { ...rest } = data
 
       onSave({
         ...rest,
-        d18O_cel: d18O_cel_arr,
-        d18O_wood: d18O_wood_arr,
-        d15N_wood: d15N_wood_arr,
-        n_wood: n_wood_arr,
-        d13C_wood: d13C_wood_arr,
-        c_wood: c_wood_arr,
-        c_cel: c_cel_arr,
-        d13C_cel: d13C_cel_arr,
       })
 
       nextTab()
     },
     (err) => {
       console.log(err)
-      alert(err.info?.root?.message ?? 'Preencha todos os campos obrigatórios.')
-      // notification.display('Preencha todos os campos obrigatórios.', 'error')
+      alert(err?.root?.message ?? 'Preencha todos os campos obrigatórios.')
     },
   )
 
-  const { fields, append, remove } = useFieldArray({
-    control,
-    name: 'info',
-  })
+  const {
+    d13C_cel,
+    d18O_cel,
+    d18O_wood,
+    d15N_wood,
+    d13C_wood,
+    c_cel,
+    c_wood,
+    n_wood,
+  } = watch()
+
+  const isotopicFieldNames: IsotopicArrayKey[] = [
+    'd18O_cel',
+    'd18O_wood',
+    'd15N_wood',
+    'n_wood',
+    'd13C_wood',
+    'c_wood',
+    'c_cel',
+    'd13C_cel',
+  ]
+
+  const largestArr = getLargestIndex([
+    d18O_cel,
+    d18O_wood,
+    d15N_wood,
+    n_wood,
+    d13C_wood,
+    c_wood,
+    c_cel,
+    d13C_cel,
+  ])
+
+  const handleAddItem = () => {
+    isotopicFieldNames.forEach((fieldName) => {
+      const currentArray = watch(fieldName) || []
+      // Garantir que estamos trabalhando com um array
+      const arrayToUpdate = Array.isArray(currentArray) ? currentArray : []
+      setValue(fieldName, [...arrayToUpdate, ''], {
+        shouldValidate: true,
+        shouldDirty: true,
+      })
+    })
+  }
+
+  // Implementação da função handleRemoveItem
+  const handleRemoveItem = (indexToRemove: number) => {
+    isotopicFieldNames.forEach((fieldName) => {
+      const currentArray = watch(fieldName) || []
+      if (Array.isArray(currentArray)) {
+        const newArray = currentArray.filter((_, idx) => idx !== indexToRemove)
+        setValue(fieldName, newArray, {
+          shouldValidate: true,
+          shouldDirty: true,
+        })
+      }
+    })
+  }
 
   return (
     <form id="sample-measurements" onSubmit={handleSubmitForm} noValidate>
@@ -387,9 +432,9 @@ function SampleMeasurementsTab({
           </div>
         </div>
         <div className="mt-6 ">
-          {fields.map((item, index) => (
+          {largestArr.map((item, index) => (
             <div
-              key={item.id}
+              key={`isotopic-group-${index}`}
               className="bg-white p-6 rounded-lg shadow-md mb-6"
             >
               <h2 className="text-2xl font-semibold mb-4">
@@ -397,72 +442,32 @@ function SampleMeasurementsTab({
               </h2>
 
               <div className="grid grid-cols-2 gap-4">
-                <input
-                  {...register(`info.${index}.d18O_cel`)}
-                  placeholder="d18O_cel"
-                  className="p-2 border rounded w-full"
-                />
-                <input
-                  {...register(`info.${index}.d18O_wood`)}
-                  placeholder="d18O_wood"
-                  className="p-2 border rounded w-full"
-                />
-                <input
-                  {...register(`info.${index}.d15N_wood`)}
-                  placeholder="d15N_wood"
-                  className="p-2 border rounded w-full"
-                />
-                <input
-                  {...register(`info.${index}.n_wood`)}
-                  placeholder="n_wood"
-                  className="p-2 border rounded w-full"
-                />
-                <input
-                  {...register(`info.${index}.d13C_wood`)}
-                  placeholder="d13C_wood"
-                  className="p-2 border rounded w-full"
-                />
-                <input
-                  {...register(`info.${index}.c_wood`)}
-                  placeholder="c_wood"
-                  className="p-2 border rounded w-full"
-                />
-                <input
-                  {...register(`info.${index}.c_cel`)}
-                  placeholder="c_cel"
-                  className="p-2 border rounded w-full"
-                />
-                <input
-                  {...register(`info.${index}.d13C_cel`)}
-                  placeholder="d13C_cel"
-                  className="p-2 border rounded w-full"
-                />
+                {isotopicFieldNames.map((fieldName) => {
+                  return (
+                    <input
+                      key={`${fieldName}-${index}`}
+                      {...register(`${fieldName}.${index}`)}
+                      placeholder={fieldName}
+                      className="p-2 border rounded w-full"
+                    />
+                  )
+                })}
               </div>
-
-              <button
-                type="button"
-                onClick={() => remove(index)}
-                className="mt-4 px-4 py-2 bg-red-500 text-white rounded"
-              >
-                Remover Item
-              </button>
+              {largestArr.length > 1 && (
+                <button
+                  type="button"
+                  onClick={() => handleRemoveItem(index)}
+                  className="mt-4 px-4 py-2 bg-red-500 text-white rounded"
+                >
+                  Remover Item
+                </button>
+              )}
             </div>
           ))}
 
           <button
             type="button"
-            onClick={() =>
-              append({
-                d18O_cel: '',
-                d18O_wood: '',
-                d15N_wood: '',
-                n_wood: '',
-                d13C_wood: '',
-                c_wood: '',
-                c_cel: '',
-                d13C_cel: '',
-              })
-            }
+            onClick={handleAddItem}
             className="px-4 py-2 bg-blue-500 text-white rounded"
           >
             Adicionar Novo Item

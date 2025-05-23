@@ -1,6 +1,5 @@
 import { useRouter } from 'next/router'
 import { useEffect } from 'react'
-import { usePostHog } from 'posthog-js/react'
 import Cookies from 'js-cookie'
 
 import { useQueryClient } from '@tanstack/react-query'
@@ -11,7 +10,6 @@ import * as activeReducer from 'common/reducers/selected'
 
 function Logout() {
   const router = useRouter()
-  const posthog = usePostHog()
   const dispatch = useAppDispatch()
   const queryClient = useQueryClient()
 
@@ -22,7 +20,6 @@ function Logout() {
     Cookies.remove('token')
     Cookies.remove('refreshToken')
     queryClient.removeQueries()
-    posthog.reset()
 
     router.replace({ pathname: '/login', query: { ...router.query } })
   }

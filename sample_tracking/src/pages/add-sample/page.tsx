@@ -1,9 +1,8 @@
 'use client'
 
 import 'bootstrap/dist/css/bootstrap.css'
-import { useRouter } from 'next/navigation'
+import { useRouter } from 'next/router'
 import { doc, getDoc } from 'firebase/firestore'
-import { onAuthStateChanged } from 'firebase/auth'
 import { useState, useEffect } from 'react'
 import AddNewSample from '../../old_components/Sample/AddNewSample'
 import {
@@ -12,12 +11,13 @@ import {
   type UserData,
   Sample,
 } from '../../old_components/utils'
-import { useSearchParams, useParams } from 'next/navigation'
 import { useTranslation } from 'react-i18next'
 import Link from 'next/link'
 import { setSample } from '../../old_components/firebase_utils'
-import { auth, firestore } from '@services/firebase/config'
+import { auth, db } from '@services/firebase/config'
 import { QRCodeSVG } from 'qrcode.react'
+import { useAuthState } from 'react-firebase-hooks/auth'
+import { useDocument } from 'react-firebase-hooks/firestore'
 
 /**
  * Component to handle adding a complete or incomplet sample. It uses the SampleDataInput
@@ -33,64 +33,25 @@ import { QRCodeSVG } from 'qrcode.react'
  *
  */
 export default function AddSample() {
-  const [userData, setUserdata] = useState({} as UserData)
-  const [currentTab, setCurrentTab] = useState(1)
   const [sampleId, setSampleID] = useState('')
   const [sampleCreationFinished, setSampleCreationFinished] = useState(false)
-  const params = useParams()
-  const [formData, setFormData] = useState({
-    visibility: 'private',
-    collected_by: 'supplier',
-    status: 'concluded',
-  })
+  const [formData, setFormData] = useState<Partial<Sample>>({} as Sample)
 
   const router = useRouter()
-  const db = firestore
   const { t } = useTranslation()
-
-  let status = 'completed'
-  const searchParams = useSearchParams()
 
   if (sampleId.length < 1) {
     setSampleID(getRanHex(20))
   }
 
-  useEffect(() => {
-    if (typeof window !== 'undefined' && !formData.trusted) {
-      const queryString = params
-      const urlParams = new URLSearchParams(queryString)
-      status = urlParams.get('status')
-        ? urlParams.get('status')
-        : searchParams.get('status')
-      setFormData({
-        ...formData,
-        trusted: status === 'originVerification' ? 'untrusted' : 'trusted',
-      })
-    }
+  const { status = '' } = router.query as {
+    status: string
+  }
 
-    if (!userData.role || userData.role.length < 1) {
-      onAuthStateChanged(auth, (user) => {
-        if (!user) {
-          router.push('/login')
-        } else {
-          const userDocRef = doc(db, 'users', user.uid)
-          getDoc(userDocRef).then((docRef) => {
-            if (docRef.exists()) {
-              const docData = docRef.data()
-              if (!docData.org) {
-                router.push('/samples')
-              } else {
-                setUserdata(docData as UserData)
-              }
-            }
-          })
-        }
-        if (!user) {
-          router.push('/login')
-        }
-      })
-    }
-  }, [])
+  const [user, loadingUser, errorUser] = useAuthState(auth)
+
+  const userRef = user ? doc(db, 'users', user?.uid || '') : null
+  const [userData, loadingUserData, errorUserData] = useDocument(userRef)
 
   /**
    * Adds a new sample to the correct collection depending on if the sample is trusted, untrusted or unknown.
@@ -99,7 +60,10 @@ export default function AddSample() {
    * @param sampleId The ID of the new sample
    * @param formSampleData The data of the sample being added
    */
-  function onCreateSampleClick(sampleId: string, formSampleData: Sample) {
+  function onCreateSampleClick(
+    sampleId: string,
+    formSampleData: Partial<Sample>,
+  ) {
     console.log('form sample data: ' + formSampleData)
     if (!formSampleData) return
     if (!sampleId) {
@@ -116,10 +80,10 @@ export default function AddSample() {
       ...formSampleData,
       created_by: auth.currentUser!.uid,
       created_on: currentDateString,
-      last_updated_by: userData.name,
-      org: userData.org,
-      org_name: userData.org_name ? userData.org_name : '',
-      created_by_name: userData.name,
+      last_updated_by: userData!.name,
+      org: userData!.org,
+      org_name: userData!.org_name ? userData!.org_name : '',
+      created_by_name: userData!.name,
       createdAt: date,
       code_lab: sampleId,
       visibility: 'private',
@@ -156,10 +120,6 @@ export default function AddSample() {
     setFormData(sampleData)
   }
 
-  function handleTabChange(newTab: number) {
-    setCurrentTab(newTab)
-  }
-
   function handlePrint() {
     const mywindow = window.open('', 'PRINT', 'height=400,width=600')
     if (!mywindow) return
@@ -178,8 +138,49 @@ export default function AddSample() {
     return true
   }
 
+  if (loadingUser || loadingUserData) {
+    return (
+      <div className="loading">
+        <span className="material-symbols-outlined loading-icon">
+          hourglass_empty
+        </span>
+        {t('loading')}
+      </div>
+    )
+  }
+
+  if (errorUser || errorUserData) {
+    return (
+      <div className="loading">
+        <span className="material-symbols-outlined loading-icon">
+          hourglass_empty
+        </span>
+        {t('errorLoading')}
+      </div>
+    )
+  }
+
+  if (!user || (!userData && !loadingUser && !loadingUserData)) {
+    return (
+      <div className="loading">
+        <span className="material-symbols-outlined loading-icon">
+          hourglass_empty
+        </span>
+        {t('errorLoading')}
+      </div>
+    )
+  }
+
   const url = `timberid.org/sample-details?trusted=${formData.trusted}&id=${sampleId}`
   const viewSampleUrl = `/sample-details?trusted=${formData.trusted}&id=${sampleId}`
+
+  const defaultValue = {
+    ...formData,
+    visibility: 'private',
+    collected_by: 'supplier',
+    status: 'concluded',
+    trusted: status === 'originVerification' ? 'untrusted' : 'trusted',
+  }
 
   return (
     <div>
@@ -235,11 +236,11 @@ export default function AddSample() {
           {userData && !sampleCreationFinished && (
             <div id="sample-form">
               <AddNewSample
-                baseState={formData}
-                onActionButtonClick={(id: string, formSampleData: Sample) =>
-                  onCreateSampleClick(id, formSampleData)
-                }
-                onTabChange={(tab) => handleTabChange(tab)}
+                defaultValue={defaultValue}
+                onActionButtonClick={(
+                  id: string,
+                  formSampleData: Partial<Sample>,
+                ) => onCreateSampleClick(id, formSampleData)}
                 actionButtonTitle="Create sample"
                 isNewSampleForm={true}
                 sampleId={sampleId}

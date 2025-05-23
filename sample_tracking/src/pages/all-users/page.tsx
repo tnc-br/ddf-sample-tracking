@@ -30,7 +30,7 @@ import {
   ConfirmationBox,
   ConfirmationProps,
 } from '../../old_components/confirmation_box'
-import { auth, firestore } from '@services/firebase/config'
+import { auth, db } from '@services/firebase/config'
 import moment from 'moment'
 
 interface NestedSchemas {
@@ -64,7 +64,6 @@ export default function Users() {
   )
 
   const router = useRouter()
-  const db = firestore
   const { t } = useTranslation()
   const userDataTableInstanceRef = useRef<MRT_TableInstance<UserData>>(null)
   const orgDataTableInstanceRef = useRef<MRT_TableInstance<OrgData>>(null)

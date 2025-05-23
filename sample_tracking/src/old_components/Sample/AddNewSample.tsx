@@ -2,7 +2,8 @@
 
 import 'bootstrap/dist/css/bootstrap.css'
 import { useState, useEffect } from 'react'
-import { hideNavBar, hideTopBar, Sample } from '../utils'
+import { useGlobal } from '@hooks/useGlobal'
+import { Sample } from '../utils'
 import { useTranslation } from 'react-i18next'
 import '../../i18n/config'
 
@@ -11,13 +12,11 @@ import SampleMeasurementsTab from './SampleMeasurementTab'
 import ReviewAndSubmitTab from './ReviewSample'
 
 type AddNewSampleProps = {
-  onActionButtonClick: any
-  onTabChange: (tab: number) => void
-  baseState: Partial<Sample>
+  onActionButtonClick: (id: string, formSampleData: Partial<Sample>) => void
+  defaultValue?: Partial<Sample>
   actionButtonTitle: string
   isNewSampleForm?: boolean
   sampleId: string
-  tab?: number
 }
 
 /**
@@ -26,38 +25,30 @@ type AddNewSampleProps = {
  * - onTabChange: function to call when the tab of the input form is changed
  * - baseState: the initial data for the input form
  * - actionButtonTitle: the label for the action button
- * - isNewSampleForm: boolean representing if this is a new sample or represents an already existing sample
  * - sampleId: 20 character hex ID for the sample
  * - currentTab: the tab of the sample form that should be shown
  *
  * This is a very large file but at its core its just a form to enter Sample data.
  */
 export default function AddNewSample({
-  tab,
   actionButtonTitle,
-  baseState,
-  isNewSampleForm,
+  defaultValue,
   onActionButtonClick,
-  onTabChange,
   sampleId,
 }: AddNewSampleProps) {
-  const [currentTab, setCurrentTab] = useState(tab ? tab : 1)
-  const [formData, setFormData] = useState(baseState)
-  const [numMeasurements, setNumMeasurements] = useState(2)
-  const [currentMeasurementsTab, setCurentMeasurementsTab] = useState(0)
+  const [currentTab, setCurrentTab] = useState(1)
+  const [formData, setFormData] = useState(defaultValue || ({} as Sample))
 
   const { t } = useTranslation()
 
+  const { setShowNavBar, setShowTopBar } = useGlobal()
+
   useEffect(() => {
-    hideNavBar()
-    hideTopBar()
+    setShowNavBar(false)
+    setShowTopBar(false)
   })
 
-  if (!onActionButtonClick || !baseState || !actionButtonTitle) return
-
-  if (Object.keys(baseState).length > Object.keys(formData).length) {
-    setFormData(baseState)
-  }
+  if (!onActionButtonClick || !actionButtonTitle) return
 
   const handleChangeTab = (tab: number) => {
     setCurrentTab(tab)
@@ -83,19 +74,7 @@ export default function AddNewSample({
     setFormData((prev) => {
       return { ...prev, ...res }
     })
-    console.log('saveChanges', res)
   }
-
-  function handleMeasurementsTabClick(evt: any) {
-    setCurentMeasurementsTab(parseInt(evt.target.id))
-  }
-
-  function handleAddMeasurementClick() {
-    setNumMeasurements(numMeasurements + 1)
-  }
-
-  const originIsKnownOrUncertain =
-    formData.trusted === 'trusted' || formData.trusted === 'untrusted'
 
   const finish = async () => {
     await onActionButtonClick(sampleId, formData)
@@ -203,7 +182,6 @@ export default function AddNewSample({
                 onSave={saveChanges}
                 onChangeClickMyOrg={handleSelectMyOrg}
                 onChangeClickSupplier={handleSelectSupplier}
-                originIsKnownOrUncertain={originIsKnownOrUncertain}
                 nextTab={() => handleChangeTab(currentTab + 1)}
               />
             )}
@@ -213,15 +191,11 @@ export default function AddNewSample({
                 onSave={saveChanges}
                 onCancelClick={() => handleChangeTab(currentTab - 1)}
                 formData={formData}
-                handleAddMeasurementClick={handleAddMeasurementClick}
               />
             )}
             {currentTab === 3 && (
               <ReviewAndSubmitTab
-                currentMeasurementsTab={currentMeasurementsTab}
                 formData={formData}
-                handleMeasurementsTabClick={handleMeasurementsTabClick}
-                numMeasurements={numMeasurements}
                 onCancelClick={() => handleChangeTab(currentTab - 1)}
                 onNextClick={finish}
               />

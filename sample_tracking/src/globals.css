@@ -2671,14 +2671,6 @@ button {
   color: #ba1a1a;
 }
 
-.import-status-text-wrapper {
-  display: flex;
-  padding: 16px 0px;
-  align-items: flex-start;
-  gap: 10px;
-  flex: 1 0 0;
-}
-
 .import-status-text {
   /* Body/Body 2 (Android) - 14pt */
   font-family: Roboto;

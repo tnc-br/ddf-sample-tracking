@@ -15,7 +15,7 @@ import {
   validateImportedEntry,
 } from './utils'
 import { ExportToCsv } from 'export-to-csv'
-import { auth, firestore } from '@services/firebase/config'
+import { auth, db } from '@services/firebase/config'
 
 /**
  * Component to handle importing samples from a csv file.
@@ -36,7 +36,6 @@ export default function ImportSamples() {
   errorSampleRef.current = errorSamples
 
   const router = useRouter()
-  const db = firestore
   const { t } = useTranslation()
 
   document.addEventListener('click', (event) => {
