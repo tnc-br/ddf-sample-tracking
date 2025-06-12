@@ -1,6 +1,5 @@
 'use client'
 
-import 'bootstrap/dist/css/bootstrap.css'
 import { type User } from 'firebase/auth'
 import { useRouter } from 'next/navigation'
 import { useState, useRef } from 'react'

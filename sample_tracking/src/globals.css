@@ -509,14 +509,6 @@ label {
   padding-right: 10px;
 }
 
-.nav-wrapper {
-  position: absolute;
-  width: 256px;
-  top: 67px;
-  margin: 20px;
-  display: block;
-}
-
 .admin-options {
   border-top: 1px solid lightgray;
   /* border-bottom: 1px solid lightgray; */

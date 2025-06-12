@@ -1,9 +1,8 @@
 'use client'
 
-import 'bootstrap/dist/css/bootstrap.css'
 import { useRouter } from 'next/router'
-import { doc, getDoc } from 'firebase/firestore'
-import { useState, useEffect } from 'react'
+import { doc, setDoc } from 'firebase/firestore'
+import { useState } from 'react'
 import AddNewSample from '../../old_components/Sample/AddNewSample'
 import {
   getRanHex,
@@ -13,11 +12,10 @@ import {
 } from '../../old_components/utils'
 import { useTranslation } from 'react-i18next'
 import Link from 'next/link'
-import { setSample } from '../../old_components/firebase_utils'
 import { auth, db } from '@services/firebase/config'
 import { QRCodeSVG } from 'qrcode.react'
 import { useAuthState } from 'react-firebase-hooks/auth'
-import { useDocument } from 'react-firebase-hooks/firestore'
+import { useUserData } from '../../hooks/useFirebaseSamples'
 
 /**
  * Component to handle adding a complete or incomplet sample. It uses the SampleDataInput
@@ -47,12 +45,14 @@ export default function AddSample() {
   const { status = '' } = router.query as {
     status: string
   }
-
   const [user, loadingUser, errorUser] = useAuthState(auth)
 
-  const userRef = user ? doc(db, 'users', user?.uid || '') : null
-  const [userData, loadingUserData, errorUserData] = useDocument(userRef)
-
+  // Usar o hook personalizado para dados do usuário
+  const {
+    data: userData,
+    loading: loadingUserData,
+    error: errorUserData,
+  } = useUserData(user?.uid || null)
   /**
    * Adds a new sample to the correct collection depending on if the sample is trusted, untrusted or unknown.
    * All isotope result values are converted to an array of floats and the lat/lon are converted to floats before the data is added.
@@ -65,9 +65,10 @@ export default function AddSample() {
     formSampleData: Partial<Sample>,
   ) {
     console.log('form sample data: ' + formSampleData)
-    if (!formSampleData) return
+    if (!formSampleData || !userData) return
     if (!sampleId) {
       console.log('Error: SampleId not provided when trying to create sample')
+      return
     }
     const user = auth.currentUser
     if (!user) return
@@ -76,15 +77,14 @@ export default function AddSample() {
       date.getMonth() + 1
     }-${date.getDate()}-${date.getFullYear()}`
 
-    const sampleData = {
+    const sampleData: Sample = {
       ...formSampleData,
       created_by: auth.currentUser!.uid,
       created_on: currentDateString,
-      last_updated_by: userData!.name,
-      org: userData!.org,
-      org_name: userData!.org_name ? userData!.org_name : '',
-      created_by_name: userData!.name,
-      createdAt: date,
+      last_updated_by: userData.name,
+      org: userData.org,
+      org_name: userData.org_name ? userData.org_name : '',
+      created_by_name: userData.name,
       code_lab: sampleId,
       visibility: 'private',
       d18O_wood: formSampleData.d18O_wood
@@ -111,22 +111,36 @@ export default function AddSample() {
       d18O_cel: formSampleData.d18O_cel
         ? formSampleData.d18O_cel.map((value: string) => parseFloat(value))
         : [],
-      lat: formSampleData.lat ? parseFloat(formSampleData.lat) : '',
-      lon: formSampleData.lon ? parseFloat(formSampleData.lon) : '',
-      points: getPointsArrayFromSampleResults(formSampleData),
+      lat: formSampleData.lat ? parseFloat(formSampleData.lat).toString() : '',
+      lon: formSampleData.lon ? parseFloat(formSampleData.lon).toString() : '',
+      points: getPointsArrayFromSampleResults(formSampleData as Sample),
+    } as Sample
+    // Set sample to appropriate collection
+    if (sampleData.trusted) {
+      let docRef
+      if (sampleData.trusted === 'trusted') {
+        docRef = doc(db, 'trusted_samples', sampleId)
+      } else if (sampleData.trusted === 'untrusted') {
+        docRef = doc(db, 'untrusted_samples', sampleId)
+      } else {
+        docRef = doc(db, 'unknown_samples', sampleId)
+      }
+      setDoc(docRef, sampleData)
     }
-    setSample(sampleData.trusted, sampleId, sampleData)
     setSampleCreationFinished(true)
     setFormData(sampleData)
   }
-
   function handlePrint() {
     const mywindow = window.open('', 'PRINT', 'height=400,width=600')
     if (!mywindow) return
+
+    const qrCodeElement = document.getElementById('qr-code')
+    if (!qrCodeElement) return
+
     mywindow.document.write('<html><head><title>' + document.title + '</title>')
     mywindow.document.write('</head><body >')
     mywindow.document.write('<h1>' + document.title + '</h1>')
-    mywindow.document.write(document.getElementById('qr-code').innerHTML)
+    mywindow.document.write(qrCodeElement.innerHTML)
     mywindow.document.write('</body></html>')
 
     mywindow.document.close() // necessary for IE >= 10

@@ -1,268 +1,250 @@
 'use client'
-import 'bootstrap/dist/css/bootstrap.css'
-import { onAuthStateChanged } from 'firebase/auth'
-import { useState, useEffect } from 'react'
-import { useRouter } from 'next/navigation'
+import { useEffect, useMemo } from 'react'
 import SamplesTable from '../../old_components/samples_table'
-import { type Sample, type UserData } from '../../old_components/utils'
-import {
-  getSamplesFromCollection,
-  getUserData,
-} from '../../old_components/firebase_utils'
+import { type Sample } from '../../old_components/utils'
 import { useTranslation } from 'react-i18next'
 import '@i18n/config'
-import { auth } from '@services/firebase/config'
 import { useGlobal } from '@hooks/useGlobal'
+import Card from '@components/layout/home/Card'
+import { useSamplesFromCollection } from '../../hooks/useFirebaseSamples'
+import { useCurrentUser } from '@hooks/useCurrentUser'
 
 const COMPLETED_SAMPLES = 'completed_samples'
 const IN_PROGRESS_SAMPLES = 'in_progress_samples'
 
-/**
- * Component for the main page of TimberId. Renders all the samples visible to the logged in user using the SamplesTable subcomponent.
- * If the user is a site_admin, all samples in the database are fetched, otherwise only the samples linked to the users org are fetched.
- */
 export default function Samples() {
-  const [userData, setUserData] = useState({} as UserData)
-  const [samplesState, setSamplesState] = useState([{}])
-  const [allSamples, setAllSamples] = useState({
-    inProgress: null as Sample[] | null,
-    completed: null as Sample[] | null,
-  })
-
-  const router = useRouter()
   const { t } = useTranslation()
-
   const { setShowNavBar, setShowTopBar } = useGlobal()
 
   useEffect(() => {
     setShowNavBar(true)
     setShowTopBar(true)
-
-    if (!userData.role || userData.role.length < 1) {
-      onAuthStateChanged(auth, (user) => {
-        if (user) {
-          getUserData(user.uid).then((userData: UserData) => {
-            setUserData(userData)
-          })
-        }
-      })
-    }
   }, [])
 
-  if (!allSamples.inProgress && !allSamples.completed) {
-    addSamplesToDataList()
-  }
+  const {
+    user: userData,
+    loading: loadingUser,
+    error: errorUser,
+    isAuthenticated,
+  } = useCurrentUser()
 
-  async function addSamplesToDataList() {
-    // We don't want to refetch the data if we already have.
-    if (allSamples.inProgress || allSamples.completed) {
-      return
-    }
-    const trustedSamples = await getSamplesFromCollection(
-      userData,
-      'trusted_samples',
-    )
-    const untrustedSamples = await getSamplesFromCollection(
-      userData,
-      'untrusted_samples',
-    )
-    const unknownSamples = await getSamplesFromCollection(
-      userData,
-      'unknown_samples',
-    )
-    if (
-      trustedSamples.length + untrustedSamples.length + unknownSamples.length <
-      1
-    ) {
-      setAllSamples({ inProgress: [], completed: [] })
+  const {
+    data: trustedSamples,
+    loading: loadingTrusted,
+    error: errorTrusted,
+  } = useSamplesFromCollection(userData, 'trusted_samples')
+
+  const {
+    data: untrustedSamples,
+    loading: loadingUntrusted,
+    error: errorUntrusted,
+  } = useSamplesFromCollection(userData, 'untrusted_samples')
+
+  const {
+    data: unknownSamples,
+    loading: loadingUnknown,
+    error: errorUnknown,
+  } = useSamplesFromCollection(userData, 'unknown_samples')
+
+  // Combinar e categorizar as amostras
+  const allSamples = useMemo(() => {
+    if (!trustedSamples && !untrustedSamples && !unknownSamples) {
+      return { inProgress: null, completed: null }
     }
 
-    let inProgressSamples: any = []
-    let completedSamples: any = []
-    trustedSamples.forEach((sample: Sample) => {
+    const inProgressSamples: Sample[] = []
+    const completedSamples: Sample[] = []
+
+    // Processar amostras trusted
+    trustedSamples?.forEach((sample: Sample) => {
+      const sampleWithTrust = { ...sample, trusted: 'trusted' }
       if (sample.status === 'concluded') {
-        completedSamples.push({
-          ...sample,
-          trusted: 'trusted',
-        })
+        completedSamples.push(sampleWithTrust)
       } else {
-        inProgressSamples.push({
-          ...sample,
-          trusted: 'trusted',
-        })
+        inProgressSamples.push(sampleWithTrust)
       }
     })
 
-    untrustedSamples.forEach((sample: Sample) => {
+    // Processar amostras untrusted
+    untrustedSamples?.forEach((sample: Sample) => {
+      const sampleWithTrust = { ...sample, trusted: 'untrusted' }
       if (sample.status === 'concluded') {
-        completedSamples.push({
-          ...sample,
-          trusted: 'untrusted',
-        })
+        completedSamples.push(sampleWithTrust)
       } else {
-        inProgressSamples.push({
-          ...sample,
-          trusted: 'untrusted',
-        })
+        inProgressSamples.push(sampleWithTrust)
       }
     })
 
-    unknownSamples.forEach((sample: Sample) => {
+    // Processar amostras unknown
+    unknownSamples?.forEach((sample: Sample) => {
+      const sampleWithTrust = { ...sample, trusted: 'unknown' }
       if (sample.status === 'concluded') {
-        completedSamples.push({
-          ...sample,
-          trusted: 'unknown',
-        })
+        completedSamples.push(sampleWithTrust)
       } else {
-        inProgressSamples.push({
-          ...sample,
-          trusted: 'unknown',
-        })
+        inProgressSamples.push(sampleWithTrust)
       }
     })
 
-    if (inProgressSamples.length > 0 || completedSamples.length > 0) {
-      setAllSamples({
-        inProgress: inProgressSamples,
-        completed: completedSamples,
-      })
+    return {
+      inProgress: inProgressSamples.length > 0 ? inProgressSamples : [],
+      completed: completedSamples.length > 0 ? completedSamples : [],
     }
-  }
+  }, [trustedSamples, untrustedSamples, unknownSamples])
 
-  function isAdmin(): boolean {
-    return userData.role === 'admin' || userData.role === 'site_admin'
-  }
+  // Estados de loading e error
+  const isLoading =
+    loadingUser || loadingTrusted || loadingUntrusted || loadingUnknown
+  const hasError = errorUser || errorTrusted || errorUntrusted || errorUnknown
+  const isAdmin = userData?.role === 'admin' || userData?.role === 'site_admin'
 
-  function viewTab(scrollToElementId: string) {
+  // To-Do: Implement the viewTab function to handle tab switching.
+  const viewTab = (tab: string) => {}
+
+  if (loadingUser || loadingUser) {
     return (
-      <div
-        onClick={() =>
-          document.getElementById(scrollToElementId)?.scrollIntoView()
-        }
-        className="filter-chip"
-      >
-        <div className="filter-chip-slate-layer">
-          <div className="filter-chip-icon-wrapper">
-            <div className="filter-chip-icon">
-              <span className="material-symbols-outlined">visibility</span>
-            </div>
-          </div>
-          <div className="filter-chip-text">{t('view')}</div>
-        </div>
+      <div className="loading">
+        <span className="material-symbols-outlined loading-icon">
+          hourglass_empty
+        </span>
+        {t('loading')}
       </div>
     )
   }
 
-  function samplesTableHeader() {
+  if (errorUser || errorUser) {
     return (
-      <div className="samples-header-wrapper">
-        <div className="samples-header">In progress</div>
-        <div className="samples-subheader">
-          Your tasks currently in progress
-        </div>
+      <div className="loading">
+        <span className="material-symbols-outlined loading-icon">
+          hourglass_empty
+        </span>
+        {t('errorLoading')}
+      </div>
+    )
+  }
+
+  if (!userData || (!userData && !loadingUser && !loadingUser)) {
+    return (
+      <div className="loading">
+        <span className="material-symbols-outlined loading-icon">
+          hourglass_empty
+        </span>
+        {t('errorLoading')}
+      </div>
+    )
+  }
+
+  // Mostrar loading se ainda estiver carregando amostras
+  if (isLoading) {
+    return (
+      <div className="loading">
+        <span className="material-symbols-outlined loading-icon">
+          hourglass_empty
+        </span>
+        {t('loading')}
+      </div>
+    )
+  }
+
+  // Mostrar erro se houver problema ao carregar amostras
+  if (hasError) {
+    return (
+      <div className="loading">
+        <span className="material-symbols-outlined loading-icon">error</span>
+        {t('errorLoading')}
       </div>
     )
   }
 
   return (
-    <div className="samples-page-wrapper">
-      <link
-        rel="stylesheet"
-        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@48,400,0,0"
-      />
+    <div className="">
+      <div className="flex gap-8 mt-4">
+        {allSamples.inProgress && (
+          <Card
+            qtty={allSamples.inProgress.length}
+            variant="inProgress"
+            subtext={t('inProgress')}
+            onClick={() => viewTab(IN_PROGRESS_SAMPLES)}
+          />
+        )}
+        {allSamples.completed && (
+          <Card
+            qtty={allSamples.completed.length}
+            variant="completed"
+            subtext={t('completed')}
+            onClick={() => viewTab(COMPLETED_SAMPLES)}
+          />
+        )}
+      </div>
 
-      {allSamples.inProgress || allSamples.completed ? (
-        <div id="samplesTable" className="samples-wrapper">
-          <div id="import-status-bar"></div>
-          <div className="samples-summary">
-            {allSamples.inProgress && (
-              <div className="samples-summary-box">
-                <div className="samples-size-label">
-                  {allSamples.inProgress.length}
-                </div>
-                <span className="samples-badge samples-in-progress">
-                  {t('inProgress')}
-                </span>
-                {viewTab(IN_PROGRESS_SAMPLES)}
-              </div>
-            )}
+      <hr className="h-px color-[#F1F1F1] w-full my-6" />
 
-            {allSamples.completed && (
-              <div className="samples-summary-box">
-                <div className="samples-size-label">
-                  {allSamples.completed.length}
-                </div>
-                <span className="samples-badge samples-completed">
-                  {t('completed')}
-                </span>
-                {viewTab(COMPLETED_SAMPLES)}
-              </div>
-            )}
+      <div className="flex flex-col gap-4 mt-8" id={IN_PROGRESS_SAMPLES}>
+        <div className="flex gap-2 items-center">
+          <div className="text-[#006E2C] text-2xl font-bold rounded-lg size-12 bg-[#F3F3F3] flex items-center justify-center">
+            {allSamples?.inProgress?.length ?? 0}
           </div>
-
-          <div id={IN_PROGRESS_SAMPLES} className="samples-sample-table">
-            {/* <p className='samples-header'>{t('inProgress')}</p> */}
-            <div className="samples-header-wrapper">
-              <div className="samples-header">
-                In progress ({allSamples?.inProgress?.length ?? 0})
-              </div>
-              <div className="samples-subheader">
-                Your tasks currently in progress
-              </div>
-            </div>
-            {allSamples.inProgress && (
-              <SamplesTable
-                samplesData={
-                  allSamples.inProgress.map((item) => ({
-                    ...item,
-                    code_lab: item.code_lab ?? '',
-                    validity: item.validity ?? '',
-                    trusted: item.trusted ?? '',
-                  })) as Sample[]
-                }
-                canDeleteSamples={isAdmin()}
-                showValidity={false}
-                allowExport={false}
-              />
-            )}
+          <div className="flex flex-col">
+            <span className="samples-header">{t('inProgress')}</span>
+            <span className="samples-subheader">
+              {t('inProgressDescription')}
+            </span>
           </div>
-
-          <div id={COMPLETED_SAMPLES} className="samples-sample-table">
-            {/* <p className='samples-header'>{t('completed')}</p> */}
-            <div className="samples-header-wrapper">
-              <div className="samples-header">
-                Completed ({allSamples?.completed?.length ?? 0})
-              </div>
-              <div className="samples-subheader">Your completed tasks</div>
-            </div>
-            {allSamples.completed && (
-              <SamplesTable
-                samplesData={
-                  allSamples.completed.map((item) => ({
-                    ...item,
-                    code_lab: item.code_lab ?? '',
-                    validity: item.validity ?? '',
-                    trusted: item.trusted ?? '',
-                  })) as Sample[]
-                }
-                canDeleteSamples={isAdmin()}
-                showValidity={true}
-                allowExport={true}
-              />
-            )}
-          </div>
-          {!allSamples.inProgress && !allSamples.completed && (
-            <div>
-              No samples to show. Wait to be accepted to an organization to view
-              samples.
-            </div>
-          )}
         </div>
-      ) : (
-        <div className="spinner-grow text-success" role="status">
-          <span className="sr-only"></span>
+
+        {allSamples.inProgress && (
+          <SamplesTable
+            samplesData={
+              allSamples.inProgress.map((item) => ({
+                ...item,
+                code_lab: item.code_lab ?? '',
+                validity: item.validity ?? '',
+                trusted: item.trusted ?? '',
+              })) as Sample[]
+            }
+            canDeleteSamples={isAdmin}
+            showValidity={false}
+            allowExport={false}
+          />
+        )}
+      </div>
+
+      <div className="flex flex-col gap-4 mt-8" id={COMPLETED_SAMPLES}>
+        <div className="flex gap-2 items-center">
+          <div className="text-[#006E2C] text-2xl font-bold rounded-lg size-12 bg-[#F3F3F3] flex items-center justify-center">
+            {allSamples?.completed?.length ?? 0}
+          </div>
+          <div className="flex flex-col">
+            <span className="samples-header">{t('completed')}</span>
+            <span className="samples-subheader">
+              {t('completedDescription')}
+            </span>
+          </div>
         </div>
-      )}
+
+        {allSamples.completed && (
+          <SamplesTable
+            samplesData={
+              allSamples.completed.map((item) => ({
+                ...item,
+                code_lab: item.code_lab ?? '',
+                validity: item.validity ?? '',
+                trusted: item.trusted ?? '',
+              })) as Sample[]
+            }
+            canDeleteSamples={isAdmin}
+            showValidity={true}
+            allowExport={true}
+          />
+        )}
+      </div>
+
+      {(!allSamples.inProgress || allSamples.inProgress.length === 0) &&
+        (!allSamples.completed || allSamples.completed.length === 0) && (
+          <div>
+            No samples to show. Wait to be accepted to an organization to view
+            samples.
+          </div>
+        )}
     </div>
   )
 }

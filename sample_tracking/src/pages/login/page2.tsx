@@ -8,7 +8,7 @@ import { useRouter } from 'next/navigation'
 import { doc, getDoc, setDoc } from 'firebase/firestore'
 import Image from 'next/image'
 import { useTranslation } from 'react-i18next'
-import TextInput from '@components/TextInput'
+import TextInput from '@components/ui/TextInput'
 import { auth, db } from '@services/firebase/config'
 interface LogInProps {
   onSignUpClick: any
@@ -153,12 +153,7 @@ export default function Login(props: LogInProps) {
             id="googleSignInButton"
           >
             <div className="login-google-icon-wrapper">
-              <Image
-                src="/google-icon.svg"
-                alt="google"
-                width="22"
-                height="22"
-              />
+              <img src="/google-icon.svg" alt="google" width="22" height="22" />
             </div>
             <div className="login-google-text-wrapper">
               <div className="login-google-text">Google</div>

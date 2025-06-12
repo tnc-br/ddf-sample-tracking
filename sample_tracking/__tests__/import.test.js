@@ -1,5 +1,5 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/react'
-import ImportSamples from '../app/import-samples'
+import ImportSamples from '../src/old_components/import-samples'
 import '@testing-library/jest-dom'
 import { updateDoc } from 'firebase/firestore'
 import { act } from 'react-dom/test-utils'
@@ -22,36 +22,7 @@ jest.mock('next/navigation', () => {
   }
 })
 
-jest.mock('../app/firebase_utils', () => {
-  return {
-    getSamplesFromCollection: jest.fn(() => {
-      return [
-        {
-          code_lab: 1,
-          name: 'testname',
-          created_by: 'Joshua',
-          status: 'concluded',
-        },
-        {
-          code_lab: 2,
-          name: 'nametest',
-          created_by: 'Auhsoj',
-          status: 'incomplete',
-        },
-      ]
-    }),
-    getUserData: jest.fn(() => {
-      return {
-        role: 'member',
-        org: '12345',
-        user_id: '12345',
-      }
-    }),
-    setSample: jest.fn(() => {
-      return 'test'
-    }),
-  }
-})
+// Mock removed: firebase_utils is no longer used directly
 
 jest.mock('firebase/auth', () => {
   return {

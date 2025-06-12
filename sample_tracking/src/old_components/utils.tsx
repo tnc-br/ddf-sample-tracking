@@ -54,7 +54,7 @@ export type Sample = {
   created_by_name: string
   last_updated_by_photo: string
   measurements: {}
-  points?: []
+  points?: Sample[]
   request: string
   validity_details?: ValidityDetails
 
@@ -72,6 +72,10 @@ export type Sample = {
   c_cel: string[]
   d13C_cel: string[]
   d18O_cel: string[]
+  d18O_wood?: string[]
+  d15N_wood?: string[]
+  d13C_wood?: string[]
+  [key: string]: any // Para permitir indexação dinâmica
 }
 
 export type ValidityDetails = {
@@ -113,7 +117,7 @@ export type SampleError = {
   errorString: string
 }
 
-const resultRanges = {
+const resultRanges: { [key: string]: { min: number; max: number } } = {
   d18O_cel: {
     min: 20,
     max: 32,
@@ -192,26 +196,6 @@ export function getRanHex(size: number): string {
     result.push(hexRef[Math.floor(Math.random() * 16)])
   }
   return result.join('')
-}
-
-async function initializeAppIfNecessary() {
-  try {
-    getApp()
-  } catch (any) {
-    const app = await initializeApp({
-      apiKey: process.env.NEXT_PUBLIC_API_KEY,
-      authDomain: process.env.NEXT_PUBLIC_AUTH_DOMAIN,
-      projectId: process.env.NEXT_PUBLIC_PROJECT_ID,
-      storageBucket: process.env.NEXT_PUBLIC_STORAGE_BUCKET,
-      messagingSenderId: process.env.NEXT_PUBLIC_MESSAGING_SENDER_ID,
-      appId: process.env.NEXT_PUBLIC_APP_ID,
-    })
-    isSupported().then((isSupported: boolean) => {
-      if (isSupported && isProd()) {
-        const analytics = getAnalytics(app)
-      }
-    })
-  }
 }
 
 export function verifyLatLonFormat(input: string) {

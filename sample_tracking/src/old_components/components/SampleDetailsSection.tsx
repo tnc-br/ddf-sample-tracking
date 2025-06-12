@@ -1,5 +1,5 @@
 import React from 'react'
-import { type Sample } from '../../../old_components/utils'
+import { type Sample } from '../utils'
 import { useTranslation } from 'react-i18next'
 
 type Props = {
@@ -7,7 +7,7 @@ type Props = {
   sampleId: string
 }
 
-const SampleDetailsSection: React.FC<Props> = ({ selectedDoc, sampleId }) => {
+const SampleDetailsSection = ({ selectedDoc, sampleId }: Props) => {
   const { t } = useTranslation()
 
   return (

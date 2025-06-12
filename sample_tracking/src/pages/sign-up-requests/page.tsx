@@ -3,7 +3,6 @@
 import { onAuthStateChanged } from 'firebase/auth'
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import 'bootstrap/dist/css/bootstrap.css'
 import {
   getDocs,
   collection,
@@ -19,7 +18,7 @@ import {
   deleteDoc,
 } from 'firebase/firestore'
 import { getRanHex, isProd } from '../../old_components/utils'
-import { getUserData } from '../../old_components/firebase_utils'
+import { useUserData } from '../../hooks/useFirebaseSamples'
 import { auth, db } from '@services/firebase/config'
 import moment from 'moment'
 import { useGlobal } from '@hooks/useGlobal'
@@ -248,7 +247,15 @@ export default function SignUpRequests() {
     const dateString = `${
       date.getMonth() + 1
     } ${date.getDate()} ${date.getFullYear()}`
-    const potentialUserData = await getUserData(userId as unknown as string)
+    const potentialUserData = await (async () => {
+      const userDocRef = doc(db, 'users', userId as unknown as string)
+      const userDoc = await getDoc(userDocRef)
+      if (userDoc.exists()) {
+        return userDoc.data()
+      } else {
+        return {}
+      }
+    })()
     const newUserDocRef = doc(db, 'users', userId as unknown as string)
     if (potentialUserData.email) {
       updateDoc(newUserDocRef, {
@@ -312,14 +319,22 @@ export default function SignUpRequests() {
           <p className="section-title">
             Users ({Object.keys(prospectiveUsers).length})
           </p>
-        </div>
-        <table className="table">
-          <thead>
+        </div>{' '}
+        <table className="w-full border-collapse border border-gray-300 bg-white rounded-lg overflow-hidden shadow-sm">
+          <thead className="bg-gray-50">
             <tr id="table-header">
-              <th>Name</th>
-              <th>Organization</th>
-              <th>Email</th>
-              <th>Date requested</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-b border-gray-300">
+                Name
+              </th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-b border-gray-300">
+                Organization
+              </th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-b border-gray-300">
+                Email
+              </th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-b border-gray-300">
+                Date requested
+              </th>
             </tr>
           </thead>
           <tbody>
@@ -333,19 +348,19 @@ export default function SignUpRequests() {
                     {moment(prospectiveUsers[key].date_requested).format(
                       'DD/MM/YYYY',
                     )}
-                  </td>
+                  </td>{' '}
                   <td className="approve-reject-wrapper">
                     <button
                       onClick={handleRejectMemberClick}
                       type="button"
-                      className="btn btn-outline-danger reject-button"
+                      className="border border-red-500 text-red-500 hover:bg-red-50 font-medium py-2 px-4 rounded transition-colors reject-button"
                     >
                       Decline
                     </button>
                     <button
                       onClick={handleApproveMemberClick}
                       type="button"
-                      className="btn btn-outline-primary approve-button"
+                      className="border border-blue-500 text-blue-500 hover:bg-blue-50 font-medium py-2 px-4 rounded transition-colors approve-button"
                     >
                       Approve
                     </button>
@@ -362,13 +377,19 @@ export default function SignUpRequests() {
           <p className="section-title">
             Organizations ({Object.keys(prospectiveOrgs).length})
           </p>
-        </div>
-        <table className="table">
-          <thead>
+        </div>{' '}
+        <table className="w-full border-collapse border border-gray-300 bg-white rounded-lg overflow-hidden shadow-sm">
+          <thead className="bg-gray-50">
             <tr id="table-header">
-              <th>Lab name</th>
-              <th>Email</th>
-              <th>Date requested</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-b border-gray-300">
+                Lab name
+              </th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-b border-gray-300">
+                Email
+              </th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-b border-gray-300">
+                Date requested
+              </th>
             </tr>
           </thead>
           <tbody>
@@ -381,19 +402,19 @@ export default function SignUpRequests() {
                     {moment(prospectiveOrgs[key].date_requested).format(
                       'DD/MM/YYYY',
                     )}
-                  </td>
+                  </td>{' '}
                   <td className="approve-reject-wrapper">
                     <button
                       onClick={handleRejectOrgClick}
                       type="button"
-                      className="btn btn-outline-danger reject-button"
+                      className="border border-red-500 text-red-500 hover:bg-red-50 font-medium py-2 px-4 rounded transition-colors reject-button"
                     >
                       Decline
                     </button>
                     <button
                       onClick={handleApproveOrgClick}
                       type="button"
-                      className="btn btn-outline-primary approve-button"
+                      className="border border-blue-500 text-blue-500 hover:bg-blue-50 font-medium py-2 px-4 rounded transition-colors approve-button"
                     >
                       Approve
                     </button>

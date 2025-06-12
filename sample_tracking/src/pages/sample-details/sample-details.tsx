@@ -1,5 +1,4 @@
 'use client'
-import 'bootstrap/dist/css/bootstrap.css'
 
 import { useRouter } from 'next/router'
 
@@ -15,15 +14,16 @@ var QRCode = require('qrcode')
 import { QRCodeSVG } from 'qrcode.react'
 import { useTranslation } from 'react-i18next'
 
-import ValidityTag from './components/ValidityTag'
-import ValiditySection from './components/ValiditySection'
-import SampleOverviewSection from './components/SampleOverviewSection'
-import SampleDetailsSection from './components/SampleDetailsSection'
-import MeasurementsSection from './components/MeasurementsSection'
-import LandUseDetailsSection from './components/LandUseDetailsSection'
-import DeforestationAlertsSection from './components/DeforestationAlertsSection'
+import ValidityTag from '../../old_components/components/ValidityTag'
+import ValiditySection from '../../old_components/components/ValiditySection'
+import SampleOverviewSection from '../../old_components/components/SampleOverviewSection'
+import SampleDetailsSection from '../../old_components/components/SampleDetailsSection'
+import MeasurementsSection from '../../old_components/components/MeasurementsSection'
+import LandUseDetailsSection from '../../old_components/components/LandUseDetailsSection'
+// import DeforestationAlertsSection from './components/DeforestationAlertsSection'
 import { auth, db } from '@services/firebase/config'
 import { useGlobal } from '@hooks/useGlobal'
+import DeforestationAlertsSection from '../../old_components/components/DeforestationAlertsSection'
 
 type WaterPercentageResults = {
   is_point_water: boolean
@@ -95,8 +95,6 @@ export default function SampleDetails() {
   }
 
   const url = `timberid.org/sample-details?trusted=${trusted}&id=${sampleId}`
-
-  console.log(selectedDoc)
 
   return (
     <div>

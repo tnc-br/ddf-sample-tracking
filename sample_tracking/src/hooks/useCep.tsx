@@ -1,27 +1,45 @@
-import { AxiosError } from "axios";
-import { UseMutationOptions, useMutation } from "@tanstack/react-query";
-import axios from "axios";
+import { AxiosError } from 'axios'
+import { UseMutationOptions, useMutation } from '@tanstack/react-query'
+import axios from 'axios'
 
-type retryInviteUserBody = {
-  cep: string;
-};
+type CepResponse = {
+  cep: string
+  logradouro: string
+  complemento: string
+  bairro: string
+  localidade: string
+  uf: string
+  ibge: string
+  gia: string
+  ddd: string
+  siafi: string
+  erro?: boolean
+}
 
-type getCepOptions = UseMutationOptions<
-  any, // oq retorna
+interface CepRequestBody {
+  cep: string
+}
+
+type FetchCepOptions = UseMutationOptions<
+  CepResponse,
   AxiosError<any>,
-  retryInviteUserBody,
+  CepRequestBody,
   unknown
->;
+>
 
-export const useCep = (options?: getCepOptions) => {
+export const useCep = (options?: FetchCepOptions) => {
   return useMutation({
     ...options,
-    mutationFn: async (body: retryInviteUserBody) => {
-      const { data } = await axios.get(
-        `https://viacep.com.br/ws/${body.cep}/json/`
-      );
+    mutationFn: async (body: CepRequestBody) => {
+      const { data } = await axios.get<CepResponse>(
+        `https://viacep.com.br/ws/${body.cep}/json/`,
+      )
 
-      return data;
+      if (data.erro) {
+        throw new Error('CEP não encontrado')
+      }
+
+      return data
     },
-  });
-};
+  })
+}

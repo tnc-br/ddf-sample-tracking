@@ -17,7 +17,7 @@ import {
   validateImportedEntry,
 } from '../../old_components/utils'
 import { MdInfo } from 'react-icons/md'
-import HoverIcon from '@components/HoverIcon'
+import HoverIcon from '@components/ui/HoverIcon'
 
 const AddCSVSample = () => {
   const [file, setFile] = useState(null)

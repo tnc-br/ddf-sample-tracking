@@ -1,9 +1,9 @@
 import { useTranslation } from 'react-i18next'
 import { z } from 'zod'
 import { useForm, Controller, useFieldArray } from 'react-hook-form'
-import TextInput from '@components/TextInput'
-import Select from '@components/Select'
-import TextArea from '@components/TextArea'
+import TextInput from '@components/ui/TextInput'
+import Select from '@components/ui/Select'
+import TextArea from '@components/ui/TextArea'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { ErrorMessage } from '@hookform/error-message'
 

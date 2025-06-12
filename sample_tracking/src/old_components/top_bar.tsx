@@ -1,6 +1,5 @@
 'use client'
 
-import 'bootstrap/dist/css/bootstrap.css'
 import { signOut, onAuthStateChanged } from 'firebase/auth'
 import { useRouter } from 'next/navigation'
 import { useState, useEffect, useRef } from 'react'
@@ -152,7 +151,7 @@ export default function TopBar() {
             onClick={() => router.push('/samples')}
             className="top-bar-title-text"
           >
-            <Image src="/ddf-header.svg" alt="google" width="300" height="50" />
+            <img src="/ddf-header.svg" alt="google" width="300" height="50" />
           </div>
         </div>
 

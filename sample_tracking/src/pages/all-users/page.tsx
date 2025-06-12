@@ -3,7 +3,6 @@
 import { onAuthStateChanged } from 'firebase/auth'
 import { useState, useEffect, useMemo, useRef } from 'react'
 import { useRouter } from 'next/navigation'
-import 'bootstrap/dist/css/bootstrap.css'
 import {
   getDocs,
   collection,

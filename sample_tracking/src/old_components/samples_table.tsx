@@ -1,5 +1,4 @@
 'use client'
-import 'bootstrap/dist/css/bootstrap.css'
 import { deleteDoc, doc, collection } from 'firebase/firestore'
 import { useState, useMemo, useRef, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
@@ -322,9 +321,10 @@ export default function SamplesTable(props: SampleDataProps) {
             <div>
               {props.allowExport && (
                 <div>
+                  {' '}
                   <button
                     type="button"
-                    className="btn btn-primary export-button"
+                    className="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded transition-colors export-button"
                     onClick={handleDownloadAllData}
                   >
                     Export all data
@@ -332,7 +332,7 @@ export default function SamplesTable(props: SampleDataProps) {
                   <button
                     disabled={!table.getIsSomeRowsSelected()}
                     type="button"
-                    className="btn btn-primary export-button"
+                    className="bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed text-white font-medium py-2 px-4 rounded transition-colors export-button"
                     onClick={() =>
                       onDowloadClick(table.getSelectedRowModel().rows)
                     }

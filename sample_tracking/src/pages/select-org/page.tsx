@@ -1,6 +1,5 @@
 'use client'
 
-import 'bootstrap/dist/css/bootstrap.css'
 import { useRouter } from 'next/navigation'
 import { doc, getDoc, getDocs, collection, updateDoc } from 'firebase/firestore'
 import { onAuthStateChanged } from 'firebase/auth'
@@ -89,10 +88,14 @@ export default function SelectOrg() {
 
   return (
     <div>
-      <div className="form-group">
+      {' '}
+      <div className="space-y-4">
         <p className="title">Which organization are you a part of?</p>
         <label htmlFor="orgSelect">Organization</label>
-        <select className="form-control" id="orgSelect">
+        <select
+          className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+          id="orgSelect"
+        >
           <option key="newOrgOption" id="newOrgOption">
             Create new organization
           </option>
@@ -107,7 +110,7 @@ export default function SelectOrg() {
         <button
           onClick={handleOrgSelectButtonClick}
           type="button"
-          className="btn btn-primary"
+          className="bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 px-6 rounded-lg transition-colors"
         >
           Request to join organization
         </button>

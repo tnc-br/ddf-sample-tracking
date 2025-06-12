@@ -1,6 +1,5 @@
 'use client'
 
-import 'bootstrap/dist/css/bootstrap.css'
 import { useState, useEffect } from 'react'
 import { useGlobal } from '@hooks/useGlobal'
 import { Sample } from '../utils'

@@ -7,11 +7,11 @@ import {
   doc,
   setDoc,
 } from 'firebase/firestore'
-import * as utils from './utils'
+import { UserData, Sample } from './utils'
 import { db } from '@services/firebase/config'
 
 export async function getSamplesFromCollection(
-  userData: utils.UserData,
+  userData: UserData,
   collectionName: string,
 ): Promise<Map<string, Map<string, string>>[]> {
   const samples: any = {}
@@ -63,30 +63,30 @@ export async function getSamplesFromCollection(
   return samplesStateArray
 }
 
-export async function getUserData(userId: string): Promise<utils.UserData> {
+export async function getUserData(userId: string): Promise<UserData> {
   const userDocRef = doc(db, 'users', userId)
   const userDoc = await getDoc(userDocRef)
   if (userDoc.exists()) {
-    return userDoc.data() as utils.UserData
+    return userDoc.data() as UserData
   } else {
-    return {} as utils.UserData
+    return {} as UserData
   }
 }
 
-export async function getNewUserData(userId: string): Promise<utils.UserData> {
+export async function getNewUserData(userId: string): Promise<UserData> {
   const userDocRef = doc(db, 'new_users', userId)
   const userDoc = await getDoc(userDocRef)
   if (userDoc.exists()) {
-    return userDoc.data() as utils.UserData
+    return userDoc.data() as UserData
   } else {
-    return {} as utils.UserData
+    return {} as UserData
   }
 }
 
 export function setSample(
   trustedValue: string,
   sampleId: string,
-  sample: utils.Sample,
+  sample: Sample,
 ) {
   if (!trustedValue) return
   let docRef

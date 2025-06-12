@@ -1,6 +1,5 @@
 'use client'
 
-import 'bootstrap/dist/css/bootstrap.css'
 import { useAuthState } from 'react-firebase-hooks/auth'
 import { auth } from '@services/firebase/config'
 import { useRouter, usePathname } from 'next/navigation'
