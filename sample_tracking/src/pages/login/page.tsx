@@ -41,14 +41,12 @@ export default function LogInSignUpPage() {
 
   function handleSignUpClick() {
     setSignInScreen(LogInScreen.SIGN_UP)
-    setCanSignIn(false)
   }
-  function handleSignInClick() {
-    setCanSignIn(true)
-  }
+
   function handleForgotPasswordClick() {
     setSignInScreen(LogInScreen.FORGOT_PASSWORD)
   }
+
   function handleReturnToSignInClick() {
     setSignInScreen(LogInScreen.LOG_IN)
   }
@@ -66,7 +64,7 @@ export default function LogInSignUpPage() {
               onSignUpClick={() => handleSignUpClick()}
               onForgotPasswordClick={() => handleForgotPasswordClick()}
             />
-            <SignUp onLogInClick={() => handleSignInClick()} />
+            <SignUp />
           </div>
           <div className="text-center">
             <a

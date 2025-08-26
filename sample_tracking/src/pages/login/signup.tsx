@@ -3,6 +3,9 @@ import { useRouter } from 'next/navigation'
 import { createUserWithEmailAndPassword, updateProfile } from 'firebase/auth'
 import { doc, getDocs, collection, updateDoc, setDoc } from 'firebase/firestore'
 import { TextField, MenuItem } from '@mui/material'
+import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { z } from 'zod'
 import {
   ConfirmationBox,
   ConfirmationProps,
@@ -10,16 +13,40 @@ import {
 import { useTranslation } from 'react-i18next'
 import { auth, db } from '@services/firebase/config'
 
-interface SignUpProps {
-  onLogInClick: any
-}
+const signUpSchema = z
+  .object({
+    firstName: z
+      .string()
+      .min(1, 'Nome é obrigatório')
+      .min(2, 'Nome deve ter pelo menos 2 caracteres'),
+    lastName: z
+      .string()
+      .min(1, 'Sobrenome é obrigatório')
+      .min(2, 'Sobrenome deve ter pelo menos 2 caracteres'),
+    email: z.string().email('Email inválido').min(1, 'Email é obrigatório'),
+    password: z.string().min(6, 'Senha deve ter pelo menos 6 caracteres'),
+    confirmPassword: z.string().min(1, 'Confirmação de senha é obrigatória'),
+    orgName: z.string().min(1, 'Organização é obrigatória'),
+    newOrgName: z.string().optional(),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: 'Senhas não coincidem',
+    path: ['confirmPassword'],
+  })
+  .refine(
+    (data) => {
+      if (data.newOrgName && data.newOrgName.includes(' ')) {
+        return false
+      }
+      return true
+    },
+    {
+      message: 'Nome da organização deve ser uma palavra só',
+      path: ['newOrgName'],
+    },
+  )
 
-type SignUpData = {
-  firstName: string
-  lastName: string
-  lab: string
-  labName: string
-}
+type SignUpFormData = z.infer<typeof signUpSchema>
 
 interface NestedSchemas {
   [key: string]: NestedSchemas | string
@@ -29,45 +56,37 @@ interface OrgsSchemas {
   [key: string]: string
 }
 
-type NewUser = {
-  firstName: string
-  lastName: string
-  email: string
-  password: string
-  confirmPassword: string
-  date_requested: string
-  org: string
-  uid: string
-  orgName: string
-  newOrgName: string
-}
-
-/**
- * Component to handle signing a user up using Firebase auth. When a user signs up they are added to the 'new_users' collection.
- * If a user is trying to register a new organization, they are added to the 'new_orgs' document in the 'new_users' collection.
- * This data will then be fetched by admins in the SignUpRequests component to be approved/rejected.
- */
-export default function SignUp(props: SignUpProps) {
-  const [formData, setFormData] = useState({} as NewUser)
+export default function SignUp() {
   const [signUpTab, setSignUpTab] = useState(0)
-  const [signUpData, setSignUpData] = useState({
-    firstName: '',
-    lastName: '',
-    lab: '',
-    labName: '',
-  })
   const [availableOrgs, setAvailableOrgs] = useState({} as OrgsSchemas)
-  const [errorText, setErrorText] = useState({} as NewUser)
   const [confirmationBoxData, setConfirmationBoxData] = useState(
     null as ConfirmationProps | null,
   )
 
-  function updateSignUpData(signUpData: SignUpData) {
-    setSignUpData(signUpData)
-  }
-
   const router = useRouter()
   const { t } = useTranslation()
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+    watch,
+    setValue,
+    getValues,
+  } = useForm<SignUpFormData>({
+    resolver: zodResolver(signUpSchema),
+    defaultValues: {
+      firstName: '',
+      lastName: '',
+      email: '',
+      password: '',
+      confirmPassword: '',
+      orgName: '',
+      newOrgName: '',
+    },
+  })
+
+  const watchOrgName = watch('orgName')
 
   if (Object.keys(availableOrgs).length < 1) {
     const orgs: OrgsSchemas = {}
@@ -81,151 +100,99 @@ export default function SignUp(props: SignUpProps) {
     })
   }
 
-  useEffect(() => {
-    if (signUpTab === 1) {
-      const signupEmail = document.getElementById('signupEmail')
-      if (signupEmail && !formData.email) {
-        signupEmail.value = null
-      }
-      const newOrgName = document.getElementById('newOrgName')
-      if (newOrgName && !formData.newOrgName) {
-        newOrgName.value = null
-      }
-    }
-  })
-
-  async function handleSignUpButtonClicked() {
-    setErrorText({} as NewUser)
-
-    const accountInfo = document.getElementById('account-info')
-    if (!accountInfo.checkValidity()) {
-      accountInfo.reportValidity()
-      return
-    }
-    if (
-      !formData.firstName ||
-      !formData.lastName ||
-      !formData.email ||
-      !formData.password ||
-      !formData.confirmPassword ||
-      !formData.orgName
-    ) {
-      return
-    }
-    if (formData.password !== formData.confirmPassword) {
-      setErrorText({
-        confirmPassword: t('passwordsDontMatch'),
-      } as NewUser)
-      return
-    }
-
-    const newOrgName = formData.newOrgName ? formData.newOrgName : null
+  const validateOrgName = (newOrgName: string) => {
     if (newOrgName && Object.keys(availableOrgs).includes(newOrgName)) {
-      setErrorText({
-        newOrgName: t('orgNameExists'),
-      } as NewUser)
-      return
+      return false
     }
-    if (newOrgName && newOrgName.includes(' ')) {
-      setErrorText({
-        newOrgName: t('orgNameMustBeOneWord'),
-      } as NewUser)
-      return
-    }
-    const orgName = formData.orgName
-    const name = `${formData.firstName} ${formData.lastName}`
-    const labValue = orgName ? availableOrgs[orgName] : ''
-
-    await createUserWithEmailAndPassword(
-      auth,
-      formData.email,
-      formData.password,
-    ).catch((error) => {
-      console.log(error)
-      switch (error.code) {
-        case 'auth/weak-password':
-          setErrorText({
-            ...errorText,
-            password: t('weakPassword'),
-          })
-          return
-        case 'auth/email-already-exists':
-          setErrorText({
-            ...errorText,
-            email: t('emailAlreadyInUse'),
-          })
-          return
-        case 'auth/email-already-in-use':
-          setErrorText({
-            ...errorText,
-            email: t('emailAlreadyInUse'),
-          })
-          return
-        default:
-          const cancelFunction = () => {
-            setConfirmationBoxData(null)
-          }
-          const title = `${t('errorCreatingAccount')} + ${error.message}`
-          const actionButtonTitle = t('confirm')
-          setConfirmationBoxData({
-            title: title,
-            actionButtonTitle: actionButtonTitle,
-            onCancelButtonClick: cancelFunction,
-          })
-      }
-      return
-    })
-    const user = auth.currentUser
-    if (!user) return
-    await updateProfile(auth.currentUser, {
-      displayName: name,
-    })
-
-    const date = new Date()
-    const dateString = `${
-      date.getMonth() + 1
-    } ${date.getDate()} ${date.getFullYear()}`
-    if (newOrgName) {
-      const newOrgDoc = doc(db, 'new_users', 'new_orgs')
-      let newObj: NestedSchemas = {}
-      newObj[newOrgName] = {
-        admin_id: auth.currentUser!.uid,
-        admin_name: name,
-        email: formData.email,
-        date_requested: dateString,
-      }
-      updateDoc(newOrgDoc, newObj)
-    } else {
-      const newDocRef = doc(db, 'new_users', auth.currentUser!.uid)
-      setDoc(newDocRef, {
-        name: name,
-        email: formData.email,
-        date_requested: dateString,
-        org: labValue,
-        uid: auth.currentUser!.uid,
-        org_name: orgName,
-      })
-    }
-
-    router.push('/samples')
+    return true
   }
 
-  function handleChange(evt: any) {
-    let value = evt.target.value
-    value = value === 'Create new organization' ? 'NEW' : value
-    const newFormData = {
-      ...formData,
-      [evt.target.name]: value,
+  async function onSubmit(data: SignUpFormData) {
+    try {
+      if (data.newOrgName && !validateOrgName(data.newOrgName)) {
+        setConfirmationBoxData({
+          title: t('orgNameExists'),
+          actionButtonTitle: t('confirm'),
+          onCancelButtonClick: () => setConfirmationBoxData(null),
+        })
+        return
+      }
+
+      const orgName = data.orgName
+      const name = `${data.firstName} ${data.lastName}`
+      const labValue = orgName ? availableOrgs[orgName] : ''
+
+      await createUserWithEmailAndPassword(auth, data.email, data.password)
+
+      const user = auth.currentUser
+      if (!user) return
+
+      await updateProfile(user, {
+        displayName: name,
+      })
+
+      const date = new Date()
+      const dateString = `${date.getMonth() + 1} ${date.getDate()} ${date.getFullYear()}`
+
+      if (data.newOrgName) {
+        const newOrgDoc = doc(db, 'new_users', 'new_orgs')
+        let newObj: NestedSchemas = {}
+        newObj[data.newOrgName] = {
+          admin_id: user.uid,
+          admin_name: name,
+          email: data.email,
+          date_requested: dateString,
+        }
+        await updateDoc(newOrgDoc, newObj)
+      } else {
+        const newDocRef = doc(db, 'new_users', user.uid)
+        await setDoc(newDocRef, {
+          name: name,
+          email: data.email,
+          date_requested: dateString,
+          org: labValue,
+          uid: user.uid,
+          org_name: orgName,
+        })
+      }
+
+      router.push('/samples')
+    } catch (error: any) {
+      console.log(error)
+      let errorMessage = ''
+
+      switch (error.code) {
+        case 'auth/weak-password':
+          errorMessage = t('weakPassword')
+          break
+        case 'auth/email-already-exists':
+        case 'auth/email-already-in-use':
+          errorMessage = t('emailAlreadyInUse')
+          break
+        default:
+          errorMessage = `${t('errorCreatingAccount')} + ${error.message}`
+      }
+
+      setConfirmationBoxData({
+        title: errorMessage,
+        actionButtonTitle: t('confirm'),
+        onCancelButtonClick: () => setConfirmationBoxData(null),
+      })
     }
-    setFormData(newFormData)
   }
 
   function handleNextClick() {
-    const detailsForm = document.getElementById('details-tab')
-    if (!detailsForm) return
-    if (!detailsForm.checkValidity()) {
-      detailsForm.reportValidity()
-    } else {
+    const firstTabFields = ['firstName', 'lastName', 'orgName'] as const
+    const values = getValues()
+
+    let hasErrors = false
+    firstTabFields.forEach((field) => {
+      if (!values[field]) {
+        hasErrors = true
+      }
+    })
+
+    if (!hasErrors) {
       setSignUpTab(1)
     }
   }
@@ -241,10 +208,10 @@ export default function SignUp(props: SignUpProps) {
             fullWidth
             required
             id="firstName"
-            name="firstName"
             label="Nome"
-            value={formData.firstName}
-            onChange={(evt: any) => handleChange(evt)}
+            error={!!errors.firstName}
+            helperText={errors.firstName?.message}
+            {...register('firstName')}
           />
         </div>
         <div className="login-input-wrapper">
@@ -253,10 +220,10 @@ export default function SignUp(props: SignUpProps) {
             fullWidth
             required
             id="lastName"
-            name="lastName"
             label="Sobrenome"
-            value={formData.lastName}
-            onChange={(evt: any) => handleChange(evt)}
+            error={!!errors.lastName}
+            helperText={errors.lastName?.message}
+            {...register('lastName')}
           />
         </div>
         <div className="input-text-field-wrapper">
@@ -266,9 +233,10 @@ export default function SignUp(props: SignUpProps) {
             fullWidth
             select
             required
-            name="orgName"
             label="Organização"
-            onChange={(evt: any) => handleChange(evt)}
+            error={!!errors.orgName}
+            helperText={errors.orgName?.message}
+            {...register('orgName')}
           >
             {Object.keys(availableOrgs).map((orgValue: string) => (
               <MenuItem key={orgValue} value={orgValue}>
@@ -291,7 +259,11 @@ export default function SignUp(props: SignUpProps) {
 
   function accountInfo() {
     return (
-      <form autoComplete="off" id="account-info">
+      <form
+        autoComplete="off"
+        id="account-info"
+        onSubmit={handleSubmit(onSubmit)}
+      >
         <p className="forgot-password-header">
           <span
             onClick={() => setSignUpTab(0)}
@@ -301,18 +273,17 @@ export default function SignUp(props: SignUpProps) {
           </span>
           Sign up
         </p>
-        {formData['orgName'] === 'NEW' && (
+        {watchOrgName === 'NEW' && (
           <div className="login-input-wrapper">
             <TextField
               size="small"
               fullWidth
               required
               id="newOrgName"
-              name="newOrgName"
               label="New org name"
-              value={formData.newOrgName}
-              helperText={errorText.newOrgName}
-              onChange={(evt: any) => handleChange(evt)}
+              error={!!errors.newOrgName}
+              helperText={errors.newOrgName?.message}
+              {...register('newOrgName')}
             />
           </div>
         )}
@@ -322,11 +293,10 @@ export default function SignUp(props: SignUpProps) {
             fullWidth
             required
             id="signupEmail"
-            name="email"
             label="Email"
-            helperText={errorText.email}
-            value={formData.email}
-            onChange={(evt: any) => handleChange(evt)}
+            error={!!errors.email}
+            helperText={errors.email?.message}
+            {...register('email')}
           />
         </div>
         <div className="login-input-wrapper">
@@ -336,10 +306,10 @@ export default function SignUp(props: SignUpProps) {
             required
             type="password"
             id="password"
-            helperText={errorText.password}
-            name="password"
             label="Password"
-            onChange={(evt: any) => handleChange(evt)}
+            error={!!errors.password}
+            helperText={errors.password?.message}
+            {...register('password')}
           />
         </div>
         <div className="login-input-wrapper">
@@ -349,20 +319,23 @@ export default function SignUp(props: SignUpProps) {
             required
             type="password"
             id="confirmPassword"
-            helperText={errorText.confirmPassword}
-            name="confirmPassword"
             label="Confirm password"
-            onChange={(evt: any) => handleChange(evt)}
+            error={!!errors.confirmPassword}
+            helperText={errors.confirmPassword?.message}
+            {...register('confirmPassword')}
           />
         </div>
-        <div
-          onClick={handleSignUpButtonClicked}
-          className="forgot-password-button-wrapper"
+        <button
+          type="submit"
+          disabled={isSubmitting}
+          className="forgot-password-button-wrapper w-full"
         >
           <div className="forgot-password-button">
-            <div className="forgot-password-button-text">Sign up</div>
+            <div className="forgot-password-button-text">
+              {isSubmitting ? 'Criando conta...' : 'Sign up'}
+            </div>
           </div>
-        </div>
+        </button>
       </form>
     )
   }

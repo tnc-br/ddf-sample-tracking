@@ -509,12 +509,6 @@ label {
   padding-right: 10px;
 }
 
-.admin-options {
-  border-top: 1px solid lightgray;
-  /* border-bottom: 1px solid lightgray; */
-  max-width: 200px;
-}
-
 .action-buttons-wrapper {
   display: flex;
   justify-content: space-between;
@@ -1357,49 +1351,6 @@ label {
   padding-top: 6px;
   text-align: center;
   cursor: pointer;
-}
-
-.logout-button-container-wrapper {
-  display: flex;
-  padding: 8px 16px;
-  justify-content: center;
-  align-items: center;
-  gap: 14px;
-  align-self: stretch;
-}
-
-.logout-button-wrapper {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  cursor: pointer;
-}
-
-.logout-button-wrapper:hover {
-  background-color: #d4e8d1 !important;
-}
-
-.logout-button {
-  display: flex;
-  padding: 8px 24px;
-  flex-direction: column;
-  align-items: center;
-  gap: 8px;
-  border-radius: 4px;
-  border: 1px solid var(--grey-300, #dadce0);
-}
-
-.logout-button-text {
-  color: var(--timber-id-sys-light-primary, #006e2c);
-  text-align: center;
-
-  /* TimberID/title/small */
-  font-family: Roboto;
-  font-size: 14px;
-  font-style: normal;
-  font-weight: 500;
-  line-height: 20px;
-  /* 142.857% */
 }
 
 .page-title-wrapper {

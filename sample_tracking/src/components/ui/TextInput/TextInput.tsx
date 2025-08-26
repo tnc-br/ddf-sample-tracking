@@ -49,7 +49,7 @@ const getContainerClasses = ({
     valid: 'border-green-500',
     error: 'border-red-500',
     disabled: 'border-neutral-200 pointer-events-none',
-    default: 'border-neutral-300',
+    default: 'border-[#9496A1]',
   }[status]
 
   const focusClasses = {
@@ -163,10 +163,4 @@ Object.defineProperties(TextInput, {
   PhoneIcon: { value: MdPhone },
 })
 
-export default TextInput as typeof TextInput & {
-  SearchIcon: typeof MdOutlineSearch
-  ClearIcon: typeof MdOutlineClose
-  ErrorIcon: typeof MdError
-  SuccessIcon: typeof MdCheckCircle
-  PhoneIcon: typeof MdPhone
-}
+export default TextInput as typeof TextInput

@@ -6,6 +6,7 @@ export type TextInputButtonProps = {
   isValid?: boolean
   isErrored?: boolean
   paint?: boolean
+  shape?: 'rounded' | 'square'
 } & React.ButtonHTMLAttributes<HTMLButtonElement>
 
 const TextInputButton = (props: TextInputButtonProps) => {
@@ -15,6 +16,7 @@ const TextInputButton = (props: TextInputButtonProps) => {
     isValid = false,
     isErrored = false,
     paint = false,
+    shape = 'square',
     ...inputProps
   } = props
 

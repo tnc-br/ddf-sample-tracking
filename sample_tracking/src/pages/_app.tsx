@@ -11,12 +11,10 @@ import queryClient from '@services/query-client'
 
 import { GlobalProvider } from '@hooks/useGlobal'
 
-import TopBar from '../old_components/top_bar'
 import Navbar from '@components/layout/shared/navbar'
 
 const MyApp: React.FC<AppProps> = ({ Component, pageProps }) => {
   moment.locale('pt-br')
-  // moment.tz.setDefault('America/Sao_Paulo')
 
   return (
     <div className="flex h-screen bg-[#f8fafa]">
@@ -26,17 +24,11 @@ const MyApp: React.FC<AppProps> = ({ Component, pageProps }) => {
 
       <QueryClientProvider client={queryClient}>
         <GlobalProvider>
-          <div className="flex flex-col min-h-screen w-full">
-            {/* TopBar no topo */}
-            <TopBar />
-
-            {/* Conteúdo principal com navbar e página */}
-            <div className="flex flex-1 w-full">
-              <Navbar />
-              <main className="flex-1 p-4 overflow-auto">
-                <Component {...pageProps} />
-              </main>
-            </div>
+          <div className="flex flex-1 w-full">
+            <Navbar />
+            <main className="flex-1 p-4 overflow-auto">
+              <Component {...pageProps} />
+            </main>
           </div>
         </GlobalProvider>
       </QueryClientProvider>

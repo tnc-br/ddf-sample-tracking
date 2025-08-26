@@ -31,16 +31,6 @@ export default function TopBar() {
     return null
   }
 
-  function onLogOutClick() {
-    signOut(auth)
-      .then(() => {
-        router.replace('/login')
-      })
-      .catch((error) => {
-        console.log('Unable to log out: ' + error)
-      })
-  }
-
   function handlePortugalesChange(evt: any) {
     if (i18n.language === 'en') {
       i18n.changeLanguage('pt')
@@ -131,13 +121,6 @@ export default function TopBar() {
         </div>
         <div className="popup-divider-wrapper">
           <div className="popup-divider"></div>
-        </div>
-        <div className="logout-button-container-wrapper">
-          <div onClick={onLogOutClick} className="logout-button-wrapper">
-            <div className="logout-button">
-              <div className="logout-button-text">Log out</div>
-            </div>
-          </div>
         </div>
       </div>
     )
