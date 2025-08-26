@@ -6,7 +6,6 @@ import Select from '@components/ui/Select'
 import TextArea from '@components/ui/TextArea'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { ErrorMessage } from '@hookform/error-message'
-import { MdArrowBack } from 'react-icons/md'
 
 interface SampleMeasurementsTabProps {
   formData: any
@@ -240,58 +239,40 @@ function SampleMeasurementsTab({
   }
 
   return (
-    <>
-      {/* <div className="flex justify-between items-center">
-        <div className="flex gap-2.5">
-          <div className="bg-[#F7F7F7] size-6 rounded text-[#006E2C] flex items-center justify-center">
-            <MdArrowBack className="text-base" />
-          </div>
-          <span className="bg-white">Voltar</span>
-        </div>
-        <h1 className="text-2xl font-semibold text-gray-900 mb-2">
-          Medições da Amostra
-        </h1>
-        <div></div>
-      </div> */}
-
-      <div className="max-w-6xl mx-auto p-6">
-        {/* Header */}
-        <div className="mb-6">
-          <h1 className="text-2xl font-semibold text-gray-900 mb-2">
-            Adicione as medições da amostra
-          </h1>
-          <p className="text-gray-600">
-            Preencha os dados de medição e isotópicos
-          </p>
-        </div>
-
-        <form id="sample-measurements" onSubmit={handleSubmitForm} noValidate>
-          {/* Campos principais */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-            {/* Altura de medição */}
-            <div className="md:col-span-1">
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                {t('measuringHeight')}:
+    <form id="sample-measurements" onSubmit={handleSubmitForm} noValidate>
+      <div>
+        <div className="flex flex-col gap-4">
+          <div className="flex flex-row gap-4">
+            <div className="w-full">
+              <label
+                className="text-xs text-neutral-400 font-medium"
+                htmlFor="measureing_height"
+              >
+                {t('measuringHeight')}
               </label>
-              <input
-                type="text"
-                placeholder="Digite aqui..."
-                className="rounded-full w-full px-4 py-3 border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
+              <TextInput
+                required
+                id="measureing_height"
+                placeholder=""
                 {...register('measureing_height')}
               />
               <ErrorMessage
                 errors={errors}
                 name="measureing_height"
                 render={({ message }) => (
-                  <p className="text-red-500 text-sm mt-1">{message}</p>
+                  <span className="text-xs text-red-500 text-left">
+                    {message}
+                  </span>
                 )}
               />
             </div>
 
-            {/* Tipo de amostra */}
-            <div className="md:col-span-1">
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                {t('sampleType')}:
+            <div className="w-full">
+              <label
+                className="text-xs text-neutral-400 font-medium"
+                htmlFor="sample_type"
+              >
+                {t('sampleType')}
               </label>
               <Controller
                 control={control}
@@ -304,200 +285,212 @@ function SampleMeasurementsTab({
                     fill
                     placeholder="Selecione..."
                     onChange={(c) => onChange(c)}
-                    className="rounded-full w-full px-4 py-3 border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
+                    className="border border-solid border-neutral-100 rounded-md h-7 text-sm"
                     value={value}
                     options={sampleTypeValues}
                   />
                 )}
               />
+
               <ErrorMessage
                 errors={errors}
                 name="sample_type"
                 render={({ message }) => (
-                  <p className="text-red-500 text-sm mt-1">{message}</p>
+                  <span className="text-xs text-red-500 text-left">
+                    {message}
+                  </span>
                 )}
               />
             </div>
-
-            {/* Diâmetro */}
-            <div className="md:col-span-1">
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                {t('diameter')}:
+          </div>
+          <div className="flex flex-row gap-4">
+            <div className="w-full">
+              <label
+                className="text-xs text-neutral-400 font-medium"
+                htmlFor="diameter"
+              >
+                {t('diameter')}
               </label>
-              <input
-                type="text"
-                placeholder="Digite aqui..."
-                className="rounded-full w-full px-4 py-3 border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
+              <TextInput
+                required
+                id="diameter"
+                placeholder=""
                 {...register('diameter')}
               />
+
               <ErrorMessage
                 errors={errors}
                 name="diameter"
                 render={({ message }) => (
-                  <p className="text-red-500 text-sm mt-1">{message}</p>
+                  <span className="text-xs text-red-500 text-left">
+                    {message}
+                  </span>
                 )}
               />
             </div>
 
-            {/* AVP */}
-            <div className="md:col-span-1">
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                {t('avp')}:
+            <div className="w-full">
+              <label
+                className="text-xs text-neutral-400 font-medium"
+                htmlFor="avp"
+              >
+                {t('avp')}
               </label>
-              <input
-                type="text"
-                placeholder="Digite aqui..."
-                className="rounded-full w-full px-4 py-3 border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
+              <TextInput
+                required
+                id="avp"
+                placeholder=""
                 {...register('avp')}
               />
+
               <ErrorMessage
                 errors={errors}
                 name="avp"
                 render={({ message }) => (
-                  <p className="text-red-500 text-sm mt-1">{message}</p>
+                  <span className="text-xs text-red-500 text-left">
+                    {message}
+                  </span>
                 )}
               />
             </div>
-
-            {/* Temperatura média anual */}
-            <div className="md:col-span-1">
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                {t('meanAnnualTemperature')}:
+          </div>
+          <div className="flex flex-row gap-4">
+            <div className="w-full">
+              <label
+                className="text-xs text-neutral-400 font-medium"
+                htmlFor="mean_annual_temperature"
+              >
+                {t('meanAnnualTemperature')}
               </label>
-              <input
-                type="text"
-                placeholder="Digite aqui..."
-                className="rounded-full w-full px-4 py-3 border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
+              <TextInput
+                required
+                id="mean_annual_temperature"
+                placeholder=""
                 {...register('mean_annual_temperature')}
               />
+
               <ErrorMessage
                 errors={errors}
                 name="mean_annual_temperature"
                 render={({ message }) => (
-                  <p className="text-red-500 text-sm mt-1">{message}</p>
+                  <span className="text-xs text-red-500 text-left">
+                    {message}
+                  </span>
                 )}
               />
             </div>
-
-            {/* Precipitação média anual */}
-            <div className="md:col-span-1">
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                {t('meanAnnualPrecipitation')}:
+            <div className="w-full">
+              <label
+                className="text-xs text-neutral-400 font-medium"
+                htmlFor="mean_annual_precipitation"
+              >
+                {t('meanAnnualPrecipitation')}
               </label>
-              <input
-                type="text"
-                placeholder="Digite aqui..."
-                className="rounded-full w-full px-4 py-3 border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
+              <TextInput
+                required
+                id="mean_annual_precipitation"
+                placeholder=""
                 {...register('mean_annual_precipitation')}
               />
+
               <ErrorMessage
                 errors={errors}
                 name="mean_annual_precipitation"
                 render={({ message }) => (
-                  <p className="text-red-500 text-sm mt-1">{message}</p>
+                  <span className="text-xs text-red-500 text-left">
+                    {message}
+                  </span>
                 )}
               />
             </div>
-
-            {/* Observações */}
-            <div className="md:col-span-3">
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                {t('observations')}:
+          </div>
+          <div className="">
+            <div className="w-full flex flex-col gap-1">
+              <label
+                className="text-xs text-neutral-400 font-medium"
+                htmlFor="observations"
+              >
+                {t('observations')}
               </label>
-              <textarea
-                placeholder="Digite aqui..."
-                className="rounded-lg w-full px-4 py-3 border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none resize-none"
-                rows={4}
+              <TextArea
+                required
+                id="observations"
+                placeholder=""
                 {...register('observations')}
               />
+
               <ErrorMessage
                 errors={errors}
                 name="observations"
                 render={({ message }) => (
-                  <p className="text-red-500 text-sm mt-1">{message}</p>
+                  <span className="text-xs text-red-500 text-left">
+                    {message}
+                  </span>
                 )}
               />
             </div>
           </div>
+        </div>
+        <div className="mt-6 ">
+          {largestArr.map((item, index) => (
+            <div
+              key={`isotopic-group-${index}`}
+              className="bg-white p-6 rounded-lg shadow-md mb-6"
+            >
+              <h2 className="text-2xl font-semibold mb-4">
+                Dados Isotópicos - Item {index + 1}
+              </h2>
 
-          {/* Seção de Dados Isotópicos */}
-          <div className="mb-8">
-            <h2 className="text-lg font-semibold text-gray-900 mb-4">
-              Dados Isotópicos
-            </h2>
-
-            {largestArr.map((item, index) => (
-              <div
-                key={`isotopic-group-${index}`}
-                className="bg-white border border-gray-200 rounded-lg p-6 mb-6"
-              >
-                <div className="flex justify-between items-center mb-4">
-                  <h3 className="text-lg font-medium text-gray-900">
-                    Item {index + 1}
-                  </h3>
-                  {largestArr.length > 1 && (
-                    <button
-                      type="button"
-                      onClick={() => handleRemoveItem(index)}
-                      className="px-4 py-2 bg-red-100 text-red-700 rounded-full hover:bg-red-200 font-medium transition-colors"
-                    >
-                      Remover Item
-                    </button>
-                  )}
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                  {isotopicFieldNames.map((fieldName) => (
-                    <div
+              <div className="grid grid-cols-2 gap-4">
+                {isotopicFieldNames.map((fieldName) => {
+                  return (
+                    <input
                       key={`${fieldName}-${index}`}
-                      className="md:col-span-1"
-                    >
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        {fieldName}:
-                      </label>
-                      <input
-                        type="text"
-                        placeholder="Digite aqui..."
-                        className="rounded-full w-full px-4 py-3 border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
-                        {...register(`${fieldName}.${index}`)}
-                      />
-                    </div>
-                  ))}
-                </div>
+                      {...register(`${fieldName}.${index}`)}
+                      placeholder={fieldName}
+                      className="p-2 border rounded w-full"
+                    />
+                  )
+                })}
               </div>
-            ))}
-
-            {/* Botão adicionar novo item */}
-            <div className="flex justify-center mb-8">
-              <button
-                type="button"
-                onClick={handleAddItem}
-                className="px-6 py-3 bg-blue-100 text-blue-700 rounded-full hover:bg-blue-200 font-medium transition-colors"
-              >
-                Adicionar Novo Item
-              </button>
+              {largestArr.length > 1 && (
+                <button
+                  type="button"
+                  onClick={() => handleRemoveItem(index)}
+                  className="mt-4 px-4 py-2 bg-red-500 text-white rounded"
+                >
+                  Remover Item
+                </button>
+              )}
             </div>
-          </div>
+          ))}
 
-          {/* Botões de ação */}
-          <div className="flex justify-between items-center mt-8">
-            <button
-              onClick={onCancelClick}
-              type="button"
-              className="px-6 py-3 bg-gray-100 text-gray-700 rounded-full hover:bg-gray-200 font-medium transition-colors"
-            >
-              {t('back')}
-            </button>
-            <button
-              type="submit"
-              className="px-6 py-3 bg-[#006E2C] rounded-full hover:bg-green-700 text-white font-medium transition-colors"
-            >
-              Próxima etapa
-            </button>
-          </div>
-        </form>
+          <button
+            type="button"
+            onClick={handleAddItem}
+            className="px-4 py-2 bg-blue-500 text-white rounded"
+          >
+            Adicionar Novo Item
+          </button>
+        </div>
       </div>
-    </>
+      <div className="flex justify-between my-10">
+        <button
+          onClick={onCancelClick}
+          type="button"
+          className="rounded border border-green-300 px-4 py-2 text-green-300 text-sm"
+        >
+          {t('back')}
+        </button>
+        <button
+          id="next-button-wrapper"
+          type="submit"
+          className="rounded border bg-green-800 px-4 py-2 text-white text-sm"
+        >
+          {t('next')}
+        </button>
+      </div>
+    </form>
   )
 }
 

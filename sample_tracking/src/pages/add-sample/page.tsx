@@ -202,17 +202,17 @@ export default function AddSample() {
         rel="stylesheet"
         href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@48,400,0,0&display=optional"
       />
-      <div className="page-title-wrapper">
+      {/* <div className="page-title-wrapper">
         <Link href="./samples" className="close-icon">
           <span className="material-symbols-outlined add-sample-close-icon">
             close
           </span>
         </Link>
         <div className="page-title-text">{t('addNewSample')}</div>
-      </div>
+      </div> */}
       <div>
         <div className="sample-details-form-wrapper">
-          {!sampleCreationFinished && (
+          {/* {!sampleCreationFinished && (
             <div>
               {formData.status !== 'concluded' && (
                 <p className="sample-details-section-title">
@@ -245,7 +245,7 @@ export default function AddSample() {
                 </div>
               </div>
             </div>
-          )}
+          )} */}
 
           {userData && !sampleCreationFinished && (
             <div id="sample-form">

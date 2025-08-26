@@ -26,7 +26,7 @@ const MyApp: React.FC<AppProps> = ({ Component, pageProps }) => {
         <GlobalProvider>
           <div className="flex flex-1 w-full">
             <Navbar />
-            <main className="flex-1 p-4 overflow-auto">
+            <main className="flex-1 overflow-auto">
               <Component {...pageProps} />
             </main>
           </div>

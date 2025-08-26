@@ -5,16 +5,16 @@ import { ErrorMessage } from '@hookform/error-message'
 import { useTranslation } from 'react-i18next'
 import TextInput from '@components/ui/TextInput'
 import Select from '@components/ui/Select'
-import { speciesList } from '../species_list'
+import { speciesList } from '../../species_list'
 import InfoDummy from '@components/ui/Tooltip'
-import { states_list } from '../states_list'
-import { municipalities_list } from '../municipalities_list'
+import { states_list } from '../../states_list'
+import { municipalities_list } from '../../municipalities_list'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import DatePicker from '@components/ui/DatePicker'
 import moment from 'moment'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { Sample } from '../utils'
+import { Sample } from '../../utils'
 
 interface BasicInfoTabProps {
   onSave: (data: any) => void
@@ -153,71 +153,39 @@ function BasicInfoTab({
     trusted === 'trusted' || trusted === 'untrusted'
 
   return (
-    <div className="max-w-6xl mx-auto p-6">
-      {/* Header */}
-      <div className="flex justify-between items-center mb-8">
-        <div className="mb-6">
-          <h1 className="text-2xl font-semibold text-gray-900 mb-2">
-            Preencha abaixo os detalhes
-          </h1>
-          <p className="text-gray-600">
-            Obs: os campos abaixo são todos obrigatórios
-          </p>
-        </div>
-
-        {/* Tabs para Coletado por */}
-        <div className="flex gap-2 mb-8">
-          <button
-            onClick={onChangeClickSupplier}
-            className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
-              formData.collected_by === 'supplier'
-                ? 'bg-green-100 text-green-700 border border-green-200'
-                : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-            }`}
-          >
-            {t('supplier')}
-          </button>
-          <button
-            onClick={onChangeClickMyOrg}
-            className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
-              formData.collected_by === 'my_org'
-                ? 'bg-green-100 text-green-700 border border-green-200'
-                : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-            }`}
-          >
-            {t('myOrg')}
-          </button>
-        </div>
-      </div>
-
-      <form className="" onSubmit={handleSubmitForm} noValidate>
-        {/* Form */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {/* Nome da amostra */}
-          <div className="md:col-span-1">
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              {t('sampleName')}:
+    <form className="" onSubmit={handleSubmitForm} noValidate>
+      <div className="grid grid-cols-2 gap-5">
+        <div className="flex flex-col gap-3">
+          <div className="">
+            <label
+              className="text-xs text-neutral-400 font-medium"
+              htmlFor="sampleName"
+            >
+              {t('sampleName')}
             </label>
-            <input
-              type="text"
-              placeholder="Digite aqui..."
-              className="rounded-full w-full px-4 py-3 border border-blue-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
+            <TextInput
+              required
+              id="sampleName"
+              placeholder="Digite..."
               {...register('sample_name')}
+              isErrored={!!errors.sample_name}
             />
             <ErrorMessage
               errors={errors}
               name="sample_name"
               render={({ message }) => (
-                <p className="text-red-500 text-sm mt-1">{message}</p>
+                <span className="text-xs text-red-500 text-left">
+                  {message}
+                </span>
               )}
             />
           </div>
 
-          {/* Status */}
-          <div className="md:col-span-1">
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              {t('status')}:
+          <div className="">
+            <label className="text-xs text-neutral-400 font-medium">
+              {t('status')}
             </label>
+
             <Controller
               control={control}
               name="status"
@@ -227,28 +195,31 @@ function BasicInfoTab({
               render={({ field: { onChange, value } }) => (
                 <Select
                   fill
-                  placeholder="Digite aqui..."
+                  placeholder="Selecione..."
                   onChange={(c) => onChange(c)}
-                  className="rounded-full w-full px-4 py-3 border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
+                  className="border border-solid border-neutral-100 rounded-md h-7 text-sm"
                   value={value}
                   options={STATUS_OPTIONS}
                 />
               )}
             />
+
             <ErrorMessage
               errors={errors}
               name="status"
               render={({ message }) => (
-                <p className="text-red-500 text-sm mt-1">{message}</p>
+                <span className="text-xs text-red-500 text-left">
+                  {message}
+                </span>
               )}
             />
           </div>
 
-          {/* Espécies */}
-          <div className="md:col-span-1">
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              {t('treeSpecies')}:
+          <div className="">
+            <label className="text-xs text-neutral-400 font-medium">
+              {t('treeSpecies')}
             </label>
+
             <Controller
               control={control}
               name="species"
@@ -258,29 +229,32 @@ function BasicInfoTab({
               render={({ field: { onChange, value } }) => (
                 <Select
                   fill
-                  placeholder="Digite aqui..."
+                  placeholder="Selecione..."
                   onChange={(c) => onChange(c)}
-                  className="rounded-full w-full px-4 py-3 border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
+                  className="border border-solid border-neutral-100 rounded-md h-7 text-sm"
                   value={value}
                   isSearchable
                   options={SPECIES_NAMES_OPTIONS}
                 />
               )}
             />
+
             <ErrorMessage
               errors={errors}
               name="species"
               render={({ message }) => (
-                <p className="text-red-500 text-sm mt-1">{message}</p>
+                <span className="text-xs text-red-500 text-left">
+                  {message}
+                </span>
               )}
             />
           </div>
 
-          {/* Origem */}
-          <div className="md:col-span-1">
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              {t('origin')}:
+          <div className="">
+            <label className="text-xs text-neutral-400 font-medium">
+              {t('origin')}
             </label>
+
             <Controller
               control={control}
               name="trusted"
@@ -290,95 +264,135 @@ function BasicInfoTab({
               render={({ field: { onChange, value } }) => (
                 <Select
                   fill
-                  placeholder="Digite aqui..."
+                  placeholder="Selecione..."
                   onChange={(c) => onChange(c)}
-                  className="rounded-full w-full px-4 py-3 border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
+                  className="border border-solid border-neutral-100 rounded-md h-7 text-sm"
                   value={value}
                   options={ORIGIN_OPTIONS}
                 />
               )}
             />
+
             <ErrorMessage
               errors={errors}
               name="trusted"
               render={({ message }) => (
-                <p className="text-red-500 text-sm mt-1">{message}</p>
+                <span className="text-xs text-red-500 text-left">
+                  {message}
+                </span>
               )}
             />
           </div>
 
-          {/* Local de Coleta */}
           {originIsKnownOrUncertain && (
-            <div className="md:col-span-1">
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                {t('collectionSite')}:
+            <div className="">
+              <label
+                className="text-xs text-neutral-400 font-medium"
+                htmlFor="collectionSite"
+              >
+                {t('collectionSite')}
               </label>
-              <input
-                type="text"
-                placeholder="Digite aqui..."
-                className="rounded-full w-full px-4 py-3 border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
+              <TextInput
+                required
+                id="collectionSite"
+                placeholder="Digite..."
                 {...register('collection_site')}
               />
               <ErrorMessage
                 errors={errors}
                 name="collection_site"
                 render={({ message }) => (
-                  <p className="text-red-500 text-sm mt-1">{message}</p>
+                  <span className="text-xs text-red-500 text-left">
+                    {message}
+                  </span>
                 )}
               />
             </div>
           )}
 
-          {/* Latitude */}
           {originIsKnownOrUncertain && (
-            <div className="md:col-span-1">
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                {t('latitude')}:
-              </label>
-              <input
-                type="number"
-                placeholder="Digite aqui..."
-                className="rounded-full w-full px-4 py-3 border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
-                {...register('lat')}
-              />
-              <ErrorMessage
-                errors={errors}
-                name="lat"
-                render={({ message }) => (
-                  <p className="text-red-500 text-sm mt-1">{message}</p>
-                )}
-              />
+            <div className="flex gap-2 justify-between">
+              <div className="w-full">
+                <label
+                  className="text-xs text-neutral-400 font-medium flex items-center gap-3"
+                  htmlFor="inputLon"
+                >
+                  {t('latitude')}{' '}
+                  <InfoDummy
+                    children={
+                      <>
+                        📍 Formato esperado: decimal (WGS84) <br />
+                        Ex: Latitude: -23.55052, Longitude: -46.63331 <br />
+                        • Use ponto como separador decimal <br />• Sem símbolos
+                        como °, N, S, E, W <br />• Latitude: -90 a 90 <br />•
+                        Longitude: -180 a 180
+                      </>
+                    }
+                  />
+                </label>
+                <TextInput
+                  required
+                  id="inputLat"
+                  placeholder="Digite..."
+                  type="number"
+                  {...register('lat')}
+                />
+
+                <ErrorMessage
+                  errors={errors}
+                  name="lat"
+                  render={({ message }) => (
+                    <span className="text-xs text-red-500 text-left">
+                      {message}
+                    </span>
+                  )}
+                />
+              </div>
+              <div className="w-full">
+                <label
+                  className="text-xs text-neutral-400 font-medium flex items-center gap-3"
+                  htmlFor="inputLon"
+                >
+                  {t('longitude')}{' '}
+                  <InfoDummy
+                    children={
+                      <>
+                        📍 Formato esperado: decimal (WGS84) <br />
+                        Ex: Latitude: -23.55052, Longitude: -46.63331 <br />
+                        • Use ponto como separador decimal <br />• Sem símbolos
+                        como °, N, S, E, W <br />• Latitude: -90 a 90 <br />•
+                        Longitude: -180 a 180
+                      </>
+                    }
+                  />
+                </label>
+                <TextInput
+                  required
+                  id="inputLon"
+                  placeholder="Digite..."
+                  type="number"
+                  {...register('lon')}
+                />
+
+                <ErrorMessage
+                  errors={errors}
+                  name="lon"
+                  render={({ message }) => (
+                    <span className="text-xs text-red-500 text-left">
+                      {message}
+                    </span>
+                  )}
+                />
+              </div>
             </div>
           )}
 
-          {/* Longitude */}
           {originIsKnownOrUncertain && (
-            <div className="md:col-span-1">
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                {t('longitude')}:
+            <div className="">
+              <label className="text-xs text-neutral-400 font-medium">
+                {t('state')}
               </label>
-              <input
-                type="number"
-                placeholder="Digite aqui..."
-                className="rounded-full w-full px-4 py-3 border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
-                {...register('lon')}
-              />
-              <ErrorMessage
-                errors={errors}
-                name="lon"
-                render={({ message }) => (
-                  <p className="text-red-500 text-sm mt-1">{message}</p>
-                )}
-              />
-            </div>
-          )}
 
-          {/* Estado */}
-          {originIsKnownOrUncertain && (
-            <div className="md:col-span-1">
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                {t('state')}:
-              </label>
               <Controller
                 control={control}
                 name="state"
@@ -388,31 +402,34 @@ function BasicInfoTab({
                 render={({ field: { onChange, value } }) => (
                   <Select
                     fill
-                    placeholder="Digite aqui..."
+                    placeholder="Selecione..."
                     onChange={(c) => onChange(c)}
-                    className="rounded-full w-full px-4 py-3 border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
+                    className="border border-solid border-neutral-100 rounded-md h-7 text-sm"
                     value={value}
                     isSearchable
                     options={STATES_OPTIONS}
                   />
                 )}
               />
+
               <ErrorMessage
                 errors={errors}
                 name="state"
                 render={({ message }) => (
-                  <p className="text-red-500 text-sm mt-1">{message}</p>
+                  <span className="text-xs text-red-500 text-left">
+                    {message}
+                  </span>
                 )}
               />
             </div>
           )}
 
-          {/* Município */}
           {originIsKnownOrUncertain && (
-            <div className="md:col-span-1">
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                {t('municipality')}:
+            <div className="">
+              <label className="text-xs text-neutral-400 font-medium">
+                {t('municipality')}
               </label>
+
               <Controller
                 control={control}
                 name="municipality"
@@ -422,30 +439,33 @@ function BasicInfoTab({
                 render={({ field: { onChange, value } }) => (
                   <Select
                     fill
-                    placeholder="Digite aqui..."
+                    placeholder="Selecione..."
                     onChange={(c) => onChange(c)}
-                    className="rounded-full w-full px-4 py-3 border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
+                    className="border border-solid border-neutral-100 rounded-md h-7 text-sm"
                     value={value}
                     isSearchable
                     options={municipalitiesList}
                   />
                 )}
               />
+
               <ErrorMessage
                 errors={errors}
                 name="municipality"
                 render={({ message }) => (
-                  <p className="text-red-500 text-sm mt-1">{message}</p>
+                  <span className="text-xs text-red-500 text-left">
+                    {message}
+                  </span>
                 )}
               />
             </div>
           )}
 
-          {/* Data de Coleta */}
-          <div className="md:col-span-1">
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              {t('dateCollected')}:
+          <div className="">
+            <label className="text-xs text-neutral-400 font-medium">
+              {t('dateCollected')}
             </label>
+
             <Controller
               control={control}
               name="date_collected"
@@ -454,8 +474,8 @@ function BasicInfoTab({
               }}
               render={({ field: { onChange, value } }) => (
                 <DatePicker
-                  className={`rounded-full w-full px-4 py-3 border focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none ${
-                    errors.date_collected ? 'border-red-300' : 'border-gray-300'
+                  className={`w-full ${
+                    errors.date_collected ? 'border-red-300' : ''
                   }`}
                   shape="square"
                   leftIcon
@@ -469,69 +489,128 @@ function BasicInfoTab({
                 />
               )}
             />
+
             <ErrorMessage
               errors={errors}
               name="date_collected"
               render={({ message }) => (
-                <p className="text-red-500 text-sm mt-1">{message}</p>
+                <span className="text-xs text-red-500 text-left">
+                  {message}
+                </span>
               )}
             />
           </div>
-
-          {/* Fornecedor (se aplicável) */}
+        </div>
+        <div className="">
+          <div className="collected-by-wrapper">
+            <div className="collected-by-text-wrapper">
+              <div className="collected-by-text">{t('collectedBy')}</div>
+            </div>
+            <div className="collected-by-button-wrapper">
+              <div
+                onClick={onChangeClickSupplier}
+                className="supplier-button-wrapper"
+              >
+                <div
+                  className={
+                    formData.collected_by === 'supplier'
+                      ? 'supplier-button-container collected-by-button-container selected'
+                      : 'supplier-button-container collected-by-button-container'
+                  }
+                >
+                  <div className="supplier-button-slate-layer">
+                    <div className="supplier-button-text">{t('supplier')}</div>
+                  </div>
+                </div>
+              </div>
+              <div
+                onClick={onChangeClickMyOrg}
+                className="supplier-button-wrapper"
+              >
+                <div
+                  className={
+                    formData.collected_by === 'my_org'
+                      ? 'org-button-container collected-by-button-container selected'
+                      : 'org-button-container collected-by-button-container'
+                  }
+                >
+                  <div className="supplier-button-slate-layer">
+                    <div className="supplier-button-text">{t('myOrg')}</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
           {formData.collected_by === 'supplier' && (
-            <div className="md:col-span-1">
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                {t('supplier')}:
+            <div className="">
+              <label
+                className="text-xs text-neutral-400 font-medium"
+                htmlFor="supplier"
+              >
+                {t('supplier')}
               </label>
-              <input
-                type="text"
-                placeholder="Digite aqui..."
-                className="rounded-full w-full px-4 py-3 border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
+              <TextInput
+                required
+                id="supplier"
+                placeholder="Digite..."
                 {...register('supplier')}
               />
+
               <ErrorMessage
                 errors={errors}
                 name="supplier"
                 render={({ message }) => (
-                  <p className="text-red-500 text-sm mt-1">{message}</p>
+                  <span className="text-xs text-red-500 text-left">
+                    {message}
+                  </span>
                 )}
               />
             </div>
           )}
 
-          {/* Cidade */}
-          <div className="md:col-span-1">
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              {t('city')}:
+          <div className="">
+            <label
+              className="text-xs text-neutral-400 font-medium"
+              htmlFor="city"
+            >
+              {t('city')}
             </label>
-            <input
-              type="text"
-              placeholder="Digite aqui..."
-              className="rounded-full w-full px-4 py-3 border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
+            <TextInput
+              required
+              id="city"
+              placeholder="Digite..."
               {...register('city')}
             />
+
             <ErrorMessage
               errors={errors}
               name="city"
               render={({ message }) => (
-                <p className="text-red-500 text-sm mt-1">{message}</p>
+                <span className="text-xs text-red-500 text-left">
+                  {message}
+                </span>
               )}
             />
           </div>
         </div>
-
-        {/* Submit button */}
-        <div className="mt-12 flex justify-center">
-          <button
-            type="submit"
-            className="px-6 py-3 bg-[#006E2C] rounded-full hover:bg-green-700 text-white font-medium transition-colors"
-          >
-            Próxima etapa
-          </button>
-        </div>
-      </form>
-    </div>
+      </div>
+      <div className="flex justify-between my-10">
+        <button
+          onClick={onCancelClick}
+          type="button"
+          className="rounded border border-green-300 px-4 py-2 text-green-300 text-sm"
+        >
+          {t('back')}
+        </button>
+        <button
+          id="next-button-wrapper"
+          type="submit"
+          className="rounded border bg-green-800 px-4 py-2 text-white text-sm"
+        >
+          {t('next')}
+        </button>
+      </div>
+    </form>
   )
 }
 

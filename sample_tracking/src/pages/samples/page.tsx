@@ -1,6 +1,7 @@
 'use client'
 import { useEffect, useMemo } from 'react'
 import SamplesTable from '../../old_components/samples_table'
+import SamplesTableNew from '../../old_components/samples_table_new'
 import { type Sample } from '../../old_components/utils'
 import { useTranslation } from 'react-i18next'
 import '@i18n/config'
@@ -46,7 +47,6 @@ export default function Samples() {
     error: errorUnknown,
   } = useSamplesFromCollection(userData, 'unknown_samples')
 
-  // Combinar e categorizar as amostras
   const allSamples = useMemo(() => {
     if (!trustedSamples && !untrustedSamples && !unknownSamples) {
       return { inProgress: null, completed: null }
@@ -91,13 +91,11 @@ export default function Samples() {
     }
   }, [trustedSamples, untrustedSamples, unknownSamples])
 
-  // Estados de loading e error
   const isLoading =
     loadingUser || loadingTrusted || loadingUntrusted || loadingUnknown
   const hasError = errorUser || errorTrusted || errorUntrusted || errorUnknown
   const isAdmin = userData?.role === 'admin' || userData?.role === 'site_admin'
 
-  // To-Do: Implement the viewTab function to handle tab switching.
   const viewTab = (tab: string) => {}
 
   if (loadingUser || loadingUser) {
@@ -133,7 +131,6 @@ export default function Samples() {
     )
   }
 
-  // Mostrar loading se ainda estiver carregando amostras
   if (isLoading) {
     return (
       <div className="loading">
@@ -145,7 +142,6 @@ export default function Samples() {
     )
   }
 
-  // Mostrar erro se houver problema ao carregar amostras
   if (hasError) {
     return (
       <div className="loading">
@@ -156,8 +152,8 @@ export default function Samples() {
   }
 
   return (
-    <div className="">
-      <div className="flex gap-8 mt-4">
+    <div className="px-4">
+      <div className="flex gap-8 mt-12">
         {allSamples.inProgress && (
           <Card
             qtty={allSamples.inProgress.length}
@@ -176,7 +172,7 @@ export default function Samples() {
         )}
       </div>
 
-      <hr className="h-px color-[#F1F1F1] w-full my-6" />
+      <hr className="h-px color-[#F1F1F1] w-[95%] mx-auto my-6" />
 
       <div className="flex flex-col gap-4 mt-8" id={IN_PROGRESS_SAMPLES}>
         <div className="flex gap-2 items-center">
@@ -192,18 +188,18 @@ export default function Samples() {
         </div>
 
         {allSamples.inProgress && (
-          <SamplesTable
-            samplesData={
-              allSamples.inProgress.map((item) => ({
-                ...item,
-                code_lab: item.code_lab ?? '',
-                validity: item.validity ?? '',
-                trusted: item.trusted ?? '',
-              })) as Sample[]
+          <SamplesTableNew
+            samples={(allSamples?.inProgress as Sample[]) ?? ([] as Sample[])}
+            onEdit={(sample) => {
+              console.log('Edit sample:', sample)
+            }}
+            onDelete={
+              isAdmin
+                ? (sample) => {
+                    console.log('Delete sample:', sample)
+                  }
+                : undefined
             }
-            canDeleteSamples={isAdmin}
-            showValidity={false}
-            allowExport={false}
           />
         )}
       </div>
