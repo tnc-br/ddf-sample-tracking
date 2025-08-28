@@ -32,10 +32,10 @@ const SampleDetailsSection = ({ selectedDoc, sampleId }: Props) => {
             {selectedDoc['lat'] || 'unknown'}
           </span>
         </div>
-        <div className="detail">
+        {/* <div className="detail">
           <span className="detail-name">{t('collectedBy')}</span>
           <span className="detail-value">{selectedDoc['collected_by']}</span>
-        </div>
+        </div> */}
       </div>
 
       <div className="detail-row">

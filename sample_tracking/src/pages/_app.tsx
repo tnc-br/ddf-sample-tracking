@@ -12,9 +12,20 @@ import queryClient from '@services/query-client'
 import { GlobalProvider } from '@hooks/useGlobal'
 
 import Navbar from '@components/layout/shared/navbar'
+import { useAuth } from '@hooks/useAuth'
 
 const MyApp: React.FC<AppProps> = ({ Component, pageProps }) => {
   moment.locale('pt-br')
+
+  const { signOut, isSigningOut, signOutError } = useAuth()
+
+  const handleLogout = async () => {
+    try {
+      await signOut()
+    } catch (error) {
+      console.error('Erro ao fazer logout:', error)
+    }
+  }
 
   return (
     <div className="flex h-screen bg-[#f8fafa]">
@@ -24,12 +35,14 @@ const MyApp: React.FC<AppProps> = ({ Component, pageProps }) => {
 
       <QueryClientProvider client={queryClient}>
         <GlobalProvider>
-          <div className="flex flex-1 w-full">
+          <>
             <Navbar />
             <main className="flex-1 overflow-auto">
               <Component {...pageProps} />
             </main>
-          </div>
+
+            {/* <button onClick={handleLogout}>logout</button> */}
+          </>
         </GlobalProvider>
       </QueryClientProvider>
     </div>

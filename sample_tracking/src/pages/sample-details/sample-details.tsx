@@ -95,64 +95,63 @@ export default function SampleDetails() {
   }
 
   const url = `timberid.org/sample-details?trusted=${trusted}&id=${sampleId}`
+  console.log(url)
 
   return (
-    <div>
-      <div className="sample-details-wrapper">
-        <button onClick={handlePrint} className="print-button">
-          <span className="material-symbols-outlined">print</span>
-        </button>
-        <p className="title">{selectedDoc['code_lab'] || 'Sample details'}</p>
-        <div>
-          <div className="tab-content" id="myTabContent">
+    <div className="px-4 py-12">
+      {/* <button onClick={handlePrint} className="print-button">
+        <span className="material-symbols-outlined">print</span>
+      </button> */}
+      <p className="title">{selectedDoc['code_lab'] || 'Sample details'}</p>
+      <div>
+        <div className="tab-content" id="myTabContent">
+          <div>
+            <div className="header-validity">
+              <ValidityTag
+                validityLabel={selectedDoc['validity'] || ''}
+                isTrusted={trusted === 'trusted'}
+                city={selectedDoc['municipality'] || ''}
+                lat={selectedDoc['lat']}
+                lon={selectedDoc['lon']}
+              />
+            </div>
             <div>
-              <div className="header-validity">
-                <ValidityTag
-                  validityLabel={selectedDoc['validity'] || ''}
-                  isTrusted={trusted === 'trusted'}
-                  city={selectedDoc['municipality'] || ''}
-                  lat={selectedDoc['lat']}
-                  lon={selectedDoc['lon']}
-                />
-              </div>
-              <div>
-                {trusted != 'trusted' && (
-                  <ValiditySection selectedDoc={selectedDoc || {}} />
-                )}
-                <SampleOverviewSection selectedDoc={selectedDoc || {}} />
-                <SampleDetailsSection
+              {trusted != 'trusted' && (
+                <ValiditySection selectedDoc={selectedDoc || {}} />
+              )}
+              <SampleOverviewSection selectedDoc={selectedDoc || {}} />
+              <SampleDetailsSection
+                selectedDoc={selectedDoc || {}}
+                sampleId={sampleId}
+              />
+              <MeasurementsSection selectedDoc={selectedDoc || {}} />
+              {trusted != 'trusted' && (
+                <LandUseDetailsSection
                   selectedDoc={selectedDoc || {}}
                   sampleId={sampleId}
                 />
-                <MeasurementsSection selectedDoc={selectedDoc || {}} />
-                {trusted != 'trusted' && (
-                  <LandUseDetailsSection
-                    selectedDoc={selectedDoc || {}}
-                    sampleId={sampleId}
-                  />
-                )}
-                {trusted != 'trusted' && (
-                  <DeforestationAlertsSection selectedDoc={selectedDoc || {}} />
-                )}
+              )}
+              {trusted != 'trusted' && (
+                <DeforestationAlertsSection selectedDoc={selectedDoc || {}} />
+              )}
 
-                {/* Integration Point #3. Display your new section component in the desired order with respect to other snippets. */}
+              {/* Integration Point #3. Display your new section component in the desired order with respect to other snippets. */}
 
-                <div className="details page-legend">
-                  <div className="section-title">{t('legend')}:</div>
-                  <div className="page-legend-content">
-                    <p>{t('legendP1')}</p>
-                    <p>{t('legendP2')}</p>
-                    <p>{t('legendP3')}</p>
-                    <p>{t('legendP4')}</p>
-                    <p>{t('legendP5')}</p>
-                    <p>{t('legendP6')}</p>
-                  </div>
+              <div className="details page-legend">
+                <div className="section-title">{t('legend')}:</div>
+                <div className="page-legend-content">
+                  <p>{t('legendP1')}</p>
+                  <p>{t('legendP2')}</p>
+                  <p>{t('legendP3')}</p>
+                  <p>{t('legendP4')}</p>
+                  <p>{t('legendP5')}</p>
+                  <p>{t('legendP6')}</p>
                 </div>
               </div>
-              <div id="qr-code">
-                <div className="section-title">{t('sampleQrCode')}</div>
-                <QRCodeSVG value={url} />
-              </div>
+            </div>
+            <div id="qr-code">
+              <div className="section-title">{t('sampleQrCode')}</div>
+              <QRCodeSVG value={url} />
             </div>
           </div>
         </div>

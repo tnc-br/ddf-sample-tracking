@@ -20,7 +20,7 @@ import { MdInfo } from 'react-icons/md'
 import HoverIcon from '@components/ui/HoverIcon'
 
 const AddCSVSample = () => {
-  const [file, setFile] = useState(null)
+  const [file, setFile] = useState<File | null>(null)
   const [dragging, setDragging] = useState(false)
 
   const [userData, setUserData] = useState(null as UserData | null)
@@ -42,7 +42,7 @@ const AddCSVSample = () => {
     isRequired: t('isRequired'),
   }
 
-  const handleDragOver = (e) => {
+  const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault()
     setDragging(true)
   }
@@ -51,7 +51,7 @@ const AddCSVSample = () => {
     setDragging(false)
   }
 
-  const handleDrop = (e) => {
+  const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault()
     setDragging(false)
     if (e.dataTransfer.files.length > 0) {
@@ -59,8 +59,8 @@ const AddCSVSample = () => {
     }
   }
 
-  const handleFileChange = (e) => {
-    if (e.target.files.length > 0) {
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files.length > 0) {
       setFile(e.target.files[0])
 
       onFileChanged(e)
@@ -299,28 +299,30 @@ const AddCSVSample = () => {
   const csvExporter = new ExportToCsv(csvOptions)
 
   return (
-    <div className="absolute max-w-screen-lg w-full left-[304px] top-[67px] ">
-      <div className="pt-6 flex flex-col items-center">
-        <div className="py-8">
-          <span className="flex items-center gap-2">
-            <span>
-              <a
-                href="https://firebasestorage.googleapis.com/v0/b/river-sky-386919.appspot.com/o/planilha_exemplo.csv?alt=media&token=46e4c9eb-790b-459b-acd1-037385bfad86"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                Clique aqui
-              </a>{' '}
-              para baixar o modelo de planilha.
-            </span>
-            <HoverIcon
-              customTrigger={<MdInfo />}
-              message="É necessário que a planilha obedeça os nomes dos campos e tenha as colunas: code, lat, lon"
-            />
-          </span>
+    <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
+      <div className="max-w-2xl w-full text-center">
+        {/* Header */}
+        <div className="mb-8">
+          <h1 className="text-4xl font-bold text-gray-900 mb-4">
+            Nova Amostra
+          </h1>
+          <p className="text-gray-600 text-lg mb-2">
+            As amostras padrão são inseridas no nosso modelo de planilha.
+          </p>
+          <a
+            href="https://firebasestorage.googleapis.com/v0/b/river-sky-386919.appspot.com/o/planilha_exemplo.csv?alt=media&token=46e4c9eb-790b-459b-acd1-037385bfad86"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-[#006E2C] font-medium hover:text-[#006E2C] transition-colors underline"
+          >
+            Baixe ele aqui agora mesmo.
+          </a>
         </div>
+        {/* Drag and Drop Area */}
         <div
-          className={`w-full max-w-lg p-6 border-2 border-dashed rounded-lg bg-white text-center transition-all ${dragging ? 'border-blue-500 bg-blue-50' : 'border-gray-300'}`}
+          className={`w-full px-20 py-32 border-2 border-dashed rounded-lg bg-white text-center transition-all mb-8 ${
+            dragging ? 'border-[#006E2C] bg-green-50' : 'border-[#006E2C]'
+          }`}
           onDragOver={handleDragOver}
           onDragLeave={handleDragLeave}
           onDrop={handleDrop}
@@ -333,100 +335,53 @@ const AddCSVSample = () => {
             onChange={handleFileChange}
           />
           <label htmlFor="fileInput" className="cursor-pointer block">
-            <p className="text-gray-600">
-              Arraste e solte um arquivo aqui ou clique para selecionar
+            <p className="text-gray-500 text-lg">
+              Arraste e solte ou clique aqui para adicionar uma amostra.
             </p>
           </label>
-          {file && <p className="mt-3 text-green-600">{file.name}</p>}
+          {file && (
+            <p className="mt-4 text-green-600 font-medium">📄 {file.name}</p>
+          )}
         </div>
+
+        {/* Import Button */}
         <button
           disabled={!file || (samples?.length ?? 0) == 0}
           onClick={handleUpload}
-          className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-lg shadow hover:bg-blue-700 disabled:bg-blue-600/30 cursor-not-allowed transition"
+          className="bg-green-600 hover:bg-green-700 disabled:bg-gray-300 disabled:cursor-not-allowed text-white font-medium py-4 px-8 rounded-full text-lg transition-colors shadow-lg"
         >
-          {t('importSamples')}
+          🔒 Importar amostra
         </button>
-      </div>
-      <div id="import-status-bars">
-        {errorSamples.length > 0 && file && (
-          <div id="" className="bg-red-300 rounded-md p-4 mt-4">
-            <div className="py-3 gap-2 flex flex-col">
-              <div className="import-status-text">
-                Existe alguns erros na planilha
-              </div>
-              <div className="import-status-text">
-                {errorTexts.length} Erros encontrados <br />
-                {samples?.length ?? 0} Itens importados
-              </div>
 
-              <div>
-                {errorTexts.map((texts, index) => {
-                  return (
-                    <div key={index} className="import-status-text">
-                      {texts}
-                    </div>
-                  )
-                })}
-              </div>
-            </div>
-            <div className="import-status-actions-wrapper">
-              <div className="import-status-actions">
-                <button
-                  className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-lg shadow hover:bg-blue-700 disabled:bg-blue-600/30 cursor-not-allowed transition"
-                  onClick={handleDownloadClick}
-                >
-                  <div className="import-status-button-slate-layer">
-                    <div className="import-status-button-text">
-                      {t('download')}
-                    </div>
-                  </div>
-                </button>
-              </div>
-            </div>
+        {/* Status Messages */}
+        {samples && samples.length > 0 && (
+          <div className="mt-8 p-6 bg-white rounded-lg border border-gray-200 text-left">
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">
+              Status da Importação
+            </h3>
+            <p className="text-green-600 mb-2">
+              ✅ {samples.length} amostras processadas com sucesso
+            </p>
+            {errorSamples.length > 0 && (
+              <p className="text-red-600">
+                ❌ {errorSamples.length} amostras com erro
+              </p>
+            )}
           </div>
         )}
-        {errorSamples.length <= 0 && file && (
-          <div className="flex items-center rounded mt-4 success-background-color">
-            <div className="import-status-icon-wrapper">
-              <div className="import-status-icon">
-                <span className="material-symbols-outlined import-status-icon icon-color-green">
-                  check_circle
-                </span>
-              </div>
-            </div>
-            <div className="import-status-text-wrapper">
-              <div className="import-status-text text-color-green">
-                {t('successfullyImportedFile')}
-              </div>
-            </div>
-            <div className="import-status-actions-wrapper">
-              <div className="import-status-actions">
-                <div
-                  id="import-success-great"
-                  className="import-success-status-button pointer"
-                >
-                  <div className="import-status-button-slate-layer">
-                    <div className="import-status-button-text">
-                      {t('great')}
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
+
+        {/* Remove CSV Button */}
+        {file && (
+          <div className="mt-6">
+            <button
+              onClick={handleDeleteCSV}
+              className="text-gray-500 hover:text-gray-700 font-medium transition-colors"
+            >
+              Remover arquivo
+            </button>
           </div>
         )}
       </div>
-
-      {file && (
-        <div className="mb-8 w-full">
-          <button
-            onClick={handleDeleteCSV}
-            className="mt-4 px-4 py-2 bg-blue-600 mx-auto text-white rounded-lg shadow hover:bg-blue-700 disabled:bg-blue-600/30 cursor-not-allowed transition"
-          >
-            Retirar CSV
-          </button>
-        </div>
-      )}
     </div>
   )
 }
