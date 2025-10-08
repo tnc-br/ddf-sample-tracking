@@ -75,7 +75,8 @@ export type Sample = {
   d18O_wood?: string[]
   d15N_wood?: string[]
   d13C_wood?: string[]
-  [key: string]: any // Para permitir indexação dinâmica
+
+  // [key: string]: any
 }
 
 export type ValidityDetails = {

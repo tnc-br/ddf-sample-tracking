@@ -1,5 +1,6 @@
 import React from 'react'
 import { type Sample } from './utils'
+import Link from 'next/link'
 
 interface SamplesTableProps {
   samples: Sample[]
@@ -52,8 +53,8 @@ export default function SamplesTableNew({
   }
 
   return (
-    <div className="w-full overflow-x-auto">
-      <table className="min-w-full bg-white px-1">
+    <div className="w-full min-w-[800px] overflow-x-auto max-h-[800px] overflow-y-auto">
+      <table className="min-w-full bg-white px-1 ">
         <thead className="bg-gray-50 mb-4">
           <tr>
             <th className="py-3 text-left text-sm text-[#1E1E1E] font-bold tracking-wider pl-4">
@@ -80,9 +81,15 @@ export default function SamplesTableNew({
               className={index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}
             >
               <td className="py-4 whitespace-nowrap pl-4">
-                <div className="text-sm font-medium text-green-600">
-                  {sample.code_lab || sample.sample_name || 'N/A'}
-                </div>
+                <Link
+                  href={`/sample-details?id=${sample.code_lab}&trusted=${sample.trusted}`}
+                  id={sample.trusted}
+                  className="text-sm font-medium text-green-600"
+                >
+                  <span id={sample.code_lab}>
+                    {sample.code_lab || sample.sample_name || 'N/A'}
+                  </span>
+                </Link>
               </td>
               <td className="py-4 whitespace-nowrap">
                 {getValidityBadge(sample.validity || 'N/A')}

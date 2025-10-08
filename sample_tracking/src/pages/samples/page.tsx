@@ -151,6 +151,31 @@ export default function Samples() {
     )
   }
 
+  const hasInProgressSample =
+    allSamples.inProgress && allSamples.inProgress.length > 0
+  const hasCompletedSample =
+    allSamples.completed && allSamples.completed.length > 0
+
+  const noSamples = !hasInProgressSample && !hasCompletedSample
+
+  const inProgressSamples = hasInProgressSample
+    ? allSamples.inProgress.map((item) => ({
+        ...item,
+        code_lab: item.code_lab ?? '',
+        validity: item.validity ?? '',
+        trusted: item.trusted ?? '',
+      }))
+    : []
+
+  const completedSamples = hasCompletedSample
+    ? allSamples.completed.map((item) => ({
+        ...item,
+        code_lab: item.code_lab ?? '',
+        validity: item.validity ?? '',
+        trusted: item.trusted ?? '',
+      }))
+    : []
+
   return (
     <div className="px-4">
       <div className="flex gap-8 mt-12">
@@ -189,7 +214,7 @@ export default function Samples() {
 
         {allSamples.inProgress && (
           <SamplesTableNew
-            samples={(allSamples?.inProgress as Sample[]) ?? ([] as Sample[])}
+            samples={inProgressSamples}
             onEdit={(sample) => {
               console.log('Edit sample:', sample)
             }}
@@ -217,7 +242,23 @@ export default function Samples() {
           </div>
         </div>
 
-        {allSamples.completed && (
+        {allSamples.inProgress && (
+          <SamplesTableNew
+            samples={completedSamples}
+            onEdit={(sample) => {
+              console.log('Edit sample:', sample)
+            }}
+            onDelete={
+              isAdmin
+                ? (sample) => {
+                    console.log('Delete sample:', sample)
+                  }
+                : undefined
+            }
+          />
+        )}
+
+        {/* {allSamples.completed && (
           <SamplesTable
             samplesData={
               allSamples.completed.map((item) => ({
@@ -231,16 +272,15 @@ export default function Samples() {
             showValidity={true}
             allowExport={true}
           />
-        )}
+        )} */}
       </div>
 
-      {(!allSamples.inProgress || allSamples.inProgress.length === 0) &&
-        (!allSamples.completed || allSamples.completed.length === 0) && (
-          <div>
-            No samples to show. Wait to be accepted to an organization to view
-            samples.
-          </div>
-        )}
+      {noSamples && (
+        <div>
+          No samples to show. Wait to be accepted to an organization to view
+          samples.
+        </div>
+      )}
     </div>
   )
 }
