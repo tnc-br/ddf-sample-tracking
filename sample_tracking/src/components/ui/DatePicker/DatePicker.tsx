@@ -75,16 +75,16 @@ const DatePicker = (props: DatePickerProps) => {
         data-test-id={dataTestIdAlias}
         className={twMerge(
           clsx(
-            'flex items-center gap-2 h-8',
+            'flex items-center gap-2',
             isOpen && 'ring-2 ring-orange-50',
             {
               'border rounded-3xl focus-within:ring-2 ring-orange-50':
                 shape === 'round',
               'border rounded-sm focus-within:ring-2 ring-orange-50':
                 shape === 'square',
-              'border-0 border-b ring-transparent focus-within:shadow-gm-orange-50':
+              'border-0 border-b ring-transparent focus-within:shadow-orange-50':
                 shape === 'line',
-              'border-0 ring-transparent focus-within:shadow-gm-orange-50':
+              'border-0 ring-transparent focus-within:shadow-orange-50':
                 shape === 'none',
             },
             { 'bg-neutral-0': fill === true },
@@ -97,7 +97,7 @@ const DatePicker = (props: DatePickerProps) => {
           className,
         )}
       >
-        <DropdownMenu.Trigger className="flex items-center gap-2 focus:outline-none h-full w-full py-2 pl-2 cursor-pointer overflow-hidden">
+        <DropdownMenu.Trigger className="flex items-center gap-2 focus:outline-none h-full w-full py-1 pl-2 cursor-pointer overflow-hidden">
           {leftIcon && (
             <MdCalendarToday
               className={clsx('w-4 h-4 min-w-min transition', {
@@ -126,7 +126,7 @@ const DatePicker = (props: DatePickerProps) => {
           <button
             onClick={handleClear}
             type="button"
-            className={clsx('py-2 pr-2 hover:text-red-500', {
+            className={clsx('pr-2 hover:text-red-500', {
               'text-neutral-300': disabled,
               'text-neutral-400': !isErrored && !disabled,
             })}

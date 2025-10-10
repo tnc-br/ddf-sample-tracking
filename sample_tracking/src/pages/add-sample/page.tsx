@@ -111,25 +111,39 @@ export default function AddSample() {
       d18O_cel: formSampleData.d18O_cel
         ? formSampleData.d18O_cel.map((value: string) => parseFloat(value))
         : [],
-      lat: formSampleData.lat ? parseFloat(formSampleData.lat).toString() : '',
-      lon: formSampleData.lon ? parseFloat(formSampleData.lon).toString() : '',
+      lat: formSampleData.lat ? parseFloat(formSampleData.lat) : 0,
+      lon: formSampleData.lon ? parseFloat(formSampleData.lon) : 0,
       points: getPointsArrayFromSampleResults(formSampleData as Sample),
     } as Sample
     // Set sample to appropriate collection
-    if (sampleData.trusted) {
-      let docRef
-      if (sampleData.trusted === 'trusted') {
-        docRef = doc(db, 'trusted_samples', sampleId)
-      } else if (sampleData.trusted === 'untrusted') {
-        docRef = doc(db, 'untrusted_samples', sampleId)
-      } else {
-        docRef = doc(db, 'unknown_samples', sampleId)
-      }
-      setDoc(docRef, sampleData)
+    let docRef
+    if (sampleData.trusted === 'trusted') {
+      docRef = doc(db, 'trusted_samples', sampleId)
+    } else if (sampleData.trusted === 'untrusted') {
+      docRef = doc(db, 'untrusted_samples', sampleId)
+    } else {
+      docRef = doc(db, 'unknown_samples', sampleId)
     }
+
+    setDoc(docRef, sampleData)
+
+    console.log('New sample added to collection: ')
+    console.log('SampleData: ', sampleData)
+    console.log(
+      'Sample ID: ',
+      sampleData.code_lab,
+      'Trusted: ',
+      sampleData.trusted,
+    )
+
+    router.push(
+      `/sample-details?id=${sampleData.code_lab}&trusted=${sampleData.trusted}`,
+    )
+
     setSampleCreationFinished(true)
     setFormData(sampleData)
   }
+
   function handlePrint() {
     const mywindow = window.open('', 'PRINT', 'height=400,width=600')
     if (!mywindow) return
@@ -197,72 +211,18 @@ export default function AddSample() {
   }
 
   return (
-    <div>
-      <link
-        rel="stylesheet"
-        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@48,400,0,0&display=optional"
-      />
-      {/* <div className="page-title-wrapper">
-        <Link href="./samples" className="close-icon">
-          <span className="material-symbols-outlined add-sample-close-icon">
-            close
-          </span>
-        </Link>
-        <div className="page-title-text">{t('addNewSample')}</div>
-      </div> */}
-      <div>
-        <div className="sample-details-form-wrapper">
-          {/* {!sampleCreationFinished && (
-            <div>
-              {formData.status !== 'concluded' && (
-                <p className="sample-details-section-title">
-                  {t('addDetails')}
-                </p>
-              )}
-              <p className="sample-details-requirements">
-                {t('requiredFields')}
-              </p>
-            </div>
-          )}
-          {sampleCreationFinished && (
-            <div>
-              <div className="sample-added-title">{t('newSampleAdded')}</div>
-              <div className="qr-instructions">{t('qrPrintInstructions')}</div>
-              <div className="qr-code" id="qr-code">
-                <QRCodeSVG value={url} />
-              </div>
-              <div className="buttons-wrapper">
-                <Link className="view-sample-link" href={viewSampleUrl}>
-                  View sample
-                </Link>
-                <div
-                  onClick={handlePrint}
-                  id="print-button"
-                  className="add-sample-print-button"
-                >
-                  <span className="material-symbols-outlined">print</span>
-                  {t('print')}
-                </div>
-              </div>
-            </div>
-          )} */}
-
-          {userData && !sampleCreationFinished && (
-            <div id="sample-form">
-              <AddNewSample
-                defaultValue={defaultValue}
-                onActionButtonClick={(
-                  id: string,
-                  formSampleData: Partial<Sample>,
-                ) => onCreateSampleClick(id, formSampleData)}
-                actionButtonTitle="Create sample"
-                isNewSampleForm={true}
-                sampleId={sampleId}
-              />
-            </div>
-          )}
-        </div>
-      </div>
+    <div className="sample-details-form-wrapper max-h-screen overflow-y-auto">
+      {userData && !sampleCreationFinished && (
+        <AddNewSample
+          defaultValue={defaultValue}
+          onActionButtonClick={(id: string, formSampleData: Partial<Sample>) =>
+            onCreateSampleClick(id, formSampleData)
+          }
+          actionButtonTitle="Create sample"
+          isNewSampleForm={true}
+          sampleId={sampleId}
+        />
+      )}
     </div>
   )
 }

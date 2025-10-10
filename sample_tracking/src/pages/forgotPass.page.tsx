@@ -17,7 +17,6 @@ const ForgotPassPage = () => {
       <div className="h-screen w-full px-20 py-24 z-30 relative">
         <div className="g-6 flex h-full items-center justify-center">
           <div className="sm:w-8/12 md:w-8/12 lg:w-6/12 justify-center items-center text-center content-center">
-            <img className="mb-4 mx-auto" src="/assets/gm-logo-new.svg" />
             <h1 className="mb-4">Recuperar Senha</h1>
             <form onSubmit={(e) => e.preventDefault()}>
               <div
@@ -26,7 +25,7 @@ const ForgotPassPage = () => {
               >
                 <input
                   className={clsx(
-                    'flex items-center w-96 gap-2 h-8 py-4 px-3 border-[0.5px] focus: outline-none focus-within:ring-[3px] ring-growth-lighter rounded-sm',
+                    'flex items-center w-96 gap-2 h-8 py-4 px-3 border-[0.5px] focus: outline-none focus-within:ring-[3px] rounded-sm',
                     { 'border-neutral-400': email.length == 0 },
                     { 'border-neutral-600': email.length > 0 },
                   )}

@@ -12,7 +12,7 @@ const NotFound = () => {
     else router.replace('/login')
   }, [router.isReady])
 
-  return <h1> nao achado </h1>
+  return <h1> Not Found </h1>
 }
 
 export default NotFound

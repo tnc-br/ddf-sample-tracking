@@ -53,7 +53,7 @@ const ValidityTag = ({ validityLabel, city, lat, lon, isTrusted }: Props) => {
         <span>{validityText}</span>
       </div>
       <div className="validity-location-subtitle">
-        <span className="material-symbols-outlined">location_on</span>
+        <span className="material-symbols-outlined">Local:</span>
         <span>{`${city ?? 'Sem coordenadas'}`}</span>
         {lat && lon && <span>{` (${lat}, ${lon})`}</span>}
       </div>
