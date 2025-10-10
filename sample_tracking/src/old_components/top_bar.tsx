@@ -1,0 +1,192 @@
+'use client'
+
+import { signOut, onAuthStateChanged } from 'firebase/auth'
+import { useRouter } from 'next/navigation'
+import { useState, useEffect, useRef } from 'react'
+import { useTranslation } from 'react-i18next'
+import '../i18n/config'
+import Switch from '@mui/material/Switch'
+import { green } from '@mui/material/colors'
+import { alpha, styled } from '@mui/material/styles'
+
+import Image from 'next/image'
+import { auth } from '@services/firebase/config'
+import { useGlobal } from '@hooks/useGlobal'
+import { useAuthState } from 'react-firebase-hooks/auth'
+
+/**
+ * Component to render the top bar shown on most pages in TimberId.
+ * Renders website name/icon in top left of screen, and user profile photo
+ * or first initial on top left to let user access profile menu.
+ */
+export default function TopBar() {
+  const showMenu = false
+
+  const { showTopBar } = useGlobal()
+  const [user, loading, error] = useAuthState(auth)
+  const { t, i18n } = useTranslation()
+  const router = useRouter()
+
+  if (!showTopBar) {
+    return null
+  }
+
+  function handlePortugalesChange(evt: any) {
+    if (i18n.language === 'en') {
+      i18n.changeLanguage('pt')
+    } else {
+      i18n.changeLanguage('en')
+    }
+  }
+
+  const GreenSwitch = styled(Switch)(({ theme }) => ({
+    '& .MuiSwitch-switchBase.Mui-checked': {
+      color: green[600],
+      '&:hover': {
+        backgroundColor: alpha(green[600], theme.palette.action.hoverOpacity),
+      },
+    },
+    '& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track': {
+      backgroundColor: green[600],
+    },
+  }))
+
+  function profilePopup() {
+    if (!user) return
+    return (
+      <div className="profile-popup-wrapper" id="profile-popup-wrapper">
+        <div className="prifile-wrapper">
+          <div className="monogram-wrapper">
+            <div>
+              {user.photoURL && (
+                <img
+                  className="popup-profile-photo"
+                  src={user.photoURL}
+                  alt="Trulli"
+                  width="32"
+                  height="32"
+                />
+              )}
+              {!user.photoURL && (
+                <div className="popup-letter-profile popup-profile-photo">
+                  {user.displayName ? user.displayName.charAt(0) : ''}
+                </div>
+              )}
+            </div>
+          </div>
+          <div className="popup-header-wrapper">
+            <div className="popup-name-text">{user.displayName}</div>
+            <div className="popup-email-text">{user.email}</div>
+          </div>
+        </div>
+        <div className="manage-profile-link-wrapper">
+          <div
+            onClick={() => router.push('./profile')}
+            className="manage-profile-chip"
+          >
+            <div className="manage-profile-text">Manage profile</div>
+            <div className="external-link-svg">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="16"
+                height="16"
+                viewBox="0 0 16 16"
+                fill="none"
+              >
+                <path
+                  fillRule="evenodd"
+                  clipRule="evenodd"
+                  d="M3.33333 3.33333V12.6667H12.6667V8H14V12.6667C14 13.4 13.4 14 12.6667 14H3.33333C2.59333 14 2 13.4 2 12.6667V3.33333C2 2.6 2.59333 2 3.33333 2H8V3.33333H3.33333ZM9.33333 3.33333V2H14V6.66667H12.6667V4.27333L6.11333 10.8267L5.17333 9.88667L11.7267 3.33333H9.33333Z"
+                  fill="#5F6368"
+                />
+              </svg>
+            </div>
+          </div>
+        </div>
+        <div className="popup-divider-wrapper">
+          <div className="popup-divider"></div>
+        </div>
+        <div className="language-toggle-wrapper">
+          <div className="language-toggle-slate-layer">
+            <div className="language-text-wrapper">
+              <div className="language-text">Português</div>
+            </div>
+            <div className="toggle-wrapper">
+              <GreenSwitch
+                defaultChecked={i18n.language === 'pt'}
+                onChange={handlePortugalesChange}
+              />
+            </div>
+          </div>
+        </div>
+        <div className="popup-divider-wrapper">
+          <div className="popup-divider"></div>
+        </div>
+      </div>
+    )
+  }
+
+  return (
+    <div id="top-bar-wrapper" className="top-bar-wrapper">
+      <div className="top-bar-product-wrapper">
+        <div className="display-inline-flex-center">
+          <div
+            onClick={() => router.push('/samples')}
+            className="top-bar-title-text"
+          >
+            <img src="/ddf-header.svg" alt="google" width="300" height="50" />
+          </div>
+        </div>
+
+        <div className="display-inline-flex-center">
+          <div className="top-bar-info-link-wrapper">
+            <a href="https://timberid.gitbook.io/timberid/">
+              <div className="top-bar-info-link-button">
+                <div className="top-bar-info-link-icon">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="24"
+                    height="24"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                  >
+                    <path
+                      fillRule="evenodd"
+                      clipRule="evenodd"
+                      d="M2 12C2 6.48 6.48 2 12 2C17.52 2 22 6.48 22 12C22 17.52 17.52 22 12 22C6.48 22 2 17.52 2 12ZM13 16V18H11V16H13ZM12 20C7.59 20 4 16.41 4 12C4 7.59 7.59 4 12 4C16.41 4 20 7.59 20 12C20 16.41 16.41 20 12 20ZM8 10C8 7.79 9.79 6 12 6C14.21 6 16 7.79 16 10C16 11.2829 15.21 11.9733 14.4408 12.6455C13.711 13.2833 13 13.9046 13 15H11C11 13.1787 11.9421 12.4566 12.7704 11.8217C13.4202 11.3236 14 10.8792 14 10C14 8.9 13.1 8 12 8C10.9 8 10 8.9 10 10H8Z"
+                      fill="#5F6368"
+                    />
+                  </svg>
+                </div>
+              </div>
+            </a>
+          </div>
+          {user && (
+            <div className="top-bar-profile-menu-wrapper">
+              <div className="top-bar-profile-menu">
+                {user.photoURL && (
+                  <img
+                    id="profile-photo"
+                    className="profile-photo"
+                    src={user.photoURL}
+                    width="32"
+                    height="32"
+                  />
+                )}
+                {!user.photoURL && (
+                  <div
+                    id="profile-photo"
+                    className="letter-profile profile-photo size-32"
+                  >
+                    {user.displayName ? user.displayName.charAt(0) : ''}
+                  </div>
+                )}
+                {showMenu && profilePopup()}
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  )
+}
