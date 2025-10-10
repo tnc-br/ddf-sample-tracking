@@ -211,18 +211,21 @@ export default function AddSample() {
   }
 
   return (
-    <div className="sample-details-form-wrapper max-h-screen overflow-y-auto">
-      {userData && !sampleCreationFinished && (
-        <AddNewSample
-          defaultValue={defaultValue}
-          onActionButtonClick={(id: string, formSampleData: Partial<Sample>) =>
-            onCreateSampleClick(id, formSampleData)
-          }
-          actionButtonTitle="Create sample"
-          isNewSampleForm={true}
-          sampleId={sampleId}
-        />
-      )}
+    <div className="max-w-5xl mx-auto pt-24 max-h-screen">
+      <div className="overflow-y-auto">
+        {userData && !sampleCreationFinished && (
+          <AddNewSample
+            defaultValue={defaultValue}
+            onActionButtonClick={(
+              id: string,
+              formSampleData: Partial<Sample>,
+            ) => onCreateSampleClick(id, formSampleData)}
+            actionButtonTitle="Create sample"
+            isNewSampleForm={true}
+            sampleId={sampleId}
+          />
+        )}
+      </div>
     </div>
   )
 }

@@ -112,6 +112,7 @@
   "legend": "Legenda",
   "sampleQrCode": "Código QR da amostra",
   "waterAndLandUseDetails": "Detalhes de uso da água e do solo",
+  "need_d18O_cel": "Para ver os detalhes de uso da água e do solo, adicione pelo menos 2 medições de δ18O cel à sua amostra.",
   "water": "Água",
   "isLatLonInWater": "Está a lat/lon na água?",
   "percentageOfWaterIn1kmBufferZone": "Porcentagem de água em uma zona de buffer de 1 km",

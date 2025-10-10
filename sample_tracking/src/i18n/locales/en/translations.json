@@ -110,6 +110,7 @@
   "legend": "Legend",
   "sampleQrCode": "Sample QR code",
   "waterAndLandUseDetails": "Water and land use details",
+  "need_d18O_cel": "To see the water and land use details, please add at least 2 δ18O cel measurements to your sample.",
   "water": "Water",
   "isLatLonInWater": "Is lat/lon in water?",
   "percentageOfWaterIn1kmBufferZone": "Percentage of water in a 1km buffer zone",

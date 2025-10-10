@@ -10,6 +10,7 @@ import SampleMeasurementsTab from './SampleMeasurementTab'
 import ReviewSample from './ReviewSample'
 import { SampleCompleteSchema, type SampleFormData } from './sample-schema'
 import { Sample } from '../utils'
+import { useRouter } from 'next/router'
 
 const STEPS = [
   {
@@ -58,6 +59,8 @@ export default function AddNewSample({
     d13C_cel: [''],
     ...defaultValue,
   })
+
+  const router = useRouter()
 
   // Handlers para navegação entre abas
   const handleNextStep = () => {
@@ -129,13 +132,19 @@ export default function AddNewSample({
     }
   }
 
+  const handleBack = () => {
+    if (currentStepIndex > 0) {
+      handlePreviousStep()
+      return
+    }
+
+    router.push(`/samples`)
+  }
+
   return (
     <>
       <div className="flex justify-between items-center mb-4">
-        <div
-          className="flex gap-2.5 cursor-pointer"
-          onClick={currentStepIndex > 0 ? handlePreviousStep : undefined}
-        >
+        <div className="flex gap-2.5 cursor-pointer" onClick={handleBack}>
           <div className="bg-[#F7F7F7] size-6 rounded text-[#006E2C] flex items-center justify-center">
             <MdArrowBack className="text-base" />
           </div>

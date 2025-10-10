@@ -36,11 +36,13 @@ const LandUseDetailsSection = ({ selectedDoc, sampleId }: Props) => {
     }).format(num)
   }
 
+  const showMap = selectedDoc?.d18O_cel?.length > 2
+
   return (
     <div className="details">
       <div className="section-title">{t('waterAndLandUseDetails')}</div>
       <div className="iframe-wrapper">
-        {/* {selectedDoc.lat && selectedDoc.lon && ( */}
+        {/* {showMap && ( */}
         <iframe
           src={mapUrl}
           frameBorder={0}
@@ -50,6 +52,8 @@ const LandUseDetailsSection = ({ selectedDoc, sampleId }: Props) => {
           marginHeight={0}
         ></iframe>
         {/* )} */}
+
+        {!showMap && <p>{t('need_d18O_cel')}</p>}
 
         {!selectedDoc.lat && !selectedDoc.lon && (
           <div className="flex items-center justify-center h-full">
