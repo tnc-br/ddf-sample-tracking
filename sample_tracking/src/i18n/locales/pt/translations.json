@@ -193,5 +193,8 @@
   "invalidRadius": "Raio deve estar entre 10 e 1000 km",
   "loading": "Carregando...",
   "saving": "Salvando...",
-  "saveChanges": "Salvar Alterações"
+  "saveChanges": "Salvar Alterações",
+  "mapPdfAvailable": "Mapa de Probabilidade Disponível",
+  "clickToViewPdf": "Clique no botão abaixo para visualizar o mapa em uma nova aba",
+  "openMapPdf": "Abrir Mapa em Nova Aba"
 }
