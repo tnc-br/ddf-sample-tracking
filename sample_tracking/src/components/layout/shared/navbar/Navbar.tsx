@@ -3,7 +3,7 @@
 import Link from 'next/link'
 import { useTranslation } from 'react-i18next'
 import '../../../../i18n/config'
-import { MdAdd, MdMenu } from 'react-icons/md'
+import { MdAdd, MdMenu, MdSettings } from 'react-icons/md'
 import { FaUserPlus, FaUsers } from 'react-icons/fa'
 import Dropdown from '@components/ui/Dropdown'
 import { useGlobal } from '@hooks/useGlobal'
@@ -133,6 +133,14 @@ const Navbar = () => {
                   {userData?.role === 'site_admin'
                     ? t('allUsers')
                     : t('myOrganization')}
+                </Link>
+              </li>
+              <li className="list-none">
+                <Link
+                  className="flex gap-2 items-center no-underline font-bold text-[#454545] hover:text-[#006E2C] transition-all"
+                  href="./config"
+                >
+                  <MdSettings /> {t('configurations')}
                 </Link>
               </li>
             </div>
