@@ -1,5 +1,5 @@
 // Utilitário para gerenciar as configurações de cores do mapa
-import { doc, updateDoc, getDoc } from 'firebase/firestore'
+import { doc, updateDoc, setDoc, getDoc } from 'firebase/firestore'
 import { db } from '@services/firebase/config'
 
 export const DEFAULT_MAP_COLORS = {
@@ -120,10 +120,14 @@ export const saveMapColorsToFirestore = async (
 
   try {
     const orgRef = doc(db, 'organizations', orgId)
-    await updateDoc(orgRef, {
-      mapColors: colors,
-      mapColorsUpdatedAt: new Date().toISOString(),
-    })
+    await setDoc(
+      orgRef,
+      {
+        mapColors: colors,
+        mapColorsUpdatedAt: new Date().toISOString(),
+      },
+      { merge: true },
+    )
   } catch (error) {
     console.error('Erro ao salvar cores no Firestore:', error)
     throw error
@@ -194,11 +198,15 @@ export const saveMapConfigToFirestore = async (
 
   try {
     const orgRef = doc(db, 'organizations', orgId)
-    await updateDoc(orgRef, {
-      mapColors: config.colors,
-      mapRadius: config.radius,
-      mapConfigUpdatedAt: new Date().toISOString(),
-    })
+    await setDoc(
+      orgRef,
+      {
+        mapColors: config.colors,
+        mapRadius: config.radius,
+        mapConfigUpdatedAt: new Date().toISOString(),
+      },
+      { merge: true },
+    )
   } catch (error) {
     console.error('Erro ao salvar configuração do mapa no Firestore:', error)
     throw error

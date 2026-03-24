@@ -39,6 +39,12 @@ export default function Config() {
   const [loadingMapConfig, setLoadingMapConfig] = useState(true)
   const [showOrgAlert, setShowOrgAlert] = useState(false)
   const [saveSuccess, setSaveSuccess] = useState(false)
+  const [saveError, setSaveError] = useState(false)
+  const [savedConfig, setSavedConfig] = useState<OrgConfigFormData | null>(null)
+
+  // Permissão: apenas admin e site_admin podem editar
+  const canEdit =
+    !!user?.org && (user?.role === 'site_admin' || user?.role === 'admin')
 
   // Configuração do formulário
   const {
@@ -90,12 +96,19 @@ export default function Config() {
       }
 
       await saveMapConfigToFirestore(user.org, mapConfig)
+      setSaveError(false)
       setSaveSuccess(true)
+
+      // Atualizar savedConfig para refletir os novos valores salvos
+      setSavedConfig(data)
 
       // Esconder mensagem de sucesso após 3 segundos
       setTimeout(() => setSaveSuccess(false), 3000)
     } catch (error) {
       console.error('Erro ao salvar configuração:', error)
+      setSaveSuccess(false)
+      setSaveError(true)
+      setTimeout(() => setSaveError(false), 5000)
     }
   }
 
@@ -124,13 +137,15 @@ export default function Config() {
       if (!userLoading && user?.org) {
         try {
           setLoadingMapConfig(true)
-          const savedConfig = await getMapConfigFromFirestore(user.org)
-          reset({
-            highColor: savedConfig.colors.high,
-            mediumColor: savedConfig.colors.medium,
-            lowColor: savedConfig.colors.low,
-            mapRadius: savedConfig.radius,
-          })
+          const config = await getMapConfigFromFirestore(user.org)
+          const formValues = {
+            highColor: config.colors.high,
+            mediumColor: config.colors.medium,
+            lowColor: config.colors.low,
+            mapRadius: config.radius,
+          }
+          reset(formValues)
+          setSavedConfig(formValues)
         } catch (error) {
           console.error('Erro ao carregar configuração:', error)
           reset({
@@ -273,15 +288,8 @@ export default function Config() {
               </div>
               <button
                 type="button"
-                onClick={() => {
-                  reset({
-                    highColor: '#22C55E',
-                    mediumColor: '#EAB308',
-                    lowColor: '#EF4444',
-                    mapRadius: 500,
-                  })
-                }}
-                disabled={!user?.org || isSubmitting}
+                onClick={resetToDefault}
+                disabled={!canEdit || isSubmitting}
                 className="px-3 py-1 text-xs font-medium text-blue-600 bg-blue-50 rounded-md hover:bg-blue-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {isSubmitting ? t('loading') : t('resetToDefault')}
@@ -308,7 +316,7 @@ export default function Config() {
                     <input
                       type="color"
                       {...register('highColor')}
-                      disabled={!user?.org || isSubmitting}
+                      disabled={!canEdit || isSubmitting}
                       className="w-12 h-8 border border-gray-300 rounded cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                       title={t('colorPickerLabel')}
                     />
@@ -333,7 +341,7 @@ export default function Config() {
                     <input
                       type="color"
                       {...register('mediumColor')}
-                      disabled={!user?.org || isSubmitting}
+                      disabled={!canEdit || isSubmitting}
                       className="w-12 h-8 border border-gray-300 rounded cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                       title={t('colorPickerLabel')}
                     />
@@ -358,7 +366,7 @@ export default function Config() {
                     <input
                       type="color"
                       {...register('lowColor')}
-                      disabled={!user?.org || isSubmitting}
+                      disabled={!canEdit || isSubmitting}
                       className="w-12 h-8 border border-gray-300 rounded cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                       title={t('colorPickerLabel')}
                     />
@@ -411,7 +419,7 @@ export default function Config() {
                       max: { value: 1000, message: t('maxRadius') },
                     })}
                     placeholder={t('radiusPlaceholder')}
-                    disabled={!user?.org || isSubmitting}
+                    disabled={!canEdit || isSubmitting}
                     isErrored={!!errors.mapRadius}
                     className="w-full"
                   />
@@ -431,19 +439,45 @@ export default function Config() {
             )}
           </div>
 
+          {/* Mensagem de Erro */}
+          {saveError && (
+            <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg">
+              <div className="flex items-center">
+                <svg
+                  className="h-5 w-5 text-red-400 mr-2"
+                  fill="currentColor"
+                  viewBox="0 0 20 20"
+                >
+                  <path
+                    fillRule="evenodd"
+                    d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+                    clipRule="evenodd"
+                  />
+                </svg>
+                <span className="text-sm font-medium text-red-800">
+                  {t('errorSavingMapColors')}
+                </span>
+              </div>
+            </div>
+          )}
+
           {/* Botões do Formulário */}
           <div className="flex justify-end space-x-3 pt-6 border-t border-gray-200">
             <button
               type="button"
-              onClick={() => reset()}
-              disabled={isSubmitting}
+              onClick={() => {
+                if (savedConfig) {
+                  reset(savedConfig)
+                }
+              }}
+              disabled={isSubmitting || !isDirty}
               className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {t('cancel')}
             </button>
             <button
               type="submit"
-              disabled={!user?.org || isSubmitting}
+              disabled={!canEdit || isSubmitting || !isDirty}
               className="px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {isSubmitting ? t('saving') : t('saveChanges')}

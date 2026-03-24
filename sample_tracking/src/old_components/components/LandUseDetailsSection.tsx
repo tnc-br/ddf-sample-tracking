@@ -24,9 +24,7 @@ type Props = {
  */
 const LandUseDetailsSection = ({ selectedDoc, sampleId }: Props) => {
   const { t } = useTranslation()
-  const mapUrl = `https://storage.googleapis.com/timberid-public-to-internet/timberid-maps/${sampleId
-    .split(' ')
-    .join('')}`
+  const mapUrl = (selectedDoc as any).map_landuse_percentage_probability
 
   function formatAsPercentage(num: number) {
     return new Intl.NumberFormat('default', {
@@ -38,28 +36,56 @@ const LandUseDetailsSection = ({ selectedDoc, sampleId }: Props) => {
 
   const showMap = selectedDoc?.d18O_cel?.length > 2
 
+  const handleOpenPDF = () => {
+    if (mapUrl) {
+      window.open(mapUrl, '_blank')
+    }
+  }
+
   return (
     <div className="details">
       <div className="section-title">{t('waterAndLandUseDetails')}</div>
       <div className="iframe-wrapper">
-        {/* {showMap && ( */}
-        <iframe
-          src={mapUrl}
-          frameBorder={0}
-          height="300px"
-          width="100%"
-          marginWidth={0}
-          marginHeight={0}
-        ></iframe>
-        {/* )} */}
-
-        {!showMap && <p>{t('need_d18O_cel')}</p>}
-
-        {!selectedDoc.lat && !selectedDoc.lon && (
+        {mapUrl ? (
+          <div className="relative w-full" style={{ height: '600px' }}>
+            {/* Visualizador de PDF embutido */}
+            <embed
+              src={mapUrl}
+              type="application/pdf"
+              width="100%"
+              height="100%"
+              className="border border-gray-300 rounded-lg"
+            />
+            
+            {/* Botão flutuante para abrir em nova aba */}
+            <button
+              onClick={handleOpenPDF}
+              className="absolute top-2 right-2 inline-flex items-center px-3 py-2 border border-transparent text-sm font-medium rounded-md shadow-lg text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 z-10"
+              title={t('openInNewTab') || 'Abrir em nova aba'}
+            >
+              <svg
+                className="w-4 h-4 mr-1"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
+                />
+              </svg>
+              {t('openInNewTab') || 'Nova Aba'}
+            </button>
+          </div>
+        ) : !showMap ? (
+          <p>{t('need_d18O_cel')}</p>
+        ) : !selectedDoc.lat || !selectedDoc.lon ? (
           <div className="flex items-center justify-center h-full">
             Sem Coordenadas
           </div>
-        )}
+        ) : null}
       </div>
       <div className="water-land-use-details">
         <div className="table-title-land-use">{t('water')}</div>
